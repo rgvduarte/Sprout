@@ -2,16 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
 import { BookOpen } from 'lucide-react';
-import { SIM_COMPLETE_POINTS, SIM_RULES, getQuest } from '../../data';
+import { SIM_RULES, getQuest } from '../../data';
 import type { SimRunResult } from '../../data/types';
 import { Badge, ButtonLink, Page, PageHeader, Section, Stepper, Tabs } from '../../components/ui';
-import { useGame, useRole, useToast } from '../../state';
+import { useGame, useRole } from '../../state';
 import { now } from '../../lib/clock';
+import { tidyText } from '../../lib/format';
 import { SCENARIO_LOTS, monthLabel, shortName } from './deck';
 import { simulate, type Allocation } from './engine';
 import { DebriefPhase } from './DebriefPhase';
 import { HistoryPanel } from './HistoryPanel';
 import { LeaguePanel, pseudonymFor } from './LeaguePanel';
+import { LEAGUE_SEED } from './league';
 import { PlayPhase } from './PlayPhase';
 import { decisionsFromResult, toResult } from './runs';
 import { SetupPhase } from './SetupPhase';
@@ -43,7 +45,6 @@ export default function SimuladorPage() {
   const { profileId } = useRole();
   const [session, update] = useSimSession(profileId);
   const game = useGame();
-  const { toast } = useToast();
   const reduce = useReducedMotion();
   const phaseRef = useRef<HTMLDivElement>(null);
   const phaseKey = `${session.phase}-${session.runNonce}`;
@@ -109,13 +110,12 @@ export default function SimuladorPage() {
       update({ phase: 'debrief' });
       return;
     }
-    const first = game.simRuns.length === 0;
     const quest = getQuest('q-simulador');
     const questPts = quest && !game.isQuestDone(quest.id) ? quest.points : 0;
     const id = `sim-${profileId}-${game.simRuns.length + 1}-${session.seed}-${session.runNonce}`;
     game.recordSimRun(toResult(run, id, now().toISOString()));
-    update((s) => ({ phase: 'debrief', recordedRunId: id, pointsAwarded: (first ? SIM_COMPLETE_POINTS : 0) + questPts, streak: s.streak + 1 }));
-    if (first) toast({ tone: 'accent', title: `Campanha completa: +${SIM_COMPLETE_POINTS} pontos de conhecimento`, description: 'Pelo jogo completo e pelo balanço lido, nunca pelo resultado.' });
+    update((s) => ({ phase: 'debrief', recordedRunId: id, pointsAwarded: questPts, streak: s.streak + 1 }));
+    // os pontos chegam pela missão «Joga uma campanha completa no simulador» (o aviso «Missão cumprida» já os anuncia); o balanço explica-os
   };
 
   const review = (r: SimRunResult) => {
@@ -128,7 +128,7 @@ export default function SimuladorPage() {
     <Page>
       <PageHeader
         title="Simulador de campanha"
-        description="Joga 18 meses de uma campanha de azeite e água com 50 000 € fictícios. Vês o que a cobertura, a reserva de primeira perda, a extensão e o refunding fazem ao resultado, incluindo campanhas que acabam em perda."
+        description={tidyText('Joga 18 meses de uma campanha com 50 000 € fictícios. Vês o que a cobertura, a reserva comum de primeira perda, a extensão e o refunding fazem ao resultado, incluindo campanhas que acabam em perda.')}
         meta={
           <>
             <Badge tone="info" dot>
@@ -183,7 +183,7 @@ export default function SimuladorPage() {
         )}
       </div>
 
-      <Section id="historico-liga" title="As tuas campanhas e a liga" description="O histórico guarda as campanhas jogadas nesta sessão. A liga é opcional e só existe com dinheiro fictício." className="mt-14">
+      <Section id="historico-liga" title="As tuas campanhas e a liga" description="O histórico guarda as campanhas jogadas nesta sessão. A liga é opcional, usa a mesma campanha para todos e só existe com dinheiro fictício." className="mt-14">
         <Tabs
           label="Histórico e liga"
           items={[
@@ -203,6 +203,10 @@ export default function SimuladorPage() {
                   runs={game.simRuns}
                   onOptIn={(v) => game.setLeague({ optIn: v })}
                   onNextPseudonym={() => game.setLeague({ pseudonymIndex: game.league.pseudonymIndex + 1 })}
+                  onPlaySeason={() => {
+                    update({ phase: 'setup', draftSeed: LEAGUE_SEED });
+                    phaseRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+                  }}
                 />
               ),
             },

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Download, FileText, Package } from 'lucide-react';
-import { getRegion, RESERVE_SHARE } from '../../data';
+import { getRegion, ILLUSTRATIVE_LABEL, RESERVE_POOL, RESERVE_RULE } from '../../data';
 import type { QualityAnalysis } from '../../data';
 import { CampaignFeed, HarvestBand, JourneyTrack } from '../../components/game';
 import { Button, Drawer, KeyValue, RiskNote, StatusPill, Tabs } from '../../components/ui';
@@ -167,7 +167,7 @@ function DrawerBody({ p }: { p: PositionView }) {
                     <Package aria-hidden className="size-4 text-muted" strokeWidth={1.75} />
                     Amostra do lote
                   </p>
-                  <p className="mt-1 text-sm text-muted">Todos os co-financiadores podem pedir uma amostra, qualquer que seja o montante. É participação, não tamanho.</p>
+                  <p className="mt-1 text-sm text-muted">Todos os cofinanciadores podem pedir uma amostra, qualquer que seja o montante. É participação, não tamanho.</p>
                   {requested ? (
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-ok-ink">
                       <Check aria-hidden className="size-4" strokeWidth={2} /> Pedida a {fmtDate(requested.at)} · {requested.status}.
@@ -240,7 +240,7 @@ function DrawerBody({ p }: { p: PositionView }) {
                       {lot.hedge.trigger && <> Gatilho: {lot.hedge.trigger}</>}
                     </li>
                     <li>
-                      <span className="font-medium text-fg">Reserva de primeira perda.</span> {pct(RESERVE_SHARE, 0)} da margem bruta do lote fica retida pela Sprout para absorver perdas antes do capital dos co-financiadores. Pode não chegar.
+                      <span className="font-medium text-fg">Reserva de primeira perda.</span> {RESERVE_RULE.text} Saldo hoje: <span className="font-mono text-fg tnum">{eur(RESERVE_POOL.balance)}</span> ({ILLUSTRATIVE_LABEL.toLowerCase()}).
                     </li>
                     {pb && (
                       <li>

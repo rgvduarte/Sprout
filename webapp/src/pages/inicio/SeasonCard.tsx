@@ -3,6 +3,7 @@ import { getWorld } from '../../data';
 import type { JourneyStage, Lot, WorldId } from '../../data';
 import { SeasonTrack } from '../../components/game';
 import { Badge, Card, TextLink } from '../../components/ui';
+import { cn } from '../../lib/cn';
 import { CommodityGlyph } from '../../components/ui/Commodity';
 import { useData } from '../../state';
 import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
@@ -90,9 +91,9 @@ function WorldRow({ world }: { world: 'azeite' | 'agua' }) {
 }
 
 /** A estação: onde estamos no ano agrícola de cada mundo + os depósitos a encher. */
-export function SeasonCard() {
+export function SeasonCard({ className }: { className?: string }) {
   return (
-    <Card padding="lg" className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-0">
+    <Card padding="lg" className={cn('grid min-w-0 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-0', className)}>
       <section className="min-w-0 lg:pr-8" aria-labelledby="estacao-title">
         <h2 id="estacao-title" className="text-[1.1875rem] leading-tight">
           Onde estamos no ano agrícola

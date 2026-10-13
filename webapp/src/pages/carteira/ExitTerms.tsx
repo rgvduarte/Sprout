@@ -67,7 +67,8 @@ export function ExitTerms({ lot, className }: { lot?: Lot; className?: string })
       {items.map((it) => (
         <div key={it.term} className="grid gap-1 py-3 first:pt-0 last:pb-0 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-4">
           <dt className="text-sm font-semibold text-fg">{it.term}</dt>
-          <dd className="text-sm text-muted">{it.body}</dd>
+          {/* o texto que o investidor mais precisa de ler: 16 px, cor do texto, linhas de ~60 caracteres */}
+          <dd className="measure text-base text-fg">{it.body}</dd>
         </div>
       ))}
     </dl>

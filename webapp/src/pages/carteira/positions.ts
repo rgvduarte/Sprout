@@ -14,8 +14,12 @@ import { physicalForAmount } from '../../lib/physical';
 /** Período de reflexão depois de um compromisso (política Sprout, espelha os 4 dias do ECSP). */
 export const REFLECTION_DAYS = 4;
 
-/** Limite de atenção para concentração (orientação, não regra). */
-export const CONCENTRATION_LIMIT = 0.4;
+/**
+ * Limites de atenção para concentração (orientação de proteção, não regra), os
+ * mesmos no ritual de compromisso (/lote) e na Carteira: um só lote acima de
+ * 25 %, um só produtor acima de 35 %, um só mundo acima de 80 %.
+ */
+export const CONCENTRATION = { lote: 0.25, produtor: 0.35, mundo: 0.8 } as const;
 
 export interface PositionState {
   label: string;

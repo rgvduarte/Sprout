@@ -1,7 +1,8 @@
-import { getWorld, getRegion, getProducer, MARKET_TODAY } from '../../data';
+import { getWorld, getRegion, getProducer, MARKET_TODAY, referenceToday } from '../../data';
 import type { JourneyStage, Lot, Position, Producer, Region, World, WorldId } from '../../data/types';
 import { addMonths, toDate } from '../../lib/clock';
 import { IBC_KG, kgToLitres, num, PALETE, plural, SACA_KG } from '../../lib/format';
+import { CONCENTRATION } from '../carteira/positions';
 
 /* =====================================================================
    Jornada do lote · números derivados (janela, tradução física, curva
@@ -89,18 +90,18 @@ export const WORLD_COPY: Record<WorldId, WorldCopy> = {
     colheitaNav: 'Colheita',
     colheitaTitle: 'Colheita e extração',
     colheitaLead: 'A azeitona foi moída no próprio dia. O azeite do lote está pesado, separado e analisado por um laboratório acreditado.',
-    mission: 'Missão: encher o depósito',
+    mission: 'Objetivo do lote',
     containerSingular: 'IBC',
     containerPlural: 'IBC',
     sample: 'frasco de 250 mL do lote, com o número do lote e a data de extração',
     terrainLabel: 'Socalcos de olival e lagar',
-    stockWhere: 'em depósito',
+    stockWhere: 'nos depósitos do lagar',
   },
   agua: {
     colheitaNav: 'Engarrafamento',
     colheitaTitle: 'Captação e engarrafamento',
     colheitaLead: 'A água foi engarrafada na origem, como manda a lei. As paletes estão contadas em armazém e a composição foi confirmada por um laboratório acreditado.',
-    mission: 'Missão: completar as paletes',
+    mission: 'Objetivo do lote',
     containerSingular: 'palete',
     containerPlural: 'paletes',
     sample: 'pack de 6 garrafas de 1,5 L do lote de engarrafamento',
@@ -111,7 +112,7 @@ export const WORLD_COPY: Record<WorldId, WorldCopy> = {
     colheitaNav: 'Colheita',
     colheitaTitle: 'Da cereja à saca',
     colheitaLead: 'A cereja é colhida, seca no terreiro e descascada até ficar o grão verde que viaja em sacas de 60 kg.',
-    mission: 'Missão: encher as sacas',
+    mission: 'Objetivo do lote',
     containerSingular: 'saca',
     containerPlural: 'sacas',
     sample: 'amostra de 350 g de café verde',
@@ -166,9 +167,23 @@ export function marginSplit(lot: Lot): MarginSplit {
   return { perUnit, investors, operation, reserve, reserveTotal: reserve * lot.quantityBase };
 }
 
+/**
+ * Variação do índice de mercado (no azeite, o índice de origem a granel) desde a
+ * abertura do lote: granel com granel, nunca granel com o preço embalado.
+ */
 export function referenceChange(lot: Lot): number {
-  return MARKET_TODAY[lot.world] / lot.economics.refPrice - 1;
+  const e = lot.economics;
+  return e.indexAtOpen > 0 ? MARKET_TODAY[lot.world] / e.indexAtOpen - 1 : 0;
 }
+
+/** Variação da referência do canal (preço embalado) desde a abertura: segue o índice de origem. */
+export function channelRefChange(lot: Lot): number {
+  const e = lot.economics;
+  return e.refPrice > 0 ? referenceToday(lot) / e.refPrice - 1 : 0;
+}
+
+/** Lote em modelo de agente (cesto de água): sem financiamento, sem stock da Sprout. */
+export const isAgentLot = (lot: Pick<Lot, 'economics'>) => lot.economics.model === 'agente';
 
 /* ------------------------------------------------------------ curva de vendas */
 
@@ -226,9 +241,9 @@ export function concentrationAfter(positions: (Position & { lot: Lot })[], lot: 
   if (totalBefore === 0) {
     notes.push({ tone: 'info', text: 'Seria o teu primeiro lote: todo o montante financiado ficaria num só produtor. Num piloto, comprometer pouco no primeiro lote dá para acompanhar um ciclo inteiro antes de decidir mais.' });
   } else {
-    if (lotShare > 0.25) notes.push({ tone: 'warn', text: `Este lote passaria a valer ${Math.round(lotShare * 100)} % do teu montante financiado. Acima de 25 % num só lote, um problema de qualidade ou um comprador que não paga pesa muito no conjunto.` });
-    if (producerShare > 0.35) notes.push({ tone: 'warn', text: `${producerName} passaria a ter ${Math.round(producerShare * 100)} % do teu montante financiado. Repartir por produtores reduz o efeito de um único armazém ou contraparte.` });
-    if (worldShare > 0.8) notes.push({ tone: 'info', text: `Ficarias com ${Math.round(worldShare * 100)} % em ${worldName}. Os lotes de ${worldName} reagem ao mesmo preço de referência ao mesmo tempo.` });
+    if (lotShare > CONCENTRATION.lote) notes.push({ tone: 'warn', text: `Este lote passaria a valer ${Math.round(lotShare * 100)} % do teu montante financiado, acima do limite de atenção de ${Math.round(CONCENTRATION.lote * 100)} % por lote (o mesmo da Carteira). Um problema de qualidade ou um comprador que não paga pesa muito no conjunto.` });
+    if (producerShare > CONCENTRATION.produtor) notes.push({ tone: 'warn', text: `${producerName} passaria a ter ${Math.round(producerShare * 100)} % do teu montante financiado, acima do limite de atenção de ${Math.round(CONCENTRATION.produtor * 100)} % por produtor. Repartir por produtores reduz o efeito de um único armazém ou contraparte.` });
+    if (worldShare > CONCENTRATION.mundo) notes.push({ tone: 'info', text: `Ficarias com ${Math.round(worldShare * 100)} % em ${worldName}. Os lotes de ${worldName} reagem ao mesmo preço de referência ao mesmo tempo.` });
   }
   const worlds: WorldId[] = ['azeite', 'agua', 'cafe'];
   const byWorld = worlds
@@ -239,9 +254,10 @@ export function concentrationAfter(positions: (Position & { lot: Lot })[], lot: 
 
 /* ------------------------------------------------------------ capítulos */
 
-export type ChapterId = 'origem' | 'colheita' | 'preco' | 'ciclo' | 'riscos' | 'compromisso' | 'acompanhamento' | 'liquidacao' | 'abertura';
+export type ChapterId = 'origem' | 'colheita' | 'preco' | 'ciclo' | 'riscos' | 'compromisso' | 'acompanhamento' | 'liquidacao' | 'abertura' | 'cesto';
 
 export function endingFor(lot: Lot): ChapterId {
+  if (lot.status === 'cesto' || lot.economics.model === 'agente') return 'cesto';
   if (lot.status === 'aberto') return 'compromisso';
   if (lot.status === 'liquidado') return 'liquidacao';
   if (lot.status === 'em-preparacao') return 'abertura';
@@ -253,6 +269,7 @@ export const ENDING_LABEL: Record<string, string> = {
   acompanhamento: 'Acompanhamento',
   liquidacao: 'Liquidação',
   abertura: 'Abertura',
+  cesto: 'Cesto',
 };
 
 /** Simulação associada (mesmos parâmetros do lote, dinheiro fictício). */

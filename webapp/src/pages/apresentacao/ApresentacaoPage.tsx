@@ -19,7 +19,7 @@ const CHAPTERS: ScrollChapter[] = [
   { id: 'colheita', label: 'A colheita' },
   { id: 'cadeia', label: 'A cadeia hoje' },
   { id: 'lote', label: 'Um lote' },
-  { id: 'ciclo', label: '18 meses' },
+  { id: 'ciclo', label: 'O ciclo' },
   { id: 'jogo', label: 'O jogo' },
   { id: 'confianca', label: 'Confiança' },
   { id: 'acesso', label: 'Acesso' },
@@ -36,7 +36,7 @@ export default function ApresentacaoPage() {
       <LotChapter tall={tall} />
       <CycleChapter tall={tall} />
       <GameSection />
-      <TrustChapter tall={tall} />
+      <TrustChapter />
       <Resolution />
     </div>
   );

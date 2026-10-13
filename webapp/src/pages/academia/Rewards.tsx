@@ -37,7 +37,7 @@ function unlockState(r: RewardDef, game: GameView, sampleLots: PositionView[]) {
   for (const qid of r.unlock.quests ?? []) {
     if (!game.isQuestDone(qid)) missing.push(`Missão «${getQuest(qid)?.title}»`);
   }
-  if (r.unlock.participation && sampleLots.length === 0) missing.push('Co-financiar um lote de azeite ou de água, com qualquer montante');
+  if (r.unlock.participation && sampleLots.length === 0) missing.push('Cofinanciar um lote de azeite ou de água, com qualquer montante');
   return { unlocked: missing.length === 0, missing };
 }
 
@@ -98,7 +98,7 @@ export function Rewards() {
         })}
       </ul>
 
-      <aside className="flex min-w-0 flex-col gap-6" aria-label="Pedidos e regras do catálogo">
+      <section className="flex min-w-0 flex-col gap-6" aria-label="Pedidos e regras do catálogo">
         <section aria-labelledby="pedidos-title">
           <h3 id="pedidos-title" className="text-[1.0625rem]">
             Os teus pedidos
@@ -119,12 +119,12 @@ export function Rewards() {
           </h3>
           <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-4 text-sm text-fg marker:text-muted">
             <li>Só em espécie: produto, acesso e conhecimento. Nunca dinheiro, bónus ou descontos em comissões.</li>
-            <li>Nenhuma recompensa depende do montante investido. Quem co-financia um lote pode pedir a amostra, seja qual for o valor.</li>
+            <li>Nenhuma recompensa depende do montante investido. Quem cofinancia um lote pode pedir a amostra, seja qual for o valor.</li>
             <li>Nenhum nível dá melhores preços nem prioridade na alocação de lotes.</li>
             <li>As recompensas são pessoais: não se transferem, não se vendem, não se trocam.</li>
           </ul>
         </section>
-      </aside>
+      </section>
 
       <section aria-labelledby="niveis-title" className="min-w-0 lg:col-span-2">
         <h3 id="niveis-title" className="text-[1.0625rem]">
@@ -272,7 +272,7 @@ function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; 
               value={lot}
               onChange={setLot}
               options={sampleLots.map((p) => ({ value: p.lotId, label: `${p.lotId} · ${p.producer.nome}`, description: p.lot.product }))}
-              hint="Uma amostra por lote, para qualquer co-financiador."
+              hint="Uma amostra por lote, para qualquer cofinanciador."
             />
             <RadioGroup legend="Entrega" name="amostra-entrega" value={place} onChange={setPlace} options={(def.places ?? []).map((p) => ({ value: p.id, label: p.label }))} />
           </>

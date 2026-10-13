@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { CalendarClock, CheckCircle2, Landmark, PauseCircle, PlayCircle, ShoppingCart, Tag } from 'lucide-react';
+import { CalendarClock, CheckCircle2, Landmark, PauseCircle, PiggyBank, PlayCircle, ShoppingCart, Tag } from 'lucide-react';
 import { SIM_RULES } from '../../data';
 import { Badge, Button, CommodityGlyph } from '../../components/ui';
 import { EASE_OUT } from '../../components/game';
@@ -12,21 +12,23 @@ import { fe, fes, fpct, refChange } from './parts';
 
 /* =====================================================================
    Cartas do mês: acontecimentos (causa → efeito), propostas para decidir,
-   meses calmos e o fecho da campanha. As cartas viram ao entrar.
+   meses calmos e o fecho da campanha. As cartas entram com um deslize curto.
    ===================================================================== */
 
 const WORLD_LABEL = { azeite: 'Azeite', agua: 'Água', cafe: 'Café' } as const;
 
-/** Carta que vira (rotação em Y) ao entrar. Com movimento reduzido só aparece. */
+/**
+ * Carta que entra com um deslize curto (8 px) e opacidade. A folha do mês é o momento focal
+ * de cada avanço; as cartas só acompanham, com um escalonamento total de 150 ms no máximo.
+ */
 export function FlipIn({ children, index = 0, className }: { children: ReactNode; index?: number; className?: string }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, rotateY: -72, x: 12 }}
-      animate={{ opacity: 1, rotateY: 0, x: 0 }}
-      transition={{ duration: reduce ? 0.15 : 0.45, delay: Math.min(index, 4) * 0.09, ease: EASE_OUT }}
-      style={{ transformPerspective: 900, transformOrigin: 'left center' }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduce ? 0.15 : 0.22, delay: Math.min(index, 3) * 0.05, ease: EASE_OUT }}
     >
       {children}
     </motion.div>
@@ -41,7 +43,7 @@ export function EventCard({ ev }: { ev: AppliedEvent }) {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-world-line bg-world-soft px-4 py-2">
         <span className="inline-flex items-center gap-2 text-sm font-medium text-world-ink">
           <CommodityGlyph world={ev.world} className="size-4" />
-          {WORLD_LABEL[ev.world]} · {ev.scope === 'mundo' ? 'todo o mercado' : 'um lote'} · {monthLabel(ev.month)}
+          {ev.scope === 'economia' ? 'Todos os mercados' : `${WORLD_LABEL[ev.world]} · ${ev.scope === 'mundo' ? 'todo o mercado' : 'um lote'}`} · {monthLabel(ev.month)}
         </span>
         <Badge tone={adverse ? 'warn' : 'ok'} dot>
           {adverse ? 'Adverso' : 'Favorável'}
@@ -104,10 +106,10 @@ export function DecisionCard({ pending, run, onDecide }: { pending: Pending; run
       </h3>
       <p className="mt-2 text-[0.9375rem] text-fg">
         {isRefunding
-          ? `O choque deixou a referência ${refChange(pending.priceIndex)} face à entrada. O resultado bruto previsto do lote é ${fpct(pending.gross)}, mais do que a reserva de primeira perda absorve (${pct(SIM_RULES.firstLossReservePct, 0)}): mesmo com a reserva, ficas em ${fpct(pending.projected)}.`
+          ? `O choque deixou a referência ${refChange(pending.priceIndex)} face à entrada. O resultado bruto previsto do lote é ${fpct(pending.gross)} (${fes(pending.gross * amount)}), mais do que a reserva comum tem agora (${fe(pending.reserveAvailable)}): mesmo com a reserva, ficas em ${fpct(pending.projected)}.`
           : `Chegou o fim da janela de 18 meses com ${pct(pending.rem, 0)} do stock por vender (${unitsText(lot, snap.units)}) e a referência ${refChange(pending.priceIndex)} face à entrada.`}
       </p>
-      <p className="mt-1.5 text-sm text-muted">Na operação real, quem decide é a Tesouraria com o Comité de risco, e os co-financiadores são avisados. Aqui decides tu, para veres o efeito no balanço.</p>
+      <p className="mt-1.5 text-sm text-muted">Na operação real, quem decide é a Tesouraria com o Comité de risco, e os cofinanciadores são avisados. Aqui decides tu, para veres o efeito no balanço.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {options.map((o) => (
           <button
@@ -139,6 +141,7 @@ const NOTICE_ICON: Record<NoticeKind, typeof ShoppingCart> = {
   'venda-fecho': Tag,
   liquidado: CheckCircle2,
   retoma: PlayCircle,
+  reserva: PiggyBank,
 };
 
 export function NoticeList({ notices, className }: { notices: Notice[]; className?: string }) {

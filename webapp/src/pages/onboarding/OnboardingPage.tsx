@@ -339,7 +339,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
       <div ref={top} className="scroll-mt-20 rounded-md border border-border bg-surface px-4 py-4 sm:px-6 sm:py-5">
         <Stepper steps={STEPS.map((s) => ({ id: s.id, label: s.label }))} current={step} reached={draft.reached} onStepClick={goTo} />
         <div className="mt-4 border-t border-border pt-4">
-          <MissionBar fractions={fractions} current={step} counts={{ done: check.done, total: check.total }} />
+          <MissionBar fractions={fractions} current={step} counts={{ done: check.done, total: check.total }} prefilled={fractions.map((f, i) => Boolean(draft.example) && i > draft.reached && i !== step && f > 0)} />
         </div>
       </div>
 
@@ -418,6 +418,21 @@ const DEMO_DOC_NOTES: Record<string, string> = {
   'Declaração de investidor qualificado': 'Pedido escrito assinado a 21/11/2025, com evidência de 2 dos 3 critérios.',
 };
 
+/** Caminho de volta ao lote de onde se veio (?lote=), também depois de submeter ou de ser aprovado. */
+function BackToLot({ approved }: { approved: boolean }) {
+  const [params] = useSearchParams();
+  const lot = params.get('lote') ? getLot(params.get('lote')!) : undefined;
+  if (!lot) return null;
+  return (
+    <Disclaimer boxed className="mb-5">
+      {approved
+        ? <>Conta verificada. Volta ao lote <span className="font-mono tnum">{lot.id}</span> para leres os fatores de risco antes de qualquer compromisso.</>
+        : <>Vieste do lote <span className="font-mono tnum">{lot.id}</span>. Quando a verificação estiver concluída, voltas a ele para leres os fatores de risco.</>}{' '}
+      <TextLink to={`/lote/${lot.id}`}>Voltar ao lote</TextLink>
+    </Disclaimer>
+  );
+}
+
 export default function OnboardingPage() {
   const { profileId } = useRole();
   const game = useGame();
@@ -479,7 +494,7 @@ export default function OnboardingPage() {
           ? { title: 'Acesso ao piloto', description: 'O registo ficou na lista de interesse. Aprender continua aberto.' }
           : {
               title: 'Registo no piloto',
-              description: 'Seis passos para abrir conta no piloto fechado de azeite e água. Cerca de 12 minutos, e podes voltar a qualquer passo.',
+              description: 'Seis passos para abrir conta no piloto fechado: lotes de azeite (a água entra como cesto, sem financiamento). Cerca de 12 minutos, e podes voltar a qualquer passo.',
             };
 
   const meta =
@@ -511,6 +526,7 @@ export default function OnboardingPage() {
   return (
     <Page>
       <PageHeader title={header.title} description={header.description} meta={meta} />
+      {(status === 'aprovado' || status === 'em-analise') && <BackToLot approved={status === 'aprovado'} />}
       {status === 'aprovado' ? (
         <ApprovedView c={caseView} profileId={profileId} onRestart={profileId === 'visitante' ? restart : undefined} />
       ) : status === 'em-analise' ? (

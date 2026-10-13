@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Download } from 'lucide-react';
 import { Button, DataTable } from '../../components/ui';
 import type { Column } from '../../components/ui';
+import { ILLUSTRATIVE_LABEL, isIllustrative } from '../../data';
 import type { Investor } from '../../data';
 import { transferReference, useToast, type PositionView } from '../../state';
 import { date as fmtDate } from '../../lib/format';
@@ -77,8 +78,14 @@ export function Documents({ investor, positions }: { investor: Investor; positio
     },
   ];
 
+  const illustrative = positions.some((p) => isIllustrative(p) || isIllustrative(p.lot));
   return (
     <div className="min-w-0">
+      {illustrative && (
+        <p className="mb-3 text-sm text-muted">
+          <span className="font-medium text-warn-ink">{ILLUSTRATIVE_LABEL}.</span> Os extratos destas posições mostram a jornada de lotes anteriores ao piloto; não são resultados.
+        </p>
+      )}
       <DataTable<DocRow> columns={columns} rows={rows} getRowId={(r) => r.id} caption="Extratos e documentos da carteira" initialSort={{ key: 'date', dir: 'desc' }} framed={false} />
       {months.length > 3 && (
         <Button variant="ghost" size="sm" className="mt-2" onClick={() => setAll((v) => !v)} aria-expanded={all}>

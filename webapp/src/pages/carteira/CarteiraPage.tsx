@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Download } from 'lucide-react';
-import { getProducer } from '../../data';
+import { getProducer, ILLUSTRATIVE_LABEL, ILLUSTRATIVE_NOTE, isIllustrative } from '../../data';
 import { LotGauge } from '../../components/game';
 import { Badge, Button, ButtonLink, Card, DataTable, KeyValue, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
 import type { Column } from '../../components/ui';
@@ -87,6 +87,7 @@ export default function CarteiraPage() {
               </span>
             )}
             {isTeam && <Badge tone="info">Vista da equipa sobre a carteira de demonstração</Badge>}
+            {active.some((p) => isIllustrative(p) || isIllustrative(p.lot)) && <Badge tone="warn">{ILLUSTRATIVE_LABEL}</Badge>}
           </>
         }
         actions={
@@ -97,6 +98,8 @@ export default function CarteiraPage() {
           )
         }
       />
+
+      {active.some((p) => isIllustrative(p) || isIllustrative(p.lot)) && <p className="measure -mt-2 mb-6 text-sm text-muted">{ILLUSTRATIVE_NOTE}</p>}
 
       <Footprint
         positions={active}
@@ -145,8 +148,10 @@ export default function CarteiraPage() {
             <DataTable columns={settleColumns} rows={bySettle} getRowId={(r) => r.p.id} caption="Próximas liquidações previstas" initialSort={{ key: 'liq', dir: 'asc' }} framed={false} onRowClick={(r) => setOpenId(r.p.id)} />
           </div>
           <div className="mt-8 border-t border-border pt-5">
-            <h3 className="text-[1.0625rem]">Como terminaram os lotes do piloto</h3>
-            <p className="mt-0.5 text-sm text-muted">Resultado efetivo de cada lote liquidado, em fração do capital. Resultados passados não garantem resultados futuros.</p>
+            <h3 className="text-[1.0625rem]">Como terminaram os lotes anteriores</h3>
+            <p className="mt-0.5 text-sm text-muted">
+              <span className="font-medium text-warn-ink">{ILLUSTRATIVE_LABEL}.</span> Resultado de cada lote liquidado, em fração do capital, para mostrar como um ciclo pode acabar (incluindo em perda). Não são resultados do piloto, que só começa em fevereiro de 2027.
+            </p>
             <ul className="mt-3 divide-y divide-border">
               {pilotHistory.map((l) => {
                 const prod = getProducer(l.producerId);

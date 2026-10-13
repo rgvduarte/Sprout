@@ -195,13 +195,15 @@ function LearnPhase({ cards, onDone }: { cards: SensoryAttribute[]; onDone: () =
                       e.dataTransfer.setData('text/plain', a.id);
                       e.dataTransfer.effectAllowed = 'move';
                     }}
-                    onClick={() => pick(a.id)}
-                    disabled={isMatched || isWrong || solved}
+                    // aria-disabled (não `disabled`): o foco do teclado fica no chip depois de responder
+                    onClick={() => !(isMatched || isWrong || solved) && pick(a.id)}
+                    aria-disabled={isMatched || isWrong || solved || undefined}
                     className={cn(
                       'inline-flex min-h-11 items-center gap-1.5 rounded-sm border px-3 text-[0.9375rem] transition-[background-color,border-color,color] duration-150',
                       isMatched && 'border-transparent bg-world-soft text-world-ink',
                       isWrong && 'border-[color-mix(in_oklab,var(--crit)_40%,var(--border))] text-muted line-through decoration-1',
-                      !isMatched && !isWrong && 'border-border bg-surface text-fg enabled:cursor-grab enabled:hover:border-world-line enabled:hover:bg-world-soft disabled:text-muted',
+                      !isMatched && !isWrong && !solved && 'cursor-grab border-border bg-surface text-fg hover:border-world-line hover:bg-world-soft',
+                      !isMatched && !isWrong && solved && 'border-border bg-surface text-muted',
                     )}
                   >
                     {isMatched ? <Check aria-hidden className="size-4" strokeWidth={2.25} /> : isWrong ? <X aria-hidden className="size-4 text-crit-ink" strokeWidth={2.25} /> : <GripVertical aria-hidden className="hidden size-4 text-muted sm:block" strokeWidth={1.75} />}

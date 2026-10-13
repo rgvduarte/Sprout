@@ -7,9 +7,11 @@ export interface LegendItem {
   label: string;
   /** cor CSS (use tokens: var(--series-azeite), useTokens()) */
   color: string;
-  kind?: 'line' | 'rect' | 'dot';
+  kind?: 'line' | 'rect' | 'dot' | 'hatch';
   /** traço tracejado = projeção/referência */
   dashed?: boolean;
+  /** traço pontilhado (nível secundário) */
+  dotted?: boolean;
 }
 
 export interface ChartFrameProps<T> {
@@ -62,11 +64,16 @@ export function ChartFrame<T>({ title, description, legend, table, height = 260,
             <li key={l.label} className="inline-flex items-center gap-2">
               {l.kind === 'rect' ? (
                 <span aria-hidden className="inline-block size-2.5 rounded-[2px]" style={{ background: l.color }} />
+              ) : l.kind === 'hatch' ? (
+                <svg aria-hidden width="12" height="12" className="shrink-0">
+                  <rect x="0.5" y="0.5" width="11" height="11" rx="2" fill="none" stroke={l.color} />
+                  <path d="M2 10 L10 2 M-1 5 L5 -1 M7 13 L13 7" stroke={l.color} strokeWidth="1.4" />
+                </svg>
               ) : l.kind === 'dot' ? (
                 <span aria-hidden className="inline-block size-2.5 rounded-full" style={{ background: l.color }} />
               ) : (
                 <svg aria-hidden width="18" height="6" className="shrink-0">
-                  <line x1="1" y1="3" x2="17" y2="3" stroke={l.color} strokeWidth="2" strokeLinecap="round" strokeDasharray={l.dashed ? '3 3' : undefined} />
+                  <line x1="1" y1="3" x2="17" y2="3" stroke={l.color} strokeWidth="2" strokeLinecap="round" strokeDasharray={l.dashed ? '4 3' : l.dotted ? '0.5 3.5' : undefined} />
                 </svg>
               )}
               {l.label}

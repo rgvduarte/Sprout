@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { ShieldAlert } from 'lucide-react';
-import { getWorld } from '../../data';
+import { getMarketSeries, getWorld, MARKET_TODAY } from '../../data';
 import type { WorldId } from '../../data';
 import { Badge, SegmentedControl } from '../../components/ui';
 import { CommodityGlyph } from '../../components/ui/Commodity';
 import type { PositionView } from '../../state';
 import { cn } from '../../lib/cn';
-import { eur, pct } from '../../lib/format';
-import { CONCENTRATION_LIMIT } from './positions';
+import { eur, num, pct } from '../../lib/format';
+import { CONCENTRATION } from './positions';
 
 /* =====================================================================
    Diversificação: quanto do montante financiado depende de cada produtor,
@@ -54,14 +54,18 @@ const BY_LABEL: Record<By, string> = { produtor: 'Produtor', lote: 'Lote', mundo
 export function Diversification({ positions }: { positions: PositionView[] }) {
   const [by, setBy] = useState<By>('produtor');
   const rows = slices(positions, by);
-  const limited = by !== 'mundo';
   const byProducer = slices(positions, 'produtor');
   const byLot = slices(positions, 'lote');
   const topProducer = byProducer[0];
   const topLot = byLot[0];
-  const producerOver = topProducer && topProducer.share > CONCENTRATION_LIMIT && byProducer.length > 1;
-  const lotOver = topLot && topLot.share > CONCENTRATION_LIMIT && byLot.length > 1;
+  const producerOver = topProducer && topProducer.share > CONCENTRATION.produtor && byProducer.length > 1;
+  const lotOver = topLot && topLot.share > CONCENTRATION.lote && byLot.length > 1;
+  // a linha de atenção do mundo é informativa (o preço de referência move os lotes do mesmo mundo em conjunto)
+  const limit = CONCENTRATION[by];
   const olive = slices(positions, 'mundo').find((s) => s.world === 'azeite');
+  // variação do índice de origem desde jan. 2025, a partir da série (não um número escrito à mão)
+  const jan25 = getMarketSeries('azeite').monthly.find((m) => m.t === '2025-01')?.value ?? MARKET_TODAY.azeite;
+  const oliveDrop = MARKET_TODAY.azeite / jan25 - 1;
 
   if (!rows.length) return null;
 
@@ -69,16 +73,14 @@ export function Diversification({ positions }: { positions: PositionView[] }) {
     <div className="min-w-0">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <SegmentedControl<By> label="Ver concentração por" value={by} onChange={setBy} options={(['produtor', 'lote', 'mundo'] as By[]).map((v) => ({ value: v, label: BY_LABEL[v] }))} />
-        {limited && (
-          <p className="flex items-center gap-2 text-sm text-muted">
-            <span aria-hidden className="inline-block h-4 w-0.5 bg-fg" />
-            Limite de atenção: {pct(CONCENTRATION_LIMIT, 0)} por {by}
-          </p>
-        )}
+        <p className="flex items-center gap-2 text-sm text-muted">
+          <span aria-hidden className="inline-block h-4 w-0.5 bg-fg" />
+          Limite de atenção: {pct(limit, 0)} por {by}
+        </p>
       </div>
       <ul className="space-y-4" aria-label={`Montante financiado por ${by}`}>
         {rows.map((r) => {
-          const over = limited && r.share > CONCENTRATION_LIMIT && rows.length > 1;
+          const over = r.share > limit && rows.length > 1;
           return (
             <li key={r.id} className="grid min-w-0 gap-x-4 gap-y-1.5 sm:grid-cols-[13rem_minmax(0,1fr)_7.5rem] sm:items-center" data-world={r.world}>
               <div className="min-w-0">
@@ -91,7 +93,7 @@ export function Diversification({ positions }: { positions: PositionView[] }) {
               <div className="relative h-6 min-w-0" role="img" aria-label={`${r.label}: ${pct(r.share, 0)} do montante financiado, ${eur(r.amount)}${over ? ', acima do limite de atenção' : ''}`}>
                 <div className="absolute inset-y-1.5 left-0 right-0 rounded-xs bg-surface-2" />
                 <div className="absolute inset-y-1.5 left-0 rounded-r-[4px] bg-world transition-[width] duration-300 ease-out" style={{ width: `${r.share * 100}%` }} />
-                {limited && <div aria-hidden className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-fg" style={{ left: `${CONCENTRATION_LIMIT * 100}%` }} />}
+                <div aria-hidden className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-fg" style={{ left: `${limit * 100}%` }} />
               </div>
               <div className="flex items-center gap-2 sm:justify-end">
                 <span className="font-mono text-sm text-fg tnum">{pct(r.share, 0)}</span>
@@ -130,7 +132,7 @@ export function Diversification({ positions }: { positions: PositionView[] }) {
       )}
       {by === 'mundo' && olive && (
         <p className="mt-5 text-sm text-muted">
-          {pct(olive.share, 0)} do montante financiado depende do preço do azeite, que caiu mais de 35 % desde o início de 2025. A água tem preço estável mas margem fina por litro; o café só entra na Fase 2.
+          {pct(olive.share, 0)} do montante financiado depende do preço do azeite: o índice de origem a granel está hoje em {num(MARKET_TODAY.azeite, 2)} €/kg, {pct(Math.abs(oliveDrop), 0)} {oliveDrop < 0 ? 'abaixo' : 'acima'} do de janeiro de 2025. A água entra no piloto como cesto, sem financiamento; o café só na Fase 2.
         </p>
       )}
     </div>

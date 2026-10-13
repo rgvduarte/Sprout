@@ -9,14 +9,14 @@ import { useToast } from '../../state';
 import { TODAY_DATE } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, dateTime, lisbonParts, MONTHS_SHORT, num, plural } from '../../lib/format';
-import { ALLOWED, DECISION_STATUS, DIRECTIVE_2026_10_13, FORBIDDEN, FOUNDERS_QUOTES, PHASES, PILOT_SCOPE, PRIORITY_ZERO, type Decision, type Phase } from './content';
+import { ALLOWED, CRITERION_SOURCE, DECISION_STATUS, DIRECTIVE_2026_10_13, FORBIDDEN, FOUNDERS_QUOTES, PHASES, PILOT_SCOPE, PRIORITY_ZERO, type Decision, type Phase } from './content';
 import { ITEM_STATUS_LABEL, ITEM_STATUSES, planoActions, usePlano, type ItemStatus, type PlanoState } from './store';
 
 /* =====================================================================
    /plano · Plano de execução (equipa). O plano dos fundadores tal como
-   saiu da reunião de 13/10: responsáveis, ações (texto exato, prazo TBD),
-   prioridade zero, roteiro por fases com go/no-go e registo de decisões.
-   Pessoas reais do documento-fonte só aparecem aqui.
+   saiu da reunião de 13/10: responsáveis, ações (texto exato, prazo por
+   definir), prioridade zero, roteiro por fases e gates do business plan e
+   registo de decisões. Pessoas reais do documento-fonte só aparecem aqui.
    ===================================================================== */
 
 
@@ -65,8 +65,8 @@ function ActionRow({ item, st }: { item: ActionItem; st: PlanoState }) {
           ))}
         </Select>
       </div>
-      <span className="pl-6 font-mono text-sm text-muted tnum sm:pl-0 sm:text-right" title="Prazo por definir">
-        Prazo: <span className="text-fg">{item.due}</span>
+      <span className="pl-6 text-sm text-muted sm:pl-0 sm:text-right">
+        Prazo: <span className="text-fg">{item.due === 'TBD' ? 'por definir' : item.due}</span>
       </span>
     </li>
   );
@@ -126,6 +126,15 @@ function OwnerLane({ row, st }: { row: ExecutionPlanRow; st: PlanoState }) {
 /* ------------------------------------------------------------ roteiro */
 
 const CAL_FROM = { y: 2026, m: 10 };
+/** Gates do business plan. */
+const GATES = [
+  { date: '2027-01-31', label: 'piloto' },
+  { date: '2027-08-31', label: 'Fase 2' },
+];
+const gatePos = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return ((y - CAL_FROM.y) * 12 + (m - CAL_FROM.m) + d / 31) / CAL_MONTHS;
+};
 const CAL_MONTHS = 36;
 const monthPos = (ym: string, end = false) => {
   const [y, m] = ym.split('-').map(Number);
@@ -181,6 +190,9 @@ function PhaseCalendar() {
               );
             })}
             <li aria-hidden className="pointer-events-none absolute inset-y-0 left-[calc(11rem+0.75rem)] right-0">
+              {GATES.map((g) => (
+                <span key={g.date} className="absolute inset-y-0 w-0 -translate-x-1/2 border-l border-dashed border-fg" style={{ left: `${gatePos(g.date) * 100}%` }} />
+              ))}
               <span className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-fg" style={{ left: `${todayPos * 100}%` }} />
             </li>
           </ol>
@@ -208,6 +220,10 @@ function PhaseCalendar() {
         <li className="inline-flex items-center gap-2">
           <span aria-hidden className="inline-block h-3 w-0.5 bg-fg" />
           Hoje, {fmtDate(TODAY_DATE)}
+        </li>
+        <li className="inline-flex items-center gap-2">
+          <span aria-hidden className="inline-block h-3 w-0 border-l border-dashed border-fg" />
+          Go/no-go: {GATES.map((g) => `${fmtDate(g.date)} (${g.label})`).join(' e ')}
         </li>
       </ul>
     </figure>
@@ -238,7 +254,8 @@ function Gate({ phase, st }: { phase: Phase; st: PlanoState }) {
               <span className={cn(ok ? 'text-muted' : 'text-fg')}>
                 {c.text}
                 {c.actionIds && <span className="text-muted"> · {c.actionIds.map((id) => id.replace('ai-', 'ação ')).join(', ')}</span>}
-                {!c.actionIds && <span className="text-muted"> · medido no piloto</span>}
+                {!c.actionIds && <span className="text-muted"> · {phase.id === 'f0' ? 'medido na Fase 0' : 'medido no piloto'}</span>}
+                <span className="mt-0.5 block text-xs text-muted">{CRITERION_SOURCE[c.source]}</span>
               </span>
             </li>
           );
@@ -309,7 +326,7 @@ const NAV = [
 export default function PlanoPage() {
   const st = usePlano();
   const counts = Object.fromEntries(ITEM_STATUSES.map((s) => [s, ACTION_ITEMS.filter((a) => st.status[a.id] === s).length])) as Record<ItemStatus, number>;
-  const tbd = ACTION_ITEMS.filter((a) => a.due === 'TBD').length;
+  const noDue = ACTION_ITEMS.filter((a) => a.due === 'TBD').length;
 
   const deliverableCols: Column<ExecutionPlanRow>[] = [
     { key: 'resp', header: 'Responsável', minWidth: 150, render: (r) => <span className="font-medium text-fg">{r.responsavel === 'Tesouraria' ? 'Tesouraria (a designar)' : r.responsavel}</span> },
@@ -347,7 +364,8 @@ export default function PlanoPage() {
         meta={
           <>
             <Badge tone="neutral">Fonte: resumo da reunião de 13/10 · alinhamento 14h45–16h</Badge>
-            <Badge tone="warn">{plural(tbd, 'ação sem prazo', 'ações sem prazo')} (TBD)</Badge>
+            <Badge tone="warn">{plural(noDue, 'ação sem prazo', 'ações sem prazo')}</Badge>
+            <Badge tone="info">Hoje: Fase 0 · piloto em fevereiro de 2027</Badge>
           </>
         }
       />
@@ -401,7 +419,7 @@ export default function PlanoPage() {
         <h2 id="responsaveis-t" className="text-[1.375rem] leading-tight">
           Responsáveis e próximos passos
         </h2>
-        <p className="measure mt-1 text-muted">As 12 ações do documento, com o texto exato, agrupadas por responsável. Prazo de todas: TBD.</p>
+        <p className="measure mt-1 text-muted">As 12 ações do documento, com o texto exato, agrupadas por responsável. O documento não fixa prazos: estão todos por definir.</p>
         <ul className="mt-4 divide-y divide-border rounded-md border border-border bg-surface">
           {EXECUTION_PLAN.map((row) => (
             <OwnerLane key={row.responsavel} row={row} st={st} />
@@ -455,7 +473,7 @@ export default function PlanoPage() {
         <h2 id="roteiro-t" className="text-[1.375rem] leading-tight">
           Roteiro por fases
         </h2>
-        <p className="measure mt-1 text-muted">Cada fase sobre o calendário agrícola, com o go/no-go que a fecha. As janelas são indicativas: as datas dependem das ações, todas ainda TBD.</p>
+        <p className="measure mt-1 text-muted">Cada fase sobre o calendário agrícola, com o go/no-go que a fecha. As janelas e os gates seguem o business plan; os critérios dizem de onde vêm: do documento de 13/10, do business plan ou de uma proposta da equipa.</p>
         <Card className="mt-4">
           <PhaseCalendar />
         </Card>

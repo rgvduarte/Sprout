@@ -1,19 +1,55 @@
 import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { fundedFraction, stageLabel } from '../../data';
+import { fundedFraction, ILLUSTRATIVE_LABEL, ILLUSTRATIVE_NOTE, isIllustrative, priceUnit, stageLabel, WATER_AGENT } from '../../data';
 import { CampaignFeed, JourneyTrack, LotGauge } from '../../components/game';
-import { ButtonLink, RiskNote, StatusPill } from '../../components/ui';
-import { date as fmtDate, eur, pct } from '../../lib/format';
+import { Badge, ButtonLink, RiskNote, StatusPill } from '../../components/ui';
+import { date as fmtDate, eur, pct, price } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { useCampaignEvents } from '../../state';
 import { SampleRequest } from './CommitDone';
-import { containersFor, stockLabel, type ChapterId } from './model';
-import { ChapterHeading, useJourney, Wrap } from './shared';
+import { containersFor, isAgentLot, priceDecimals, stockLabel, type ChapterId } from './model';
+import { ChapterHeading, useChapterNo, useJourney, Wrap } from './shared';
 
 /* =====================================================================
    Último capítulo dos lotes sem compromisso possível: acompanhamento
-   (financiado ou em extensão), liquidação, ou abertura (em preparação).
+   (financiado ou em extensão), liquidação, abertura (em preparação) ou
+   cesto (água em modelo de agente: sem financiamento). Os lotes das
+   campanhas anteriores ao piloto levam a etiqueta de histórico ilustrativo.
    ===================================================================== */
+
+/** Cesto de água: como funciona o modelo de agente (sem financiamento nem posições). */
+function AgentModel() {
+  const { lot } = useJourney();
+  const e = lot.economics;
+  const unit = priceUnit(lot);
+  const d = priceDecimals(lot);
+  return (
+    <div>
+      <h3 className="text-[1.1875rem]">Como funciona o cesto</h3>
+      <p className="measure mt-1 text-sm text-muted">{WATER_AGENT.note}</p>
+      <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+        <div>
+          <dt className="text-muted">{e.refLabel}</dt>
+          <dd className="font-mono text-[1.0625rem] text-fg tnum">{price(e.refPrice, unit, d)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Preço ao comprador do cesto</dt>
+          <dd className="font-mono text-[1.0625rem] text-fg tnum">{price(e.buyerPrice, unit, d)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Comissão da Sprout</dt>
+          <dd className="font-mono text-[1.0625rem] text-fg tnum">{pct(e.commissionPct ?? 0, 0)}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Financiamento</dt>
+          <dd className="text-[1.0625rem] text-fg">Nenhum</dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-sm text-muted">{e.refNote}</p>
+      <p className="mt-3 text-sm text-muted">Não há montante a comprometer neste lote: podes estudar a origem, o boletim e os riscos, e jogar a água no simulador.</p>
+    </div>
+  );
+}
 
 function YourPosition() {
   const { lot, positions } = useJourney();
@@ -26,6 +62,11 @@ function YourPosition() {
   return (
     <div>
       <h3 className="text-[1.1875rem]">A tua posição</h3>
+      {positions.some((p) => p.illustrative) && (
+        <Badge tone="warn" className="mt-2">
+          {ILLUSTRATIVE_LABEL}
+        </Badge>
+      )}
       <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
         <div>
           <dt className="text-muted">Montante financiado</dt>
@@ -70,12 +111,17 @@ function LotDiary({ lotId, live }: { lotId: string; live: boolean }) {
 
 export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
   const { lot, ctx, win } = useJourney();
+  const no = useChapterNo(id);
   const next = lot.milestones.find((m) => !m.done);
   const stockFrac = lot.quantity > 0 ? Math.min(1, lot.stock / lot.quantity) : 0;
   const settled = lot.status === 'liquidado';
   const prep = lot.status === 'em-preparacao';
-  const lead = settled
-    ? `Ciclo fechado a ${fmtDate(lot.settlement.settledAt ?? win.end)}. O resultado é o que foi pago aos co-financiadores, depois de custos e reserva.`
+  const agent = isAgentLot(lot);
+  const illustrative = isIllustrative(lot);
+  const lead = agent
+    ? `Cesto · sem financiamento. O lote está ${stageLabel(lot.world, lot.stage).toLowerCase()}; o engarrafador vende e fatura, e a Sprout recebe uma comissão.`
+    : settled
+    ? `Ciclo fechado a ${fmtDate(lot.settlement.settledAt ?? win.end)}. O resultado é o que foi pago aos cofinanciadores, depois de custos e reserva.`
     : prep
       ? `O lote ainda não abriu a financiamento. Abre a ${fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}, depois de publicado o boletim de análises e contratada a cobertura.`
       : `Financiamento completo. O lote está ${stageLabel(lot.world, lot.stage).toLowerCase()}; os marcos acendem quando o produtor regista o evento.`;
@@ -84,16 +130,23 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
   return (
     <section id={id} data-chapter={label} aria-labelledby={`${id}-titulo`} className="scroll-mt-6 py-14 sm:py-20">
       <Wrap>
-        <ChapterHeading id={id} n={6} title={label} lead={lead} />
+        <ChapterHeading id={id} n={no} title={label} lead={lead} />
+
+        {illustrative && (
+          <div className="mt-6 flex flex-wrap items-start gap-x-3 gap-y-1">
+            <Badge tone="warn">{ILLUSTRATIVE_LABEL}</Badge>
+            <p className="measure min-w-0 flex-[1_1_16rem] text-sm text-muted">{ILLUSTRATIVE_NOTE}</p>
+          </div>
+        )}
 
         {settled && (
           <div className="mt-8 flex flex-wrap items-end gap-x-10 gap-y-4 border-y border-border py-5">
             <div>
-              <p className="text-sm text-muted">Resultado pago aos co-financiadores</p>
+              <p className="text-sm text-muted">Resultado pago aos cofinanciadores{illustrative ? ' · ilustrativo' : ''}</p>
               <p className="mt-1 text-[2rem] font-semibold leading-none text-fg pnum">{pct(lot.settlement.settledResult ?? 0, 1, { sign: true })}</p>
               <p className="mt-1 text-sm text-muted">do capital, em {lot.settlement.settledAt ? fmtDate(lot.settlement.settledAt) : '—'}</p>
             </div>
-            <p className="max-w-[62ch] min-w-0 flex-1 text-[0.9375rem] text-fg">{lot.milestones.find((m) => m.stage === 'liquidado')?.note}</p>
+            <p className="max-w-[62ch] min-w-0 flex-[1_1_16rem] text-[0.9375rem] text-fg">{lot.milestones.find((m) => m.stage === 'liquidado')?.note}</p>
           </div>
         )}
 
@@ -135,9 +188,11 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
                   <p className="text-sm text-muted">
                     {settled ? 'Stock vendido e expedido.' : `em stock de ${stockLabel(lot, lot.quantity)} · ${lot.storage.local}`}
                   </p>
-                  <p className="mt-1 text-sm text-muted">
-                    Financiado a <span className="font-mono text-fg tnum">{pct(fundedFraction(lot), 0)}</span> · {lot.funding.coFinancers} co-financiadores
-                  </p>
+                  {!agent && (
+                    <p className="mt-1 text-sm text-muted">
+                      Financiado a <span className="font-mono text-fg tnum">{pct(fundedFraction(lot), 0)}</span> · {lot.funding.coFinancers} cofinanciadores
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -151,15 +206,17 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
                     Stock em produção: {stockLabel(lot)} de {stockLabel(lot, lot.quantity)}.
                   </li>
                 </ul>
-                <p className="mt-3 text-sm text-muted">Não há reservas nem lista de espera: quando abrir, as condições são as mesmas para todos os co-financiadores.</p>
+                <p className="mt-3 text-sm text-muted">Não há reservas nem lista de espera: quando abrir, as condições são as mesmas para todos os cofinanciadores.</p>
                 <ButtonLink to={`/mercados/${lot.world}`} variant="secondary" className="mt-3">
                   Ver {ctx.world.nome}
                 </ButtonLink>
               </div>
+            ) : agent ? (
+              <AgentModel />
             ) : (
               <YourPosition />
             )}
-            <RiskNote />
+            {!agent && <RiskNote />}
           </div>
         </div>
       </Wrap>

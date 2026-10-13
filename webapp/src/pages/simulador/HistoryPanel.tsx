@@ -6,6 +6,7 @@ import { getSimLot, shortName } from './deck';
 import { eventIdsFromResult } from './runs';
 import { getDeckEvent } from './deck';
 import { fe, fpct, WORLD_BG } from './parts';
+import { firstSeasonRun } from './LeaguePanel';
 import { cn } from '../../lib/cn';
 
 /** Histórico das campanhas jogadas: por data, nunca ordenado por resultado. */
@@ -13,6 +14,7 @@ export function HistoryPanel({ runs, onReview, onReplay }: { runs: SimRunResult[
   if (!runs.length) {
     return <EmptyState title="Ainda não completaste nenhuma campanha" body="Cada campanha fica aqui quando abres o balanço: a semente, os lotes, as decisões e o resultado fictício, para a poderes rever ou rejogar." />;
   }
+  const season = firstSeasonRun(runs);
   return (
     <div>
       <p className="measure mb-3 text-sm text-muted">Do mais recente para o mais antigo. Não é uma classificação: serve para rever o que decidiste e rejogar com a mesma semente.</p>
@@ -41,8 +43,9 @@ export function HistoryPanel({ runs, onReview, onReplay }: { runs: SimRunResult[
                   <span className="font-mono text-fg tnum">{fe(r.invested)}</span> → <span className="font-mono text-fg tnum">{fe(r.finalValue)}</span> ({fpct(r.result)}) fictícios
                   {evs.length > 0 && <> · {evs.slice(0, 3).join(', ').toLowerCase()}{evs.length > 3 ? '…' : ''}</>}
                 </p>
-                {(r.extended || r.refunded) && (
+                {(r.extended || r.refunded || r === season) && (
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {r === season && <Badge tone="accent">Conta para a liga</Badge>}
                     {r.refunded && <Badge tone="neutral">Refunding</Badge>}
                     {r.extended && <Badge tone="neutral">Extensão</Badge>}
                   </div>

@@ -36,8 +36,11 @@ export interface SimSession {
   pauseAcknowledgedAt: number;
 }
 
-/** Semente da primeira campanha: um choque de preço no azeite em abril, uma extensão e um lote de água calmo. */
-export const DEFAULT_SEED = 1012;
+/**
+ * Semente da primeira campanha: o índice de origem cai 30 % em março, a Tesouraria propõe
+ * refunding, o lote de distribuidores sem cobertura acaba em perda e esgota a reserva comum.
+ */
+export const DEFAULT_SEED = 1118;
 
 export const DEFAULT_DRAFT: Allocation[] = [
   { simLotId: 'sim-az-a', amount: 17500, hedged: true },

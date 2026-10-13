@@ -62,8 +62,8 @@ export function Meter({ value, label, valueLabel, tone = 'accent', showLabel = t
     <div className={cn('min-w-0', className)}>
       {showLabel && (
         <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
-          <span className="truncate text-muted">{label}</span>
-          <span className="font-mono tnum text-fg">{pctText}</span>
+          <span className="min-w-0 text-muted">{label}</span>
+          <span className="shrink-0 whitespace-nowrap font-mono tnum text-fg">{pctText}</span>
         </div>
       )}
       <div

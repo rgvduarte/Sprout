@@ -12,13 +12,15 @@ import { tidyText } from '../../lib/format';
 /**
  * Tokens locais da apresentação, claro e escuro. Definidos aqui (e não nos
  * tokens globais) porque só esta página os usa; validados com o script do
- * dataviz: as duas tintas de série são --series-azeite e --series-agua.
+ * dataviz: as duas tintas de série são --series-azeite e --series-agua;
+ * --vc-pack (cor de cartão) marca o embalamento no co-packer.
  */
 export const PAGE_CSS = `
 .apr {
   --vc-producer: #c6cbba;
   --vc-packager: #4a5240;
   --vc-cost: #9ba190;
+  --vc-pack: #b08f66;
   --vc-premium: var(--series-azeite);
   --vc-spread: var(--series-agua);
   --vc-hatch: #6b725f;
@@ -38,6 +40,7 @@ export const PAGE_CSS = `
     --vc-producer: #3b4234;
     --vc-packager: #b8bfab;
     --vc-cost: #646c59;
+    --vc-pack: #94744e;
     --vc-hatch: #9ba390;
     --ls-canopy: color-mix(in oklab, var(--accent) 48%, var(--bg));
     --ls-canopy-far: color-mix(in oklab, var(--accent) 30%, var(--bg));
@@ -47,6 +50,7 @@ export const PAGE_CSS = `
   --vc-producer: #3b4234;
   --vc-packager: #b8bfab;
   --vc-cost: #646c59;
+  --vc-pack: #94744e;
   --vc-hatch: #9ba390;
   --ls-canopy: color-mix(in oklab, var(--accent) 48%, var(--bg));
   --ls-canopy-far: color-mix(in oklab, var(--accent) 30%, var(--bg));

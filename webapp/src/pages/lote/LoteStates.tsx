@@ -88,7 +88,7 @@ export function PhaseTwoLot({ lot }: { lot: Lot }) {
             </p>
             <h2 className="mt-8 text-[1.25rem]">Porque ainda não se pode financiar</h2>
             <ul className="max-w-[62ch] mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-muted marker:text-world-ink">
-              <li>O piloto da fase 1 está fechado a azeite e água, com investidores qualificados.</li>
+              <li>O piloto da fase 1 financia só lotes de azeite (a água entra como cesto, sem financiamento), com investidores qualificados.</li>
               <li>A cobertura com futuros ICE KC e câmbio EUR/USD precisa de um corretor de futuros, a selecionar na Fase 2.</li>
               <li>
                 A due diligence do produtor está em curso: amostra de pré-safra com{' '}

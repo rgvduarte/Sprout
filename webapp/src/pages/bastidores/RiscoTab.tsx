@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronDown, TriangleAlert } from 'lucide-react';
-import { getWorld, HEDGE_TRIGGERS, MARKET_TODAY, REFUNDING_PLAYBOOKS, type WorldId } from '../../data';
+import { getWorld, HEDGE_TRIGGERS, isIllustrative, MARKET_TODAY, PRICE_TRIGGER, REFUNDING_PLAYBOOKS, type WorldId } from '../../data';
 import { LotGauge } from '../../components/game';
-import { Badge, Card, CardHeader, Checkbox, CommodityChip, DataTable, Disclaimer, KeyValue, SegmentedControl, StatusPill, type Column } from '../../components/ui';
+import { Badge, Card, CardHeader, CommodityChip, DataTable, Disclaimer, KeyValue, SegmentedControl, StatusPill, type Column } from '../../components/ui';
 import { useData } from '../../state';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, kg, L, num, pct, plural, price } from '../../lib/format';
@@ -36,22 +36,19 @@ export default function RiscoTab() {
   const [params, setParams] = useSearchParams();
   // estado local (resposta imediata) espelhado no URL para poder partilhar o cenário
   const [sc, setSc] = useState<ScenarioId>(() => (isScenario(params.get('cenario')) ? (params.get('cenario') as ScenarioId) : 'base'));
-  const [water, setWater] = useState(() => params.get('agua') === '1');
   const isPrice = sc === 'preco-15' || sc === 'preco-30';
-  const update = (next: { cenario?: ScenarioId; agua?: boolean }) => {
+  const update = (next: { cenario?: ScenarioId }) => {
     const c = next.cenario ?? sc;
-    const a = next.agua ?? water;
     setSc(c);
-    setWater(a);
     const p = new URLSearchParams(params);
     if (c === 'base') p.delete('cenario');
     else p.set('cenario', c);
-    if (a && (c === 'preco-15' || c === 'preco-30')) p.set('agua', '1');
-    else p.delete('agua');
+    p.delete('agua');
     setParams(p, { replace: true });
   };
 
-  const res = useMemo(() => stress(lots, sc, water && isPrice), [lots, sc, water, isPrice]);
+  // a água vende-se em cesto (modelo de agente): sem capital nem stock próprio, fica fora do teste
+  const res = useMemo(() => stress(lots, sc, false), [lots, sc]);
   const rows = [...res.rows].sort((a, b) => (windowOf(a.lot).ext ?? windowOf(a.lot).end).localeCompare(windowOf(b.lot).ext ?? windowOf(b.lot).end));
   const delta = res.totalMargin - res.baseMargin;
   const ids = (list: LotRisk[]) => (list.length ? list.map((r) => r.lot.id).join(', ') : 'nenhum');
@@ -70,6 +67,7 @@ export default function RiscoTab() {
               {r.lot.id}
             </Link>
             <p className="font-mono text-xs text-muted tnum">{qty(r.lot.world, r.S)}</p>
+            {isIllustrative(r.lot) && <p className="text-xs text-muted">ilustrativo</p>}
           </div>
         </div>
       ),
@@ -95,8 +93,8 @@ export default function RiscoTab() {
     },
     { key: 'contrato', header: 'Contrato', align: 'right', mono: true, className: 'whitespace-nowrap', sortValue: (r) => r.lot.economics.buyerPrice, render: (r) => unitPrice(r.lot.world, r.lot.economics.buyerPrice) },
     {
-      key: 'referencia',
-      header: 'Referência',
+      key: 'indice',
+      header: 'Índice',
       align: 'right',
       mono: true,
       className: 'whitespace-nowrap',
@@ -104,7 +102,7 @@ export default function RiscoTab() {
       render: (r) => (
         <div>
           <div>{unitPrice(r.lot.world, r.market)}</div>
-          <div className={cn('text-xs', r.refChange <= -0.15 ? 'text-warn-ink' : 'text-muted')}>{signedPct(r.refChange)} vs. entrada</div>
+          <div className={cn('text-xs', r.refChange <= -PRICE_TRIGGER ? 'text-warn-ink' : 'text-muted')}>{signedPct(r.refChange)} vs. abertura</div>
         </div>
       ),
     },
@@ -189,13 +187,7 @@ export default function RiscoTab() {
             />
             </div>
           </div>
-          <Checkbox
-            label="Aplicar o choque de preço também à água"
-            description={isPrice ? 'A água não tem cobertura de preço: o choque passa inteiro para a margem.' : 'Disponível nos cenários de preço.'}
-            checked={water && isPrice}
-            disabled={!isPrice}
-            onChange={(e) => update({ agua: e.target.checked })}
-          />
+          <p className="measure text-sm text-muted">A água fica fora do teste: vende-se em cesto, em modelo de agente, sem capital de cofinanciadores nem stock próprio.</p>
         </div>
 
         <Card className="mt-5" aria-live="polite">
@@ -206,7 +198,7 @@ export default function RiscoTab() {
             className="mt-4"
             columns={4}
             items={[
-              { label: 'Margem bruta prevista do piloto', value: eur(res.totalMargin, { decimals: 0 }), mono: true, hint: sc === 'base' ? 'com as referências de hoje' : `${signedEur(delta)} face a hoje` },
+              { label: 'Margem bruta prevista do piloto', value: eur(res.totalMargin, { decimals: 0 }), mono: true, hint: sc === 'base' ? 'com os índices de hoje' : `${signedEur(delta)} face a hoje` },
               { label: 'Gatilhos de cobertura que disparam', value: num(res.triggers.length), mono: true, hint: ids(res.triggers) },
               { label: 'Lotes que entram em extensão', value: num(res.extensions.length), mono: true, hint: ids(res.extensions) },
               { label: 'Lotes em refunding', value: num(res.refundings.length), mono: true, hint: ids(res.refundings) },
@@ -223,7 +215,7 @@ export default function RiscoTab() {
           )}
           {res.negative.length > 0 && (
             <p className="mt-3 text-sm text-muted">
-              {plural(res.negative.length, 'lote fica', 'lotes ficam')} com resultado negativo para os co-financiadores depois da reserva de primeira perda: {ids(res.negative)}.
+              {plural(res.negative.length, 'lote fica', 'lotes ficam')} com resultado negativo para os cofinanciadores depois da reserva comum de primeira perda: {ids(res.negative)}.
             </p>
           )}
         </Card>
@@ -246,17 +238,17 @@ export default function RiscoTab() {
             Marcação a mercado por lote
           </h2>
           <p className="measure mt-1 text-muted">
-            Preço contratado com o comprador contra a referência, base, cobertura e PnL do lote. O resultado previsto é o dos co-financiadores, em % do montante financiado, ao lado do intervalo anunciado na oferta e da ação que o cenário pede.
+            Preço contratado com o comprador contra o índice de mercado (no azeite, o índice de origem a granel), base, cobertura e PnL do lote. O resultado previsto é o dos cofinanciadores, em % do montante financiado, ao lado do intervalo anunciado na oferta e da ação que o cenário pede.
           </p>
         </div>
         <DataTable columns={columns} rows={rows} getRowId={(r) => r.lot.id} caption={`Marcação a mercado por lote, cenário ${res.scenario.label}`} rowClassName={(r) => (affected.has(r.lot.id) ? 'bg-[color-mix(in_oklab,var(--warn)_6%,var(--surface))]' : undefined)} />
-        <p className="mt-2 text-sm text-muted">MTM do stock: margem não realizada do que falta vender, ao preço do cenário. Base: preço contratado face à referência de hoje (negativo = abaixo do mercado, como prometido ao comprador).</p>
+        <p className="measure mt-2 text-sm text-muted">MTM do stock: margem não realizada do que falta vender, ao preço do cenário. Base: preço contratado face ao preço ao comprador que o índice do cenário daria no mesmo canal (embalado). Os lotes marcados «ilustrativo» são histórico ilustrativo, com dados fictícios.</p>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <Card>
-          <CardHeader title="Gatilhos de cobertura do azeite" description="Distância entre a referência e o limiar de cada gatilho armado. Abaixo do limiar, a venda a prazo sobe para o nível do gatilho." />
-          <PriceRuler min={3} max={5.2} unit="€/kg" today={MARKET_TODAY.azeite} stressed={azMarket} stressLabel={res.scenario.label} marks={marks} />
+          <CardHeader title="Gatilhos de cobertura do azeite" description="Distância entre o índice de origem e o limiar de cada gatilho armado. Abaixo do limiar, a venda a prazo sobe para o nível do gatilho." />
+          <PriceRuler min={2.2} max={4.4} unit="€/kg" today={MARKET_TODAY.azeite} stressed={azMarket} stressLabel={res.scenario.label} marks={marks} />
           <ul className="mt-5 divide-y divide-border">
             {azTriggers.map((t) => {
               const dist = (azMarket - t.threshold!) / azMarket;
@@ -304,7 +296,7 @@ export default function RiscoTab() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <CommodityChip world={it.w} />
                   <span className="font-mono text-sm text-fg tnum">
-                    {it.w === 'cafe' ? 'Fase 2 · sem exposição' : `${pct(it.coverage, 0)} do stock coberto`}
+                    {it.w === 'cafe' ? 'Fase 2 · sem exposição' : it.stock <= 0 ? 'Cesto · sem stock próprio' : `${pct(it.coverage, 0)} do stock coberto`}
                   </span>
                 </div>
                 <p className="mt-2 font-medium text-fg">{it.world.hedge.label}</p>

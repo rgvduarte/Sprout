@@ -1,5 +1,6 @@
-import { useId, useRef, useState, type ReactNode, type KeyboardEvent } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type KeyboardEvent } from 'react';
 import { cn } from '../../lib/cn';
+import { revealInline, useEdgeFade } from '../../lib/useEdgeFade';
 
 export interface TabItem<V extends string = string> {
   value: V;
@@ -29,6 +30,13 @@ export function Tabs<V extends string>({ items, value, defaultValue, onChange, l
   const current = value ?? inner;
   const uid = useId().replace(/:/g, '');
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const scroller = useRef<HTMLDivElement>(null);
+  const fade = useEdgeFade(scroller);
+  const activeIndex = items.findIndex((t) => t.value === current);
+  // o separador ativo fica sempre à vista na barra (no telemóvel a barra desliza)
+  useEffect(() => {
+    revealInline(scroller.current, refs.current[activeIndex] ?? null);
+  }, [activeIndex]);
 
   const select = (v: V) => {
     if (value === undefined) setInner(v);
@@ -52,7 +60,7 @@ export function Tabs<V extends string>({ items, value, defaultValue, onChange, l
 
   return (
     <div className={cn('min-w-0', className)}>
-      <div className="-mx-4 overflow-x-auto px-4 no-scrollbar sm:mx-0 sm:px-0">
+      <div ref={scroller} className="-mx-4 overflow-x-auto px-4 no-scrollbar sm:mx-0 sm:px-0" style={fade}>
         <div role="tablist" aria-label={label} className="flex min-w-max gap-1 border-b border-border">
           {items.map((t, i) => {
             const active = t.value === current;

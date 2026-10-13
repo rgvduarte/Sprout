@@ -37,11 +37,14 @@ export function SimCalendar({ run, month, className }: { run: SimRun; month: num
         <div className="relative">
           <div className="grid" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }} aria-hidden>
             {months.map((m) => {
-              const jan = calendarMonth(m) === 1;
+              // um rótulo a cada três meses (nov., fev., mai., ago.) e o ano em novembro de 2026 e em cada janeiro
+              const tick = (m - 1) % 3 === 0;
+              const current = m === month;
+              const year = m === 1 || calendarMonth(m) === 1;
               return (
-                <div key={m} className="min-w-0 text-center font-mono text-[11px] leading-4 text-muted">
-                  <span className={cn('block', m % 3 !== 1 && 'max-md:invisible', m === month && 'font-semibold text-fg')}>{monthShort(m)}</span>
-                  <span className={cn('block text-fg', !jan && m !== 1 && 'invisible', m === 1 && 'max-md:invisible')}>{calendarYear(m)}</span>
+                <div key={m} className="min-w-0 overflow-visible whitespace-nowrap text-center font-mono text-xs leading-4 text-muted">
+                  <span className={cn('block', !tick && !current && 'invisible', !tick && current && 'max-md:invisible', current && 'font-semibold text-fg')}>{monthShort(m)}</span>
+                  <span className={cn('block text-fg', !year && 'invisible')}>{year ? calendarYear(m) : '·'}</span>
                 </div>
               );
             })}

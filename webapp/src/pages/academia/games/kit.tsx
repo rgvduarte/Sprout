@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Check, RotateCcw, X } from 'lucide-react';
 import { Button } from '../../../components/ui';
@@ -30,22 +30,26 @@ export function shuffle<T>(items: readonly T[], rng: Rng): T[] {
 
 export type ChoiceState = 'idle' | 'right' | 'wrong' | 'missed' | 'dim';
 
-/** Botão de resposta. 'missed' = a certa que não foi escolhida (revelada). */
+/**
+ * Botão de resposta. 'missed' = a certa que não foi escolhida (revelada).
+ * Bloqueado com aria-disabled (não `disabled`): depois de responder, o foco do
+ * teclado fica na opção escolhida em vez de cair para a página.
+ */
 export function Choice({ state = 'idle', disabled, onClick, children, className, hint }: { state?: ChoiceState; disabled?: boolean; onClick?: () => void; children: ReactNode; className?: string; hint?: ReactNode }) {
   return (
     <button
       type="button"
-      disabled={disabled}
-      onClick={onClick}
-      aria-pressed={state === 'right' || state === 'wrong' ? true : undefined}
+      aria-disabled={disabled || undefined}
+      onClick={disabled ? undefined : onClick}
       className={cn(
         'flex min-h-11 w-full min-w-0 items-start gap-2 rounded-sm border px-3 py-2.5 text-left text-[0.9375rem] transition-[background-color,border-color,color,opacity] duration-150',
-        state === 'idle' && 'border-border bg-surface text-fg enabled:hover:border-world-line enabled:hover:bg-world-soft',
+        state === 'idle' && !disabled && 'border-border bg-surface text-fg hover:border-world-line hover:bg-world-soft',
+        state === 'idle' && disabled && 'border-border bg-surface text-fg',
         state === 'right' && 'border-[color-mix(in_oklab,var(--ok)_50%,var(--border))] bg-[color-mix(in_oklab,var(--ok)_13%,var(--surface))] text-fg',
         state === 'missed' && 'border-[color-mix(in_oklab,var(--ok)_50%,var(--border))] border-dashed bg-surface text-fg',
         state === 'wrong' && 'border-[color-mix(in_oklab,var(--crit)_40%,var(--border))] bg-[color-mix(in_oklab,var(--crit)_8%,var(--surface))] text-fg',
         state === 'dim' && 'border-border bg-surface text-muted',
-        'disabled:cursor-default',
+        disabled && 'cursor-default',
         className,
       )}
     >
@@ -146,8 +150,18 @@ export function useFinishGame(id: MiniGameId) {
 export function ResultPanel({ result, title, onReplay, children }: { result: FinishResult; title: string; onReplay: () => void; children?: ReactNode }) {
   const reduce = useReducedMotion();
   const pct = result.score / result.max;
+  const rootRef = useRef<HTMLDivElement>(null);
+  // "Jogar outra vez" desmonta este painel: o foco passa para a primeira opção da nova ronda (não cai para a página)
+  const replay = () => {
+    const host = rootRef.current?.closest<HTMLElement>('[role="tabpanel"], section, article') ?? null;
+    onReplay();
+    window.requestAnimationFrame(() => {
+      const target = host?.querySelector<HTMLElement>('fieldset button:not([aria-disabled="true"]), button:not([aria-disabled="true"]):not([disabled])');
+      (target ?? host)?.focus();
+    });
+  };
   return (
-    <div className="min-w-0">
+    <div ref={rootRef} className="min-w-0">
       <motion.div
         className="flex flex-wrap items-end gap-x-8 gap-y-4"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
@@ -175,7 +189,7 @@ export function ResultPanel({ result, title, onReplay, children }: { result: Fin
           </p>
           <p className="text-sm text-muted">{pct === 1 ? 'Tudo certo.' : pct >= 0.5 ? 'Revê abaixo as que falharam e joga outra vez.' : 'Lê as explicações abaixo antes de voltar a jogar.'}</p>
         </div>
-        <Button variant="secondary" iconLeft={<RotateCcw aria-hidden className="size-4" strokeWidth={1.75} />} onClick={onReplay} className="sm:ml-auto">
+        <Button variant="secondary" iconLeft={<RotateCcw aria-hidden className="size-4" strokeWidth={1.75} />} onClick={replay} className="sm:ml-auto">
           Jogar outra vez
         </Button>
       </motion.div>

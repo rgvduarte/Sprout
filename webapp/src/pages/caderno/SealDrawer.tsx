@@ -20,6 +20,10 @@ export function gaugeFor(lot: Lot): { value: number; caption: string } {
   if (lot.status === 'aberto') return { value: fundedFraction(lot), caption: `Financiamento ${pct(fundedFraction(lot), 0)}` };
   if (lot.status === 'liquidado') return { value: 0, caption: 'Vendido e liquidado' };
   if (lot.status === 'fase-2') return { value: 0, caption: 'Pré-visualização' };
+  if (lot.status === 'cesto') {
+    const v = lot.quantity ? lot.stock / lot.quantity : 0;
+    return { value: v, caption: `Cesto, sem financiamento · ${pct(v, 0)} em armazém` };
+  }
   const v = lot.quantity ? lot.stock / lot.quantity : 0;
   return { value: v, caption: lot.status === 'em-preparacao' ? `Em enchimento · ${pct(v, 0)}` : `Por vender · ${pct(v, 0)}` };
 }
@@ -79,7 +83,7 @@ export function SealDrawer({ seal, campaign, onClose }: { seal: SealView | null;
                   <p className="font-medium text-seal-ink">Ganho a {fmtDate(s.earned.at)}</p>
                   <p className="mt-1 text-sm text-muted">
                     {s.earned.by === 'compromisso'
-                      ? `Por compromisso: co-financias ${s.earned.lotId ?? 'um lote desta origem'}.`
+                      ? `Por compromisso: cofinancias ${s.earned.lotId ?? 'um lote desta origem'}.`
                       : `Por diligência: cumpriste as ${quests.length} missões desta origem.`}
                   </p>
                 </>
@@ -113,7 +117,7 @@ export function SealDrawer({ seal, campaign, onClose }: { seal: SealView | null;
                 { label: s.def.world === 'agua' ? 'Água' : 'Variedades', value: s.producer.variedades.join(', ') },
                 { label: 'Certificações', value: s.producer.certifications.join(', ') },
                 { label: 'Capacidade', value: s.producer.capacidade },
-                { label: 'Na Sprout desde', value: monthYear(`${s.producer.since}-15`) },
+                { label: 'Na Sprout desde', value: `${monthYear(`${s.producer.since}-15`)} · histórico ilustrativo` },
               ]}
             />
           </section>

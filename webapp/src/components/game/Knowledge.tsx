@@ -13,39 +13,46 @@ import { CommodityGlyph } from '../ui/Commodity';
 
 /** Glifos dos níveis: semente, copo de prova, mó de lagar, ramo de oliveira. */
 export function LevelGlyph({ level, className }: { level: LevelId; className?: string }) {
+  // desenhados numa grelha de 24 px com poucos traços grossos e folhas cheias: legíveis a 16–24 px nos dois temas
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cn('size-5 shrink-0', className)}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cn('size-5 shrink-0', className)}>
       {level === 'aprendiz' && (
         <>
-          <ellipse cx="12" cy="17" rx="4.2" ry="3.2" />
-          <path d="M12 13.8V8" />
-          <path d="M12 9.5c-.3-2.6-2.2-4.1-4.6-4.2.1 2.5 2 4.1 4.6 4.2z" />
-          <path d="M12 8c.4-2.4 2.2-3.7 4.4-3.8-.1 2.3-1.9 3.7-4.4 3.8z" />
+          {/* rebento: duas folhas sobre a linha da terra */}
+          <path d="M4 20h16" />
+          <path d="M12 20v-8.5" />
+          <path d="M11.6 13.2C11.4 9.6 9 7.4 5.2 7.3c.1 3.6 2.6 5.8 6.4 5.9z" fill="currentColor" strokeWidth={1.25} />
+          <path d="M12.4 11.4c.3-3.3 2.6-5.3 6.2-5.3-.2 3.3-2.6 5.2-6.2 5.3z" fill="currentColor" strokeWidth={1.25} />
         </>
       )}
       {level === 'provador' && (
         <>
           {/* copo de prova do painel de azeite */}
           <path d="M5 8h14l-1.3 8.2a3.2 3.2 0 0 1-3.2 2.8H9.5a3.2 3.2 0 0 1-3.2-2.8z" />
-          <path d="M5.6 11.5h12.8" />
+          <path d="M6.2 12.5h11.6l-.6 3.7a2 2 0 0 1-2 1.7H8.8a2 2 0 0 1-2-1.7z" fill="currentColor" stroke="none" />
           <path d="M9 4.5c1 1 2 1 3 0s2-1 3 0" />
         </>
       )}
       {level === 'lagareiro' && (
         <>
-          {/* mó de lagar */}
-          <circle cx="12" cy="12" r="8" />
-          <circle cx="12" cy="12" r="2.5" />
-          <path d="M12 4v5.5M12 14.5V20M4 12h5.5M14.5 12H20" />
+          {/* mó de lagar vista de lado: a pedra no eixo, sobre o pio */}
+          <path d="M12 3.5v4" />
+          <rect x="4.5" y="7.5" width="15" height="7" rx="3.5" fill="currentColor" strokeWidth={1.25} />
+          <path d="M3 18.5h18" />
+          <path d="M5.5 18.5 7 21h10l1.5-2.5" />
         </>
       )}
       {level === 'mestre' && (
         <>
-          {/* ramo de oliveira em coroa */}
-          <path d="M6.5 19C3.5 15.5 3.8 9.5 8 6" />
-          <path d="M17.5 19c3-3.5 2.7-9.5-1.5-13" />
-          <path d="M5.2 14.5c-1.6-.4-2.4-1.6-2.4-2.9 1.4 0 2.6.9 2.4 2.9zM5.6 10.2C4.4 9.4 4.1 8 4.6 6.9c1.2.6 1.8 1.9 1 3.3zM18.8 14.5c1.6-.4 2.4-1.6 2.4-2.9-1.4 0-2.6.9-2.4 2.9zM18.4 10.2c1.2-.8 1.5-2.2 1-3.3-1.2.6-1.8 1.9-1 3.3z" />
-          <path d="M9.5 19.5h5" />
+          {/* dois ramos de oliveira que se juntam na base */}
+          <path d="M12 21C7.5 19.5 5.2 15.6 5.4 9.5" />
+          <path d="M12 21c4.5-1.5 6.8-5.4 6.6-11.5" />
+          <ellipse cx="4.4" cy="8.6" rx="1.5" ry="2.8" transform="rotate(-18 4.4 8.6)" fill="currentColor" stroke="none" />
+          <ellipse cx="4.6" cy="14" rx="1.5" ry="2.8" transform="rotate(-58 4.6 14)" fill="currentColor" stroke="none" />
+          <ellipse cx="8.4" cy="18.4" rx="1.4" ry="2.6" transform="rotate(-80 8.4 18.4)" fill="currentColor" stroke="none" />
+          <ellipse cx="19.6" cy="8.6" rx="1.5" ry="2.8" transform="rotate(18 19.6 8.6)" fill="currentColor" stroke="none" />
+          <ellipse cx="19.4" cy="14" rx="1.5" ry="2.8" transform="rotate(58 19.4 14)" fill="currentColor" stroke="none" />
+          <ellipse cx="15.6" cy="18.4" rx="1.4" ry="2.6" transform="rotate(80 15.6 18.4)" fill="currentColor" stroke="none" />
         </>
       )}
     </svg>

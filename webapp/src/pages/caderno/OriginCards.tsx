@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { RotateCcw } from 'lucide-react';
-import { getWorld } from '../../data';
-import type { WorldId } from '../../data/types';
+import { Lock, RotateCcw } from 'lucide-react';
+import { getRegion, getRegionsByMap, getWorld } from '../../data';
+import type { Lot, Producer, WorldId } from '../../data/types';
 import { Button, CommodityGlyph, TextLink } from '../../components/ui';
 import { EASE_OUT } from '../../components/game';
-import { createRng } from '../../lib/prng';
+import { dateShort, num } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import type { CardView } from './model';
 
@@ -15,115 +15,95 @@ import type { CardView } from './model';
    vendem, não se trocam, não valem dinheiro.
    ===================================================================== */
 
-/* ------------------------------------------------------------ ilustrações */
+/* ------------------------------------------------------------ ilustrações (geradas dos dados do lote) */
 
-function OliveArt({ seed }: { seed: string }) {
-  const rng = createRng(seed);
-  const trees: { x: number; y: number; r: number }[] = [];
-  for (let row = 0; row < 5; row++) {
-    for (let col = 0; col < 10; col++) {
-      const x = 10 + col * 15 + (row % 2) * 7 + rng.range(-1.6, 1.6);
-      const y = 22 + row * 14 + Math.sin((x / 160) * Math.PI * 1.4) * 5 + rng.range(-1.2, 1.2);
-      if (x > 104 && y > 58) continue;
-      trees.push({ x, y, r: rng.range(2.3, 3.1) });
-    }
-  }
-  return (
-    <>
-      <rect width="160" height="110" fill="color-mix(in oklab, var(--world) 9%, var(--surface))" />
-      {[16, 44, 72, 100].map((y, i) => (
-        <path key={y} d={`M0 ${y} C 40 ${y - 9 + i}, 90 ${y + 9}, 160 ${y - 5}`} fill="none" stroke="var(--world-line)" strokeWidth="1" />
-      ))}
-      {trees.map((t, i) => (
-        <circle key={i} cx={t.x} cy={t.y} r={t.r} fill="var(--world)" opacity={0.88} />
-      ))}
-      {/* IBC de 1 000 kg na grade, sobre palete */}
-      <g transform="translate(116 64)">
-        <rect x="0" y="0" width="34" height="32" fill="var(--surface)" stroke="var(--world-ink)" strokeWidth="1.25" />
-        <rect x="1.5" y="9" width="31" height="21.5" fill="var(--world)" opacity="0.8" />
-        {[11.3, 22.6].map((x) => (
-          <line key={x} x1={x} y1="0" x2={x} y2="32" stroke="var(--world-ink)" strokeWidth="0.9" />
-        ))}
-        {[10.6, 21.3].map((y) => (
-          <line key={y} x1="0" y1={y} x2="34" y2={y} stroke="var(--world-ink)" strokeWidth="0.9" />
-        ))}
-        <rect x="-1" y="32" width="36" height="4" fill="var(--world-ink)" />
-      </g>
-    </>
-  );
+const SQRT3 = Math.sqrt(3);
+
+function hexPoints(cx: number, cy: number, r: number) {
+  return Array.from({ length: 6 }, (_, i) => {
+    const a = (Math.PI / 180) * (60 * i - 30);
+    return `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+  }).join(' ');
 }
 
-function WaterArt({ seed }: { seed: string }) {
-  const rng = createRng(seed);
-  const bands = [40, 57, 74, 91];
-  const pores = Array.from({ length: 26 }, () => ({ x: rng.range(4, 156), y: rng.range(62, 106), r: rng.range(0.8, 1.6) }));
+/** Mapa de mosaico da origem: o mapa inteiro, apagado, com a região do lote a cheio. */
+function RegionMark({ regionId, x, y, w, h }: { regionId: string; x: number; y: number; w: number; h: number }) {
+  const region = getRegion(regionId);
+  if (!region) return null;
+  const all = getRegionsByMap(region.map).flatMap((r) => r.tiles.map((t) => ({ ...t, own: r.id === regionId })));
+  const cols = Math.max(...all.map((t) => t.col)) + 1.5;
+  const rows = Math.max(...all.map((t) => t.row)) + 1;
+  const r = Math.min(w / (cols * SQRT3), h / (rows * 1.5 + 0.5));
   return (
-    <>
-      <rect width="160" height="110" fill="var(--surface)" />
-      {bands.map((y, i) => (
-        <path
-          key={y}
-          d={`M0 ${y} C 40 ${y - 4 + rng.range(-2, 2)}, 100 ${y + 5}, 160 ${y - 2} L160 110 L0 110 Z`}
-          fill={`color-mix(in oklab, var(--world) ${14 + i * 11}%, var(--surface))`}
-          stroke="var(--world-line)"
+    <g transform={`translate(${x} ${y})`}>
+      {all.map((t) => (
+        <polygon
+          key={`${t.col}-${t.row}`}
+          points={hexPoints(r * SQRT3 * (t.col + 0.5 + (t.row % 2 ? 0.5 : 0)), r * (1 + t.row * 1.5), r - 0.6)}
+          fill={t.own ? 'var(--world)' : 'color-mix(in oklab, var(--world) 14%, var(--surface))'}
+          stroke={t.own ? 'var(--world-ink)' : 'none'}
           strokeWidth="0.8"
         />
       ))}
-      {pores.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={p.r} fill="var(--surface)" opacity="0.75" />
-      ))}
-      {/* captação */}
-      <line x1="34" y1="104" x2="34" y2="33" stroke="var(--world-ink)" strokeWidth="2" />
-      <rect x="29" y="28" width="10" height="5" fill="var(--world-ink)" />
-      {/* garrafa de 1,5 L */}
-      <g transform="translate(104 4)">
-        <path d="M12 0 h8 v5 c0 2 5 4 5 9 v19 c0 2 -1 3 -3 3 h-12 c-2 0 -3 -1 -3 -3 v-19 c0 -5 5 -7 5 -9 z" fill="var(--surface)" stroke="var(--world-ink)" strokeWidth="1.2" />
-        <path d="M8 17 h16 v16 c0 2 -1 2.5 -2.5 2.5 h-11 c-1.5 0 -2.5 -0.5 -2.5 -2.5 z" fill="var(--world)" opacity="0.7" />
-      </g>
-      <g transform="translate(128 12)">
-        <path d="M9 0 h6 v4 c0 2 4 3 4 7 v15 c0 2 -1 2.5 -2.5 2.5 h-9 c-1.5 0 -2.5 -0.5 -2.5 -2.5 v-15 c0 -4 4 -5 4 -7 z" fill="var(--surface)" stroke="var(--world-ink)" strokeWidth="1.1" />
-        <path d="M6 13 h12 v13 c0 1.5 -1 2 -2 2 h-8 c-1 0 -2 -0.5 -2 -2 z" fill="var(--world)" opacity="0.7" />
-      </g>
-    </>
+    </g>
   );
 }
 
-function CoffeeArt({ seed }: { seed: string }) {
-  const rng = createRng(seed);
-  const clusters = Array.from({ length: 9 }, (_, i) => ({ x: 14 + i * 11 + rng.range(-3, 3), y: 30 + Math.sin(i * 0.8) * 10 + rng.range(-3, 3) }));
-  return (
-    <>
-      <rect width="160" height="110" fill="var(--surface)" />
-      <path d="M-10 110 C 30 40, 90 40, 130 110 Z" fill="color-mix(in oklab, var(--world) 12%, var(--surface))" />
-      <path d="M50 110 C 90 54, 150 50, 180 110 Z" fill="color-mix(in oklab, var(--world) 20%, var(--surface))" />
-      {[70, 80, 90, 100].map((y) => (
-        <path key={y} d={`M${(110 - y) * 0.9 + 4} ${y} Q 60 ${y - 14}, ${118 - (110 - y) * 0.6} ${y}`} fill="none" stroke="var(--world-line)" strokeWidth="1" />
-      ))}
-      {/* ramo com cerejas */}
-      <path d="M4 26 C 40 18, 80 40, 112 24" fill="none" stroke="var(--world-ink)" strokeWidth="1.4" />
-      {clusters.map((c, i) => (
-        <g key={i}>
-          <circle cx={c.x} cy={c.y + 4} r="3.3" fill="var(--world)" />
-          <circle cx={c.x + 5} cy={c.y + 6} r="3.3" fill="var(--world)" opacity="0.75" />
-        </g>
-      ))}
-      {/* saca de 60 kg */}
-      <g transform="translate(118 62)">
-        <path d="M6 6 C 2 14, 0 28, 3 40 h28 c3 -12 1 -26 -3 -34 z" fill="color-mix(in oklab, var(--world) 32%, var(--surface))" stroke="var(--world-ink)" strokeWidth="1.2" />
-        <path d="M6 6 c 4 -4 18 -4 22 0" fill="none" stroke="var(--world-ink)" strokeWidth="1.2" />
-        <path d="M12 3 l5 4 l5 -4" fill="none" stroke="var(--world-ink)" strokeWidth="1.2" />
-        <line x1="8" y1="22" x2="26" y2="22" stroke="var(--world-ink)" strokeWidth="0.8" strokeDasharray="2 2" />
-      </g>
-    </>
-  );
+/** Iniciais das variedades ("Verdeal e Cobrançosa" → "VC"). */
+function varietyInitials(lot: Lot, producer: Producer): string {
+  const fromTitle = lot.title.replace(/^(Virgem extra|Água mineral natural|Água de nascente|Arábica (natural|lavado),?)\s*/i, '');
+  const words = (fromTitle || producer.variedades.join(' ')).split(/[\s,]+/).filter((w) => w.length > 2 && !/^(e|de|da|do|colheita|precoce|1,5|L)$/i.test(w));
+  const letters = words.map((w) => w[0].toUpperCase()).join('').slice(0, 3);
+  return letters || producer.initials;
 }
 
-export function CardArt({ world, seed, className, muted }: { world: WorldId; seed: string; className?: string; muted?: boolean }) {
+const UNIT_WORD: Record<WorldId, [string, string]> = { azeite: ['IBC', 'IBC'], agua: ['palete', 'paletes'], cafe: ['saca', 'sacas'] };
+
+/** Unidade física do lote, pelo contentor onde está hoje (um lote por financiar pode ainda estar no depósito do lagar). */
+function unitWordOf(lot: Lot): [string, string] {
+  const c = lot.storage.container.toLowerCase();
+  if (c.startsWith('ibc')) return ['IBC', 'IBC'];
+  if (c.startsWith('depósito')) return ['depósito', 'depósitos'];
+  if (c.startsWith('palete')) return ['palete', 'paletes'];
+  if (c.startsWith('saca')) return ['saca', 'sacas'];
+  return UNIT_WORD[lot.world];
+}
+
+/**
+ * Arte da carta, gerada dos dados: o mapa da origem com a região acesa, as iniciais das
+ * variedades, a data de extração ou engarrafamento e uma fila com as unidades físicas do lote.
+ */
+export function CardArt({ lot, producer, className, muted }: { lot: Lot; producer: Producer; className?: string; muted?: boolean }) {
+  const world = lot.world;
+  const units = lot.storage.containers;
+  const perMark = units > 60 ? 20 : 1;
+  const marks = Math.min(40, Math.ceil(units / perMark));
+  const perRow = 20;
+  const cell = 6.4;
+  const harvest = lot.milestones.find((m) => m.stage === 'colhido');
+  const day = harvest?.date ?? harvest?.planned;
+  const isPt = getRegion(lot.regionId)?.map === 'pt';
   return (
-    <svg viewBox="0 0 160 110" className={cn('block h-auto w-full', muted && 'opacity-45 grayscale', className)} aria-hidden data-world={world}>
-      {world === 'azeite' && <OliveArt seed={seed} />}
-      {world === 'agua' && <WaterArt seed={seed} />}
-      {world === 'cafe' && <CoffeeArt seed={seed} />}
+    <svg viewBox="0 0 160 110" className={cn('block h-auto w-full', muted && 'opacity-50 grayscale', className)} aria-hidden data-world={world}>
+      <rect width="160" height="110" fill="color-mix(in oklab, var(--world) 7%, var(--surface))" />
+      {isPt ? <RegionMark regionId={lot.regionId} x={8} y={6} w={40} h={68} /> : <RegionMark regionId={lot.regionId} x={6} y={10} w={70} h={30} />}
+      <text x={isPt ? 58 : 84} y={isPt ? 34 : 30} fontSize="26" fontWeight={700} fontFamily="var(--font-display)" fill="var(--world-ink)" style={{ fontStretch: '87.5%' }}>
+        {varietyInitials(lot, producer)}
+      </text>
+      <text x={isPt ? 58 : 84} y={isPt ? 48 : 44} fontSize="8.5" fontFamily="var(--font-mono)" fill="var(--fg)">
+        {day ? `${world === 'agua' ? 'engarrafado' : world === 'cafe' ? 'colheita' : 'extração'} ${dateShort(day)}` : lot.campanha}
+      </text>
+      <text x={isPt ? 58 : 84} y={isPt ? 59 : 55} fontSize="8.5" fontFamily="var(--font-sans)" fill="var(--muted)">
+        {producer.localidade}
+      </text>
+      <g transform="translate(8 80)">
+        {Array.from({ length: marks }, (_, i) => (
+          <rect key={i} x={(i % perRow) * (cell + 1)} y={Math.floor(i / perRow) * (cell + 1)} width={cell} height={cell} rx={world === 'cafe' ? 2.5 : 0.8} fill="var(--world)" opacity={0.85} />
+        ))}
+      </g>
+      <text x="152" y="104" textAnchor="end" fontSize="8" fontFamily="var(--font-mono)" fill="var(--world-ink)">
+        {`${num(units)} ${units === 1 ? unitWordOf(lot)[0] : unitWordOf(lot)[1]}${perMark > 1 ? ` · ■ = ${perMark}` : ''}`}
+      </text>
     </svg>
   );
 }
@@ -131,7 +111,7 @@ export function CardArt({ world, seed, className, muted }: { world: WorldId; see
 /* ------------------------------------------------------------ carta */
 
 const STATE_TEXT: Record<CardView['state'], string> = {
-  participado: 'Co-financias este lote',
+  participado: 'Cofinancias este lote',
   estudado: 'Leste o boletim de análises',
   bloqueado: 'Por desbloquear',
 };
@@ -149,8 +129,9 @@ function Front({ card }: { card: CardView }) {
           {String(card.n).padStart(2, '0')}/{String(card.of).padStart(2, '0')}
         </span>
       </div>
-      <div className="mx-3 mt-2 overflow-hidden rounded-sm border border-world-line">
-        <CardArt world={lot.world} seed={lot.id} />
+      {/* arte a toda a largura da carta, entre filetes (uma janela, não um cartão dentro do cartão) */}
+      <div className="mt-2 border-y border-world-line">
+        <CardArt lot={lot} producer={producer} />
       </div>
       <div className="flex flex-1 flex-col px-3 pb-3 pt-2.5">
         <p className="font-mono text-sm text-fg tnum">{lot.id}</p>
@@ -160,7 +141,10 @@ function Front({ card }: { card: CardView }) {
         <p className="mt-0.5 text-xs text-muted">
           {region.nome} · {lot.campanha}
         </p>
-        <p className="mt-auto pt-2 text-xs font-medium text-world-ink">{STATE_TEXT[card.state]}</p>
+        <p className="mt-auto pt-2 text-xs font-medium text-world-ink">
+          {STATE_TEXT[card.state]}
+          {card.state === 'participado' && lot.illustrative && <span className="font-normal text-muted"> · histórico ilustrativo</span>}
+        </p>
       </div>
     </div>
   );
@@ -243,6 +227,7 @@ function FlipCard({ card }: { card: CardView }) {
 
 function LockedCard({ card }: { card: CardView }) {
   const { lot, producer } = card;
+  const shown = card.stats.filter((x) => x.label !== 'Região').slice(0, 3);
   return (
     <div className="flex h-full min-w-0 flex-col" data-world={lot.world}>
       <div className="flex flex-1 flex-col rounded-md border border-dashed border-[color-mix(in_oklab,var(--fg)_26%,var(--border))] bg-surface p-3">
@@ -255,12 +240,25 @@ function LockedCard({ card }: { card: CardView }) {
             {String(card.n).padStart(2, '0')}/{String(card.of).padStart(2, '0')}
           </span>
         </div>
-        <div className="mt-2 overflow-hidden rounded-sm border border-border">
-          <CardArt world={lot.world} seed={lot.id} muted />
+        <div className="-mx-3 mt-2 border-y border-border">
+          <CardArt lot={lot} producer={producer} muted />
         </div>
         <p className="mt-2.5 font-mono text-sm text-fg tnum">{lot.id}</p>
         <p className="mt-0.5 text-[0.9375rem] font-medium leading-tight text-fg">{producer.nome}</p>
-        <p className="mt-auto pt-2 text-xs text-muted">{card.unlock?.text}</p>
+        <dl className="mt-2 flex flex-col gap-1 text-xs text-muted">
+          {shown.map((x) => (
+            <div key={x.label} className="flex min-w-0 items-baseline justify-between gap-2">
+              <dt className="shrink-0">{x.label}</dt>
+              <dd className={cn('truncate text-right', x.mono && 'font-mono tnum')} title={x.value}>
+                {x.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-auto flex items-start gap-1.5 pt-2 text-xs text-muted">
+          <Lock aria-hidden className="mt-px size-3.5 shrink-0" strokeWidth={1.75} />
+          <span>{card.unlock?.text}</span>
+        </p>
       </div>
       <div className="mt-1 flex min-h-9 items-center justify-center">
         {card.unlock?.href ? (

@@ -170,3 +170,14 @@ export function tidyDeep<T>(value: T): T {
   }
   return value;
 }
+
+/**
+ * Minúscula na primeira letra para usar um rótulo a meio de uma frase, sem
+ * estragar siglas e nomes com maiúsculas internas ("HoReCa e lojas gourmet"
+ * fica igual; "Distribuidores e exportadores" passa a "distribuidores…").
+ */
+export function lowerInitial(label: string): string {
+  const first = label.split(/\s/)[0] ?? '';
+  if (/[A-ZÀ-Ý]/.test(first.slice(1))) return label;
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}

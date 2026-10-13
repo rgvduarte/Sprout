@@ -250,7 +250,15 @@ function LotsPanel({ state, budget, invested }: { state: MonthState; budget: num
           <dd className="font-mono text-[0.9375rem] text-fg tnum">{fe(budget - invested)}</dd>
         </div>
       </dl>
-      {reserveTotal > 0.5 && <p className="mt-3 text-sm text-muted">A reserva de primeira perda está a absorver {fe(reserveTotal)} neste momento.</p>}
+      <p className="mt-3 text-sm text-muted">
+        {reserveTotal > 0.5 ? (
+          <>
+            A reserva comum está a absorver {fe(reserveTotal)} das perdas previstas.{' '}
+          </>
+        ) : null}
+        Saldo previsto da reserva comum no fim: <span className="font-mono text-fg tnum">{fe(state.reserve)}</span>
+        {state.reserve < 0.5 && state.lots.some((l) => l.result < -0.0005) ? ', esgotada: o resto das perdas fica com os cofinanciadores.' : '.'}
+      </p>
     </Card>
   );
 }
@@ -262,6 +270,8 @@ function LotRow({ snap }: { snap: LotSnap }) {
   if (lot.hedge.available) flags.push(snap.hedged ? { label: `Coberto ${pct(lot.hedge.coverage, 0)}`, tone: 'info' } : { label: 'Sem cobertura', tone: 'neutral' });
   if (snap.reserveUsed > 0.5) flags.push({ label: `Reserva: ${fe(snap.reserveUsed)}`, tone: 'neutral' });
   if (snap.downgraded > 0) flags.push({ label: `${pct(snap.downgraded, 0)} desclassificado`, tone: 'warn' });
+  if (snap.writtenOff > 0) flags.push({ label: `${pct(snap.writtenOff, 0)} do stock perdido`, tone: 'warn' });
+  if (snap.badDebt > 0) flags.push({ label: `${pct(snap.badDebt, 0)} das vendas por cobrar`, tone: 'warn' });
   if (snap.refunded) flags.push({ label: 'Refunding', tone: 'warn' });
   if (snap.extended) flags.push({ label: `Extensão até ${monthLabel(snap.salesTo)}`, tone: 'warn' });
   if (snap.delayed > 0 && !snap.extended) flags.push({ label: `Vendas +${snap.delayed} meses`, tone: 'neutral' });

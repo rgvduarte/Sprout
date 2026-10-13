@@ -4,7 +4,7 @@ import { Check, X, CalendarRange } from 'lucide-react';
 import { LevelGlyph, OriginSeal, Reveal, TileMap, TileMapLegend } from '../../components/game';
 import { ButtonLink, SimulationLabel } from '../../components/ui';
 import { CommodityGlyph } from '../../components/ui/Commodity';
-import { getProducersByRegion, getRegion, LEVELS, SEALS, SIM_EVENTS, SIM_RULES, WORLDS } from '../../data';
+import { countsTowardCompletion, getProducersByRegion, getRegion, LEVELS, SEALS, SIM_EVENTS, SIM_RULES, WORLDS } from '../../data';
 import { useData, useGame } from '../../state';
 import { eur, num, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
@@ -22,7 +22,7 @@ const EXAMPLE_SEAL = SEALS.find((s) => s.id === 'seal-ribeira-2627')!;
 const DECK_EXAMPLE = [
   { id: 'procura-forte', month: 5 },
   { id: 'choque-preco', month: 9 },
-  { id: 'atraso-vendas', month: 13 },
+  { id: 'comprador-insolvente', month: 13 },
 ].map((e) => ({ ...e, event: SIM_EVENTS.find((x) => x.id === e.id)! }));
 
 const PLAYS = [
@@ -47,7 +47,9 @@ export function GameSection() {
   const region = getRegion(regionId)!;
   const producers = getProducersByRegion(regionId);
   const sealProducer = seals.find((s) => s.def.id === EXAMPLE_SEAL.id)!;
-  const earnedCount = seals.filter((s) => s.earned).length;
+  // selos de campanhas encerradas ficam no caderno como história, fora da contagem
+  const current = seals.filter((s) => countsTowardCompletion(s.def));
+  const earnedCount = current.filter((s) => s.earned).length;
 
   const select = (id: string) => {
     setRegionId(id);
@@ -98,12 +100,12 @@ export function GameSection() {
               <div className="mt-3 flex items-center gap-4">
                 <OriginSeal seal={EXAMPLE_SEAL} producer={sealProducer.producer} region={sealProducer.region} state="earned" size={104} className="shrink-0" />
                 <p className="min-w-0 text-sm leading-relaxed text-muted">
-                  Um selo de lacre por produtor e campanha. Este, do {sealProducer.producer.nome}, ganha-se com um compromisso no lote ou com {EXAMPLE_SEAL.questIds.length} missões de diligência.
+                  Um selo de lacre por produtor e campanha. Este, do {sealProducer.producer.nome}, ganha-se com {EXAMPLE_SEAL.questIds.length} missões de conhecimento sobre a origem ou com um compromisso no lote.
                 </p>
               </div>
               <p className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-muted">
                 <span>
-                  No teu caderno: <span className="font-medium text-fg tnum">{earnedCount}</span> de <span className="tnum">{seals.length}</span> selos.
+                  No teu caderno: <span className="font-medium text-fg tnum">{earnedCount}</span> de <span className="tnum">{current.length}</span> selos desta campanha.
                 </span>
                 <Link to="/caderno" className="inline-flex min-h-11 items-center font-medium text-accent underline underline-offset-[0.2em]">
                   Abrir o caderno
@@ -126,7 +128,7 @@ export function GameSection() {
                   );
                 })}
               </ol>
-              <p className="mt-3 text-sm leading-relaxed text-muted">Cada nível abre conhecimento e acesso: relatório técnico, prova guiada, visita ao lagar. Nunca preço, comissão ou prioridade.</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">Cada nível abre conhecimento: prova guiada, leitura técnica anotada de um lote, visita ao lagar. Nunca preço, comissão, prioridade ou informação do lote: boletins, atas e inventários são para todos os investidores.</p>
             </div>
 
             {/* simulador */}
@@ -134,7 +136,9 @@ export function GameSection() {
               <h3 className="text-[1.1875rem]">Simulador de campanha</h3>
               <SimulationLabel className="mt-2" />
               <p className="mt-3 text-sm leading-relaxed text-muted">
-                Distribuis {eur(SIM_RULES.budget)} fictícios por lotes e jogas {SIM_RULES.months} meses. O baralho traz choques de preço, colheitas fracas, atrasos e procura forte; a cobertura, a reserva de primeira perda, a extensão e o refunding mudam o desfecho, que pode ser perda.
+                {tidyText(
+                  `Distribuis ${eur(SIM_RULES.budget)} fictícios por lotes e jogas ${SIM_RULES.months} meses. O baralho traz choques de preço, recessões, compradores insolventes, stock danificado e procura forte; a cobertura, a reserva comum de primeira perda, a extensão e o refinanciamento mudam o desfecho. Até uma carteira diversificada e coberta perde em parte das campanhas.`,
+                )}
               </p>
               <DeckStrip />
               <p className="mt-4 text-sm leading-relaxed text-muted">A liga de campanha é opcional e pseudónima, e ordena pela pontuação de gestão: resultado face à maior queda, cobertura, diversificação e debrief. Não ganha quem arrisca mais.</p>

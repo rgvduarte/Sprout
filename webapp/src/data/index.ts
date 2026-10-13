@@ -1,5 +1,6 @@
 import { CAMPAIGN_EVENTS } from './events';
 import { LEVELS, MODULES, QUESTS, SEALS, SIM_COMPLETE_POINTS } from './game';
+import { MARKET_LABEL } from './market';
 import { DEMO_INVESTOR_ID, INVESTORS, SEED_POSITIONS } from './investors';
 import { LOTS } from './lots';
 import { MARKET, MARKET_TODAY } from './market';
@@ -27,11 +28,26 @@ import { REGIONS, WORLDS } from './worlds';
 export * from './types';
 export { WORLDS, REGIONS } from './worlds';
 export { PRODUCERS } from './producers';
-export { LOTS, INVESTOR_SHARE, RESERVE_SHARE, SETTLEMENT_MONTHS, EXTENSION_MONTHS } from './lots';
-export { MARKET, MARKET_TODAY } from './market';
-export { PRODUCER_PRICE_TODAY, CHAIN_DIFFERENTIAL, OLIVE_CHAIN_FACTS, FOUNDERS_THESIS } from './valueChain';
+export {
+  LOTS,
+  INVESTOR_SHARE,
+  SPROUT_SHARE,
+  RESERVE_SHARE,
+  RESERVE_CAP,
+  RESERVE_RULE,
+  RESERVE_POOL,
+  PRICE_TRIGGER,
+  PRICE_TERMS,
+  SETTLEMENT_MONTHS,
+  EXTENSION_MONTHS,
+  referenceToday,
+  buyerPriceAtIndex,
+  projectedResult,
+} from './lots';
+export { MARKET, MARKET_TODAY, MARKET_LABEL, OLIVE_REFERENCES, OLIVE_INDEX_TODAY, marketAt } from './market';
+export { PRODUCER_PRICE_TODAY, PRODUCER_PRICE_LABEL, CHAIN_DIFFERENTIAL, OLIVE_CHAIN_FACTS, OLIVE_MODEL, WATER_AGENT, FOUNDERS_THESIS } from './valueChain';
 export { INVESTORS, DEMO_INVESTOR_ID, SEED_POSITIONS, SEED_SEALS } from './investors';
-export { LEVELS, MODULES, QUESTS, SEALS, DEMO_PROGRESS, SIM_COMPLETE_POINTS, LEVEL_PERKS, REWARDS } from './game';
+export { LEVELS, MODULES, QUESTS, SEALS, DEMO_PROGRESS, SIM_COMPLETE_POINTS, LEVEL_PERKS, REWARDS, CLOSED_CAMPAIGNS, CLOSED_CAMPAIGN_LABEL, countsTowardCompletion } from './game';
 export * from './minigames';
 export { SIM_RULES, SIM_LOTS, SIM_EVENTS } from './simulator';
 export { CAMPAIGN_EVENTS, EVENT_KIND_LABEL } from './events';
@@ -59,8 +75,18 @@ export const getLotsByWorld = (world: WorldId) => LOTS.filter((l) => l.world ===
 export const getLotsByProducer = (producerId: string) => LOTS.filter((l) => l.producerId === producerId);
 export const getLotsByRegion = (regionId: string) => LOTS.filter((l) => l.regionId === regionId);
 
-/** Lotes onde é possível comprometer capital hoje. */
-export const isInvestable = (lot: Lot) => lot.status === 'aberto' && lot.funding.raised < lot.funding.goal;
+/** Lotes onde é possível comprometer capital hoje. A água (modelo de agente) nunca é financiável. */
+export const isInvestable = (lot: Lot) => lot.status === 'aberto' && lot.economics.model === 'principal' && lot.funding.raised < lot.funding.goal;
+
+/* ------------------------------------------------------------ histórico ilustrativo */
+
+/** Etiqueta para lotes, posições e indicadores anteriores ao piloto. */
+export const ILLUSTRATIVE_LABEL = 'Histórico ilustrativo · dados fictícios';
+/** Uma frase que explica a etiqueta. */
+export const ILLUSTRATIVE_NOTE =
+  'O piloto só começa em fevereiro de 2027: hoje, 13/10/2026, estamos na Fase 0. Os lotes das campanhas 2024/25 e 2025/26, as posições e os indicadores passados existem para mostrar a jornada de um lote. São fictícios e não são resultados.';
+/** Lote, posição ou indicador de histórico ilustrativo. */
+export const isIllustrative = (x: { illustrative?: boolean } | undefined | null) => Boolean(x?.illustrative);
 export const fundedFraction = (lot: Pick<Lot, 'funding'>) => (lot.funding.goal > 0 ? Math.min(1, lot.funding.raised / lot.funding.goal) : 0);
 export const remainingToFund = (lot: Pick<Lot, 'funding'>) => Math.max(0, lot.funding.goal - lot.funding.raised);
 
@@ -74,6 +100,7 @@ export const STATUS_LABEL: Record<LotStatus, string> = {
   'em-extensao': 'Em extensão',
   liquidado: 'Liquidado',
   'fase-2': 'Fase 2 · pré-visualização',
+  cesto: 'Cesto · sem financiamento',
 };
 
 export const STATUS_TONE: Record<LotStatus, Tone> = {
@@ -83,6 +110,7 @@ export const STATUS_TONE: Record<LotStatus, Tone> = {
   'em-extensao': 'warn',
   liquidado: 'ok',
   'fase-2': 'cafe',
+  cesto: 'neutral',
 };
 
 export const stageLabel = (world: WorldId, stage: JourneyStage) => getWorld(world).journeyLabels[stage];
@@ -99,10 +127,14 @@ export function unitLabel(lot: Pick<Lot, 'unit' | 'quantity'>): string {
 /** Unidade de preço do lote: 'kg' ou 'L'. */
 export const priceUnit = (lot: Pick<Lot, 'world'>) => getWorld(lot.world).priceUnit;
 
-/** Referência de mercado de hoje e variação face à referência de entrada do lote. */
-export function marketVsEntry(lot: Lot): { today: number; entry: number; change: number } {
+/**
+ * Índice de mercado de hoje face ao da abertura do lote. No azeite compara granel com granel
+ * (índice de origem), nunca granel com o preço embalado da referência do canal.
+ */
+export function marketVsEntry(lot: Lot): { today: number; entry: number; change: number; label: string } {
   const today = MARKET_TODAY[lot.world];
-  return { today, entry: lot.economics.refPrice, change: today / lot.economics.refPrice - 1 };
+  const entry = lot.economics.indexAtOpen;
+  return { today, entry, change: entry > 0 ? today / entry - 1 : 0, label: MARKET_LABEL[lot.world] };
 }
 
 export const getMarketSeries = (world: WorldId) => MARKET.find((m) => m.world === world)!;

@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { Check, Shuffle } from 'lucide-react';
+import { Check, Play, Shuffle } from 'lucide-react';
 import type { SimRunResult } from '../../data/types';
 import { Button, DataTable, type Column } from '../../components/ui';
 import { cn } from '../../lib/cn';
 import { num, pct } from '../../lib/format';
 import { managementScore, SCORE_RULES } from './engine';
-import { cohortEntries, rankEntries, type LeagueEntry } from './league';
+import { cohortEntries, LEAGUE_SEED, LEAGUE_SEASON, rankEntries, type LeagueEntry } from './league';
 import { replayResult } from './runs';
 import { PSEUDONYMS } from './store';
 import { fpct, Switch } from './parts';
@@ -16,20 +16,25 @@ export interface LeagueProps {
   runs: SimRunResult[];
   onOptIn: (v: boolean) => void;
   onNextPseudonym: () => void;
+  /** prepara uma campanha com a semente da época */
+  onPlaySeason: () => void;
+}
+
+/** A primeira campanha completa com a semente da época: é essa que entra na liga, sem repetições. */
+export function firstSeasonRun(runs: SimRunResult[]): SimRunResult | undefined {
+  return [...runs].filter((r) => r.seed === LEAGUE_SEED).sort((a, b) => a.at.localeCompare(b.at))[0];
 }
 
 /** Liga de campanha: opcional, com pseudónimo, só com dinheiro fictício, ordenada pela gestão. */
-export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }: LeagueProps) {
+export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym, onPlaySeason }: LeagueProps) {
+  const first = useMemo(() => firstSeasonRun(runs), [runs]);
+  const later = first ? runs.filter((r) => r.seed === LEAGUE_SEED && r !== first).length : 0;
   const mine = useMemo<LeagueEntry | null>(() => {
-    if (!optIn || !runs.length) return null;
-    const scored = runs.map((r) => {
-      const run = replayResult(r);
-      const f = run.final!;
-      return { r, f, score: managementScore({ allocations: r.allocations, result: f.result, drawdown: f.maxDrawdown, debriefRead: true }) };
-    });
-    const best = scored.sort((a, b) => b.score.total - a.score.total || a.f.maxDrawdown - b.f.maxDrawdown)[0];
-    return { id: 'tu', pseudonym, style: 'A tua melhor gestão da época', seed: best.r.seed, you: true, invested: best.r.invested, result: best.f.result, drawdown: best.f.maxDrawdown, score: best.score, runs: runs.length };
-  }, [optIn, runs, pseudonym]);
+    if (!optIn || !first) return null;
+    const f = replayResult(first).final!;
+    const score = managementScore({ allocations: first.allocations, result: f.result, drawdown: f.maxDrawdown, debriefRead: true });
+    return { id: 'tu', pseudonym, style: 'A tua primeira campanha da época', seed: first.seed, you: true, invested: first.invested, result: f.result, drawdown: f.maxDrawdown, score, runs: 1 };
+  }, [optIn, first, pseudonym]);
 
   const ranked = useMemo(() => rankEntries([...cohortEntries(), ...(mine ? [mine] : [])]), [mine]);
   const rankOf = (e: LeagueEntry) => ranked.indexOf(e) + 1;
@@ -48,7 +53,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
             {e.pseudonym}
             {e.you && <span className="ml-1.5 text-sm font-semibold text-accent">· tu</span>}
           </span>
-          <span className="text-muted">{e.you ? `${e.style} (${e.runs} ${e.runs === 1 ? 'campanha' : 'campanhas'})` : e.style}</span>
+          <span className="text-muted">{e.style}</span>
         </span>
       ),
     },
@@ -73,7 +78,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
       <div className="min-w-0">
         <p className="measure text-[0.9375rem] text-fg">
-          Uma liga da coorte do piloto para a campanha 2026/27. É opcional, usa pseudónimos e só conta campanhas com dinheiro fictício. Ordena pela <strong className="font-semibold">pontuação de gestão</strong>, não pelo resultado: ganha quem gere o risco, não quem arrisca mais.
+          Uma liga para a campanha {LEAGUE_SEASON}, com dinheiro fictício. Todos os gestores jogam a mesma campanha, a semente <span className="font-mono tnum">{LEAGUE_SEED}</span>, com os mesmos acontecimentos: só a gestão muda o resultado. Conta a tua <strong className="font-semibold">primeira</strong> campanha completa com essa semente; repetir não muda a tua entrada. Ordena pela <strong className="font-semibold">pontuação de gestão</strong>, não pelo resultado.
         </p>
 
         <div className="mt-4 flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
@@ -82,13 +87,25 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
             checked={optIn}
             onChange={onOptIn}
             label={optIn ? `Estás na liga como «${pseudonym}»` : 'Entrar na liga com pseudónimo'}
-            description={optIn ? 'Entra a tua melhor pontuação de gestão da época. Ninguém vê o teu nome nem o teu dinheiro real.' : `Vais aparecer como «${pseudonym}». Podes sair quando quiseres.`}
+            description={optIn ? 'Entra a tua primeira campanha completa com a semente da época. Ninguém vê o teu nome nem o teu dinheiro real.' : `Vais aparecer como «${pseudonym}». Podes sair quando quiseres.`}
           />
           <Button variant="ghost" size="sm" iconLeft={<Shuffle aria-hidden className="size-4" strokeWidth={1.75} />} onClick={onNextPseudonym}>
             Outro pseudónimo
           </Button>
         </div>
-        {optIn && !mine && <p className="mt-2 text-sm text-muted">Ainda sem campanhas completas: a tua melhor pontuação entra na liga quando abrires um balanço.</p>}
+        {optIn && !mine && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p className="text-sm text-muted">Ainda não jogaste a campanha da época. Entras na liga quando abrires o balanço da primeira.</p>
+            <Button variant="secondary" size="sm" iconLeft={<Play aria-hidden className="size-4" strokeWidth={1.75} />} onClick={onPlaySeason}>
+              Preparar a campanha da época
+            </Button>
+          </div>
+        )}
+        {optIn && mine && later > 0 && (
+          <p className="mt-2 text-sm text-muted">
+            Jogaste esta semente mais {later} {later === 1 ? 'vez' : 'vezes'}. Na liga fica a primeira: as repetições servem para aprender, não para subir.
+          </p>
+        )}
 
         {topReturn && leader && topReturn !== leader && (
           <p className="measure mt-5 border-t border-border pt-4 text-[0.9375rem] text-fg">
@@ -103,7 +120,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
         <h3 id="formula-title" className="text-[1.0625rem]">
           Como se calcula a pontuação
         </h3>
-        <p className="mt-1 text-sm text-muted">De 0 a 100, pela melhor campanha de cada gestor na época.</p>
+        <p className="mt-1 text-sm text-muted">De 0 a 100, pela primeira campanha de cada gestor com a semente da época.</p>
         <dl className="mt-4 flex flex-col gap-3.5 text-sm">
           <FormulaRow term="Risco-retorno" max={SCORE_RULES.riskReturnMax}>
             Resultado menos {num(SCORE_RULES.drawdownWeight, 1)} × a queda máxima a meio da campanha. {pct(SCORE_RULES.floor, 0)} ou pior vale 0; {pct(SCORE_RULES.ceiling, 0, { sign: true })} ou melhor vale {SCORE_RULES.riskReturnMax}.
@@ -128,7 +145,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
             columns={columns}
             rows={ranked}
             getRowId={(e) => e.id}
-            caption={`Liga de campanha 2026/27: ${ranked.length} gestores, ordenados pela pontuação de gestão (dinheiro fictício)`}
+            caption={`Liga de campanha ${LEAGUE_SEASON}: ${ranked.length} gestores na mesma campanha, ordenados pela pontuação de gestão (dinheiro fictício)`}
             rowClassName={(e) => (e.you ? 'bg-accent-soft' : undefined)}
             maxHeight={620}
           />

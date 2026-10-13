@@ -110,7 +110,7 @@ function Rail() {
       <Link to="/" className="px-3 no-underline" aria-label="Sprout, início">
         <BrandMark onRail />
       </Link>
-      <p className="-mt-3 px-3 text-xs text-rail-muted">Piloto fechado · azeite e água</p>
+      <p className="-mt-3 px-3 text-xs text-rail-muted">Piloto fechado · azeite · água em cesto</p>
       <RailNav />
       <div className="mt-auto">
         <RailIdentity />
@@ -151,7 +151,7 @@ export function RoleSwitcher({ compact }: { compact?: boolean }) {
   return (
     <label className="flex min-w-0 items-center gap-2">
       <span className={cn('shrink-0 text-sm text-muted', compact && 'sr-only')}>Ver como</span>
-      <Select value={role} onChange={(e) => setRole(e.target.value as Role)} className={cn('h-10 text-sm', compact ? 'w-[150px]' : 'w-[190px]')} aria-label="Ver como">
+      <Select value={role} onChange={(e) => setRole(e.target.value as Role)} className={cn('h-10 shrink-0 text-sm', compact ? 'w-[150px] min-w-[150px]' : 'w-[190px] min-w-[150px]')} aria-label="Ver como">
         {ROLES.map((r) => (
           <option key={r} value={r}>
             {ROLE_LABEL[r]}
@@ -171,15 +171,16 @@ export function DemoBadge({ short }: { short?: boolean }) {
   );
 }
 
-export function SeasonPill() {
+/** Estação da campanha. `short`: "2026/27 · colheita" (barras estreitas). A área de toque tem 44 px de altura. */
+export function SeasonPill({ short }: { short?: boolean }) {
   return (
     <Link
       to="/mercados/azeite"
-      className="inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-xs border border-[color-mix(in_oklab,var(--c-azeite)_35%,var(--border))] bg-[color-mix(in_oklab,var(--c-azeite)_14%,var(--surface))] px-2 text-[0.8125rem] font-medium text-azeite-ink no-underline hover:underline"
+      className="relative inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-xs border border-[color-mix(in_oklab,var(--c-azeite)_35%,var(--border))] bg-[color-mix(in_oklab,var(--c-azeite)_14%,var(--surface))] px-2 text-[0.8125rem] font-medium text-azeite-ink no-underline after:absolute after:inset-x-0 after:-inset-y-2 after:content-[''] hover:underline"
       title="A campanha do azeite: colheita de outubro a janeiro, vendas até setembro"
     >
       <CommodityGlyph world="azeite" className="size-3.5" />
-      {CAMPAIGN.label} · {CAMPAIGN.phaseLabel}
+      {short ? `${CAMPAIGN.label.replace(/^Campanha\s+/, '')} · colheita` : `${CAMPAIGN.label} · ${CAMPAIGN.phaseLabel}`}
     </Link>
   );
 }
@@ -192,15 +193,26 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
         <Link to="/" className="no-underline rail:hidden" aria-label="Sprout, início">
           <BrandMark />
         </Link>
-        <div className="hidden min-w-0 items-center gap-2 md:flex">
-          <DemoBadge />
-          <SeasonPill />
+        {/* pílulas: formas curtas até 1280/1536 px, para nunca passarem por baixo do "Ver como" */}
+        <div className="hidden min-w-0 items-center gap-2 overflow-hidden md:flex">
+          <span className="xl:hidden">
+            <DemoBadge short />
+          </span>
+          <span className="hidden xl:inline-flex">
+            <DemoBadge />
+          </span>
+          <span className="hidden lg:inline-flex 2xl:hidden">
+            <SeasonPill short />
+          </span>
+          <span className="hidden 2xl:inline-flex">
+            <SeasonPill />
+          </span>
         </div>
-        <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
-          <div className="hidden sm:block">
+        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="hidden xl:block">
             <RoleSwitcher />
           </div>
-          <div className="sm:hidden">
+          <div className="xl:hidden">
             <RoleSwitcher compact />
           </div>
           <div className="hidden rail:block">
@@ -215,7 +227,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
 /** No telemóvel o aviso de demonstração e a estação ficam por baixo da barra (sem ocupar a zona fixa). */
 function MobileContextRow() {
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 md:hidden">
+    <div role="region" aria-label="Contexto da demonstração" className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 md:hidden">
       <DemoBadge short />
       <SeasonPill />
     </div>
@@ -233,9 +245,10 @@ export function Footer() {
 
 /* ------------------------------------------------------------ carregamento */
 
+/** Esqueleto do ecrã enquanto o código chega: ocupa o ecrã todo, para o rodapé não aparecer e depois saltar (CLS). */
 export function PageFallback() {
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-4 pt-8 sm:px-6 lg:px-8" aria-busy="true">
+    <div className="mx-auto min-h-[calc(100dvh-57px)] w-full max-w-[1240px] px-4 pt-8 sm:px-6 lg:px-8" aria-busy="true">
       <Skeleton className="h-9 w-2/3 max-w-[420px]" label="A carregar o ecrã" />
       <Skeleton className="mt-3 h-4 w-full max-w-[560px]" />
       <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -273,7 +286,7 @@ export function AppShell({ children, layout }: { children: ReactNode; layout: 'a
       <div className="flex min-h-dvh flex-col">
         {skip}
         <header className="z-20 border-b border-border bg-bg">
-          <div className="mx-auto flex min-h-14 max-w-[1440px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
+          <div className="mx-auto flex min-h-14 max-w-[1440px] flex-nowrap items-center gap-x-3 px-4 py-2 sm:px-6">
             <Link to="/" className="no-underline" aria-label="Sprout, início">
               <BrandMark />
             </Link>
@@ -281,9 +294,9 @@ export function AppShell({ children, layout }: { children: ReactNode; layout: 'a
               <DemoBadge />
             </span>
             <div className="ml-auto flex items-center gap-2">
-              <Link to="/" className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-medium text-fg no-underline hover:underline">
+              <Link to="/" aria-label="Voltar à plataforma" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 px-2 text-sm font-medium text-fg no-underline hover:underline">
                 <ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />
-                Plataforma
+                <span className="max-[419px]:sr-only">Plataforma</span>
               </Link>
               <ThemeToggle />
             </div>

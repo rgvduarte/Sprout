@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, CircleCheck, Landmark, LoaderCircle, Play } from 'lucide-react';
-import { RECONCILIATION, TRANSACTIONS, type Transaction } from '../../data';
+import { ILLUSTRATIVE_LABEL, RECONCILIATION, TRANSACTIONS, type Transaction } from '../../data';
 import { Badge, Button, Card, CardHeader, DataTable, Drawer, KeyValue, RadioGroup, SegmentedControl, StatusPill, type Column } from '../../components/ui';
 import { useData, useToast } from '../../state';
 import { GameContext } from '../../state/AppProvider';
@@ -88,7 +88,7 @@ function ReconCard() {
     <Card>
       <HeaderRow
         title="Reconciliação diária"
-        description={`Saldo da conta de clientes no ${PSP_NAME} contra o razão interno, todos os dias até às 20:00.`}
+        description={`Saldo da conta de clientes no ${PSP_NAME} contra o razão interno, todos os dias até às 20:00. Os fechos dos últimos 30 dias são ${ILLUSTRATIVE_LABEL.toLowerCase()}.`}
         actions={
           st.recon ? (
             <Badge tone="ok" icon={<CircleCheck aria-hidden className="size-3.5" strokeWidth={2} />}>
@@ -245,7 +245,7 @@ export default function TesourariaTab() {
       minWidth: 220,
       render: (p) => (
         <div>
-          <div className="font-medium text-fg">{p.kind === 'liquidacao' ? 'Liquidação aos co-financiadores' : 'Pagamento ao produtor'}</div>
+          <div className="font-medium text-fg">{p.kind === 'liquidacao' ? 'Liquidação aos cofinanciadores' : 'Pagamento ao produtor'}</div>
           <div className="text-sm text-muted">
             <Link to={`/lote/${p.lotId}`} className="font-mono text-accent underline-offset-[0.2em] hover:underline tnum">
               {p.lotId}
@@ -335,7 +335,7 @@ export default function TesourariaTab() {
     { title: 'Contas segregadas', evidence: 'O dinheiro de investidores e compradores só entra na conta de clientes no PSP. A conta operacional nunca recebe transferências de investidores.' },
     { title: 'Reconciliação diária até às 20:00', evidence: `${num(onTime)} de ${num(RECONCILIATION.length)} fechos dentro do prazo nos últimos 30 dias.` },
     { title: `Dupla aprovação acima de ${eur(DOUBLE_APPROVAL_LIMIT)}`, evidence: `${plural(doubles, 'pagamento programado precisa', 'pagamentos programados precisam')} de duas funções diferentes.` },
-    { title: 'Produtores pagos em D+2 úteis', evidence: 'Contados a partir do fecho do financiamento do lote; nunca adiantados antes do fecho.' },
+    { title: 'Produtores pagos em D+2 úteis', evidence: 'Contados a partir do fecho do financiamento do lote; nunca adiantados antes do fecho. O limite legal é de 30 dias (DL 118/2010).' },
     { title: 'Só rails e jurisdição UE', evidence: 'PSP e banco de liquidação na UE. Nada de custódia em jurisdições sem ponte bancária europeia, para não haver capital retido na repatriação.' },
   ];
 
@@ -385,7 +385,7 @@ export default function TesourariaTab() {
           <h2 id="quebras-t" className="text-[1.375rem] leading-tight">
             Quebras de reconciliação
           </h2>
-          <p className="measure mt-1 text-muted">Diferenças entre o PSP e o razão nos últimos 30 dias, com causa e resolução.</p>
+          <p className="measure mt-1 text-muted">Diferenças entre o PSP e o razão nos últimos 30 dias, com causa e resolução. {ILLUSTRATIVE_LABEL}.</p>
         </div>
         <DataTable columns={breakCols} rows={recon.breaks} getRowId={(r) => r.date} caption="Quebras de reconciliação nos últimos 30 dias" empty={{ title: 'Sem quebras nos últimos 30 dias' }} />
       </section>
@@ -396,7 +396,7 @@ export default function TesourariaTab() {
             Pagamentos programados
           </h2>
           <p className="measure mt-1 text-muted">
-            Liquidações a co-financiadores e pagamentos a produtores. Acima de {eur(DOUBLE_APPROVAL_LIMIT)}, duas aprovações de funções diferentes. As liquidações são estimativas até à última receção do comprador.
+            Liquidações a cofinanciadores e pagamentos a produtores. Acima de {eur(DOUBLE_APPROVAL_LIMIT)}, duas aprovações de funções diferentes. As liquidações são estimativas até à última receção do comprador e referem-se a lotes do histórico ilustrativo (dados fictícios).
           </p>
         </div>
         <DataTable columns={payoutCols} rows={list} getRowId={(p) => p.id} caption="Pagamentos programados" />
@@ -421,7 +421,7 @@ export default function TesourariaTab() {
             <h2 id="movimentos-t" className="text-[1.375rem] leading-tight">
               Movimentos na conta de clientes
             </h2>
-            <p className="measure mt-1 text-muted">Desde 01/09/2026, mais recentes primeiro. Montantes com sinal: entradas positivas, saídas negativas.</p>
+            <p className="measure mt-1 text-muted">Desde 01/09/2026, mais recentes primeiro. Montantes com sinal: entradas positivas, saídas negativas. {ILLUSTRATIVE_LABEL}.</p>
           </div>
           <div className="max-w-full overflow-x-auto pb-1">
             <div className="w-max">

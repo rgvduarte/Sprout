@@ -155,9 +155,10 @@ export function knowledgeTimeline(profile: ProfileState): KMilestone[] {
     const pts = Math.round((Math.min(r.bestScore, g.maxScore) / g.maxScore) * g.maxPoints);
     items.push({ id: `g-${g.id}`, at: r.at, kind: 'minijogo', world: g.world, title: `${g.title}: ${r.bestScore} de ${g.maxScore}`, points: pts });
   }
-  if (profile.simRuns.length) {
+  // a primeira campanha do simulador entra como marco só se não houver já a missão «Joga uma campanha completa» (que tem os pontos)
+  if (profile.simRuns.length && !profile.questsCompleted.some((q) => q.id === 'q-simulador')) {
     const first = [...profile.simRuns].sort((a, b) => toDate(a.at).getTime() - toDate(b.at).getTime())[0];
-    items.push({ id: 'sim', at: first.at, kind: 'simulador', world: 'geral', title: 'Primeira campanha jogada no simulador, com dinheiro fictício', points: SIM_COMPLETE_POINTS });
+    items.push({ id: 'sim', at: first.at, kind: 'simulador', world: 'geral', title: 'Primeira campanha jogada no simulador, com dinheiro fictício', points: SIM_COMPLETE_POINTS || undefined });
   }
   items.sort((a, b) => toDate(a.at).getTime() - toDate(b.at).getTime() || (a.kind === 'modulo' ? -1 : 1));
   let acc = 0;
@@ -264,7 +265,11 @@ export function regionReasons(regionId: string, profile: ProfileState, f: Follow
   const reasons: string[] = [];
   const inRegion = lots.filter((l) => l.regionId === regionId);
   const part = inRegion.filter((l) => f.participated.has(l.id));
-  if (part.length) reasons.push(`Co-financias ${part.map((l) => l.id).join(', ')}.`);
+  if (part.length) {
+    // posições da investidora de demonstração em lotes anteriores ao piloto: histórico ilustrativo
+    const illustrative = part.every((l) => l.illustrative);
+    reasons.push(`Cofinancias ${part.map((l) => l.id).join(', ')}${illustrative ? ' (histórico ilustrativo, dados fictícios)' : ''}.`);
+  }
   for (const s of earnedSealRegions.filter((x) => x.regionId === regionId)) reasons.push(`Selo de origem ganho: ${s.label}.`);
   const read = inRegion.filter((l) => profile.analysesRead.includes(l.id));
   if (read.length) reasons.push(`Leste o boletim de análises de ${read.map((l) => l.id).join(', ')}.`);

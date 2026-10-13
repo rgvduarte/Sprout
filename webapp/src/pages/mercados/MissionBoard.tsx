@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
-import { fundedFraction, getWorld, stageLabel, unitLabel } from '../../data';
+import { fundedFraction, getWorld, ILLUSTRATIVE_LABEL, isIllustrative, stageLabel, unitLabel } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
 import { Badge, Button, ButtonLink, DataTable, StatusPill, TextLink, Tooltip } from '../../components/ui';
 import type { Column } from '../../components/ui';
@@ -11,12 +11,13 @@ import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, monthYear, num, pct } from '../../lib/format';
 import { lotQuantityLabel, physicalForAmount } from '../../lib/physical';
 import { useData, useGame } from '../../state';
-import { HEDGE_PILL, lotPlace, MISSION_TITLE, unitPrice } from './model';
+import { HEDGE_PILL, lotGoalTitle, lotPlace, unitPrice } from './model';
 
 /* =====================================================================
-   Lotes como missões: o medidor físico enche até ao financiamento (ou ao
-   stock real, nos lotes em preparação), com desconto, ticket mínimo,
-   janela de liquidação, saída e cobertura em linguagem simples.
+   Lotes abertos: o medidor físico enche até ao financiamento (ou ao stock
+   real, nos lotes em preparação), com o preço ao comprador e o seu canal,
+   investimento mínimo, janela de liquidação, saída e cobertura em
+   linguagem simples. Financiar não é uma missão (não dá pontos).
    ===================================================================== */
 
 export function HedgePill({ world, lot }: { world: WorldId; lot?: Lot }) {
@@ -60,8 +61,9 @@ function MissionRow({ lot }: { lot: Lot }) {
   const open = lot.status === 'aberto';
   const preparing = lot.status === 'em-preparacao';
   const preview = lot.status === 'fase-2';
+  const cesto = lot.status === 'cesto';
   const funded = fundedFraction(lot);
-  const gaugeValue = preparing ? stockFraction(lot) : funded;
+  const gaugeValue = preparing || cesto ? stockFraction(lot) : funded;
   const read = game.riskRead(lot.id).length;
   const factors = lot.riskFactors.length;
   const min = physicalForAmount(lot, lot.funding.minTicket);
@@ -69,8 +71,8 @@ function MissionRow({ lot }: { lot: Lot }) {
   const end = lot.settlement.plannedEnd ?? addMonths(lot.funding.opensPlanned ?? lot.funding.opensAt, lot.settlement.windowMonths);
   const endExact = Boolean(lot.settlement.plannedEnd);
   const physicalUnit = world === 'agua' ? 'paletes' : world === 'cafe' ? 'sacas' : 'kg';
-  const gaugeLabel = preparing ? `Stock do ${lot.id} a encher` : preview ? `${lot.id}, pré-visualização da Fase 2` : `Financiamento do ${lot.id}`;
-  const gaugeText = preparing ? `${num(lot.stock)} de ${num(lot.quantity)} ${physicalUnit}` : `${Math.round(funded * 100)} %`;
+  const gaugeLabel = preparing ? `Stock do ${lot.id} a encher` : cesto ? `Stock engarrafado do cesto ${lot.id}` : preview ? `${lot.id}, pré-visualização da Fase 2` : `Financiamento do ${lot.id}`;
+  const gaugeText = preparing || cesto ? `${num(lot.stock)} de ${num(lot.quantity)} ${physicalUnit}` : `${Math.round(funded * 100)} %`;
   const reasonId = `razao-${lot.id}`;
 
   return (
@@ -87,7 +89,7 @@ function MissionRow({ lot }: { lot: Lot }) {
         </div>
         <h3 id={`m-${lot.id}`} className="mt-2 text-[1.1875rem] leading-snug">
           <Link to={`/lote/${lot.id}`} className="hover:underline">
-            Missão: {MISSION_TITLE[world](lot)}
+            {lotGoalTitle(lot)}
           </Link>
         </h3>
         <p className="mt-1 text-[0.9375rem] text-muted">
@@ -96,12 +98,18 @@ function MissionRow({ lot }: { lot: Lot }) {
         <p className="mt-2 text-[0.9375rem] text-fg">
           {open && (
             <>
-              <span className="font-mono tnum">{eur(lot.funding.raised)}</span> financiados de <span className="font-mono tnum">{eur(lot.funding.goal)}</span> · {num(lot.funding.coFinancers)} co-financiadores
+              <span className="font-mono tnum">{eur(lot.funding.raised)}</span> financiados de <span className="font-mono tnum">{eur(lot.funding.goal)}</span> · {num(lot.funding.coFinancers)} cofinanciadores
             </>
           )}
           {preparing && (
             <>
               Em {world === 'agua' ? 'engarrafamento' : 'extração'}: <span className="font-mono tnum">{num(lot.stock)}</span> de <span className="font-mono tnum">{lotQuantityLabel(lot)}</span>. Abre a financiamento a <span className="font-mono tnum">{fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}</span>.
+            </>
+          )}
+          {cesto && (
+            <>
+              Cesto · sem financiamento: <span className="font-mono tnum">{num(lot.stock)}</span> de <span className="font-mono tnum">{lotQuantityLabel(lot)}</span> engarrafadas. O engarrafador fatura e entrega; a Sprout recebe{' '}
+              <span className="font-mono tnum">{pct(lot.economics.commissionPct ?? 0, 0)}</span> de comissão.
             </>
           )}
           {preview && (
@@ -116,22 +124,31 @@ function MissionRow({ lot }: { lot: Lot }) {
           </p>
         )}
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 lg:grid-cols-4">
-          <Term label="Desconto ao comprador" value={pct(lot.economics.discountPct, 0)} hint={`vende a ${unitPrice(world, lot.economics.buyerPrice)}`} />
-          <Term label="Ticket mínimo" value={eur(lot.funding.minTicket)} hint={`≈ ${min.primary}`} />
-          <Term label="Janela" value={`${lot.settlement.windowMonths} meses`} hint={endExact ? `liquidação prevista a ${fmtDate(end)}` : `liquidação prevista por volta de ${monthYear(end)}`} />
-          <Term label="Extensão" value={`até ${lot.extension.maxMonths} meses`} hint="condicionada, uma só vez" />
-        </dl>
-        <p className="measure mt-3 text-sm text-muted">
-          Saída só na liquidação: não há mercado secundário no piloto. Extrato mensal do lote; a liquidação é única, quando o comprador paga na conta segregada.
-        </p>
+        {cesto ? (
+          <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
+            <Term label={`Preço ao comprador · ${lot.economics.channelLabel}`} value={unitPrice(world, lot.economics.buyerPrice)} hint={lot.economics.priceBasis} />
+            <Term label="Financiamento" value="Nenhum" hint="Sem capital de cofinanciadores" />
+          </dl>
+        ) : (
+          <>
+            <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 lg:grid-cols-4">
+              <Term label={`Preço ao comprador · ${lot.economics.channelLabel}`} value={unitPrice(world, lot.economics.buyerPrice)} hint={lot.economics.priceBasis} />
+              <Term label="Investimento mínimo" value={eur(lot.funding.minTicket)} hint={`≈ ${min.primary}`} />
+              <Term label="Janela" value={`${lot.settlement.windowMonths} meses`} hint={endExact ? `liquidação prevista a ${fmtDate(end)}` : `liquidação prevista por volta de ${monthYear(end)}`} />
+              <Term label="Extensão" value={`até ${lot.extension.maxMonths} meses`} hint="condicionada, uma só vez" />
+            </dl>
+            <p className="measure mt-3 text-sm text-muted">
+              Saída só na liquidação: não há mercado secundário no piloto. Extrato mensal do lote; a liquidação é única, quando o comprador paga na conta segregada.
+            </p>
+          </>
+        )}
       </div>
 
       <div className="flex flex-col gap-2 sm:col-start-2 xl:col-start-auto xl:self-start">
         <ButtonLink to={`/lote/${lot.id}`} variant={open ? 'primary' : 'secondary'} iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
-          {preview ? 'Explorar a jornada' : 'Abrir missão'}
+          {preview ? 'Explorar a jornada' : 'Ver a jornada'}
         </ButtonLink>
-        {!preview && (
+        {!preview && !cesto && (
           <ButtonLink to={`/lote/${lot.id}#riscos`} variant="secondary">
             Fatores de risco <span className={cn('font-mono tnum', read === factors ? 'text-ok-ink' : 'text-muted')}>{read}/{factors}</span>
           </ButtonLink>
@@ -148,8 +165,8 @@ function MissionRow({ lot }: { lot: Lot }) {
         )}
         {open && game.commitBlock && (
           <p className="text-sm text-muted">
-            {game.commitBlock === 'bloqueado' ? 'O piloto está fechado a investidores qualificados.' : 'Para financiar, conclui o registo.'}{' '}
-            {game.commitBlock === 'onboarding' && <TextLink to="/onboarding">Ir para o onboarding</TextLink>}
+            {game.commitBlock === 'equipa' ? 'Vista da equipa: só o investidor pode comprometer capital.' : game.commitBlock === 'bloqueado' ? 'O piloto está fechado a investidores qualificados.' : 'Para financiar, conclui o registo.'}{' '}
+            {game.commitBlock === 'onboarding' && <TextLink to={`/onboarding?lote=${lot.id}`}>Ir para o onboarding</TextLink>}
           </p>
         )}
         {open && !game.commitBlock && read < factors && <p className="text-sm text-muted">O compromisso só abre depois de leres os {factors} fatores de risco.</p>}
@@ -191,6 +208,7 @@ export function RunningLotsTable({ lots, world }: { lots: Lot[]; world: WorldId 
             {l.id}
           </TextLink>
           <p className="truncate text-muted">{lotPlace(l)}</p>
+          {isIllustrative(l) && <p className="text-xs font-medium text-warn-ink">{ILLUSTRATIVE_LABEL}</p>}
         </div>
       ),
     },
@@ -212,7 +230,10 @@ export function RunningLotsTable({ lots, world }: { lots: Lot[]; world: WorldId 
       header: 'Janela de 18 meses',
       sortValue: (l) => l.settlement.start ?? '',
       minWidth: 168,
-      render: (l) => (
+      render: (l) =>
+        l.status === 'cesto' ? (
+          <span className="text-muted">Cesto · sem janela</span>
+        ) : (
         <span className="whitespace-nowrap font-mono tnum">
           {l.settlement.start ? monthYear(l.settlement.start) : '—'} → {l.settlement.plannedEnd ? monthYear(l.settlement.plannedEnd) : '—'}
           {l.settlement.extendedTo && <span className="block text-muted">estendida até {fmtDate(l.settlement.extendedTo)}</span>}

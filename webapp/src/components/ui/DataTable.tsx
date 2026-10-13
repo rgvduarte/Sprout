@@ -1,6 +1,7 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import { useEdgeFade } from '../../lib/useEdgeFade';
 import { EmptyState } from './Display';
 
 export interface Column<T> {
@@ -45,6 +46,9 @@ export interface DataTableProps<T> {
  */
 export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible, initialSort, empty, maxHeight, dense = true, onRowClick, rowClassName, className, framed = true }: DataTableProps<T>) {
   const [sort, setSort] = useState(initialSort);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // com colunas fora de vista, a margem esbate-se do lado onde há mais (a tabela não parece cortada)
+  const fade = useEdgeFade(scrollRef);
   const sorted = useMemo(() => {
     if (!sort) return rows;
     const col = columns.find((c) => c.key === sort.key);
@@ -62,7 +66,7 @@ export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible,
 
   return (
     <div className={cn('min-w-0', framed && 'rounded-md border border-border bg-surface', !framed && '-mx-4 sm:mx-0', className)}>
-      <div className="overflow-x-auto" style={maxHeight ? { maxHeight, overflowY: 'auto' } : undefined} tabIndex={0} role="region" aria-label={caption}>
+      <div ref={scrollRef} className="overflow-x-auto" style={{ ...(maxHeight ? { maxHeight, overflowY: 'auto' as const } : undefined), ...fade }} tabIndex={0} role="region" aria-label={caption}>
         <table className={cn('w-full border-collapse text-left', dense ? 'text-sm' : 'text-[0.9375rem]')}>
           <caption className={captionVisible ? 'px-4 pb-1 pt-3 text-left text-sm text-muted' : 'sr-only'}>{caption}</caption>
           <thead className="sticky top-0 z-[1] bg-surface-2">

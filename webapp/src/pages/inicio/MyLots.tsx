@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { getRegion } from '../../data';
+import { getRegion, ILLUSTRATIVE_LABEL, isIllustrative } from '../../data';
 import { LotGauge } from '../../components/game';
 import { CommodityGlyph } from '../../components/ui/Commodity';
 import { StatusPill } from '../../components/ui';
@@ -37,6 +37,7 @@ function LotRow({ p }: { p: PositionView }) {
           <p className="mt-1 text-sm text-muted">
             <span className="font-mono text-fg tnum">{eur(p.amount)}</span> financiados
           </p>
+          {(isIllustrative(p) || isIllustrative(lot)) && <p className="text-xs font-medium text-warn-ink">{ILLUSTRATIVE_LABEL}</p>}
           <p className="text-sm text-muted">
             A tua parte: <span className="font-mono text-fg tnum">{share.primary}</span> {share.secondary}
           </p>

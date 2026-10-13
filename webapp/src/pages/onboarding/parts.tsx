@@ -6,7 +6,7 @@ import { EASE_OUT } from '../../components/game';
 import { cn } from '../../lib/cn';
 import { now } from '../../lib/clock';
 import type { Draft, DocFile } from './draft';
-import { STEPS } from './draft';
+import { lowerFirst, STEPS } from './draft';
 import { fileSizeLabel, sniffFile } from './validation';
 
 /* ------------------------------------------------------------ props comuns dos passos */
@@ -49,12 +49,25 @@ export const exampleField = 'border-dashed bg-[color-mix(in_oklab,var(--accent)_
  * A linha de missões do registo: um segmento por passo, que enche com os
  * campos válidos desse passo. Nunca fala de dinheiro.
  */
-export function MissionBar({ fractions, current, counts }: { fractions: number[]; current: number; counts: { done: number; total: number } }) {
+/**
+ * Barra do registo por passos. Os passos que o exemplo fictício preencheu e
+ * que ainda não visitaste aparecem tracejados (não contam como teus); o
+ * título diz em que passo estás.
+ */
+export function MissionBar({ fractions, current, counts, prefilled = [] }: { fractions: number[]; current: number; counts: { done: number; total: number }; prefilled?: boolean[] }) {
   const reduce = useReducedMotion();
-  const remaining = fractions.filter((f) => f < 1).length;
-  const overall = fractions.reduce((s, f) => s + f, 0) / fractions.length;
+  const remaining = fractions.filter((f, i) => f < 1 || prefilled[i]).length;
+  const overall = fractions.reduce((s, f, i) => s + (prefilled[i] ? 0 : f), 0) / fractions.length;
   const step = STEPS[current];
-  const headline = remaining === 0 ? 'Tudo pronto para submeter' : remaining === 1 ? 'Falta 1 passo' : `Faltam ${remaining} passos`;
+  const nPrefilled = prefilled.filter(Boolean).length;
+  const headline =
+    nPrefilled > 0
+      ? `Passo ${current + 1} de ${STEPS.length} · ${nPrefilled === 1 ? '1 já preenchido' : `${nPrefilled} já preenchidos`} com o exemplo`
+      : remaining === 0
+        ? 'Tudo pronto para submeter'
+        : remaining === 1
+          ? 'Falta 1 passo'
+          : `Faltam ${remaining} passos`;
   return (
     <div className="min-w-0">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -62,18 +75,23 @@ export function MissionBar({ fractions, current, counts }: { fractions: number[]
           {headline}
         </p>
         <p className="text-sm text-muted">
-          Passo {current + 1} de {STEPS.length} · {step.label} ·{' '}
-          <span className="font-mono text-fg tnum">
-            {counts.done} de {counts.total}
-          </span>{' '}
-          {counts.total === 1 ? 'campo' : 'campos'}
+          {nPrefilled === 0 && (
+            <>
+              Passo <span className="tnum">{current + 1}</span> de <span className="tnum">{STEPS.length}</span> ·{' '}
+            </>
+          )}
+          {step.label} · <span className="font-medium text-fg tnum">{counts.done}</span> de <span className="tnum">{counts.total}</span> {counts.total === 1 ? 'campo' : 'campos'}
         </p>
       </div>
       <div role="progressbar" aria-label="Progresso do registo" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(overall * 100)} className="flex gap-1">
         {fractions.map((f, i) => (
-          <div key={STEPS[i].id} className={cn('relative h-2 flex-1 overflow-hidden rounded-full', 'bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface-2))]')}>
+          <div
+            key={STEPS[i].id}
+            className={cn('relative h-2 flex-1 overflow-hidden rounded-full', prefilled[i] ? 'border border-dashed border-[color-mix(in_oklab,var(--accent)_55%,var(--border))] bg-surface' : 'bg-[color-mix(in_oklab,var(--accent)_14%,var(--surface-2))]')}
+            title={prefilled[i] ? `${STEPS[i].label}: preenchido com o exemplo` : undefined}
+          >
             <motion.div
-              className="absolute inset-0 origin-left rounded-full bg-accent"
+              className={cn('absolute inset-0 origin-left rounded-full', prefilled[i] ? 'bg-[color-mix(in_oklab,var(--accent)_28%,var(--surface))]' : 'bg-accent')}
               initial={false}
               animate={{ scaleX: f }}
               transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
@@ -103,7 +121,7 @@ export function ErrorSummary({ errors, labels }: { errors: Record<string, string
     <div role="alert" className="mb-5 rounded-sm border border-[color-mix(in_oklab,var(--crit)_30%,var(--border))] bg-[color-mix(in_oklab,var(--crit)_7%,var(--surface))] px-4 py-3">
       <p className="flex items-center gap-2 font-medium text-crit-ink">
         <AlertCircle aria-hidden className="size-4 shrink-0" strokeWidth={1.75} />
-        {keys.length === 1 ? 'Falta corrigir 1 campo' : `Faltam corrigir ${keys.length} campos`}
+        {keys.length === 1 ? 'Falta corrigir 1 campo' : `Falta corrigir ${keys.length} campos`}
       </p>
       <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-0">
         {keys.map((k) => (
@@ -202,10 +220,10 @@ export function FileDrop({
               {file.example ? 'ficheiro de exemplo, não existe no disco' : 'formato confirmado no teu browser'}
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => input.current?.click()} aria-label={`Substituir ${label.toLowerCase()}`}>
+          <Button variant="ghost" size="sm" onClick={() => input.current?.click()} aria-label={`Substituir ${lowerFirst(label)}`}>
             Substituir
           </Button>
-          <IconButton label={`Remover ${label.toLowerCase()}`} icon={<X className="size-4" strokeWidth={1.75} />} onClick={onRemove} />
+          <IconButton label={`Remover ${lowerFirst(label)}`} icon={<X className="size-4" strokeWidth={1.75} />} onClick={onRemove} />
         </div>
       ) : (
         <div

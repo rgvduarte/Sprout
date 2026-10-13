@@ -24,7 +24,7 @@ export function ReflectionBand({ p }: { p: PositionView }) {
   return (
     <div className="min-w-0 rounded-sm bg-[color-mix(in_oklab,var(--info)_9%,var(--surface))] px-4 py-3" role="group" aria-label={`Período de reflexão do compromisso no lote ${p.lot.id}`}>
       <p className="text-sm text-fg">
-        <span className="font-semibold">{open ? `Pode cancelar sem custos até ${fmtDate(until)}` : 'Período de reflexão terminado'}</span>
+        <span className="font-semibold">{open ? `Podes cancelar sem custos até ${fmtDate(until)}` : 'Período de reflexão terminado'}</span>
         <span className="text-muted">
           {' '}
           · compromisso de <span className="font-mono text-fg tnum">{eur(p.amount)}</span> a <span className="font-mono tnum">{fmtDate(p.committedAt)}</span>, {REFLECTION_DAYS} dias de reflexão
@@ -69,6 +69,8 @@ export function ReflectionBand({ p }: { p: PositionView }) {
                 const r = game.cancelCommitment(p.id);
                 setConfirm(false);
                 toast(r.ok ? { tone: 'neutral', title: `Compromisso cancelado · ${p.lot.id}`, description: 'Sem custos. Nenhuma transferência tinha sido aplicada.' } : { tone: 'warn', title: 'Não foi possível cancelar', description: r.message });
+                // o cartão da posição sai da lista: o foco vai para o título "Os teus lotes" (não cai para a página)
+                if (r.ok) window.requestAnimationFrame(() => document.getElementById('lotes-title')?.focus());
               }}
             >
               Cancelar compromisso

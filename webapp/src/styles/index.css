@@ -317,6 +317,8 @@
    (a nota de capital em risco fica sempre à vista). A partir de 640 px vão para o canto inferior direito. */
 [data-toast-root] { top: 57px; }
 body:has([data-chrome="jornada"]) [data-toast-root] { top: 102px; }
+/* na jornada do lote, âncoras e foco aterram por baixo da barra superior + barra de capítulos (102 px) */
+html:has([data-chrome="jornada"]) { scroll-padding-top: 110px; }
 @media (min-width: 640px) {
   [data-toast-root], body:has([data-chrome="jornada"]) [data-toast-root] { top: auto; }
 }

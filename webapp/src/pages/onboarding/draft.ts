@@ -13,6 +13,13 @@ import {
   validateRequired,
 } from './validation';
 
+/** Minúscula só na primeira letra, preservando siglas ("Comprovativo de IBAN" → "comprovativo de IBAN"; "RCBE" fica). */
+export function lowerFirst(label: string): string {
+  const first = label.split(/\s/)[0] ?? '';
+  if (first.length > 1 && first === first.toUpperCase()) return label;
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
+
 /* =====================================================================
    Rascunho do registo, em memória (como o resto do jogo), por perfil.
    Sobrevive à mudança de ecrã; perde-se ao recarregar.
@@ -161,21 +168,21 @@ export const QUIZ: QuizQuestionDef[] = [
   },
   {
     id: 'q2',
-    prompt: 'A referência do azeite cai 30 % a meio da janela. O que acontece ao lote?',
+    prompt: 'O índice de origem do azeite cai 30 % a meio da janela. O que acontece ao lote?',
     options: [
       'Nada: o preço de venda ficou fixado no dia em que o lote abriu.',
-      'A liquidação pode ficar abaixo do capital. A venda a prazo e a reserva de primeira perda atenuam a queda, mas não a eliminam.',
+      'A liquidação pode ficar abaixo do capital. A venda a prazo e a reserva comum de primeira perda atenuam a queda, mas não a eliminam.',
       'A Sprout devolve o capital por inteiro.',
     ],
     correct: 1,
     explanation:
-      'Só a parte do volume vendida a prazo tem preço fixado. O resto vende-se ao preço da altura, 10–15 % abaixo da referência. A reserva de primeira perda absorve as primeiras perdas até ao seu limite; para lá disso, a perda é dos co-financiadores.',
+      'Só a parte do volume vendida a prazo tem preço fixado. O resto vende-se ao preço do canal na altura, que acompanha o índice. A reserva de primeira perda é comum a todos os lotes e absorve perdas enquanto tiver saldo; pode esgotar-se, e para lá disso a perda é dos cofinanciadores.',
   },
   {
     id: 'q3',
     prompt: 'Precisas do dinheiro antes da liquidação. Podes vender a tua parte?',
     options: [
-      'Sim, a outro co-financiador, no mercado secundário da Sprout.',
+      'Sim, a outro cofinanciador, no mercado secundário da Sprout.',
       'Não. No piloto não há mercado secundário: o capital fica no lote até à liquidação.',
       'Sim, mas só nos lotes de água.',
     ],
@@ -459,7 +466,7 @@ export function checkStep(i: number, d: Draft): StepCheck {
 
   if (i === 2) {
     if (col) req('certidao', validateCertidao(d.certidao));
-    for (const s of docSlotsFor(d)) if (s.required) req(`doc-${s.slot}`, d.docs[s.slot] ? null : `Junta: ${s.label.toLowerCase()}.`);
+    for (const s of docSlotsFor(d)) if (s.required) req(`doc-${s.slot}`, d.docs[s.slot] ? null : `Junta: ${lowerFirst(s.label)}.`);
   }
 
   if (i === 3) {

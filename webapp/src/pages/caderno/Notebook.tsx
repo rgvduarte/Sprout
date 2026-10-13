@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { ArrowUpRight, BookOpen, CalendarRange, CircleCheck, Puzzle } from 'lucide-react';
 import { Button, TextLink } from '../../components/ui';
-import { LevelGlyph, OriginSeal, QuestList, WaxSealStamp, DUR, EASE_OUT, useRichMotion, useMapRange } from '../../components/game';
+import { LevelGlyph, OriginSeal, QuestList, WaxSealStamp, EASE_OUT, useRichMotion, useMapRange } from '../../components/game';
 import type { SealView } from '../../state';
 import { useGame } from '../../state';
 import { hashString } from '../../lib/prng';
@@ -11,7 +11,11 @@ import { useNow } from '../../lib/clock';
 import { date as fmtDate, dateShort, lisbonParts, num, relative } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { CampaignStrip } from './CampaignStrip';
+import { CLOSED_CAMPAIGN_LABEL } from '../../data';
 import { CAMPAIGNS, QUESTS_BY_WORLD, type CampaignDef, type CampaignId, type KMilestone, type Note } from './model';
+
+/** Virar de página: ease-in-out simétrico, para o percurso se ler inteiro. */
+const PAGE_TURN_EASE = [0.65, 0, 0.35, 1] as const;
 
 /* =====================================================================
    O caderno: separadores por campanha e uma página dupla (selos à
@@ -64,10 +68,18 @@ export function CampaignTabs({ current, onSelect, counts }: { current: CampaignI
               {c.stateLabel}
               <span className="hidden sm:inline">
                 {' · '}
-                <span className="font-mono tnum">
-                  {k.earned}/{k.total}
-                </span>{' '}
-                {k.total === 1 ? 'selo' : 'selos'}
+                {c.state === 'concluida' ? (
+                  <>
+                    <span className="font-mono tnum">{k.earned}</span> {k.earned === 1 ? 'selo ganho' : 'selos ganhos'}
+                  </>
+                ) : (
+                  <>
+                    <span className="font-mono tnum">
+                      {k.earned}/{k.total}
+                    </span>{' '}
+                    {k.total === 1 ? 'selo' : 'selos'}
+                  </>
+                )}
               </span>
             </span>
           </button>
@@ -99,12 +111,13 @@ export function Spread({ campaign, dir, render }: { campaign: CampaignId; dir: n
   useEffect(() => {
     if (!prev) return;
     progress.set(0);
-    const ctl = animate(progress, 1, { duration: DUR.focal + 0.1, ease: EASE_OUT, onComplete: () => setPrev(null) });
+    // ease-in-out a 500 ms: o percurso da folha lê-se do princípio ao fim, sem flash nem cauda parada
+    const ctl = animate(progress, 1, { duration: 0.5, ease: PAGE_TURN_EASE, onComplete: () => setPrev(null) });
     return () => ctl.stop();
   }, [prev, shown, progress]);
   const clip = useTransform(progress, (v) => (dir >= 0 ? `inset(0% 0% 0% ${((1 - v) * 100).toFixed(2)}%)` : `inset(0% ${((1 - v) * 100).toFixed(2)}% 0% 0%)`));
   const edgeX = useTransform(progress, (v) => `${(dir >= 0 ? 1 - v : v) * 100}%`);
-  const edgeOpacity = useMapRange(progress, [0, 0.9, 1], [1, 1, 0]);
+  const edgeOpacity = useMapRange(progress, [0, 0.85, 1], [1, 1, 0]);
   const idx = CAMPAIGNS.findIndex((c) => c.id === shown);
   const frame = 'rounded-md border border-border bg-surface';
 
@@ -132,7 +145,16 @@ export function Spread({ campaign, dir, render }: { campaign: CampaignId; dir: n
       )}
       {prev && (
         <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-[3]" style={{ x: edgeX, opacity: edgeOpacity }}>
-          <span className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklab,var(--fg)_30%,var(--border))] shadow-pop" />
+          {/* sombreado suave junto à aresta, só do lado da folha que vira */}
+          <span
+            className="absolute inset-y-0 w-10"
+            style={
+              dir >= 0
+                ? { left: 0, background: 'linear-gradient(to right, color-mix(in oklab, var(--fg) 14%, transparent), transparent)' }
+                : { right: '100%', background: 'linear-gradient(to left, color-mix(in oklab, var(--fg) 14%, transparent), transparent)' }
+            }
+          />
+          <span className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklab,var(--fg)_24%,var(--border))]" />
         </motion.div>
       )}
     </div>
@@ -164,7 +186,7 @@ export function SealCaption({ s, c, questsDone }: { s: SealView; c: CampaignDef;
   const total = s.def.questIds.length;
   let line: ReactNode;
   if (s.earned) line = <span className="text-seal-ink">{`Por ${s.earned.by === 'compromisso' ? 'compromisso' : 'diligência'} · ${fmtDate(s.earned.at)}`}</span>;
-  else if (c.state === 'concluida') line = 'Campanha encerrada';
+  else if (c.state === 'concluida') line = CLOSED_CAMPAIGN_LABEL;
   else if (s.def.earnable === 'compromisso') line = 'Regista participação num lote';
   else
     line = (
@@ -202,7 +224,8 @@ export function SealsPage({
   questsDoneFor: (s: SealView) => number;
 }) {
   const earned = seals.filter((s) => s.earned).length;
-  const complete = seals.length > 0 && earned === seals.length;
+  const closed = c.state === 'concluida';
+  const complete = !closed && seals.length > 0 && earned === seals.length;
   return (
     <section aria-labelledby={`selos-${c.short}`} className="flex min-w-0 flex-col p-5 sm:p-7">
       <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
@@ -211,7 +234,15 @@ export function SealsPage({
             Selos de origem
           </h2>
           <p className="mt-1 text-sm text-muted">
-            <span className="font-mono text-fg tnum">{earned}</span> de <span className="font-mono text-fg tnum">{seals.length}</span> {seals.length === 1 ? 'selo' : 'selos'} · {c.label}
+            {closed ? (
+              <>
+                <span className="font-mono text-fg tnum">{earned}</span> {earned === 1 ? 'selo ganho' : 'selos ganhos'} · {c.label} · {CLOSED_CAMPAIGN_LABEL.toLowerCase()}, fora da contagem
+              </>
+            ) : (
+              <>
+                <span className="font-mono text-fg tnum">{earned}</span> de <span className="font-mono text-fg tnum">{seals.length}</span> {seals.length === 1 ? 'selo' : 'selos'} · {c.label}
+              </>
+            )}
           </p>
         </div>
         {complete && <PageComplete earned={earned} total={seals.length} />}
@@ -226,10 +257,10 @@ export function SealsPage({
       {children}
       <p className="max-w-[60ch] mt-auto pt-8 text-sm text-muted">
         {c.state === 'concluida'
-          ? 'Campanha encerrada a 30/09/2026. Os selos desta página já não se podem ganhar.'
+          ? 'Campanha encerrada a 30/09/2026: os selos desta página já não se ganham e não contam para a completude do caderno. Histórico ilustrativo: o piloto só começa em 2027.'
           : c.state === 'fase-2'
-            ? 'A Plantação abre em 2027. Este selo ganha-se só por diligência, com as missões da Academia sobre origens de café.'
-            : 'Os selos registam origens que estudaste ou acompanhas. Não dão pontos, níveis nem vantagens financeiras: não comprometas capital para completar o caderno.'}
+            ? 'A Plantação é Fase 2 e não é investível. Este selo ganha-se só por diligência, com as missões da Academia sobre origens de café.'
+            : 'Cada selo ganha-se com as missões de diligência da origem ou com um compromisso num lote dela. Não dão pontos, níveis nem vantagens financeiras: não comprometas capital para completar o caderno.'}
       </p>
       <p className="mt-3 font-mono text-xs text-muted tnum" aria-hidden>
         p. {c.folio[0]}

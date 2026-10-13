@@ -1,4 +1,4 @@
-import { getRegion, getWorld, RESERVE_SHARE, SETTLEMENT_MONTHS, EXTENSION_MONTHS } from '../../data';
+import { getRegion, getWorld, ILLUSTRATIVE_LABEL, ILLUSTRATIVE_NOTE, RESERVE_RULE, SETTLEMENT_MONTHS, EXTENSION_MONTHS } from '../../data';
 import type { Investor, Lot, QualityAnalysis } from '../../data';
 import type { PositionView } from '../../state';
 import { TODAY_DATE, toDate } from '../../lib/clock';
@@ -90,6 +90,7 @@ export function monthlyStatement(investor: Investor, positions: PositionView[], 
   const lines: string[] = [
     HEADER,
     `EXTRATO MENSAL · ${monthLabel(ym).toUpperCase()}`,
+    ...(positions.some((p) => p.illustrative || p.lot.illustrative) ? [`${ILLUSTRATIVE_LABEL}. ${plain(ILLUSTRATIVE_NOTE)}`] : []),
     RULE,
     `Titular: ${investor.nome}`,
     `Classificação: investidor ${investor.classe === 'profissional' ? 'profissional' : 'qualificado'}`,
@@ -128,6 +129,7 @@ export function contractSummary(investor: Investor, p: PositionView): string {
     HEADER,
     `RESUMO DAS CONDIÇÕES · LOTE ${lot.id}`,
     'Este resumo não substitui o contrato assinado entre a plataforma e o investidor.',
+    ...(p.illustrative || lot.illustrative ? [`${ILLUSTRATIVE_LABEL}. ${plain(ILLUSTRATIVE_NOTE)}`] : []),
     RULE,
     `Investidor: ${investor.nome}`,
     `Lote: ${lot.id} · ${lot.title} · ${p.producer.nome}, ${region?.nome ?? ''} · campanha ${lot.campanha}`,
@@ -148,7 +150,8 @@ export function contractSummary(investor: Investor, p: PositionView): string {
     'COBERTURA E RESERVA',
     `${plain(lot.hedge.label)}: ${plain(lot.hedge.note)}`,
     ...(lot.hedge.trigger ? [`Gatilho: ${plain(lot.hedge.trigger)}`] : []),
-    `Reserva de primeira perda: ${num(RESERVE_SHARE * 100)} % da margem bruta do lote, retida pela Sprout.`,
+    `Reserva de primeira perda: ${plain(RESERVE_RULE.text)}`,
+    `Preço ao comprador: ${plain(lot.economics.priceBasis)}.`,
     RULE,
     'REFUNDING',
     ...(pb ? [`${pb.title}. Gatilho: ${plain(pb.trigger)}`, ...pb.steps.map((s) => `${s.order}. ${plain(s.title)} (${s.owner}, ${s.sla})`)] : ['Playbook por publicar.']),

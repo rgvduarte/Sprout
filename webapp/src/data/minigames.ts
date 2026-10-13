@@ -68,7 +68,7 @@ export const WATER_LABELS: WaterLabel[] = [
   { id: 'w2', marca: 'Nascente da Serra Verde', tipo: 'de nascente', origem: 'Gerês, granito', residuoSeco: 22, ph: 6.1, sodio: 2.8, bicarbonato: 5.2, calcio: 0.9, magnesio: 0.3, silica: 8.1, fluoreto: 0.05, potassio: 0.4, cloreto: 4.1, sulfato: 0.8, nitrato: 1.5 },
   { id: 'w3', marca: 'Fonte da Lameira Alta', tipo: 'mineral natural', origem: 'Beira Litoral, calcário', residuoSeco: 312, ph: 7.6, sodio: 12.4, bicarbonato: 228, calcio: 68, magnesio: 9.8, silica: 14.2, fluoreto: 0.2, potassio: 1.9, cloreto: 21.4, sulfato: 26.8, nitrato: 4.6 },
   { id: 'w4', marca: 'Nascente do Vale Fundo', tipo: 'mineral natural', origem: 'Trás-os-Montes, falha granítica', residuoSeco: 2380, ph: 6.4, sodio: 612, bicarbonato: 1985, calcio: 92, magnesio: 31, silica: 58, fluoreto: 1.6, co2Livre: 2100, potassio: 41, cloreto: 88, sulfato: 14, nitrato: 0.5 },
-  { id: 'w5', marca: 'Fonte de São Brás do Monte', tipo: 'mineral natural', origem: 'Algarve, sienito', residuoSeco: 268, ph: 9.4, sodio: 46, bicarbonato: 98, calcio: 1.6, magnesio: 0.2, silica: 31, fluoreto: 1.2, potassio: 1.4, cloreto: 42, sulfato: 30, nitrato: 0.6, carbonato: 21 },
+  { id: 'w5', marca: 'Fonte da Pedra Alta', tipo: 'mineral natural', origem: 'origem fictícia, rocha alcalina (sienito)', residuoSeco: 268, ph: 9.4, sodio: 46, bicarbonato: 98, calcio: 1.6, magnesio: 0.2, silica: 31, fluoreto: 1.2, potassio: 1.4, cloreto: 42, sulfato: 30, nitrato: 0.6, carbonato: 21 },
 ];
 
 /** Menções de rotulagem (Diretiva 2009/54/CE, anexo III; DL 156/98). */
@@ -82,7 +82,7 @@ export const WATER_CLASSES: WaterClass[] = [
   { id: 'magnesiana', label: 'Magnesiana', rule: 'Magnésio > 50 mg/L', test: (w) => w.magnesio > 50 },
   { id: 'fluoretada', label: 'Contém fluoreto', rule: 'Fluoreto > 1 mg/L', test: (w) => w.fluoreto > 1 },
   { id: 'pobre-sodio', label: 'Adequada para dieta pobre em sódio', rule: 'Sódio ≤ 20 mg/L', test: (w) => w.sodio <= 20 },
-  { id: 'gasocarbonica', label: 'Naturalmente gaseificada', rule: 'CO₂ livre de origem > 250 mg/L', test: (w) => (w.co2Livre ?? 0) > 250 },
+  { id: 'gasocarbonica', label: 'Acídula (gasocarbónica)', rule: 'CO₂ livre de origem > 250 mg/L. «Naturalmente gaseificada» é outra menção: o teor de CO₂ depois de engarrafar igual ao da nascente.', test: (w) => (w.co2Livre ?? 0) > 250 },
 ];
 
 /** Mineralização total = soma dos iões dissolvidos + sílica (mg/L). */
@@ -103,7 +103,7 @@ export function mineralizationClass(w: WaterLabel): string {
 export const COFFEE_STEPS: CoffeeStep[] = tidyDeep([
   { id: 'colheita', order: 1, nome: 'Colheita da cereja', descricao: 'À mão, cereja a cereja, ou por derriça e máquina, quando a maioria está madura.' },
   { id: 'processo', order: 2, nome: 'Processamento', descricao: 'Natural, honey ou lavado: decide quanta polpa fica em contacto com o grão durante a secagem.' },
-  { id: 'secagem', order: 3, nome: 'Secagem no terreiro', descricao: 'Ao sol, revolvida várias vezes ao dia, até 10–12 % de humidade.' },
+  { id: 'secagem', order: 3, nome: 'Secagem no terreiro', descricao: 'Ao sol, revolvida várias vezes ao dia, até ficar entre 10 e 12 % de humidade, dentro do intervalo de 8–12,5 % da norma ICO.' },
   { id: 'descasque', order: 4, nome: 'Descasque e classificação', descricao: 'Retira-se o pergaminho; o grão verde é separado por peneira, densidade e cor.' },
   { id: 'ensaque', order: 5, nome: 'Ensaque e embarque', descricao: 'Sacas de juta de 60 kg em contentor, com ou sem saco hermético.' },
   { id: 'torra', order: 6, nome: 'Torra e prova', descricao: 'A torrefação transforma o grão verde; a prova SCA pontua o resultado de 0 a 100.' },
@@ -112,7 +112,7 @@ export const COFFEE_STEPS: CoffeeStep[] = tidyDeep([
 export const COFFEE_PROCESSES: CoffeeProcess[] = tidyDeep([
   { id: 'lavado', nome: 'Lavado', descricao: 'A polpa é retirada, o grão fermenta em tanque para soltar a mucilagem e é lavado antes de secar.', perfil: 'Limpo, acidez viva, corpo leve a médio.', passos: ['Despolpa', 'Fermentação em tanque 12–36 h', 'Lavagem', 'Secagem do pergaminho'] },
   { id: 'natural', nome: 'Natural', descricao: 'A cereja seca inteira, com a polpa, durante 2 a 4 semanas.', perfil: 'Fruta madura, doçura, corpo encorpado; mais risco de defeitos.', passos: ['Seleção da cereja', 'Secagem inteira no terreiro', 'Descasque da cereja seca'] },
-  { id: 'honey', nome: 'Honey (cereja descascado)', descricao: 'Retira-se a pele e parte da polpa; a mucilagem seca agarrada ao grão.', perfil: 'Doçura de mel, acidez média, entre o lavado e o natural.', passos: ['Despolpa', 'Secagem com mucilagem', 'Descasque'] },
+  { id: 'honey', nome: 'Honey (próximo do cereja descascado brasileiro)', descricao: 'Retira-se a pele e parte da polpa; a mucilagem seca agarrada ao grão.', perfil: 'Doçura de mel, acidez média, entre o lavado e o natural.', passos: ['Despolpa', 'Secagem com mucilagem', 'Descasque'] },
 ]);
 
 export const COFFEE_DEFECTS: CoffeeDefect[] = tidyDeep([
@@ -149,6 +149,6 @@ export const COFFEE_SAMPLES: CoffeeSample[] = [
   { id: 'c1', label: 'Amostra 1', origem: 'Huila, Colômbia', processo: 'lavado', humidade: 10.9, defeitosCat1: 0, defeitosCompletosCat2: 2, pontuacao: 85.5, notas: 'Laranja, panela, acidez brilhante.' },
   { id: 'c2', label: 'Amostra 2', origem: 'Alta Mogiana, Brasil', processo: 'natural', humidade: 11.4, defeitosCat1: 0, defeitosCompletosCat2: 4, pontuacao: 82.25, notas: 'Chocolate, frutos secos, corpo médio.' },
   { id: 'c3', label: 'Amostra 3', origem: 'Sidama, Etiópia', processo: 'natural', humidade: 10.2, defeitosCat1: 0, defeitosCompletosCat2: 3, pontuacao: 88, notas: 'Mirtilo, jasmim, doçura alta.' },
-  { id: 'c4', label: 'Amostra 4', origem: 'Sul de Minas, Brasil', processo: 'honey', humidade: 12.9, defeitosCat1: 2, defeitosCompletosCat2: 9, pontuacao: 78.5, notas: 'Madeira, fermentado; humidade de 12,9 %, acima dos 10–12 % recomendados para armazenar e transportar.' },
+  { id: 'c4', label: 'Amostra 4', origem: 'Sul de Minas, Brasil', processo: 'honey', humidade: 12.9, defeitosCat1: 2, defeitosCompletosCat2: 9, pontuacao: 78.5, notas: 'Madeira, fermentado; humidade de 12,9 %, acima do máximo de 12,5 % da norma ICO para armazenar e transportar.' },
   { id: 'c5', label: 'Amostra 5', origem: 'Planalto Central, Vietname', processo: 'natural', humidade: 11.8, defeitosCat1: 1, defeitosCompletosCat2: 12, pontuacao: 74, notas: 'Robusta comercial: terroso, amargo, corpo pesado.' },
 ];

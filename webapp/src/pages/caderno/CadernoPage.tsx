@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { getSeal, REGIONS, SEED_SEALS } from '../../data';
+import { CLOSED_CAMPAIGN_LABEL, countsTowardCompletion, getSeal, ILLUSTRATIVE_LABEL, REGIONS, SEED_SEALS } from '../../data';
 import type { WorldId } from '../../data/types';
 import { Badge, Button, Page, PageHeader, Section, TextLink } from '../../components/ui';
 import { KnowledgeLevelBadge, EASE_OUT } from '../../components/game';
-import { useData, useGame, useRole, type ProfileId, type SealView } from '../../state';
+import { useCampaignEvents, useData, useGame, useRole, type ProfileId, type SealView } from '../../state';
 import { CampaignTabs, MilestonesBlock, NotesPage, SealsPage, Spread } from './Notebook';
 import { OriginCards } from './OriginCards';
 import { OriginsMap, sealRegionLabels } from './OriginsMap';
@@ -27,6 +27,7 @@ const stamped: Record<ProfileId, Set<string>> = {
 export default function CadernoPage() {
   const { profileId } = useRole();
   const data = useData();
+  const campaignEvents = useCampaignEvents();
   const game = useGame();
   const profile = useProfile();
   const reduce = useReducedMotion();
@@ -62,6 +63,10 @@ export default function CadernoPage() {
       return [x.id, { earned: list.filter((s) => s.earned).length, total: list.length }];
     }),
   ) as Record<CampaignId, { earned: number; total: number }>;
+  // completude: só os selos que ainda se podem ganhar (campanhas em curso e futuras)
+  const openSeals = data.seals.filter((s) => countsTowardCompletion(s.def));
+  const openEarned = openSeals.filter((s) => s.earned).length;
+  const closedEarned = data.seals.filter((s) => !countsTowardCompletion(s.def) && s.earned).length;
 
   // selos ganhos por diligência que ainda não foram carimbados no caderno
   const seen = stamped[profileId];
@@ -136,7 +141,7 @@ export default function CadernoPage() {
           <MilestonesBlock c={cc} milestones={milestonesFor(cc, timeline)} />
         </SealsPage>
         <div className="min-w-0 border-t border-border xl:border-l xl:border-t-0 xl:border-dashed">
-          <NotesPage c={cc} notes={notesFor(cc, data.lots, data.events, follow)} emptyNotes={emptyNotesFor(cc)} />
+          <NotesPage c={cc} notes={notesFor(cc, data.lots, campaignEvents, follow)} emptyNotes={emptyNotesFor(cc)} />
         </div>
       </div>
     );
@@ -151,8 +156,13 @@ export default function CadernoPage() {
           <>
             <KnowledgeLevelBadge level={game.level} size="sm" />
             <Badge tone="seal">
-              <span className="font-mono tnum">{data.earnedSeals.length}</span> de <span className="font-mono tnum">{data.seals.length}</span> selos
+              <span className="font-mono tnum">{openEarned}</span> de <span className="font-mono tnum">{openSeals.length}</span> selos das campanhas abertas
             </Badge>
+            {closedEarned > 0 && (
+              <Badge tone="neutral">
+                <span className="font-mono tnum">{closedEarned}</span> {closedEarned === 1 ? 'selo' : 'selos'} de {CLOSED_CAMPAIGN_LABEL.toLowerCase()}
+              </Badge>
+            )}
             <Badge tone="neutral">
               <span className="font-mono tnum">{cardsEarned}</span> de <span className="font-mono tnum">{cardsTotal}</span> cartas
             </Badge>
@@ -165,6 +175,11 @@ export default function CadernoPage() {
 
       <section aria-label="Caderno por campanha">
         <CampaignTabs current={campaign} onSelect={select} counts={counts} />
+        {c.state === 'concluida' && (
+          <p className="mb-3 mt-1 max-w-[70ch] text-sm text-muted">
+            <span className="font-medium text-fg">{ILLUSTRATIVE_LABEL}.</span> A campanha {c.short} é anterior ao piloto, que só começa em fevereiro de 2027: os selos, as notas e as posições desta página mostram a jornada de um lote, não resultados.
+          </p>
+        )}
         <Spread campaign={campaign} dir={dir} render={renderSpread} />
         <nav aria-label="Virar de campanha" className="mt-2 flex items-center justify-between gap-3">
           {prev ? (
@@ -187,7 +202,7 @@ export default function CadernoPage() {
       <Section
         id="cartas"
         title={`Cartas de origem · ${c.short}`}
-        description="Uma por lote: ganha-se ao co-financiar o lote ou ao ler o seu boletim de análises. São pessoais e intransmissíveis: não se vendem, não se trocam e não valem dinheiro."
+        description="Uma por lote: ganha-se ao cofinanciar o lote ou ao ler o seu boletim de análises. São pessoais e intransmissíveis: não se vendem, não se trocam e não valem dinheiro."
         actions={
           <Badge tone="neutral">
             <span className="font-mono tnum">{cardsHere}</span> de <span className="font-mono tnum">{cards.length}</span> nesta página

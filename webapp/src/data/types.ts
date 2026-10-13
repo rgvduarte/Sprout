@@ -43,7 +43,9 @@ export interface World {
   map: MapId;
   fase: 1 | 2;
   investable: boolean;
-  /** p.ex. "Fase 2 · abre em 2027" */
+  /** modelo de negócio do mundo: principal (compra e venda do lote) ou agente (cesto, comissão, sem financiamento) */
+  model: LotModel;
+  /** p.ex. "Fase 2 · não investível", "Cesto · sem financiamento" */
   faseLabel?: string;
   season: { id: string; label: string; phases: SeasonPhase[] };
   vocabulario: GlossaryTerm[];
@@ -116,7 +118,20 @@ export interface Producer {
 export type JourneyStage = 'colhido' | 'analisado' | 'em-deposito' | 'em-venda' | 'expedido' | 'liquidado';
 export const JOURNEY_STAGES: JourneyStage[] = ['colhido', 'analisado', 'em-deposito', 'em-venda', 'expedido', 'liquidado'];
 
-export type LotStatus = 'em-preparacao' | 'aberto' | 'financiado' | 'em-extensao' | 'liquidado' | 'fase-2';
+export type LotStatus = 'em-preparacao' | 'aberto' | 'financiado' | 'em-extensao' | 'liquidado' | 'fase-2' | 'cesto';
+
+/** Modelo do lote: principal (a Sprout compra e vende o lote, financiado por cofinanciadores) ou agente (cesto: comissão, sem stock nem fundos de terceiros). */
+export type LotModel = 'principal' | 'agente';
+
+/** Canal de venda do lote. */
+export type SalesChannel = 'horeca' | 'distribuicao' | 'cesto' | 'torrefacao';
+
+/** Linha de custo por unidade de preço (€/kg ou €/L). */
+export interface CostLine {
+  id: string;
+  label: string;
+  value: number;
+}
 
 export interface Milestone {
   stage: JourneyStage;
@@ -166,6 +181,8 @@ export interface HedgeCoverage {
   counterparty?: string;
   trigger?: string;
   note: string;
+  /** gatilho já executado: fração do volume vendida a prazo depois, ao índice de origem desse dia */
+  executed?: { share: number; index: number; date: string };
 }
 
 export interface RiskFactor {
@@ -177,25 +194,58 @@ export interface RiskFactor {
 }
 
 export interface LotEconomics {
-  /** referência de mercado (preço a que o comprador B2B compra hoje), €/kg ou €/L */
+  /** principal (azeite, café) ou agente (água: cesto, comissão) */
+  model: LotModel;
+  /** canal de venda do lote */
+  channel: SalesChannel;
+  /** "HoReCa e lojas gourmet", "Distribuidores e exportadores", "Cesto HoReCa · agente", "Microtorrefações" */
+  channelLabel: string;
+  /**
+   * Referência do canal na abertura do lote (preço embalado, não granel), €/kg ou €/L:
+   * referência HoReCa embalada, preço de saída do embalador, referência B2B da água, preço a microtorrefações.
+   */
   refPrice: number;
-  /** desconto ao comprador (0.10–0.15) */
+  /** nome da referência do canal, p.ex. "Referência HoReCa embalada" */
+  refLabel: string;
+  /** fonte ou estado da referência, p.ex. "a validar no piloto: ≥ 20 cotações com mediana ≥ 6,00 €/kg" */
+  refNote: string;
+  /** desconto ao comprador sobre a referência do canal (HoReCa 0,10; distribuidores 0) */
   discountPct: number;
-  /** preço de venda ao comprador = ref × (1 − desconto) */
+  /** prémio de origem pago pelo comprador acima da referência, por unidade (distribuidores 0,10 €/kg) */
+  originPremium: number;
+  /** preço ao comprador = refPrice × (1 − discountPct) + originPremium */
   buyerPrice: number;
-  /** preço de aquisição ao produtor */
+  /** frase pronta sobre o preço ao comprador (usar em vez de "X % abaixo da referência de Y") */
+  priceBasis: string;
+  /** índice de origem a granel na abertura (azeite, €/kg); na água e no café, a referência de mercado na abertura */
+  indexAtOpen: number;
+  /** prémio pago ao produtor acima do índice, por unidade (azeite: 0,15 HoReCa, 0,10 distribuidores) */
+  producerPremium: number;
+  /** preço de aquisição ao produtor = indexAtOpen + producerPremium (0 no modelo agente: a Sprout não compra) */
   acquisitionPrice: number;
-  /** análises, armazenagem, seguro, logística, cobertura */
+  /** embalamento no co-packer, por unidade (já incluído em costsPerUnit) */
+  packingCost: number;
+  /** custos até à venda: embalamento, logística, armazém, custódia, análises, seguros, provisões */
   costsPerUnit: number;
-  /** custo total financiado por unidade de preço (aquisição + custos) */
+  /** decomposição de costsPerUnit (soma = costsPerUnit) */
+  costLines: CostLine[];
+  /** custo total financiado por unidade de preço (aquisição + custos); 0 no modelo agente */
   fundingPrice: number;
-  /** margem bruta por unidade de preço */
+  /** margem bruta por unidade de preço (no modelo agente: a comissão da Sprout) */
   grossMargin: number;
-  /** fração da margem bruta atribuída aos co-financiadores */
+  /** comissão da Sprout sobre o valor de venda (só modelo agente) */
+  commissionPct?: number;
+  /** fração da margem bruta atribuída aos cofinanciadores */
   investorShare: number;
-  /** fração da margem que a Sprout retém para a reserva de primeira perda */
+  /** fração da margem que alimenta a reserva comum de primeira perda */
   reserveShare: number;
-  /** liquidação prevista em 18 meses, como fração do capital, [baixo, alto]. Não garantida. */
+  /** índice de origem abaixo do qual a parte sem venda a prazo vende abaixo do preço financiado */
+  breakEvenIndex: number;
+  /** índice de origem abaixo do qual o lote inteiro, com a sua venda a prazo, entra em perda */
+  breakEvenIndexLot: number;
+  /** prazo esperado até à liquidação, em meses (dentro da janela de 18) */
+  expectedMonths: number;
+  /** liquidação prevista, como fração do capital, [baixo, alto], antes da reserva. Não garantida. */
   expectedRange: [number, number];
 }
 
@@ -245,8 +295,10 @@ export interface Lot {
   storage: { local: string; container: string; containers: number };
   /** stock físico atual no armazenamento (unidade do lote) */
   stock: number;
-  buyer?: { segment: 'Distribuição' | 'HoReCa' | 'Retalho' | 'Cash & carry' | 'Exportação'; descricao: string };
+  buyer?: { segment: 'Distribuição' | 'HoReCa' | 'Retalho' | 'Cash & carry' | 'Exportação' | 'Torrefação'; descricao: string };
   refundingPlaybookId?: string;
+  /** histórico ilustrativo (campanhas 2024/25 e 2025/26, antes do piloto): dados fictícios, nunca resultados */
+  illustrative?: boolean;
 }
 
 /* ------------------------------------------------------------ mercado */
@@ -257,6 +309,16 @@ export interface MarketPoint {
   value: number;
 }
 
+export interface MarketReference {
+  id: 'horeca' | 'embalador';
+  label: string;
+  note: string;
+  /** valor de hoje (13/10/2026) */
+  today: number;
+  /** série mensal derivada do índice (passagem integral da variação do granel) */
+  monthly: MarketPoint[];
+}
+
 export interface MarketSeries {
   world: WorldId;
   label: string;
@@ -264,6 +326,8 @@ export interface MarketSeries {
   note: string;
   monthly: MarketPoint[];
   daily: MarketPoint[];
+  /** referências embaladas derivadas do índice (só azeite) */
+  references?: MarketReference[];
 }
 
 /* ------------------------------------------------------------ investidores */
@@ -297,6 +361,8 @@ export interface Position {
   settledResult?: number;
   /** compromisso feito nesta sessão de demonstração */
   session?: boolean;
+  /** posição de histórico ilustrativo (lotes anteriores ao piloto) */
+  illustrative?: boolean;
 }
 
 /* ------------------------------------------------------------ jogo */
@@ -311,6 +377,8 @@ export interface OriginSealDef {
   /** como se ganha: compromisso num lote do produtor/campanha, ou missões de diligência */
   earnable: 'compromisso' | 'diligencia' | 'ambos';
   questIds: string[];
+  /** campanha encerrada: o selo já não se ganha e não conta para a completude do caderno */
+  closed?: boolean;
 }
 
 export interface EarnedSeal {
@@ -483,22 +551,30 @@ export interface SimLot {
   world: WorldId;
   nome: string;
   origem: string;
+  /** canal ou modelo do lote de cenário, numa frase curta */
+  canal: string;
   /** € por unidade de preço (kg ou L) tudo incluído */
   fundingPrice: number;
   priceUnit: 'kg' | 'L';
-  /** margem bruta esperada para os co-financiadores, fração em 18 meses */
+  /** margem prevista para os cofinanciadores (a sua parte da margem bruta), fração do montante */
   expectedMargin: number;
-  /** desvio mensal típico do preço de referência */
+  /** desvio mensal típico da referência do canal */
   monthlyVolatility: number;
+  /** peso do índice de origem na referência do canal (azeite HoReCa ≈ 0,58; distribuidores ≈ 0,80; água 0) */
+  indexShare: number;
   hedge: { available: boolean; instrument: HedgeInstrument; label: string; coverage: number; costPct: number };
   /** mês (1–18) em que começam e terminam as vendas, em cenário base */
   salesWindow: [number, number];
+  /** nota quando o lote é uma hipótese de estudo e não existe no piloto */
+  hypothesis?: string;
 }
 
 export interface SimEventEffect {
-  /** choque de preço (fração; −0.3 = −30 %) */
+  /** choque no índice de origem (fração; −0.3 = −30 %); cada lote sente-o na proporção de indexShare */
   priceShock?: number;
-  /** perda de quantidade vendável (fração) */
+  /** choque direto na referência do canal (procura), em todos os lotes atingidos */
+  refShock?: number;
+  /** perda de quantidade vendável antes das vendas (fração), com devolução por força maior */
   qtyLoss?: number;
   /** atraso das vendas (meses) */
   salesDelayMonths?: number;
@@ -508,6 +584,10 @@ export interface SimEventEffect {
   demand?: { monthsFaster: number; premium: number };
   /** custo extra (fração do montante) */
   extraCost?: number;
+  /** vendas não recuperadas por insolvência de um comprador (fração do valor de venda do lote), fora do seguro */
+  badDebt?: number;
+  /** stock destruído ou recusado, sem devolução (fração do stock por vender) */
+  writeOff?: number;
 }
 
 export interface SimEvent {
@@ -515,7 +595,7 @@ export interface SimEvent {
   title: string;
   description: string;
   worlds: WorldId[];
-  /** probabilidade por mês, por lote exposto */
+  /** probabilidade por mês, por lote exposto (ou por mercado, ou para toda a economia) */
   probPerMonth: number;
   /** meses em que pode ocorrer (1–18) */
   months: [number, number];
@@ -530,7 +610,10 @@ export interface SimRules {
   months: number;
   minAllocation: number;
   maxPerLot: number;
-  firstLossReservePct: number;
+  /** partilha da margem bruta de um lote com ganho: a mesma dos lotes reais */
+  shares: { investors: number; sprout: number; reserve: number };
+  /** reserva comum de primeira perda: a regra dos lotes reais, mais um saldo inicial fictício */
+  reserve: { shareOfMargin: number; capOfInvested: number; initialOfInvested: number };
   extension: { maxMonths: number; trigger: string; monthlyCostPct: number };
   refunding: { trigger: string; description: string; costPct: number };
   disclaimer: string;
@@ -591,6 +674,8 @@ export interface PilotKpi {
   status: 'ok' | 'warn' | 'crit';
   note: string;
   history: number[];
+  /** indicador calculado sobre o histórico ilustrativo (dados fictícios) */
+  illustrative?: boolean;
 }
 
 export interface ReconciliationRun {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import type { Lot } from '../../data/types';
+import { chapterScrollTop } from '../../components/game';
 import { cn } from '../../lib/cn';
 import { useData, type PositionView } from '../../state';
 import { lotContext, lotWindow, type ChapterId, type LotContext, type LotWindow } from './model';
@@ -23,8 +24,16 @@ export interface Journey {
   /** capítulos fixos com scroll (≥ 900 px de largura, ≥ 720 px de altura, sem movimento reduzido) */
   rich: boolean;
   goTo: (id: string) => void;
-  /** último capítulo: compromisso, acompanhamento, liquidação ou abertura */
+  /** último capítulo: compromisso, acompanhamento, liquidação, abertura ou cesto */
   ending: ChapterId;
+  /** capítulos desta jornada, por ordem (um lote de cesto não tem o capítulo do ciclo de 18 meses) */
+  order: ChapterId[];
+}
+
+/** Número do capítulo (01, 02…) na jornada deste lote. */
+export function useChapterNo(id: ChapterId): number {
+  const { order } = useJourney();
+  return Math.max(1, order.indexOf(id) + 1);
 }
 
 const JourneyContext = createContext<Journey | null>(null);
@@ -51,13 +60,15 @@ export function journeyBase(lot: Lot) {
 
 /* ------------------------------------------------------------ navegação */
 
-/** Leva o leitor ao capítulo e passa-lhe o foco (título), respeitando o movimento reduzido. */
-export function scrollToChapter(id: string, opts: { reduce: boolean; sticky: boolean }) {
+/**
+ * Leva o leitor ao capítulo e passa-lhe o foco (título), respeitando o
+ * movimento reduzido. Um capítulo fixo aterra no seu progresso estável (tudo
+ * à vista, valores completos); os outros por baixo da barra de capítulos.
+ */
+export function scrollToChapter(id: string, opts: { reduce: boolean }) {
   const el = document.getElementById(id);
   if (!el) return;
-  const offset = opts.sticky ? 0 : CHROME_H + 8;
-  const top = el.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top: Math.max(0, top), behavior: opts.reduce ? 'auto' : 'smooth' });
+  window.scrollTo({ top: chapterScrollTop(el, CHROME_H + 8), behavior: opts.reduce ? 'auto' : 'smooth' });
   const heading = document.getElementById(`${id}-titulo`);
   heading?.focus({ preventScroll: true });
 }
@@ -81,9 +92,13 @@ export function ChapterHeading({ id, n, title, lead, aside, className }: { id: s
   );
 }
 
-/** Contentor horizontal dos capítulos (mesma largura que as outras páginas). */
+/**
+ * Contentor horizontal dos capítulos (mesma largura que as outras páginas). É
+ * um contentor de consulta (@container): as colunas dos capítulos dependem da
+ * largura disponível (com ou sem o rail), não da largura do ecrã.
+ */
 export function Wrap({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('mx-auto w-full min-w-0 max-w-[1240px] px-4 sm:px-6 lg:px-8', className)}>{children}</div>;
+  return <div className={cn('@container mx-auto w-full min-w-0 max-w-[1240px] px-4 sm:px-6 lg:px-8', className)}>{children}</div>;
 }
 
 /* ------------------------------------------------------------ hooks */

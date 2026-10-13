@@ -1,34 +1,35 @@
 import { ArrowRight, CalendarRange } from 'lucide-react';
 import { ButtonLink } from '../../components/ui';
 import { DemoBadge } from '../../app/AppShell';
-import { useData } from '../../state';
+import { useTelemetry } from '../../state';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
 import { tidyText } from '../../lib/format';
-import { LABEL_BASE_Y, LABEL_COLUMNS, LS_H, OliveLandscape } from './OliveLandscape';
+import { LABEL_COLUMNS, LABEL_TOP_Y, LS_H, OliveLandscape } from './OliveLandscape';
 import { FOCUS_PRODUCER_ID } from './model';
 import { Frame } from './parts';
 
 /* =====================================================================
    1 · A colheita. Primeiro ecrã completo: o título, a tese com os números
-   do documento-fonte, as duas ações e o olival desenhado com etiquetas.
+   do business plan (cenário Recomendado), as duas ações e o olival
+   desenhado com etiquetas alinhadas pelo topo.
    ===================================================================== */
 
 const LABELS = [
-  { title: 'Compra direta ao lagar', detail: 'Azeite a granel, sem embalador pelo meio: o lagar recebe mais cedo.' },
-  { title: 'IBC de 1 000 kg, selados', detail: 'Cada lote tem número, análise e uma janela de 18 meses.' },
-  { title: 'Comprador B2B', detail: 'Paga 10–15 % abaixo da referência de mercado.' },
+  { title: 'Compra direta ao lagar', detail: 'Prémio sobre o índice de origem a granel, pago em 30 dias ou menos.' },
+  { title: 'IBC de 1 000 kg, selados', detail: 'Cada lote tem número e análise, e espera em IBC até ser embalado.' },
+  { title: 'Cliente HoReCa', detail: 'Paga 10 % abaixo da referência embalada, a validar no piloto.' },
 ].map((l) => ({ title: tidyText(l.title), detail: tidyText(l.detail) }));
 
 const SUBHEAD = tidyText(
-  'A Sprout compra azeite e água diretamente a lagares e nascentes, sem intermediários pelo meio, e vende a distribuição, HoReCa e retalho 10–15 % abaixo da referência de mercado. Investidores qualificados financiam lotes concretos, em janelas de 18 meses, e seguem cada quilo do depósito à liquidação.',
+  'A Sprout compra azeite de origem identificada diretamente aos lagares, com prémio ao produtor, manda-o embalar e vende-o a HoReCa e lojas gourmet 10 % abaixo da referência, e a distribuidores com prémio de origem. Cada lote é concreto e segue-se do depósito à liquidação. O piloto de 2027 usa capital próprio; só depois entram investidores qualificados.',
 );
 
-const ILLUSTRATION = 'Ilustração: olival em filas num monte, o lagar com quatro depósitos de inox, IBC de 1 000 kg numa palete e um camião a sair para o comprador.';
+const ILLUSTRATION = 'Ilustração: olival em filas num monte, o lagar com moega de receção, tapete elevador, venezianas e quatro depósitos de inox, IBC de 1 000 kg numa palete e um camião a sair para o cliente.';
 
 export function Hook() {
   const wide = useMediaQuery('(min-width: 1100px)', true);
-  const { telemetry } = useData();
+  const telemetry = useTelemetry();
   const deposits = (telemetry[FOCUS_PRODUCER_ID] ?? []).map((u) => ({ id: u.id, fraction: u.capacity ? u.level / u.capacity : 0 }));
 
   return (
@@ -50,7 +51,7 @@ export function Hook() {
             </ButtonLink>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
-            <span>Piloto fechado, por convite · azeite e água · café na Fase 2, em 2027</span>
+            <span>Piloto fechado em 2027 · azeite, com água no cesto · café na Fase 2, com go/no-go próprio</span>
             <span className="lg:hidden">
               <DemoBadge short />
             </span>
@@ -69,7 +70,7 @@ export function Hook() {
                 <div
                   key={l.title}
                   className="absolute pl-3 text-sm leading-snug"
-                  style={{ left: `${left * 100}%`, bottom: `${(1 - LABEL_BASE_Y / LS_H) * 100}%`, width: `calc(${(next - left) * 100}% - ${i === LABELS.length - 1 ? 28 : 14}px)` }}
+                  style={{ left: `${left * 100}%`, top: `${(LABEL_TOP_Y / LS_H) * 100}%`, width: `calc(${(next - left) * 100}% - ${i === LABELS.length - 1 ? 28 : 14}px)` }}
                 >
                   <p className="font-semibold text-fg">{l.title}</p>
                   <p className="mt-0.5 text-muted">{l.detail}</p>

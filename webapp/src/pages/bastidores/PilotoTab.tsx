@@ -1,8 +1,8 @@
 import { useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { fundedFraction, getProducer, PRODUCERS, stageLabel, type Lot } from '../../data';
+import { fundedFraction, getProducer, ILLUSTRATIVE_LABEL, isIllustrative, PRODUCERS, stageLabel, type Lot } from '../../data';
 import { CampaignFeed, LotGauge } from '../../components/game';
-import { Card, CardHeader, DataTable, StatusPill, type Column } from '../../components/ui';
+import { Badge, Card, CardHeader, DataTable, StatusPill, type Column } from '../../components/ui';
 import { useCampaignEvents, useData, useTelemetry } from '../../state';
 import { daysBetween, TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, eur, kg, num, pct, plural } from '../../lib/format';
@@ -16,8 +16,6 @@ import {
   KYC_WEEK_LABELS,
   kycBacklogHistory,
   OPEN_KYC,
-  ORDER_FILL_NOTE,
-  orderFill,
   recon,
 } from './metrics';
 import { KpiHistory, windowOf } from './parts';
@@ -52,7 +50,7 @@ function KpiRow({ label, note, value, sub, tone, toneLabel, history }: KpiRowPro
       <div className="min-w-0">
         <p className="text-[1.3125rem] font-semibold leading-tight text-fg pnum sm:text-[1.5rem]">{value}</p>
         {sub && <p className="mt-0.5 text-sm text-muted">{sub}</p>}
-        <StatusPill className="mt-2" tone={tone} label={toneLabel ?? TONE_LABEL[tone]} />
+        <StatusPill className="mt-2 max-w-full" tone={tone} label={toneLabel ?? TONE_LABEL[tone]} />
       </div>
       <div className="min-w-0">{history}</div>
     </li>
@@ -65,6 +63,44 @@ function physicalStock(lot: Lot) {
   if (lot.unit === 'kg') return { now: kg(lot.stock), of: kg(lot.quantity) };
   const u = lot.unit === 'palete' ? 'paletes' : 'sacas';
   return { now: `${num(lot.stock)} ${u}`, of: `${num(lot.quantity)} ${u}` };
+}
+
+/** Um lote em ciclo numa linha empilhada (ecrãs estreitos): medidor, ID, estado e dois números. */
+function StackedLot({ lot: l }: { lot: Lot }) {
+  const open = l.status === 'aberto';
+  const v = open ? fundedFraction(l) : l.quantity ? l.stock / l.quantity : 0;
+  const w = windowOf(l);
+  const s = physicalStock(l);
+  return (
+    <li className="px-4 py-3.5">
+      <div className="flex items-center gap-3">
+        <LotGauge kind={l.world} value={v} size="xs" label={open ? `Financiamento do ${l.id}` : `Stock por vender do ${l.id}`} />
+        <div className="min-w-0">
+          <Link to={`/lote/${l.id}`} className="font-mono text-[0.9375rem] font-medium text-accent underline decoration-[color-mix(in_oklab,var(--accent)_40%,transparent)] underline-offset-[0.2em] hover:decoration-accent tnum">
+            {l.id}
+          </Link>
+          <p className="text-sm text-muted">{getProducer(l.producerId)?.nome}</p>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <StatusPill status={l.status} />
+        <span className="text-sm text-muted">{stageLabel(l.world, l.stage)}</span>
+        {isIllustrative(l) && <span className="text-xs text-muted">ilustrativo</span>}
+      </div>
+      <dl className="mt-2.5 grid grid-cols-2 gap-x-4 text-sm">
+        <div className="min-w-0">
+          <dt className="text-muted">{open ? 'Financiado' : 'Stock por vender'}</dt>
+          <dd className="font-mono text-fg tnum">{open ? eur(l.funding.raised) : s.now}</dd>
+          <dd className="font-mono text-xs text-muted tnum">{open ? `${pct(fundedFraction(l), 0)} de ${eur(l.funding.goal)}` : `de ${s.of}`}</dd>
+        </div>
+        <div className="min-w-0">
+          <dt className="text-muted">Fim da janela</dt>
+          <dd className="font-mono text-fg tnum">{fmtDate(w.ext ?? w.end)}</dd>
+          <dd className="text-xs text-muted">{w.ext ? 'com extensão' : open ? 'prevista' : `${num(l.funding.coFinancers)} cofinanciadores`}</dd>
+        </div>
+      </dl>
+    </li>
+  );
 }
 
 export default function PilotoTab() {
@@ -82,7 +118,7 @@ export default function PilotoTab() {
     financiado: cyc.filter((l) => l.status === 'financiado').length,
     extensao: cyc.filter((l) => l.status === 'em-extensao').length,
   };
-  const fill = orderFill();
+  const fe = kpi('fill-rate-encomendas');
   const fr = kpi('fill-rate');
   const base = kpi('base');
   const slaP = kpi('sla-produtor');
@@ -100,7 +136,7 @@ export default function PilotoTab() {
       key: 'lote',
       header: 'Lote',
       sortValue: (l) => l.id,
-      minWidth: 250,
+      minWidth: 200,
       render: (l) => {
         const open = l.status === 'aberto';
         const v = open ? fundedFraction(l) : l.quantity ? l.stock / l.quantity : 0;
@@ -112,6 +148,7 @@ export default function PilotoTab() {
                 {l.id}
               </Link>
               <p className="truncate text-sm text-muted">{getProducer(l.producerId)?.nome}</p>
+              {isIllustrative(l) && <p className="text-xs text-muted">ilustrativo</p>}
             </div>
           </div>
         );
@@ -129,7 +166,10 @@ export default function PilotoTab() {
       render: (l) => (
         <div>
           <div>{eur(l.funding.raised)}</div>
-          {l.status === 'aberto' && <div className="text-xs text-muted">de {eur(l.funding.goal)} · {pct(fundedFraction(l), 0)}</div>}
+          <div className="text-xs text-muted">
+            {l.status === 'aberto' ? `de ${eur(l.funding.goal)} · ${pct(fundedFraction(l), 0)} · ` : ''}
+            {num(l.funding.coFinancers)} cofin.
+          </div>
         </div>
       ),
     },
@@ -167,7 +207,6 @@ export default function PilotoTab() {
         );
       },
     },
-    { key: 'co', header: 'Co-financiadores', align: 'right', mono: true, sortValue: (l) => l.funding.coFinancers, render: (l) => num(l.funding.coFinancers) },
   ];
 
   const liveProducers = PRODUCERS.filter((p) => p.fase === 1 && p.telemetry.live);
@@ -176,11 +215,15 @@ export default function PilotoTab() {
   return (
     <div className="flex flex-col gap-10">
       <Card>
-        <CardHeader title="Indicadores do piloto" description="Valor de hoje, alvo do desenho do piloto e os últimos seis períodos. Passa o cursor pelo histórico para ver cada valor." />
+        <CardHeader
+          title="Indicadores do piloto"
+          description="Valor de hoje, alvo do desenho do piloto e os últimos seis períodos. Passa o cursor pelo histórico para ver cada valor; num ecrã tátil, os dois últimos aparecem por baixo."
+          actions={<Badge tone="warn">{ILLUSTRATIVE_LABEL}</Badge>}
+        />
         <ul>
           <KpiRow
             label="Capital financiado vs. comprometido com produtores"
-            note={`Compromisso de compra assumido nos ${cyc.length} lotes em ciclo e o que os co-financiadores já financiaram. A diferença é o que falta nos lotes abertos.`}
+            note={`Compromisso de compra assumido nos ${cyc.length} lotes em ciclo e o que os cofinanciadores já financiaram. A diferença é o que falta nos lotes abertos. Os cestos de água não entram: não têm capital.`}
             value={eur(cap.financed)}
             sub={`de ${eur(cap.committed)} (${pct(cap.financed / cap.committed, 1)}); faltam ${eur(cap.gap)}`}
             tone={cap.gap > 0 ? 'info' : 'ok'}
@@ -189,7 +232,7 @@ export default function PilotoTab() {
           />
           <KpiRow
             label="Lotes em ciclo"
-            note="Lotes com capital comprometido e ainda por liquidar. Saem do ciclo quando o último pagamento chega aos co-financiadores."
+            note="Lotes com capital comprometido e ainda por liquidar. Saem do ciclo quando o último pagamento chega aos cofinanciadores."
             value={num(cyc.length)}
             sub={`${plural(counts.aberto, 'aberto', 'abertos')} · ${plural(counts.financiado, 'financiado', 'financiados')} · ${num(counts.extensao)} em extensão`}
             tone={counts.extensao > 0 ? 'info' : 'ok'}
@@ -197,40 +240,40 @@ export default function PilotoTab() {
             history={<KpiHistory kind="columns" values={hist.inCycle} labels={HISTORY_LABELS} format={(v) => num(v)} label="Lotes em ciclo no fim de cada mês" />}
           />
           <KpiRow
-            label="Fill rate de encomendas B2B"
-            note={`${ORDER_FILL_NOTE} Últimos 90 dias: ${fill.complete} de ${fill.orders} encomendas.`}
-            value={pct(fill.value, 1)}
-            sub="alvo ≥ 95,0 %"
-            tone={fill.value >= 0.95 ? 'ok' : 'warn'}
-            history={<KpiHistory kind="line" values={fill.history} target={0.95} labels={HISTORY_LABELS} format={pct0} label="Fill rate de encomendas por mês" />}
+            label="Fill rate de encomendas"
+            note={`${fe.note} Em agosto, 2 paletes do AG-2026-002 chegaram com película rasgada e foram recusadas na receção.`}
+            value={pct(fe.value, 1)}
+            sub={`alvo ≥ ${pct(fe.target, 1)}`}
+            tone={fe.value >= fe.target ? 'ok' : 'warn'}
+            history={<KpiHistory kind="line" values={fe.history} target={fe.target} labels={HISTORY_LABELS} format={pct0} label="Fill rate de encomendas por mês" />}
           />
           <KpiRow
-            label="Financiamento dos lotes da campanha"
+            label="Taxa de financiamento dos lotes"
             note={fr.note}
             value={pct(fr.value, 0)}
             sub={`alvo ≥ ${pct(fr.target, 0)}`}
             tone={fr.value >= fr.target ? 'ok' : 'warn'}
             toneLabel={fr.value >= fr.target ? undefined : 'Abaixo do alvo'}
-            history={<KpiHistory kind="line" values={fr.history} target={fr.target} labels={HISTORY_LABELS} format={pct0} label="Financiamento dos lotes por mês" />}
+            history={<KpiHistory kind="line" values={fr.history} target={fr.target} labels={HISTORY_LABELS} format={pct0} label="Volume financiado sobre oferecido, por mês" />}
           />
           <KpiRow
-            label="Variação de base: preço ao comprador vs. referência"
-            note={`${base.note} O desenho do piloto fixa o desconto entre 10 % e 15 % abaixo da referência de mercado.`}
+            label="Desconto na HoReCa face à referência embalada"
+            note={base.note}
             value={pct(base.value, 1, { sign: true })}
-            sub={`alvo ${pct(base.target, 0, { sign: true })} (banda −10 % a −15 %)`}
-            tone={base.value <= -0.1 && base.value >= -0.15 ? 'ok' : 'warn'}
-            history={<KpiHistory kind="line" values={base.history} target={base.target} labels={HISTORY_LABELS} format={(v) => pct(v, 1, { sign: true })} label="Desconto médio ao comprador por mês" />}
+            sub={`alvo ${pct(base.target, 0, { sign: true })} (banda −8 % a −12 %)`}
+            tone={base.value <= -0.08 && base.value >= -0.12 ? 'ok' : 'warn'}
+            history={<KpiHistory kind="line" values={base.history} target={base.target} labels={HISTORY_LABELS} format={(v) => pct(v, 1, { sign: true })} label="Desconto médio na HoReCa por mês" />}
           />
           <KpiRow
-            label="SLA de pagamento a produtores (D+2 úteis)"
+            label={slaP.label}
             note={slaP.note}
             value={pct(slaP.value, 0)}
-            sub={`alvo ≥ ${pct(slaP.target, 0)}`}
+            sub={`alvo ${pct(slaP.target, 0)}`}
             tone={slaP.value >= slaP.target ? 'ok' : 'warn'}
-            history={<KpiHistory kind="line" values={slaP.history} target={slaP.target} labels={HISTORY_LABELS} format={pct0} label="Pagamentos a produtores dentro do prazo por mês" />}
+            history={<KpiHistory kind="line" values={slaP.history} target={slaP.target} labels={HISTORY_LABELS} format={pct0} label="Pagamentos a produtores em 30 dias ou menos, por mês" />}
           />
           <KpiRow
-            label="SLA de liquidação a investidores"
+            label={slaI.label}
             note={slaI.note}
             value={pct(slaI.value, 0)}
             sub={`alvo ${pct(slaI.target, 0)}`}
@@ -253,14 +296,15 @@ export default function PilotoTab() {
             sub={openCases.length ? `o mais antigo tem ${plural(oldest, 'dia', 'dias')}` : 'fila vazia'}
             tone={oldest > KYC_SLA_DAYS ? 'warn' : 'ok'}
             toneLabel={oldest > KYC_SLA_DAYS ? 'Fora do prazo' : undefined}
-            history={<KpiHistory kind="columns" values={kycHist} labels={KYC_WEEK_LABELS} format={(v) => plural(v, 'caso', 'casos')} label="Casos KYC abertos no fim de cada semana" />}
+            history={<KpiHistory kind="columns" values={kycHist} labels={KYC_WEEK_LABELS} ticks="ends" showLast format={(v) => plural(v, 'caso', 'casos')} label="Casos KYC abertos no fim de cada semana" />}
           />
           <KpiRow
             label="Prazo médio de venda de um lote"
             note={prazo.note}
             value={`${num(prazo.value, 1)} meses`}
             sub={`alvo ≤ ${num(prazo.target)} meses`}
-            tone={prazo.value <= prazo.target ? 'ok' : 'warn'}
+            tone={prazo.status === 'ok' ? 'ok' : 'warn'}
+            toneLabel={prazo.status === 'ok' ? undefined : 'Acima do alvo'}
             history={<KpiHistory kind="line" values={prazo.history} target={prazo.target} labels={HISTORY_LABELS} format={(v) => `${num(v, 1)} meses`} label="Prazo médio de venda por mês" />}
           />
         </ul>
@@ -271,9 +315,21 @@ export default function PilotoTab() {
           <h2 id="ciclo-t" className="text-[1.375rem] leading-tight">
             Lotes em ciclo
           </h2>
-          <p className="measure mt-1 text-muted">Cada lote com o seu medidor: nos abertos, o financiamento; nos restantes, o stock que falta vender.</p>
+          <p className="measure mt-1 text-muted">
+            Cada lote com o seu medidor: nos abertos, o financiamento; nos restantes, o stock que falta vender. Os lotes marcados «ilustrativo» são histórico ilustrativo, com dados fictícios: o piloto só começa em fevereiro de 2027.
+          </p>
         </div>
-        <DataTable columns={columns} rows={cyc} getRowId={(l) => l.id} caption="Lotes em ciclo no piloto" initialSort={{ key: 'janela', dir: 'asc' }} />
+        {/* tabela quando cabe; num contentor estreito, uma linha empilhada por lote (nada cortado) */}
+        <div className="@container">
+          <div className="hidden @min-[54rem]:block">
+            <DataTable columns={columns} rows={cyc} getRowId={(l) => l.id} caption="Lotes em ciclo no piloto" initialSort={{ key: 'janela', dir: 'asc' }} />
+          </div>
+          <ul className="divide-y divide-border rounded-md border border-border bg-surface @min-[54rem]:hidden" aria-label="Lotes em ciclo no piloto">
+            {[...cyc].sort((x, y) => (windowOf(x).ext ?? windowOf(x).end).localeCompare(windowOf(y).ext ?? windowOf(y).end)).map((l) => (
+              <StackedLot key={l.id} lot={l} />
+            ))}
+          </ul>
+        </div>
       </section>
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">

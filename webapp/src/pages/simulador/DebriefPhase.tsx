@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Pencil, RefreshCw, Repeat, ShieldOff, Shield } from 'lucide-react';
-import { INVESTOR_SHARE, SIM_COMPLETE_POINTS, STATUS_LABEL, STATUS_TONE, fundedFraction, getQuest } from '../../data';
+import { ILLUSTRATIVE_LABEL, RESERVE_POOL, SIM_RULES, STATUS_LABEL, STATUS_TONE, fundedFraction, getQuest, isIllustrative } from '../../data';
 import { Button, Card, CardHeader, DataTable, Disclaimer, RiskNote, StatusPill, type Column } from '../../components/ui';
 import { LevelProgress, LotGauge } from '../../components/game';
 import { useData, useGame } from '../../state';
 import { cn } from '../../lib/cn';
-import { pct } from '../../lib/format';
+import { eur, pct } from '../../lib/format';
 import { getSimLot, monthLabel, shortName } from './deck';
 import { simulateFull, type Allocation, type LotFinal, type SimRun } from './engine';
 import { nextSeed } from './store';
@@ -60,7 +60,15 @@ export function DebriefPhase({ run, reviewing, pointsAwarded, streak, onReplay, 
     did.push({ id: 'cobertura', title: 'Coberturas', delta: d, text: d >= 0 ? `Valeram ${fe(d)} face à mesma campanha sem elas.` : `Custaram ${fe(-d)}: o preço não caiu o suficiente para pagar o seu custo. É o preço do seguro.` });
   }
   const dRes = value - cf.noReserve.final!.value;
-  did.push({ id: 'reserva', title: 'Reserva de primeira perda', delta: dRes, text: dRes > 0.5 ? `Absorveu ${fe(dRes)} de perdas em ${f.lots.filter((l) => l.reserveUsed > 0.5).map((l) => shortName(l.simLotId)).join(', ')}.` : 'Não foi usada: nenhum lote acabou em perda.' });
+  const reserveIn = f.lots.reduce((s, l) => s + l.reserveIn, 0);
+  did.push({
+    id: 'reserva',
+    title: 'Reserva comum de primeira perda',
+    delta: dRes,
+    text:
+      (dRes > 0.5 ? `Absorveu ${fe(dRes)} de perdas em ${f.lots.filter((l) => l.reserveUsed > 0.5).map((l) => shortName(l.simLotId)).join(', ')}${f.reserveExhausted ? ' e esgotou-se' : ''}.` : 'Não foi usada: nenhum lote acabou em perda.') +
+      (reserveIn > 0.5 ? ` Os lotes com ganho entregaram-lhe ${fe(reserveIn)} (${pct(SIM_RULES.shares.reserve, 0)} da margem).` : ''),
+  });
   if (cf.noExt) {
     const d = value - cf.noExt.final!.value;
     did.push({ id: 'extensao', title: 'Extensão', delta: d, text: d >= 0 ? `Esperar ${extended.length > 1 ? 'os meses de extensão' : `mais ${extended[0].settledAt - 18} meses`} valeu ${fe(d)} face a vender tudo no mês 18.` : `Esperar custou ${fe(-d)}: a armazenagem e o preço não compensaram face à venda de fecho no mês 18.` });
@@ -120,7 +128,14 @@ export function DebriefPhase({ run, reviewing, pointsAwarded, streak, onReplay, 
           ) : (
             'Não houve choques adversos com peso nos teus lotes.'
           )}
-          {reserveUsed > 0.5 && <> A reserva de primeira perda absorveu {fe(reserveUsed)}.</>} A queda máxima a meio da campanha foi de {pct(f.maxDrawdown, 1)}.
+          {reserveUsed > 0.5 && (
+            <>
+              {' '}
+              A reserva comum absorveu {fe(reserveUsed)}
+              {f.reserveExhausted ? ' e ficou a zero: o resto da perda foi dos cofinanciadores' : ''}.
+            </>
+          )}{' '}
+          A queda máxima a meio da campanha foi de {pct(f.maxDrawdown, 1)}.
         </p>
         <SimBand compact className="mt-3" />
       </section>
@@ -132,7 +147,7 @@ export function DebriefPhase({ run, reviewing, pointsAwarded, streak, onReplay, 
         </h3>
         <DataTable columns={lotColumns} rows={f.lots} getRowId={(l) => l.simLotId} caption="Resultado de cada lote, em € fictícios" />
         <p className="mt-2 text-sm text-muted">
-          Investido + resultado bruto − parte da Sprout ({pct(1 - INVESTOR_SHARE, 0)} da margem, só quando há margem) + reserva = liquidação. Vendas inclui devoluções por força maior. Os custos base (análises, armazenagem, seguro, logística) já estão no preço de entrada; aqui estão só os custos extra.
+          Num lote com ganho: investido + {pct(SIM_RULES.shares.investors, 0)} do resultado bruto = liquidação; os outros {pct(SIM_RULES.shares.sprout, 0)} vão para a Sprout e {pct(SIM_RULES.shares.reserve, 0)} para a reserva comum. Num lote com perda: investido + resultado bruto + o que a reserva ainda tinha = liquidação. Vendas inclui devoluções por força maior. Os custos base (compra, embalamento, logística, custódia, análises, seguros) já estão no preço de entrada; aqui estão só os custos extra.
         </p>
       </section>
 
@@ -199,15 +214,15 @@ export function DebriefPhase({ run, reviewing, pointsAwarded, streak, onReplay, 
             <p className="text-[0.9375rem] text-muted">Estás a rever uma campanha antiga: rever não dá pontos.</p>
           ) : pointsAwarded > 0 ? (
             <p className="text-[0.9375rem] text-fg">
-              <span className="font-mono tnum">+{pointsAwarded}</span> pontos de conhecimento: {SIM_COMPLETE_POINTS} por completares a primeira campanha e {getQuest('q-simulador')?.points ?? 0} pela missão «{getQuest('q-simulador')?.title}», cumprida ao abrires este balanço.
+              <span className="font-mono tnum">+{pointsAwarded}</span> pontos de conhecimento pela missão «{getQuest('q-simulador')?.title}», cumprida ao abrires este balanço.
             </p>
           ) : (
-            <p className="text-[0.9375rem] text-muted">Esta corrida não deu pontos. O simulador dá pontos uma vez, por completar a campanha e ler o balanço. O resultado nunca conta.</p>
+            <p className="text-[0.9375rem] text-muted">Esta corrida não deu pontos. O simulador dá pontos uma vez, pela missão de completar uma campanha e ler o balanço. O resultado nunca conta.</p>
           )}
           <LevelProgress points={game.points} compact className="mt-4" />
         </Card>
         <Disclaimer kind="regulatorio" title="Porque existe este simulador" boxed>
-          O Regulamento (UE) 2020/1503 (ECSP), no art. 21.º, obriga as plataformas de financiamento colaborativo a pedir aos investidores não sofisticados uma simulação da capacidade de suportar perdas, calculada como 10 % do património líquido. O piloto da Sprout é só para investidores qualificados, mas segue o mesmo espírito: antes de comprometer dinheiro real, joga campanhas que podem acabar em perda. Este simulador não substitui esse cálculo, não é aconselhamento e não prevê resultados.
+          O Regulamento (UE) 2020/1503 (ECSP), no art. 21.º, obriga as plataformas de financiamento colaborativo a pedir aos investidores não sofisticados uma simulação da capacidade de suportar perdas, calculada como 10 % do património líquido. O piloto da Sprout é só para investidores profissionais e qualificados e não é uma plataforma ECSP, mas segue o mesmo espírito: antes de comprometer dinheiro real, joga campanhas que podem acabar em perda. Este simulador não substitui esse teste nem esse cálculo, não é aconselhamento e não prevê resultados.
         </Disclaimer>
       </div>
     </div>
@@ -232,8 +247,8 @@ const lotColumns: Column<LotFinal>[] = [
   { key: 'vendas', header: 'Vendas', align: 'right', mono: true, render: (l) => fe(l.revenue + l.refunds) },
   { key: 'custos', header: 'Custos extra', align: 'right', mono: true, render: (l) => fe(l.costHedge + l.costEvents + l.costExtension + l.costRefunding) },
   { key: 'bruto', header: 'Resultado bruto', align: 'right', mono: true, render: (l) => fes(l.gross) },
-  { key: 'sprout', header: 'Sprout', align: 'right', mono: true, render: (l) => (l.gross > 0 ? fe(l.gross * (1 - INVESTOR_SHARE)) : '—') },
-  { key: 'reserva', header: 'Reserva', align: 'right', mono: true, render: (l) => (l.reserveUsed > 0.5 ? fe(l.reserveUsed) : '—') },
+  { key: 'sprout', header: 'Sprout', align: 'right', mono: true, render: (l) => (l.sprout > 0.5 ? fes(-l.sprout) : '—') },
+  { key: 'reserva', header: 'Reserva comum', align: 'right', mono: true, render: (l) => (l.reserveUsed > 0.5 ? fes(l.reserveUsed) : l.reserveIn > 0.5 ? fes(-l.reserveIn) : '—') },
   { key: 'liq', header: 'Liquidação', align: 'right', mono: true, render: (l) => <span className="font-semibold">{fe(l.value)}</span> },
   { key: 'res', header: 'Resultado', align: 'right', mono: true, render: (l) => fpct(l.result) },
   {
@@ -278,11 +293,19 @@ function DeltaList({ rows }: { rows: Delta[] }) {
 
 /* ------------------------------------------------------------ lotes reais */
 
+const LOSS_LOT = RESERVE_POOL.entries.find((e) => e.amount < 0);
+
 const REAL = [
-  { id: 'AZ-2026-021', anchor: '#cobertura', text: 'Lote aberto de azeite. Vê que cobertura tem, que parte do volume protege e quanto custa, como fizeste aqui.' },
-  { id: 'AG-2026-007', anchor: '#riscos', text: 'Lote aberto de água. Sem cobertura: o risco está no ritmo das vendas e nos custos, como no verão chuvoso.' },
-  { id: 'AZ-2025-017', anchor: '', text: 'Um lote real em extensão: é assim que a extensão aparece na jornada e no calendário de um lote.' },
-  { id: 'AZ-2025-009', anchor: '', text: 'Um lote real que liquidou com perda, depois de a reserva de primeira perda absorver 5 % do valor do lote.' },
+  { id: 'AZ-2026-021', anchor: '#cobertura', text: 'Lote aberto de azeite para HoReCa: 40 % vendido a prazo. Vê a que índice de origem o resto começa a perder, como fizeste aqui com a cobertura.' },
+  { id: 'AZ-2026-024', anchor: '#cobertura', text: 'Lote aberto para distribuidores: 85 % vendido antes da compra. A margem é fina e o risco passa a ser o comprador cumprir.' },
+  { id: 'AZ-2025-017', anchor: '', text: 'Um lote em extensão depois de o comprador do contrato cancelar metade das entregas: é assim que a extensão aparece na jornada e no calendário.' },
+  {
+    id: 'AZ-2025-009',
+    anchor: '',
+    text: LOSS_LOT
+      ? `Um lote que liquidou com perda: a reserva comum absorveu ${eur(-LOSS_LOT.amount, { decimals: 0 })}, tudo o que tinha, e o resto ficou com os cofinanciadores.`
+      : 'Um lote que liquidou com perda, depois de a reserva comum se esgotar.',
+  },
 ];
 
 function RealDecision() {
@@ -292,7 +315,7 @@ function RealDecision() {
       <h3 id="real-title" className="text-[1.25rem]">
         O que isto quer dizer numa decisão real
       </h3>
-      <p className="measure mt-1 text-muted">O simulador usa as regras dos lotes reais, não os seus números. Antes de decidir, lê a jornada do lote: análises, cobertura, fatores de risco e calendário.</p>
+      <p className="measure mt-1 text-muted">O simulador usa as regras dos lotes reais: a mesma partilha, a mesma reserva comum e os mesmos gatilhos. Antes de decidir, lê a jornada do lote: análises, cobertura, fatores de risco e calendário. Os lotes de campanhas anteriores são {ILLUSTRATIVE_LABEL.toLowerCase()}.</p>
       <ul className="mt-4 grid gap-x-6 gap-y-1 md:grid-cols-2">
         {REAL.map((r) => {
           const lot = getLot(r.id);
@@ -305,6 +328,7 @@ function RealDecision() {
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-[0.9375rem] font-medium text-fg">{lot.id}</span>
                     <StatusPill label={STATUS_LABEL[lot.status]} tone={STATUS_TONE[lot.status]} />
+                    {isIllustrative(lot) && <span className="text-xs text-muted">{ILLUSTRATIVE_LABEL}</span>}
                   </span>
                   <span className="mt-0.5 block text-sm text-muted">{r.text}</span>
                 </span>

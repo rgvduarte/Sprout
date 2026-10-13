@@ -140,7 +140,8 @@ export function parseDateInput(raw: string): string | null {
 export function validateBirth(raw: string): string | null {
   if (!raw) return 'Indica a data de nascimento.';
   const iso = parseDateInput(raw);
-  if (!iso) return 'Escreve a data no formato dd/mm/aaaa, por exemplo 17/04/1979.';
+  // formato certo mas data impossível (31/02, mês 13): o problema é a data, não o formato
+  if (!iso) return /^\d{2}\/\d{2}\/\d{4}$/.test(raw.trim()) ? 'Esta data não existe. Confirma o dia e o mês.' : 'Escreve a data no formato dd/mm/aaaa, por exemplo 17/04/1979.';
   const d = toDate(iso);
   const today = toDate(TODAY_DATE);
   const adult = new Date(d);

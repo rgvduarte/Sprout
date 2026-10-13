@@ -1,15 +1,16 @@
 import { useCallback, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ChevronDown, Gamepad2 } from 'lucide-react';
-import { getLot as getStaticLot, getMarketSeries, priceUnit } from '../../data';
+import { getMarketSeries, ILLUSTRATIVE_LABEL, priceUnit, QUESTS, RESERVE_POOL, RESERVE_RULE } from '../../data';
 import type { RiskFactor } from '../../data/types';
 import { EASE_OUT } from '../../components/game';
 import { Badge, Button, ButtonLink, TextLink } from '../../components/ui';
 import { cn } from '../../lib/cn';
-import { kg, num, pct, tidyText } from '../../lib/format';
+import { date as fmtDate, eur, kg, num, pct, tidyText } from '../../lib/format';
 import { useGame, useRole } from '../../state';
-import { marginSplit, priceDecimals, simLotFor } from './model';
-import { ChapterHeading, CheckMark, useDwell, useJourney, Wrap } from './shared';
+import { isAgentLot, marginSplit, priceDecimals, simLotFor } from './model';
+import { playedLotCard } from '../inicio/missions';
+import { ChapterHeading, CheckMark, useChapterNo, useDwell, useJourney, Wrap } from './shared';
 
 /* =====================================================================
    Capítulo 5 · Riscos. Cada fator tem de ser aberto e confirmado ("Li e
@@ -111,7 +112,7 @@ function Hedge() {
   if (h.instrument === 'forward' || h.instrument === 'indexacao') {
     covered.push(`Preço de ${pct(h.coverage, 0)} do volume (${kg(lot.quantity * h.coverage)})${fwdPrice ? `, vendido a prazo a ${fwdPrice} €/kg` : ', com preço fixado na venda a prazo'}.`);
     if (h.trigger) covered.push(h.trigger);
-    notCovered.push('O preço da parte indexada: se a referência cair, o preço de venda acompanha.');
+    notCovered.push('O preço da parte indexada: se o índice de origem cair, a referência do canal e o preço de venda acompanham.');
     notCovered.push('Desclassificação do azeite: tratada pelo playbook de qualidade e pela cláusula de ajuste com o produtor.');
     notCovered.push('Atraso nas vendas e o custo de armazenagem de uma extensão.');
     notCovered.push('Incumprimento do comprador acima do limite do seguro de crédito.');
@@ -119,6 +120,9 @@ function Hedge() {
     covered.push(`${pct(h.coverage, 0)} do volume com venda de futuros KC e cobertura cambial EUR/USD.`);
     notCovered.push('O diferencial físico sobre o KC e a qualidade na chegada.');
     notCovered.push('Atrasos de embarque.');
+  } else if (isAgentLot(lot)) {
+    notCovered.push('Neste cesto a Sprout é agente: o engarrafador vende e fatura, e o preço, o stock e o crédito ao comprador ficam do lado dele. Não há capital de cofinanciadores a cobrir.');
+    notCovered.push(`No índice ilustrativo, a referência da água variou ±${pct(swing, 1)} em 24 meses: muda a comissão da Sprout, não um capital investido.`);
   } else {
     notCovered.push(`Preço: não há cobertura. No índice ilustrativo, a referência da água variou ±${pct(swing, 1)} em 24 meses.`);
     notCovered.push('Atraso nas vendas num verão fraco: gerido com contratos anuais de fornecimento.');
@@ -140,7 +144,7 @@ function Hedge() {
               <span className="font-mono text-fg tnum">{pct(h.coverage, 0)}</span> coberto
             </span>
             <span>
-              <span className="font-mono text-fg tnum">{pct(1 - h.coverage, 0)}</span> {h.instrument === 'ice-kc' ? 'descoberto' : 'indexado à referência'}
+              <span className="font-mono text-fg tnum">{pct(1 - h.coverage, 0)}</span> {h.instrument === 'ice-kc' ? 'descoberto' : 'indexado ao índice de origem'}
             </span>
           </div>
         </div>
@@ -177,22 +181,28 @@ function Hedge() {
   );
 }
 
+/**
+ * A reserva comum de primeira perda: uma só regra (RESERVE_RULE) e o saldo de
+ * hoje (RESERVE_POOL, histórico ilustrativo). Absorve perdas antes dos
+ * cofinanciadores enquanto tiver saldo; pode esgotar-se.
+ */
 function Reserve() {
   const { lot } = useJourney();
   const split = marginSplit(lot);
   const d = priceDecimals(lot);
   const unit = priceUnit(lot);
-  const lost = getStaticLot('AZ-2025-009');
+  const e = lot.economics;
   const parts = [
-    { label: 'Co-financiadores', v: split.investors, share: lot.economics.investorShare, cls: 'bg-world' },
-    { label: 'Operação Sprout', v: split.operation, share: 1 - lot.economics.investorShare - lot.economics.reserveShare, cls: 'bg-[color-mix(in_oklab,var(--world)_42%,var(--surface))]' },
-    { label: 'Reserva de primeira perda', v: split.reserve, share: lot.economics.reserveShare, cls: 'bg-[color-mix(in_oklab,var(--fg)_55%,var(--surface))]' },
+    { label: 'Cofinanciadores', v: split.investors, share: e.investorShare, cls: 'bg-world' },
+    { label: 'Operação Sprout', v: split.operation, share: 1 - e.investorShare - e.reserveShare, cls: 'bg-[color-mix(in_oklab,var(--world)_42%,var(--surface))]' },
+    { label: 'Reserva comum de primeira perda', v: split.reserve, share: e.reserveShare, cls: 'bg-[color-mix(in_oklab,var(--fg)_55%,var(--surface))]' },
   ];
+  const used = RESERVE_POOL.entries.find((x) => x.amount < 0);
   return (
     <div>
       <h3 className="text-[1.1875rem]">Reserva de primeira perda</h3>
       <p className="mt-1 text-sm text-muted">
-        Da margem bruta de <span className="font-mono text-fg tnum">{num(split.perUnit, d)} €/{unit}</span>, {pct(lot.economics.reserveShare, 0)} vai para uma reserva comum que absorve perdas antes dos co-financiadores, até ao saldo que tiver. Não é uma garantia.
+        Da margem bruta deste lote (<span className="font-mono text-fg tnum">{num(split.perUnit, d)} €/{unit}</span>), {pct(e.reserveShare, 0)} vai para a reserva. {RESERVE_RULE.text} Não é uma garantia.
       </p>
       <div className="mt-3 flex h-3 gap-0.5" role="img" aria-label={parts.map((p) => `${p.label} ${pct(p.share, 0)}`).join(', ')}>
         {parts.map((p, i) => (
@@ -204,23 +214,29 @@ function Reserve() {
           <li key={p.label} className="flex items-center gap-2">
             <span aria-hidden className={cn('size-2.5 shrink-0 rounded-[2px]', p.cls)} />
             <span className="text-muted">{p.label}</span>
-            <span className="ml-auto font-mono text-fg tnum">
+            <span className="ml-auto whitespace-nowrap font-mono text-fg tnum">
               {num(p.v, d)} €/{unit} · {pct(p.share, 0)}
             </span>
           </li>
         ))}
       </ul>
-      {lost?.settlement.settledResult !== undefined && (
-        <p className="mt-3 text-sm text-muted">
-          {lost.id === lot.id ? 'Este lote' : `No piloto, o ${lost.id}`} liquidou com <span className="font-mono text-fg tnum">{pct(lost.settlement.settledResult, 1, { sign: true })}</span> depois de a reserva absorver 5 % do valor do lote. A reserva reduz a perda; não a impede.
-        </p>
-      )}
+      <p className="mt-3 text-sm text-muted">
+        Saldo da reserva hoje: <span className="font-mono text-fg tnum">{eur(RESERVE_POOL.balance)}</span>
+        {used && (
+          <>
+            {' '}
+            (o {used.lotId} usou <span className="font-mono tnum">{eur(-used.amount)}</span> a {fmtDate(used.date)} e esgotou-a)
+          </>
+        )}
+        . {RESERVE_POOL.next.note} A reserva reduz a perda; não a impede. <span className="whitespace-nowrap">{ILLUSTRATIVE_LABEL}.</span>
+      </p>
     </div>
   );
 }
 
 export function ChapterRiscos({ label }: { label: string }) {
   const { lot, goTo } = useJourney();
+  const no = useChapterNo('riscos');
   const game = useGame();
   const { isTeam, isVisitor } = useRole();
   const read = game.riskRead(lot.id);
@@ -229,8 +245,14 @@ export function ChapterRiscos({ label }: { label: string }) {
   const count = factors.filter((r) => isRead(r.id)).length;
   const [openId, setOpenId] = useState<string | null>(() => factors.find((r) => !read.includes(r.id))?.id ?? null);
   const btns = useRef<Record<string, HTMLButtonElement | null>>({});
+  // depois do último fator lido, o foco passa para a ação seguinte (não cai para o corpo da página)
+  const doneRef = useRef<HTMLDivElement>(null);
   const simId = simLotFor(lot);
-  const simDone = game.isQuestDone('q-simulador');
+  // a mesma regra do Início e da Origem: conta uma campanha jogada com a carta deste lote
+  const simDone = playedLotCard(game, lot);
+  const simQuest = QUESTS.find((q) => q.criteria.type === 'sim-complete');
+  const simPoints = simQuest && !game.isQuestDone(simQuest.id) ? simQuest.points : 0;
+  const agent = isAgentLot(lot);
   const all = count === factors.length;
 
   const markRead = (r: RiskFactor) => {
@@ -239,6 +261,11 @@ export function ChapterRiscos({ label }: { label: string }) {
     const next = factors.find((f) => !after.includes(f.id));
     setOpenId(next?.id ?? null);
     if (next) window.setTimeout(() => btns.current[next.id]?.focus(), 30);
+    else
+      window.setTimeout(() => {
+        const target = doneRef.current?.querySelector<HTMLElement>('button, a') ?? doneRef.current;
+        target?.focus();
+      }, 30);
   };
 
   return (
@@ -246,7 +273,7 @@ export function ChapterRiscos({ label }: { label: string }) {
       <Wrap>
         <ChapterHeading
           id="riscos"
-          n={5}
+          n={no}
           title="Riscos"
           lead={`Abre cada fator e confirma que o leste. ${lot.status === 'aberto' ? 'O compromisso só desbloqueia com todos lidos.' : 'Ler os fatores conta para a tua diligência, mesmo sem compromisso.'}`}
         />
@@ -282,7 +309,7 @@ export function ChapterRiscos({ label }: { label: string }) {
               ))}
             </ul>
             {all && (
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div ref={doneRef} tabIndex={-1} className="mt-5 flex flex-wrap items-center gap-3 outline-none">
                 <p className="text-[0.9375rem] text-fg">
                   {lot.status !== 'aberto'
                     ? 'Leste todos os fatores de risco deste lote.'
@@ -301,7 +328,7 @@ export function ChapterRiscos({ label }: { label: string }) {
 
           <div className="flex min-w-0 flex-col gap-10 lg:col-span-5">
             <Hedge />
-            <Reserve />
+            {!agent && <Reserve />}
             <div>
               <h3 className="text-[1.1875rem]">{lot.status === 'aberto' ? 'Joga esta campanha antes de decidir' : 'Joga esta campanha no simulador'}</h3>
               <p className="mt-1 text-sm text-muted">
@@ -313,7 +340,7 @@ export function ChapterRiscos({ label }: { label: string }) {
                 </ButtonLink>
                 <span className="inline-flex items-center gap-2 text-sm text-muted">
                   <CheckMark done={simDone} size={18} />
-                  {simDone ? 'Campanha jogada' : '+25 pts de conhecimento'}
+                  {simDone ? 'Campanha jogada com este lote' : simPoints > 0 ? `+${simPoints} pts de conhecimento` : 'Os pontos do simulador já estão contados'}
                 </span>
               </div>
             </div>

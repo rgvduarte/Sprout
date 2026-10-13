@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
 import { REFUNDING_PLAYBOOKS } from '../../data';
 import { Chapter, HarvestBand, useMapRange } from '../../components/game';
@@ -8,7 +8,7 @@ import { date as fmtDate, lisbonParts, monthYear, pct } from '../../lib/format';
 import { useTokens, seriesColor } from '../../lib/useTokens';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { salesShareAt, stageDate } from './model';
-import { ChapterHeading, CHROME_H, useJourney, useWidth, Wrap } from './shared';
+import { ChapterHeading, CHROME_H, useChapterNo, useJourney, useWidth, Wrap } from './shared';
 
 /* =====================================================================
    Capítulo 4 · O ciclo de 18 meses. O cursor percorre a janela com o
@@ -28,7 +28,8 @@ function makeScale(start: string, totalMonths: number) {
   };
 }
 
-function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
+const CicloBody = memo(function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
+  const no = useChapterNo('ciclo');
   const { lot, ctx, win } = useJourney();
   const tokens = useTokens();
   const color = seriesColor(tokens, lot.world);
@@ -104,7 +105,7 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
     <Wrap>
       <ChapterHeading
         id="ciclo"
-        n={4}
+        n={no}
         title={`O ciclo de ${win.months} meses`}
         lead={`Do fecho do financiamento à liquidação prevista a ${fmtDate(win.end)}. No fim da janela há três caminhos possíveis e cada um tem condições escritas antes de o lote abrir.`}
       />
@@ -133,7 +134,7 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
             return (
               <g key={v}>
                 <line x1={0} x2={xEnd} y1={y} y2={y} stroke={tokens.chartGrid} strokeWidth={1} />
-                <text x={xEnd + 8} y={y + 4} fontSize="11" fontFamily={tokens.fontMono} fill={tokens.chartAxis}>
+                <text x={xEnd + 8} y={y + 4} fontSize="12" fontFamily={tokens.fontMono} fill={tokens.chartAxis}>
                   {v === 1 ? '100 % vendido' : `${Math.round(v * 100)} %`}
                 </text>
               </g>
@@ -167,7 +168,8 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
           ))}
           <circle cx={xd} cy={base} r={4} fill={tokens.fg} />
           <circle cx={xEnd} cy={base} r={6} fill={emphasis === 'a' ? tokens.fg : tokens.surface} stroke={tokens.fg} strokeWidth={2} />
-          <motion.g style={{ opacity: forkP }}>
+          {/* rótulos dos caminhos: sempre visíveis (só os desenhos acompanham o scroll) */}
+          <g>
             <text x={xEnd - 8} y={base - 10} textAnchor="end" fontSize="12" fontWeight={600} fill={tokens.fg}>
               {settledAt ? `Liquidado ${fmtDate(settledAt)}` : `Liquidação prevista ${wide ? fmtDate(win.end) : ''}`}
             </text>
@@ -181,12 +183,12 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
                 </text>
               </>
             )}
-          </motion.g>
+          </g>
           {/* hoje */}
           {showToday && (
             <g>
               <line x1={X(today)} x2={X(today)} y1={plotTop - 8} y2={base + 8} stroke={tokens.fg} strokeWidth={1} strokeOpacity={0.6} />
-              <text x={X(today)} y={plotTop - 11} textAnchor="middle" fontSize="11" fontFamily={tokens.fontMono} fill={tokens.fg}>
+              <text x={X(today)} y={plotTop - 11} textAnchor="middle" fontSize="12" fontFamily={tokens.fontMono} fill={tokens.fg}>
                 hoje
               </text>
             </g>
@@ -266,12 +268,12 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
       </ol>
     </Wrap>
   );
-}
+});
 
 export function ChapterCiclo({ label }: { label: string }) {
   const { rich } = useJourney();
   return (
-    <Chapter id="ciclo" label={label} heightVh={240} static={!rich} className={cn(!rich && 'scroll-mt-6 border-b border-border')}>
+    <Chapter id="ciclo" label={label} heightVh={240} static={!rich} className="scroll-mt-6 border-b border-border">
       {(progress, isRich) => (
         <div style={isRich ? { paddingTop: CHROME_H } : undefined} className="min-w-0">
           <CicloBody progress={progress} rich={isRich} />

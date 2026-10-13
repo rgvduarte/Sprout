@@ -22,13 +22,21 @@ export function priceNumber(world: WorldId, v: number): string {
   return v.toLocaleString('pt-PT', { minimumFractionDigits: d, maximumFractionDigits: d });
 }
 
-/* ------------------------------------------------------------ missões */
+/* ------------------------------------------------------------ objetivo físico do lote */
 
-export const MISSION_TITLE: Record<WorldId, (lot: Lot) => string> = {
-  azeite: (lot) => `encher o depósito com ${Math.round(lot.quantity / 1000)} IBC de 1 000 kg`,
-  agua: (lot) => `encher o armazém com ${lot.quantity} paletes de 504 garrafas`,
-  cafe: (lot) => `encher a tulha com ${lot.quantity} sacas de 60 kg`,
+/**
+ * O objetivo físico de um lote aberto, o mesmo no Início e nos Mercados.
+ * É um objetivo do lote, não uma missão de conhecimento: financiar não dá
+ * pontos (as missões com pontos são só de conhecimento e diligência).
+ */
+export const LOT_GOAL: Record<WorldId, (lot: Lot) => string> = {
+  azeite: (lot) => `${num(Math.round(lot.quantity / 1000))} IBC de 1 000 kg`,
+  agua: (lot) => `${num(lot.quantity)} paletes de 504 garrafas`,
+  cafe: (lot) => `${num(lot.quantity)} sacas de 60 kg`,
 };
+
+/** "Objetivo do lote: 24 IBC de 1 000 kg" */
+export const lotGoalTitle = (lot: Lot) => `Objetivo do lote: ${LOT_GOAL[lot.world](lot)}`;
 
 /** Pílula de cobertura de preço por mundo (o que protege o lote). */
 export const HEDGE_PILL: Record<WorldId, { label: string; tone: Tone; detail: (lot: Lot) => string }> = {
@@ -97,21 +105,21 @@ export const CHAIN: Record<WorldId, ChainModel> = {
     middleman: 'embalador',
     nodes: ['Lagar', 'Embalador', 'Distribuição, HoReCa, retalho'],
     traditionalProducer: PRODUCER_PRICE_TODAY.azeite,
-    note: `O lagar vende a granel a um embalador, que embala e revende à distribuição. O diferencial paga o embalamento (${OLIVE_CHAIN_FACTS.packingCost.map((v) => num(v, 2)).join('–')} €/kg), a logística e as margens de cada intermediário; a margem líquida do embalador é só ${OLIVE_CHAIN_FACTS.packagerNetMargin.map((v) => num(v, 2)).join('–')} €/kg (${OLIVE_CHAIN_FACTS.sourceShort}). A Sprout compra o lote a granel e vende-o em IBC, sem embalar.`,
+    note: `O lagar vende a granel, ao índice de origem, a um embalador que embala e revende. O diferencial até ao preço embalado paga o embalamento (${OLIVE_CHAIN_FACTS.packingCost.map((v) => num(v, 2)).join('–')} €/kg), a logística e as margens de cada intermediário; a margem líquida do embalador é só ${OLIVE_CHAIN_FACTS.packagerNetMargin.map((v) => num(v, 2)).join('–')} €/kg (${OLIVE_CHAIN_FACTS.sourceShort}). A Sprout compra o lote a granel com um prémio, manda-o embalar num co-packer (o IBC é só a unidade de armazenagem) e vende-o embalado.`,
   },
   agua: {
     lotId: 'AG-2026-007',
     middleman: 'grossista',
     nodes: ['Nascente', 'Grossista', 'Distribuição, HoReCa'],
     traditionalProducer: PRODUCER_PRICE_TODAY.agua,
-    note: 'Na água não há embalador: a lei obriga a engarrafar na origem. O diferencial paga transporte, armazém e a margem do grossista, e a logística pesa mais por litro.',
+    note: 'Na água não há embalador: a lei obriga a engarrafar na origem. No cesto, a Sprout é agente: junta encomendas de HoReCa, o engarrafador fatura e entrega, e a Sprout recebe uma comissão. Não compra água nem financia lotes.',
   },
   cafe: {
     lotId: 'CF-2027-001',
     middleman: 'exportador e importador',
     nodes: ['Fazenda', 'Exportador e importador', 'Torrefação'],
     traditionalProducer: PRODUCER_PRICE_TODAY.cafe,
-    note: 'No café verde, a margem fica entre o exportador na origem e o importador na Europa. Na Fase 2 a Sprout compra à fazenda e vende à torrefação.',
+    note: 'No café verde, a margem fica entre o exportador na origem e o importador na Europa. Na Fase 2 a Sprout compra o verde e vende-o a microtorrefações.',
   },
 };
 
@@ -128,6 +136,8 @@ export interface ChainSegment {
 export interface ChainNumbers {
   lot: Lot;
   model: ChainModel;
+  /** modelo do lote: principal (compra, embala e vende) ou agente (cesto com comissão) */
+  agent: boolean;
   ref: number;
   buyer: number;
   acquisition: number;
@@ -136,6 +146,7 @@ export interface ChainNumbers {
   pool: number;
   premium: number;
   costs: number;
+  /** margem bruta do lote (no cesto: a comissão da Sprout) */
   spread: number;
   discount: number;
   /** parte do diferencial que passa para comprador, produtor e lote (sem os custos do lote) */
@@ -149,24 +160,66 @@ export function chainFor(world: WorldId, lot: Lot): ChainNumbers {
   const e = lot.economics;
   const ref = e.refPrice;
   const trad = model.traditionalProducer;
+  const agent = e.model === 'agente';
+  const who = world === 'agua' ? 'a nascente' : world === 'cafe' ? 'a fazenda' : 'o lagar';
+  const pool = ref - trad;
+  const discount = ref - e.buyerPrice;
+  if (agent) {
+    // cesto: o engarrafador vende ao comprador a buyerPrice e paga a comissão da Sprout
+    const commission = e.grossMargin;
+    const producerGets = e.buyerPrice - commission;
+    const segments: ChainSegment[] = [
+      { id: 'produtor', label: 'Preço ex-fábrica habitual', value: trad, from: 0, to: trad, description: 'O que o engarrafador recebe hoje a vender a um grossista.' },
+      { id: 'premio', label: 'Ganho do engarrafador no cesto', value: producerGets - trad, from: trad, to: producerGets, description: `Vende diretamente ao comprador do cesto e recebe ${unitPrice(world, producerGets)}; passa a pagar a entrega.` },
+      { id: 'spread', label: 'Comissão da Sprout', value: commission, from: producerGets, to: e.buyerPrice, description: `${Math.round((e.commissionPct ?? 0) * 100)} % do valor de venda, faturados ao engarrafador. Sem stock nem capital de cofinanciadores.` },
+      { id: 'desconto', label: 'Desconto ao comprador', value: discount, from: e.buyerPrice, to: ref, description: `O comprador paga ${unitPrice(world, e.buyerPrice)} em vez de ${unitPrice(world, ref)}.` },
+    ];
+    return {
+      lot,
+      model,
+      agent,
+      ref,
+      buyer: e.buyerPrice,
+      acquisition: producerGets,
+      traditionalProducer: trad,
+      pool,
+      premium: producerGets - trad,
+      costs: 0,
+      spread: commission,
+      discount,
+      captured: pool > 0 ? 1 : 0,
+      split: { investors: 0, reserve: 0, sprout: commission },
+      segments,
+    };
+  }
   const premium = e.acquisitionPrice - trad;
   const costs = e.costsPerUnit;
   const spread = e.buyerPrice - e.fundingPrice;
-  const discount = ref - e.buyerPrice;
-  const pool = ref - trad;
   const captured = pool > 0 ? (pool - costs) / pool : 0;
   const sproutShare = Math.max(0, 1 - e.investorShare - e.reserveShare);
-  const who = world === 'agua' ? 'a nascente' : world === 'cafe' ? 'a fazenda' : 'o lagar';
   const segments: ChainSegment[] = [
-    { id: 'produtor', label: 'Preço habitual ao produtor', value: trad, from: 0, to: trad, description: `O que ${who} recebe hoje na cadeia habitual.` },
-    { id: 'premio', label: 'Prémio ao produtor', value: premium, from: trad, to: e.acquisitionPrice, description: `A Sprout paga ${unitPrice(world, e.acquisitionPrice)} por compra direta e pagamento à cabeça.` },
-    { id: 'custos', label: 'Custos do lote', value: costs, from: e.acquisitionPrice, to: e.fundingPrice, description: world === 'agua' ? 'Análises, armazém, seguro e transporte.' : world === 'cafe' ? 'Classificação, frete, seguro, armazém e cobertura KC.' : 'Análises, armazenagem sob azoto, seguro e cobertura.' },
-    { id: 'spread', label: 'Spread do lote', value: spread, from: e.fundingPrice, to: e.buyerPrice, description: 'Remunera os co-financiadores, a reserva de primeira perda e a Sprout.' },
-    { id: 'desconto', label: 'Desconto ao comprador', value: discount, from: e.buyerPrice, to: ref, description: `O comprador paga ${unitPrice(world, e.buyerPrice)} em vez de ${unitPrice(world, ref)}.` },
+    { id: 'produtor', label: world === 'azeite' ? 'Índice de origem (granel)' : 'Preço habitual ao produtor', value: trad, from: 0, to: trad, description: world === 'azeite' ? 'O que o lagar recebe hoje a vender a granel.' : `O que ${who} recebe hoje na cadeia habitual.` },
+    { id: 'premio', label: 'Prémio ao produtor', value: premium, from: trad, to: e.acquisitionPrice, description: `A Sprout paga ${unitPrice(world, e.acquisitionPrice)} por origem identificada e pagamento à cabeça.` },
+    {
+      id: 'custos',
+      label: 'Custos até à venda',
+      value: costs,
+      from: e.acquisitionPrice,
+      to: e.fundingPrice,
+      description:
+        world === 'azeite'
+          ? `Embalamento no co-packer (${num(e.packingCost, 2)}), logística, custódia, análises, seguro e provisões.`
+          : world === 'cafe'
+            ? 'Classificação, frete, seguro, armazém e cobertura KC.'
+            : 'Análises, armazém, seguro e transporte.',
+    },
+    { id: 'spread', label: 'Margem bruta do lote', value: spread, from: e.fundingPrice, to: e.buyerPrice, description: 'Remunera os cofinanciadores, a reserva comum de primeira perda e a Sprout.' },
+    { id: 'desconto', label: 'Desconto ao comprador', value: discount, from: e.buyerPrice, to: ref, description: discount > 0.0005 ? `O comprador paga ${unitPrice(world, e.buyerPrice)} em vez de ${unitPrice(world, ref)}.` : e.priceBasis },
   ];
   return {
     lot,
     model,
+    agent,
     ref,
     buyer: e.buyerPrice,
     acquisition: e.acquisitionPrice,
@@ -178,18 +231,19 @@ export function chainFor(world: WorldId, lot: Lot): ChainNumbers {
     discount,
     captured,
     split: { investors: spread * e.investorShare, reserve: spread * e.reserveShare, sprout: spread * sproutShare },
-    segments,
+    segments: segments.filter((x) => x.id === 'produtor' || x.value > 0.0005),
   };
 }
 
 /** Uma frase: de onde vem a margem do lote neste mercado, com €/kg ilustrativos. */
 export function marginSentence(world: WorldId, c: ChainNumbers): string {
   const p = (v: number) => unitPrice(world, v);
+  const e = c.lot.economics;
+  if (c.agent)
+    return `No cesto, o engarrafador vende ao comprador a ${p(c.buyer)} em vez de ${p(c.ref)} e recebe ${p(c.acquisition)} em vez de cerca de ${p(c.traditionalProducer)} ex-fábrica; a Sprout fica com ${p(c.spread)} de comissão por litro. Sem financiamento.`;
   if (world === 'azeite')
-    return `O lagar recebe ${p(c.acquisition)} em vez de cerca de ${p(c.traditionalProducer)}; o comprador paga ${p(c.buyer)} em vez dos ${p(c.ref)} da referência; ficam ${p(c.spread)} de spread para o lote, depois de ${p(c.costs)} de custos.`;
-  if (world === 'agua')
-    return `A nascente recebe ${p(c.acquisition)} em vez de cerca de ${p(c.traditionalProducer)}; o comprador paga ${p(c.buyer)} em vez de ${p(c.ref)}; ficam ${p(c.spread)} de spread por litro, porque a logística pesa mais do que no azeite.`;
-  return `A fazenda receberia ${p(c.acquisition)} em vez de cerca de ${p(c.traditionalProducer)}; a torrefação pagaria ${p(c.buyer)} em vez de ${p(c.ref)}; o spread indicativo é de ${p(c.spread)}, com futuros ICE a cobrir o preço.`;
+    return `O lagar recebe ${p(c.acquisition)} (índice ${p(c.traditionalProducer)} mais prémio); o lote paga ${p(c.costs)} até à venda, com o embalamento no co-packer; o comprador paga ${p(c.buyer)} (${e.priceBasis}); ficam ${p(c.spread)} de margem bruta para o lote.`;
+  return `A fazenda receberia ${p(c.acquisition)}; a torrefação pagaria ${p(c.buyer)} (${e.priceBasis}); a margem bruta indicativa é de ${p(c.spread)}, com futuros ICE a cobrir o preço.`;
 }
 
 /* ------------------------------------------------------------ gráficos */

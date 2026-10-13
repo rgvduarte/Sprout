@@ -31,12 +31,47 @@ export interface TileMapProps {
   title?: string;
 }
 
+interface Seg {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
 interface Geo {
   region: Region;
   tiles: { cx: number; cy: number }[];
   cx: number;
   cy: number;
   active: boolean;
+  /** contorno da região (arestas sem vizinho da mesma região) */
+  boundary: Seg[];
+  /** arestas entre mosaicos da mesma região (pintadas com o fundo, para a região ler-se como uma só forma) */
+  inner: Seg[];
+}
+
+/** Vizinho de um mosaico pela aresta i (vértices i e i+1 a −30° + 60°·i), em offset "odd-r". */
+function neighbour(col: number, row: number, edge: number): [number, number] {
+  const odd = row % 2 === 1;
+  switch (edge) {
+    case 0:
+      return [col + 1, row]; // este
+    case 1:
+      return odd ? [col + 1, row + 1] : [col, row + 1]; // sudeste
+    case 2:
+      return odd ? [col, row + 1] : [col - 1, row + 1]; // sudoeste
+    case 3:
+      return [col - 1, row]; // oeste
+    case 4:
+      return odd ? [col, row - 1] : [col - 1, row - 1]; // noroeste
+    default:
+      return odd ? [col + 1, row - 1] : [col, row - 1]; // nordeste
+  }
+}
+
+function vertex(cx: number, cy: number, r: number, i: number): [number, number] {
+  const a = (Math.PI / 180) * (60 * i - 30);
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
 }
 
 function hexPoints(cx: number, cy: number, r: number) {
@@ -61,7 +96,19 @@ function computeLayout(map: MapId, world: WorldId | undefined, labels: boolean) 
     const tiles = region.tiles.map((t) => ({ cx: leftW + W / 2 + t.col * W + (t.row % 2 === 1 ? W / 2 : 0), cy: 6 + R + t.row * VS }));
     const cx = tiles.reduce((s, t) => s + t.cx, 0) / tiles.length;
     const cy = tiles.reduce((s, t) => s + t.cy, 0) / tiles.length;
-    return { region, tiles, cx, cy, active: !world || region.worlds.includes(world) };
+    const own = new Set(region.tiles.map((t) => `${t.col},${t.row}`));
+    const boundary: Seg[] = [];
+    const inner: Seg[] = [];
+    region.tiles.forEach((t, k) => {
+      const c = tiles[k];
+      for (let e = 0; e < 6; e++) {
+        const [nc, nr] = neighbour(t.col, t.row, e);
+        const [x1, y1] = vertex(c.cx, c.cy, R - 1, e);
+        const [x2, y2] = vertex(c.cx, c.cy, R - 1, (e + 1) % 6);
+        (own.has(`${nc},${nr}`) ? inner : boundary).push({ x1, y1, x2, y2 });
+      }
+    });
+    return { region, tiles, cx, cy, active: !world || region.worlds.includes(world), boundary, inner };
   });
   const mapRight = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cx))) + W / 2;
   const mapLeft = leftW;
@@ -77,7 +124,8 @@ function computeLayout(map: MapId, world: WorldId | undefined, labels: boolean) 
           // o mosaico mais exterior e mais perto do centro da região ancora o rótulo
           const score = (t: { cx: number; cy: number }) => (side === 'left' ? -t.cx : t.cx) - Math.abs(t.cy - g.cy) * 0.9;
           const edge = g.tiles.reduce((a, b) => (score(b) > score(a) ? b : a));
-          return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W / 2 + 3 : W / 2 - 3), ay: edge.cy, y: edge.cy, text: g.region.nome };
+          // a âncora fica no próprio mosaico, do lado do rótulo (o centro fica para o ponto dos produtores)
+          return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W * 0.26 : W * 0.26), ay: edge.cy, y: edge.cy, text: g.region.nome };
         })
         .sort((a, b) => a.ay - b.ay);
       let prev = -Infinity;
@@ -96,8 +144,9 @@ function computeLayout(map: MapId, world: WorldId | undefined, labels: boolean) 
 
 export function TileMap({ map, states, world, selectedId, onSelect, labels: labelsProp = true, className, title }: TileMapProps) {
   const reduce = useReducedMotion();
-  // Os rótulos SVG escalam com o viewBox: abaixo de ~80 % do tamanho natural ficam
-  // com menos de 11 px. Nesse caso saem do SVG e passam a lista HTML por baixo.
+  // Os rótulos SVG escalam com o viewBox: abaixo de ~93 % do tamanho natural ficam
+  // com menos de 12 px. Nesse caso saem do SVG e passam a lista HTML por baixo
+  // (no telemóvel, a lista de regiões é o controlo principal e o mapa uma figura).
   const wrapRef = useRef<HTMLDivElement>(null);
   const [renderedW, setRenderedW] = useState<number | null>(null);
   useLayoutEffect(() => {
@@ -110,7 +159,7 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels: labe
     return () => ro.disconnect();
   }, [labelsProp]);
   const naturalW = useMemo(() => (labelsProp ? computeLayout(map, world, true).width : 0), [map, world, labelsProp]);
-  const labels = labelsProp && (renderedW === null || renderedW >= naturalW * 0.8);
+  const labels = labelsProp && (renderedW === null || renderedW >= naturalW * (12 / 13));
   const htmlLabels = labelsProp && !labels;
   const R = map === 'pt' ? 28 : 22;
   const tint = world ?? (map === 'cafe' ? 'cafe' : 'azeite');
@@ -168,12 +217,17 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels: labe
           <pattern id={`contour-${map}`} width="7" height="7" patternUnits="userSpaceOnUse">
             <circle cx="3.5" cy="3.5" r="1" fill="var(--world-ink)" opacity="0.55" />
           </pattern>
+          {/* regiões sem este mundo: textura neutra, sem contorno (não competem com as regiões do mundo) */}
+          <pattern id={`idle-${map}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="color-mix(in oklab, var(--fg) 3%, var(--surface))" />
+            <line x1="0" y1="0" x2="0" y2="6" stroke="color-mix(in oklab, var(--fg) 9%, var(--surface))" strokeWidth="1.5" />
+          </pattern>
         </defs>
         {/* fios dos rótulos (por baixo dos mosaicos) */}
         {labs.map((l) => {
           const edgeX = l.side === 'left' ? mapLeft - 4 : mapRight + 4;
           const textX = l.side === 'left' ? mapLeft - 12 : mapRight + 12;
-          return <polyline key={`w-${l.id}`} points={`${l.ax},${l.ay} ${edgeX},${l.ay} ${textX - (l.side === 'left' ? -2 : 2)},${l.y}`} fill="none" stroke="var(--border)" strokeWidth="1" />;
+          return <polyline key={`w-${l.id}`} points={`${l.ax},${l.ay} ${edgeX},${l.ay} ${textX - (l.side === 'left' ? -2 : 2)},${l.y}`} fill="none" stroke="color-mix(in oklab, var(--fg) 30%, var(--surface))" strokeWidth="1" />;
         })}
         {geo.map((g) => {
           const state = states[g.region.id] ?? 'unexplored';
@@ -182,13 +236,14 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels: labe
           const producers = getProducersByRegion(g.region.id).filter((p) => !world || p.world === world);
           const name = `${g.region.nome}${g.region.country ? `, ${g.region.country}` : ''} · ${STATE_LABEL[state]}${producers.length ? ` · ${producers.length} ${producers.length === 1 ? 'produtor' : 'produtores'}` : ''}`;
           const fill = !g.active
-            ? 'color-mix(in oklab, var(--fg) 4%, var(--surface))'
+            ? `url(#idle-${map})`
             : state === 'participated'
               ? 'var(--world)'
               : state === 'learned'
                 ? 'color-mix(in oklab, var(--world) 22%, var(--surface))'
                 : 'var(--surface)';
-          const stroke = !g.active ? 'color-mix(in oklab, var(--fg) 12%, var(--surface))' : state === 'unexplored' ? 'color-mix(in oklab, var(--fg) 26%, var(--surface))' : 'var(--world-ink)';
+          const innerFill = !g.active ? 'color-mix(in oklab, var(--fg) 3%, var(--surface))' : fill;
+          const stroke = state === 'unexplored' ? 'color-mix(in oklab, var(--fg) 45%, var(--surface))' : 'var(--world-ink)';
           const dotTile = g.tiles.reduce((a, b) => (Math.hypot(b.cx - g.cx, b.cy - g.cy) < Math.hypot(a.cx - g.cx, a.cy - g.cy) ? b : a));
           return (
             <g
@@ -209,38 +264,53 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels: labe
               <title>{name}</title>
               {g.tiles.map((t, i) => (
                 <g key={i}>
-                  <polygon
-                    points={hexPoints(t.cx, t.cy, R - 1.5)}
-                    fill={fill}
-                    stroke={stroke}
-                    strokeWidth={1.25}
-                    className={g.active && onSelect ? 'group-hover/tile:[stroke-width:2.25]' : undefined}
-                    style={{ transition: reduce ? undefined : 'fill 450ms cubic-bezier(0.16,1,0.3,1), stroke 450ms' }}
-                  />
+                  <polygon points={hexPoints(t.cx, t.cy, R - 1)} fill={fill} stroke="none" style={{ transition: reduce ? undefined : 'fill 450ms cubic-bezier(0.16,1,0.3,1)' }} />
                   {g.active && state === 'learned' && <polygon points={hexPoints(t.cx, t.cy, R * 0.6)} fill={`url(#contour-${map})`} stroke="var(--world-ink)" strokeOpacity="0.45" strokeWidth="1" />}
                   {g.active && state === 'participated' && <polygon points={hexPoints(t.cx, t.cy, R * 0.6)} fill="none" stroke="color-mix(in oklab, var(--world) 40%, var(--surface))" strokeWidth="1.25" />}
                 </g>
               ))}
+              {/* uma região com vários mosaicos lê-se como uma só forma: as arestas internas fecham-se com o fundo */}
+              {g.inner.map((e, i) => (
+                <line key={`i${i}`} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} stroke={innerFill} strokeWidth={2.5} />
+              ))}
+              {/* contorno da região (1,5 px), só nas regiões deste mundo */}
+              {g.active &&
+                g.boundary.map((e, i) => (
+                  <line
+                    key={`b${i}`}
+                    x1={e.x1}
+                    y1={e.y1}
+                    x2={e.x2}
+                    y2={e.y2}
+                    stroke={stroke}
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    className={onSelect ? 'group-hover/tile:[stroke-width:2.5]' : undefined}
+                    style={{ transition: reduce ? undefined : 'stroke 450ms' }}
+                  />
+                ))}
               {g.active && producers.length > 0 && (
                 <circle cx={dotTile.cx} cy={dotTile.cy} r={4} fill={state === 'participated' ? 'var(--surface)' : 'var(--world-ink)'} stroke={state === 'participated' ? 'var(--world-ink)' : 'none'} strokeWidth="1.5" />
               )}
-              {(selected || focused) &&
-                g.tiles.map((t, i) => (
-                  <motion.polygon
-                    key={`s${i}`}
-                    points={hexPoints(t.cx, t.cy, R - 1.5)}
-                    fill="none"
-                    stroke={selected ? 'var(--fg)' : 'var(--accent)'}
-                    strokeWidth={selected ? 2.5 : 2}
-                    initial={reduce ? false : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.15 }}
-                    className={!selected ? 'hidden group-focus-visible/tile:inline' : undefined}
-                  />
-                ))}
+              {(selected || focused) && (
+                <motion.g
+                  initial={reduce ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className={!selected ? 'hidden group-focus-visible/tile:inline' : undefined}
+                >
+                  {g.boundary.map((e, i) => (
+                    <line key={`s${i}`} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} stroke={selected ? 'var(--fg)' : 'var(--accent)'} strokeWidth={selected ? 2.75 : 2.25} strokeLinecap="round" />
+                  ))}
+                </motion.g>
+              )}
             </g>
           );
         })}
+        {/* ponto de ancoragem do rótulo no próprio mosaico da região */}
+        {labs.map((l) => (
+          <circle key={`a-${l.id}`} cx={l.ax} cy={l.ay} r={2.25} fill="color-mix(in oklab, var(--fg) 55%, var(--surface))" aria-hidden />
+        ))}
         {labs.map((l) => {
           const g = geo.find((x) => x.region.id === l.id)!;
           const selected = l.id === selectedId;

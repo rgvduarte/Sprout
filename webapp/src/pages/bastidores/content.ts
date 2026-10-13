@@ -138,7 +138,8 @@ export const POINT_SOURCES = [
   { label: 'Módulos da Academia', count: MODULES.length, points: MODULES.reduce((s, m) => s + m.points, 0) },
   { label: 'Missões de conhecimento', count: QUESTS.length, points: QUESTS.reduce((s, q) => s + q.points, 0) },
   { label: 'Mini-jogos', count: MINI_GAMES.length, points: MINI_GAMES.reduce((s, g) => s + g.maxPoints, 0) },
-  { label: 'Primeira campanha simulada', count: 1, points: SIM_COMPLETE_POINTS },
+  // a campanha simulada já conta como missão (q-simulador); só há uma linha própria se existir um bónus à parte
+  ...(SIM_COMPLETE_POINTS > 0 ? [{ label: 'Primeira campanha simulada (bónus)', count: 1, points: SIM_COMPLETE_POINTS }] : []),
 ];
 
 /* ------------------------------------------------------------ revisão da gamificação */
@@ -191,7 +192,7 @@ export const ADOPTED: Pattern[] = tidyDeep([
     name: 'Catálogo de recompensas',
     refs: 'Smartico (loja de recompensas), PlayEstates',
     original: 'Recompensas trocadas por pontos ou desbloqueadas por objetivos.',
-    sprout: 'Recompensas da colheita, em espécie e conhecimento: amostra do lote que acompanhas, prova guiada online com o mestre lagareiro, visita ao lagar na campanha, certificado de Provador, relatório técnico. Qualquer co-financiador pode pedir a amostra do seu lote, seja qual for o montante.',
+    sprout: 'Recompensas da colheita, em espécie e conhecimento: amostra do lote que acompanhas, prova guiada online com o mestre lagareiro, visita ao lagar na campanha, certificado de Provador, relatório técnico. Qualquer cofinanciador pode pedir a amostra do seu lote, seja qual for o montante.',
     why: 'Participação, não tamanho: nenhuma recompensa em dinheiro, bónus ou proporcional ao capital.',
     where: [{ label: 'Caderno de colheita', href: '/caderno' }],
   },
@@ -307,7 +308,7 @@ export const REJECTED: Pattern[] = tidyDeep([
     name: 'Descontos de comissões por atividade',
     refs: 'Corretoras com níveis de cliente',
     original: 'Quanto mais negoceias, menos pagas.',
-    sprout: 'Os custos do lote são iguais para todos os co-financiadores.',
+    sprout: 'Os custos do lote são iguais para todos os cofinanciadores.',
     why: 'É um benefício financeiro por atividade: um incentivo a investir mais, não melhor.',
   },
 ]);
@@ -394,7 +395,7 @@ export const FRAMEWORKS: Framework[] = tidyDeep([
     name: 'Financiamento colaborativo (ECSP)',
     ref: 'Reg. (UE) 2020/1503',
     question: 'A Sprout é um prestador de serviços de financiamento colaborativo? Se sim, aplica-se a licença e, para não sofisticados, o teste de conhecimentos e a simulação da capacidade de suportar perdas.',
-    hypothesis: 'Piloto só com investidores qualificados; licença avaliada antes da abertura progressiva (Fase 3). O Simulador já cumpre a função de simulação de perdas.',
+    hypothesis: 'Piloto só com investidores qualificados; licença avaliada antes da abertura progressiva (Fase 3). O Simulador cumpre uma função educativa semelhante, mas não é a simulação do art. 21.º, n.º 5 (capacidade de suportar perdas, 10 % do património líquido calculado a partir de rendimentos, ativos e compromissos): essa terá de ser implementada no registo antes da abertura a investidores não sofisticados.',
     ifYes: 'Licença junto da CMVM, ficha de informação fundamental por oferta, período de reflexão de 4 dias e avisos para investidores não sofisticados.',
   },
   {

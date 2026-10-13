@@ -1,7 +1,7 @@
 import { ArrowRight, PanelRightOpen } from 'lucide-react';
-import { fundedFraction, priceUnit, stageLabel } from '../../data';
+import { fundedFraction, ILLUSTRATIVE_LABEL, isIllustrative, priceUnit, projectedResult, stageLabel } from '../../data';
 import { JourneyTrack, LotGauge } from '../../components/game';
-import { Button, Card, CommodityChip, StatusPill, TextLink } from '../../components/ui';
+import { Badge, Button, Card, CommodityChip, StatusPill, TextLink } from '../../components/ui';
 import type { PositionView } from '../../state';
 import { date as fmtDate, eur, pct, price } from '../../lib/format';
 import { JourneyMini } from './JourneyMini';
@@ -22,6 +22,9 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
   const u = priceUnit(lot);
   const isOpen = lot.status === 'aberto';
   const [low, high] = lot.economics.expectedRange;
+  // cenário neutro ao índice de hoje (a parte vendida a prazo fica ao preço contratado), ao lado do intervalo da abertura
+  const today = projectedResult(lot);
+  const illustrative = isIllustrative(p) || isIllustrative(lot);
   return (
     <Card as="article" padding="md" data-world={lot.world} aria-labelledby={`pos-${p.id}`} className="min-w-0">
       {p.status === 'aguarda-transferencia' && <ReflectionBand p={p} />}
@@ -48,6 +51,7 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
             <CommodityChip world={lot.world} label="commodity" />
             <span className="font-mono text-sm text-fg tnum">{lot.id}</span>
             <StatusPill label={st.label} tone={st.tone} />
+            {illustrative && <Badge tone="warn">{ILLUSTRATIVE_LABEL}</Badge>}
           </div>
           <p className="mt-2 text-sm text-muted">
             Campanha {lot.campanha} · {lot.storage.local}
@@ -97,12 +101,14 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
 
           <div className="mt-5 grid gap-x-6 gap-y-2 border-t border-border pt-4 text-sm text-muted lg:grid-cols-2">
             <p>
-              Referência de mercado hoje <span className="font-mono text-fg tnum">{price(ref.today, u)}</span>, na entrada <span className="font-mono text-fg tnum">{price(ref.entry, u)}</span>
+              {lot.world === 'azeite' ? 'Índice de origem (granel) hoje' : 'Referência de mercado hoje'} <span className="font-mono text-fg tnum">{price(ref.today, u)}</span>, na abertura{' '}
+              <span className="font-mono text-fg tnum">{price(ref.entry, u)}</span>
               {Math.abs(ref.change) < 0.0005 ? ' (sem variação). ' : <> (<span className="font-mono text-fg tnum">{pct(ref.change, 1, { sign: true })}</span>). </>}
-              {lot.hedge.coverage > 0 ? `${pct(lot.hedge.coverage, 0)} do volume com ${lot.hedge.label.toLowerCase()}.` : 'Sem cobertura de preço: o risco da água é de prazo, não de preço.'}
+              {lot.hedge.coverage > 0 ? `${pct(lot.hedge.coverage, 0)} do volume com ${lot.hedge.label.toLowerCase()}.` : 'Sem cobertura de preço.'}
             </p>
             <p>
-              Intervalo estimado na abertura do lote: <span className="font-mono text-fg tnum">{pct(low, 1, { sign: true })}</span> a <span className="font-mono text-fg tnum">{pct(high, 1, { sign: true })}</span> do capital em 18 meses. Estimativa, não garantida; pode haver perda.
+              Cenário ao índice de hoje: <span className="font-mono text-fg tnum">{pct(today.result, 1, { sign: true })}</span> do capital, antes da reserva, se a parte sem venda a prazo vendesse a este preço. Na abertura, o intervalo estimado era{' '}
+              <span className="font-mono text-fg tnum">{pct(low, 1, { sign: true })}</span> a <span className="font-mono text-fg tnum">{pct(high, 1, { sign: true })}</span>. Estimativas, não garantidas; pode haver perda.
             </p>
           </div>
 

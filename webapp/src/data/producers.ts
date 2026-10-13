@@ -11,7 +11,7 @@ export const PRODUCERS: Producer[] = tidyDeep([
     localidade: 'Mirandela',
     initials: 'RA',
     story:
-      'Lagar cooperativo de 140 olivicultores em socalcos de xisto. Moe no próprio dia da apanha e guarda o azeite em quatro depósitos de inox com azoto. Entrou no piloto na campanha 2024/25.',
+      'Lagar cooperativo de 140 olivicultores em socalcos de xisto. Moe no próprio dia da apanha e guarda o azeite em quatro depósitos de inox com azoto. Vende a granel a embaladores; com a Sprout, vende azeite DOP de origem identificada.',
     variedades: ['Verdeal Transmontana', 'Madural', 'Cobrançosa'],
     certifications: ['DOP Azeite de Trás-os-Montes', 'IFS Food'],
     capacidade: '4 depósitos de inox (78 420 kg) · extração em duas fases',
@@ -38,7 +38,7 @@ export const PRODUCERS: Producer[] = tidyDeep([
     localidade: 'Moura',
     initials: 'OG',
     story:
-      'Exploração familiar de 310 ha de olival tradicional e intensivo junto ao Guadiana, com lagar próprio. Vende a maior parte a granel a embaladores espanhóis; no piloto vende diretamente.',
+      'Exploração familiar de 310 ha de olival tradicional e intensivo junto ao Guadiana, com lagar próprio e linha de embalamento de 5 L. Vende a maior parte a granel a embaladores espanhóis.',
     variedades: ['Galega Vulgar', 'Cordovil de Serpa', 'Cobrançosa'],
     certifications: ['DOP Azeite de Moura', 'Produção Integrada'],
     capacidade: '6 depósitos de 25 000 kg',
@@ -67,7 +67,7 @@ export const PRODUCERS: Producer[] = tidyDeep([
     localidade: 'Santarém',
     initials: 'MC',
     story:
-      'Herdade de 95 ha de Galega em solos de aluvião, com lagar contratado a 12 km. Guarda o azeite em IBC numa nave climatizada, o que permite isolar cada lote fisicamente.',
+      'Herdade de 95 ha de Galega em solos de aluvião, com lagar contratado a 12 km. Não mói: guarda o azeite em IBC numa nave climatizada, o que permite isolar cada lote fisicamente. O inventário é contado à mão, uma vez por mês.',
     variedades: ['Galega Vulgar', 'Arbequina'],
     certifications: ['Produção Integrada'],
     capacidade: 'Nave climatizada para 60 IBC de 1 000 kg',
@@ -78,10 +78,10 @@ export const PRODUCERS: Producer[] = tidyDeep([
       unitLabel: 'kg',
       units: [
         { id: 'N1', label: 'Nave · fila A', capacity: 30000, level: 22000 },
-        { id: 'N2', label: 'Nave · fila B', capacity: 30000, level: 9400 },
+        { id: 'N2', label: 'Nave · fila B', capacity: 30000, level: 10400 },
       ],
-      live: true,
-      ratePerReading: [120, 400],
+      live: false,
+      ratePerReading: [0, 0],
     },
   },
   {
@@ -149,7 +149,7 @@ export const PRODUCERS: Producer[] = tidyDeep([
     telemetry: {
       kind: 'armazem',
       unitLabel: 'paletes',
-      units: [{ id: 'A1', label: 'Armazém', capacity: 600, level: 388 }],
+      units: [{ id: 'A1', label: 'Armazém', capacity: 600, level: 540 }],
       live: true,
       ratePerReading: [3, 9],
     },

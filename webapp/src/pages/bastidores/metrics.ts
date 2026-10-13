@@ -1,11 +1,14 @@
 import {
+  buyerPriceAtIndex,
   HEDGE_TRIGGERS,
   INVESTOR_SHARE,
   KYC_QUEUE,
   MARKET_TODAY,
   PILOT_KPIS,
+  PRICE_TRIGGER,
   RECONCILIATION,
-  RESERVE_SHARE,
+  RESERVE_POOL,
+  RESERVE_RULE,
   SIM_EVENTS,
   SIM_RULES,
   type HedgeTrigger,
@@ -14,7 +17,7 @@ import {
   type WorldId,
 } from '../../data';
 import { addMonths, monthsBetween, TODAY_DATE, toDate } from '../../lib/clock';
-import { PALETE, SACA_KG } from '../../lib/format';
+import { eur, PALETE, SACA_KG } from '../../lib/format';
 
 /* =====================================================================
    Bastidores · contas da equipa. Funções puras sobre os lotes (já com os
@@ -26,8 +29,11 @@ import { PALETE, SACA_KG } from '../../lib/format';
 
 export const CYCLE_STATUSES: Lot['status'][] = ['aberto', 'financiado', 'em-extensao'];
 
-/** Lotes do piloto (azeite + água) com capital em ciclo. O café é Fase 2: sem exposição. */
-export const cycleLots = (lots: Lot[]) => lots.filter((l) => l.world !== 'cafe' && CYCLE_STATUSES.includes(l.status));
+/**
+ * Lotes do piloto com capital em ciclo: só o modelo principal (a água é cesto, em
+ * modelo de agente, com objetivo 0 e sem capital). O café é Fase 2: sem exposição.
+ */
+export const cycleLots = (lots: Lot[]) => lots.filter((l) => l.world !== 'cafe' && l.economics.model === 'principal' && CYCLE_STATUSES.includes(l.status));
 
 /** Stock atual na unidade de preço (kg ou L). */
 export function stockBase(lot: Lot): number {
@@ -47,7 +53,7 @@ export const SALES_MONTHS = kpi('prazo-venda').value;
 export interface CapitalSnapshot {
   /** compromisso de compra assumido com produtores nos lotes em ciclo */
   committed: number;
-  /** montante financiado por co-financiadores */
+  /** montante financiado por cofinanciadores */
   financed: number;
   /** por financiar nos lotes abertos */
   gap: number;
@@ -69,7 +75,7 @@ const leq = (a: string | undefined, b: string) => Boolean(a) && toDate(a!).getTi
 
 /** Capital financiado e lotes em ciclo no fim de cada mês, reconstruídos a partir das datas dos lotes. */
 export function capitalHistory(lots: Lot[]): { financed: number[]; committed: number[]; inCycle: number[] } {
-  const piloto = lots.filter((l) => l.world !== 'cafe' && l.status !== 'em-preparacao' && l.status !== 'fase-2');
+  const piloto = lots.filter((l) => l.world !== 'cafe' && l.economics.model === 'principal' && l.status !== 'em-preparacao' && l.status !== 'fase-2');
   const financed: number[] = [];
   const committed: number[] = [];
   const inCycle: number[] = [];
@@ -97,30 +103,6 @@ export function capitalHistory(lots: Lot[]): { financed: number[]; committed: nu
   return { financed, committed, inCycle };
 }
 
-/* ------------------------------------------------------------ fill rate de encomendas */
-
-/**
- * Encomendas B2B servidas completas e no prazo (fictício, determinístico).
- * O fill rate do piloto mede o que o comprador recebeu face ao que encomendou.
- */
-export const ORDER_FILL = [
-  { month: 'mai', orders: 15, complete: 14 },
-  { month: 'jun', orders: 19, complete: 18 },
-  { month: 'jul', orders: 22, complete: 21 },
-  { month: 'ago', orders: 18, complete: 17 },
-  { month: 'set', orders: 21, complete: 20 },
-  { month: 'out', orders: 9, complete: 9 },
-];
-export const ORDER_FILL_NOTE =
-  'Encomendas entregues completas e no prazo sobre encomendas recebidas. Em agosto, 2 paletes do AG-2026-002 chegaram com película rasgada e foram recusadas na receção.';
-
-export function orderFill() {
-  const last90 = ORDER_FILL.slice(-3);
-  const orders = last90.reduce((s, m) => s + m.orders, 0);
-  const complete = last90.reduce((s, m) => s + m.complete, 0);
-  return { value: complete / orders, orders, complete, history: ORDER_FILL.map((m) => m.complete / m.orders) };
-}
-
 /* ------------------------------------------------------------ KYC */
 
 /** Datas de decisão dos casos já fechados (fictício). Os casos abertos não têm. */
@@ -140,7 +122,7 @@ export const OPEN_KYC: KycCase['status'][] = ['em-analise', 'pendente'];
 export const KYC_SLA_DAYS = 10;
 
 export const KYC_WEEKS = ['2026-09-13', '2026-09-20', '2026-09-27', '2026-10-04', '2026-10-11', TODAY_DATE];
-export const KYC_WEEK_LABELS = ['13 set', '20', '27', '4 out', '11', 'hoje'];
+export const KYC_WEEK_LABELS = ['13 set', '20 set', '27 set', '4 out', '11 out', 'hoje'];
 
 /** Casos abertos no fim de cada semana (antes das decisões desta sessão). */
 export function kycBacklogHistory(): number[] {
@@ -184,7 +166,8 @@ function parseTrigger(def: HedgeTrigger): ParsedTrigger {
   return {
     def,
     threshold: th ? parseNum(th[1]) : undefined,
-    toCoverage: to ? Number(to[1]) / 100 : def.status === 'executado' ? 1 : undefined,
+    // "vender a prazo os N % em aberto" ou "o stock por vender": cobre tudo o que falta
+    toCoverage: to ? Number(to[1]) / 100 : def.status === 'executado' || /em aberto|por vender/.test(def.description) ? 1 : undefined,
     executedAt: ex ? parseNum(ex[1]) : undefined,
   };
 }
@@ -220,16 +203,16 @@ export function scenario(id: ScenarioId, includeWater: boolean): Scenario {
   const shock = (v: number) => Object.fromEntries(worlds.map((w) => [w, v])) as Partial<Record<WorldId, number>>;
   switch (id) {
     case 'base':
-      return { id, label: 'Hoje', description: 'Referências de 13/10/2026, sem choque.', price: {}, delay: 0, qtyLossPrep: 0, priceWorlds: [] };
+      return { id, label: 'Hoje', description: 'Índices de 13/10/2026, sem choque.', price: {}, delay: 0, qtyLossPrep: 0, priceWorlds: [] };
     case 'preco-15':
-      return { id, label: 'Preço −15 %', description: 'A referência cai 15 % e fica lá até à venda.', price: shock(-0.15), delay: 0, qtyLossPrep: 0, priceWorlds: worlds };
+      return { id, label: 'Preço −15 %', description: 'O índice de origem cai 15 % e fica lá até à venda.', price: shock(-0.15), delay: 0, qtyLossPrep: 0, priceWorlds: worlds };
     case 'preco-30':
-      return { id, label: 'Preço −30 %', description: 'A referência cai 30 %, como no choque do Simulador.', price: shock(-0.3), delay: 0, qtyLossPrep: 0, priceWorlds: worlds };
+      return { id, label: 'Preço −30 %', description: 'O índice de origem cai 30 %, como no choque do Simulador.', price: shock(-0.3), delay: 0, qtyLossPrep: 0, priceWorlds: worlds };
     case 'colheita-fraca':
       return {
         id,
         label: 'Colheita fraca',
-        description: `Volume dos lotes em preparação desce ${Math.round((WEAK.qtyLoss ?? 0.12) * 100)} % e a referência do azeite sobe ${Math.round((WEAK.priceShock ?? 0.08) * 100)} %.`,
+        description: `Volume dos lotes em preparação desce ${Math.round((WEAK.qtyLoss ?? 0.12) * 100)} % e o índice de origem do azeite sobe ${Math.round((WEAK.priceShock ?? 0.08) * 100)} %.`,
         price: { azeite: WEAK.priceShock ?? 0.08 },
         delay: 0,
         qtyLossPrep: WEAK.qtyLoss ?? 0.12,
@@ -255,10 +238,11 @@ export interface LotRisk {
   /** quantidade total e stock, na unidade de preço */
   Q: number;
   S: number;
+  /** índice de mercado no cenário (no azeite, o índice de origem a granel) */
   market: number;
-  /** variação da referência desde a entrada */
+  /** variação do índice desde a abertura do lote (granel com granel) */
   refChange: number;
-  /** base: preço de venda contratado face à referência de hoje */
+  /** preço contratado com o comprador face ao preço do canal a este índice */
   basis: number;
   h0: number;
   h: number;
@@ -272,8 +256,9 @@ export interface LotRisk {
   extraCost: number;
   /** margem bruta total prevista do lote */
   margin: number;
+  /** parte da reserva comum de primeira perda atribuída a este lote no cenário (0 se a reserva estiver vazia) */
   reserve: number;
-  /** resultado previsto para co-financiadores, fração do montante */
+  /** resultado previsto para cofinanciadores, fração do montante */
   result: number;
   extension: boolean;
   extensionReason?: string;
@@ -289,8 +274,13 @@ function salesStartOffset(lot: Lot): number {
   return Math.max(0, monthsBetween(TODAY_DATE, m.planned));
 }
 
-/** Avalia um lote num cenário. Ver PRESSUPOSTOS para as regras em texto. */
-export function evaluateLot(lot: Lot, sc: Scenario): LotRisk {
+/**
+ * Avalia um lote num cenário. O choque aplica-se ao índice de mercado (no azeite,
+ * o índice de origem a granel); o preço do canal acompanha o índice
+ * (buyerPriceAtIndex), nunca se compara granel com embalado. Ver PRESSUPOSTOS.
+ * `reserveShare` é a parte da reserva comum disponível para este lote.
+ */
+export function evaluateLot(lot: Lot, sc: Scenario, reserveShare = 0): LotRisk {
   const e = lot.economics;
   const Q = lot.quantityBase;
   const S = stockBase(lot);
@@ -298,25 +288,29 @@ export function evaluateLot(lot: Lot, sc: Scenario): LotRisk {
   const market = MARKET_TODAY[lot.world] * (1 + shock);
   const trigger = triggerFor(lot.id);
   const h0 = lot.hedge.coverage;
-  let h = h0;
-  let extraPrice = 0;
+  // gatilho já executado: essa fração vende ao preço do canal do índice desse dia
+  const ex = lot.hedge.executed;
+  const exShare = ex ? Math.min(ex.share, 1 - h0) : 0;
+  const exPrice = ex ? buyerPriceAtIndex(lot, ex.index) : 0;
+  let h = h0 + exShare;
+  let armedShare = 0;
+  let armedPrice = 0;
   let triggerFired = false;
-  if (trigger?.def.status === 'executado' && trigger.executedAt) {
-    h = 1;
-    extraPrice = trigger.executedAt * (1 - e.discountPct);
-  } else if (trigger?.def.status === 'armado' && trigger.threshold && trigger.toCoverage && market < trigger.threshold) {
-    h = Math.max(h0, trigger.toCoverage);
-    extraPrice = trigger.threshold * (1 - e.discountPct);
+  if (trigger?.def.status === 'armado' && trigger.threshold && trigger.toCoverage && market < trigger.threshold) {
+    armedShare = Math.max(0, trigger.toCoverage - h);
+    armedPrice = buyerPriceAtIndex(lot, trigger.threshold);
+    h += armedShare;
     triggerFired = true;
   }
-  const unitValue = h0 * e.buyerPrice + (h - h0) * extraPrice + (1 - h) * market * (1 - e.discountPct);
+  const atIndex = buyerPriceAtIndex(lot, market);
+  const unitValue = h0 * e.buyerPrice + exShare * exPrice + armedShare * armedPrice + Math.max(0, 1 - h) * atIndex;
   const realized = (Q - S) * (e.buyerPrice - e.fundingPrice);
   const unrealized = S * (unitValue - e.fundingPrice);
   const extraCost = sc.delay > 0 && S > 0 ? sc.delay * SIM_RULES.extension.monthlyCostPct * lot.funding.goal : 0;
   const margin = realized + unrealized - extraCost;
-  const reserve = RESERVE_SHARE * Math.max(0, e.grossMargin * Q);
   const goal = lot.funding.goal;
-  const result = margin >= 0 ? (INVESTOR_SHARE * margin) / goal : Math.min(0, margin + reserve) / goal;
+  const reserve = margin < 0 ? Math.min(reserveShare, -margin) : 0;
+  const result = goal <= 0 ? 0 : margin >= 0 ? (INVESTOR_SHARE * margin) / goal : (margin + reserve) / goal;
 
   // prazo: o stock vende-se ao ritmo médio do piloto, a partir do início das vendas
   const end = lot.settlement.extendedTo ?? lot.settlement.plannedEnd ?? addMonths(TODAY_DATE, lot.settlement.windowMonths);
@@ -325,12 +319,13 @@ export function evaluateLot(lot: Lot, sc: Scenario): LotRisk {
   const unsoldAtEnd = S > 0 ? Math.min(S / Q, Math.max(0, (monthsNeeded - monthsLeft) / SALES_MONTHS)) : 0;
 
   const alreadyExtended = lot.status === 'em-extensao';
-  const priceCond = S > 0 && h < 1 && market <= e.refPrice * 0.85;
+  const refChange = e.indexAtOpen > 0 ? market / e.indexAtOpen - 1 : 0;
+  const priceCond = S > 0 && h < 1 && refChange <= -PRICE_TRIGGER;
   // num lote já em extensão não há segunda extensão: qualquer stock por vender no fim conta
   const timeCond = alreadyExtended ? unsoldAtEnd > 0.005 : unsoldAtEnd > 0.3;
   const condition = priceCond || timeCond;
   const reason = priceCond
-    ? `Referência ${Math.round((1 - market / e.refPrice) * 100)} % abaixo da entrada, com ${Math.round((1 - h) * 100)} % do stock sem cobertura.`
+    ? `${lot.world === 'azeite' ? 'Índice de origem' : 'Índice'} ${Math.round(-refChange * 100)} % abaixo do da abertura, com ${Math.round((1 - Math.min(1, h)) * 100)} % do stock sem cobertura.`
     : timeCond
       ? `${Math.round(unsoldAtEnd * 100)} % do lote ficaria por vender no fim da ${alreadyExtended ? 'extensão' : 'janela'}.`
       : undefined;
@@ -343,13 +338,13 @@ export function evaluateLot(lot: Lot, sc: Scenario): LotRisk {
     Q,
     S,
     market,
-    refChange: market / e.refPrice - 1,
-    basis: e.buyerPrice / (market * 1) - 1,
+    refChange,
+    basis: atIndex > 0 ? e.buyerPrice / atIndex - 1 : 0,
     h0,
-    h,
+    h: Math.min(1, h),
     trigger,
     triggerFired,
-    exposure: S * (1 - h),
+    exposure: S * Math.max(0, 1 - h),
     realized,
     unrealized,
     extraCost,
@@ -362,7 +357,7 @@ export function evaluateLot(lot: Lot, sc: Scenario): LotRisk {
     refundingReason: refunding
       ? alreadyExtended && condition
         ? `Já usou a extensão. ${reason ?? ''}`.trim()
-        : 'Perda prevista acima da reserva de primeira perda depois do choque de preço.'
+        : `Perda prevista acima do saldo da reserva comum (${RESERVE_POOL.balance > 0 ? 'que não chega' : 'hoje vazia'}) depois do choque de preço.`
       : undefined,
     monthsLeft,
     monthsNeeded,
@@ -383,13 +378,26 @@ export interface StressResult {
   prepImpact: { lot: Lot; from: number; to: number }[];
 }
 
+/** Avalia os lotes e reparte o saldo da reserva comum pelos lotes com perda, do maior para o menor. */
+function evaluateAll(lots: Lot[], sc: Scenario): LotRisk[] {
+  const first = lots.map((l) => evaluateLot(l, sc));
+  let pool = Math.max(0, RESERVE_POOL.balance);
+  const share = new Map<string, number>();
+  for (const r of [...first].filter((x) => x.margin < 0).sort((a, b) => a.margin - b.margin)) {
+    const take = Math.min(pool, -r.margin);
+    share.set(r.lot.id, take);
+    pool -= take;
+  }
+  return lots.map((l, i) => (share.has(l.id) ? evaluateLot(l, sc, share.get(l.id)) : first[i]));
+}
+
 export function stress(lots: Lot[], id: ScenarioId, includeWater: boolean): StressResult {
   const sc = scenario(id, includeWater);
   const baseSc = scenario('base', false);
   const cyc = cycleLots(lots);
-  const rows = cyc.map((l) => evaluateLot(l, sc));
-  const base = cyc.map((l) => evaluateLot(l, baseSc));
-  const prep = lots.filter((l) => l.status === 'em-preparacao' && l.world !== 'cafe' && (l.world === 'azeite' || sc.priceWorlds.includes(l.world)));
+  const rows = evaluateAll(cyc, sc);
+  const base = evaluateAll(cyc, baseSc);
+  const prep = lots.filter((l) => l.status === 'em-preparacao' && l.world !== 'cafe' && l.economics.model === 'principal' && (l.world === 'azeite' || sc.priceWorlds.includes(l.world)));
   return {
     scenario: sc,
     rows,
@@ -406,11 +414,12 @@ export function stress(lots: Lot[], id: ScenarioId, includeWater: boolean): Stre
 
 /** Regras do teste de esforço, em texto (mostradas na página). */
 export const PRESSUPOSTOS = [
-  'O stock vende-se ao desconto habitual do lote face à referência; a parte coberta vende-se ao preço contratado.',
-  'Um gatilho armado dispara quando a referência desce abaixo do limiar: a cobertura sobe para o nível do gatilho, ao preço do limiar.',
+  'O choque aplica-se ao índice de mercado (no azeite, o índice de origem a granel). O preço do canal (embalado) acompanha o índice e o stock vende-se com o desconto ou o prémio do lote sobre esse preço; a parte coberta vende-se ao preço contratado.',
+  'Um gatilho armado dispara quando o índice desce abaixo do limiar: a cobertura sobe para o nível do gatilho, ao preço do canal desse índice. Um gatilho já executado vende a sua fração ao índice desse dia.',
   'As vendas já feitas contam ao preço contratado com o comprador.',
   `O stock por vender escoa ao ritmo médio do piloto (${String(SALES_MONTHS).replace('.', ',')} meses por lote), a partir do início previsto das vendas.`,
-  'Extensão: referência 15 % ou mais abaixo da entrada com stock sem cobertura, ou mais de 30 % do lote por vender no fim da janela. Uma só por lote, de até 6 meses.',
-  `Refunding: lote já em extensão com stock por vender no fim ou com a referência de novo abaixo do limite, ou perda prevista acima da reserva de primeira perda (${Math.round(RESERVE_SHARE * 100)} % da margem bruta prevista) depois de um choque de preço.`,
-  'O resultado dos co-financiadores é 65 % da margem bruta quando positiva; quando negativa, a reserva absorve primeiro e o resto é perda de capital.',
+  `Extensão: índice ${Math.round(PRICE_TRIGGER * 100)} % ou mais abaixo do da abertura com stock sem cobertura, ou mais de 30 % do lote por vender no fim da janela. Uma só por lote, de até 6 meses.`,
+  `Refunding: lote já em extensão com stock por vender no fim ou com o índice de novo abaixo do limite, ou perda prevista acima do saldo da reserva comum de primeira perda depois de um choque de preço. Reserva: ${RESERVE_RULE.short}; saldo hoje ${eur(RESERVE_POOL.balance)}, depois de o AZ-2025-009 a ter usado toda (histórico ilustrativo).`,
+  `O resultado dos cofinanciadores é ${Math.round(INVESTOR_SHARE * 100)} % da margem bruta quando positiva; quando negativa, a reserva comum absorve primeiro (enquanto tiver saldo, repartido pelos lotes com maior perda) e o resto é perda de capital.`,
+  'Os cestos de água (modelo de agente) não entram: não têm capital de cofinanciadores.',
 ];

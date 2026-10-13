@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { fundedFraction, maxCommit, getWorld } from '../../data';
+import { fundedFraction, maxCommit, getWorld, PRICE_TRIGGER, RESERVE_RULE } from '../../data';
 import type { WorldId } from '../../data/types';
 import { CountUp, HoldToConfirm, LotGauge } from '../../components/game';
 import { ButtonLink, Checkbox, Field, Input, Slider, TextLink } from '../../components/ui';
@@ -8,10 +8,10 @@ import { now } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, num, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
-import { useData, useGame, useRole, useToast } from '../../state';
+import { TEAM_VIEW_MESSAGE, useData, useGame, useRole, useToast } from '../../state';
 import { CommitDone, type CommitMoment } from './CommitDone';
 import { concentrationAfter, containersFor, priceDecimals, reflectionEnd } from './model';
-import { ChapterHeading, CheckMark, CHROME_H, useJourney, Wrap } from './shared';
+import { ChapterHeading, CheckMark, CHROME_H, useChapterNo, useJourney, Wrap } from './shared';
 
 /* =====================================================================
    Capítulo 6 · Compromisso (dinheiro real). Montante traduzido em
@@ -69,11 +69,11 @@ function Terms({ amount }: { amount: number }) {
   const d = priceDecimals(lot);
   const today = now().toISOString();
   const rows: { label: string; value: string }[] = [
-    { label: 'Montante financiado', value: `${eur(amount)}. Paga a compra ao produtor e os custos do lote até à venda.` },
-    { label: 'Liquidação prevista', value: `Até ${fmtDate(win.end)} (mês ${win.months} da janela), quando o lote estiver vendido e os compradores tiverem pago. Pode ser antes.` },
-    { label: 'Resultado no cenário base', value: `${pct(e.expectedRange[0], 1, { sign: true })} a ${pct(e.expectedRange[1], 1, { sign: true })} do capital no fim do ciclo, se o lote vender ao preço previsto. Não é garantido e pode haver perda.` },
-    { label: 'Extensão condicionada', value: `Uma vez, até ${lot.extension.maxMonths} meses, só se no mês ${win.months} a referência estiver 15 % ou mais abaixo da entrada ou faltar vender mais de 30 % do stock. Aviso com 30 dias.` },
-    { label: 'Custos e comissões', value: `Sem comissão de entrada nem de saída. Os custos do lote (${num(e.costsPerUnit, d)} €/${lot.world === 'agua' ? 'L' : 'kg'}) já estão no preço financiado. Da margem bruta, ${pct(e.investorShare, 0)} vai para os co-financiadores, ${pct(1 - e.investorShare - e.reserveShare, 0)} para a operação e ${pct(e.reserveShare, 0)} para a reserva.` },
+    { label: 'Montante financiado', value: `${eur(amount)}. Paga a compra ao produtor e os custos do lote até à venda${e.packingCost > 0 ? ', incluindo o embalamento no co-packer' : ''}.` },
+    { label: 'Liquidação prevista', value: `Até ${fmtDate(win.end)} (mês ${win.months} da janela), quando o lote estiver vendido e os compradores tiverem pago. No cenário base, cerca de ${e.expectedMonths} meses; pode ser antes.` },
+    { label: 'Resultado no cenário base', value: `${pct(e.expectedRange[0], 1, { sign: true })} a ${pct(e.expectedRange[1], 1, { sign: true })} do capital no fim do ciclo, antes da reserva, se o lote vender ao preço previsto (${e.priceBasis}). Não é garantido e pode haver perda.` },
+    { label: 'Extensão condicionada', value: `Uma vez, até ${lot.extension.maxMonths} meses, só se no mês ${win.months} o ${lot.world === 'azeite' ? 'índice de origem' : 'índice de mercado'} estiver ${pct(PRICE_TRIGGER, 0)} ou mais abaixo do da abertura ou faltar vender mais de 30 % do stock. Aviso com 30 dias.` },
+    { label: 'Custos e comissões', value: `Sem comissão de entrada nem de saída. Os custos do lote até à venda (${num(e.costsPerUnit, d)} €/${lot.world === 'agua' ? 'L' : 'kg'}${e.packingCost > 0 ? `, dos quais ${num(e.packingCost, d)} de embalamento no co-packer` : ''}) já estão no preço financiado. Da margem bruta, ${pct(e.investorShare, 0)} vai para os cofinanciadores, ${pct(1 - e.investorShare - e.reserveShare, 0)} para a operação e ${pct(e.reserveShare, 0)} para a reserva comum de primeira perda (${RESERVE_RULE.short}).` },
     { label: 'Saída antes do fim', value: 'Não há mercado secundário no piloto: o capital fica comprometido até à liquidação.' },
     { label: 'Período de reflexão', value: `Podes cancelar sem custos durante 4 dias (até ${fmtDate(reflectionEnd(today))}).` },
     { label: 'Informação', value: 'Inventário físico mensal com fotografia, extrato mensal no dia 5 e uma única liquidação no fim (capital e resultado).' },
@@ -90,7 +90,25 @@ function Terms({ amount }: { amount: number }) {
   );
 }
 
-function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void }) {
+/**
+ * Lê um montante escrito em pt-PT: espaços e pontos como separadores de
+ * milhares, vírgula decimal. Só euros inteiros (cêntimos diferentes de zero
+ * dão erro, em vez de multiplicar o montante por 100).
+ */
+export function parseAmount(raw: string): { value: number; error?: string } {
+  const t = raw.replace(/[\s\u00a0\u202f€]/g, '');
+  if (!t) return { value: 0, error: 'Escreve o montante a comprometer.' };
+  const m = t.match(/^(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d*))?$/);
+  if (!m) return { value: 0, error: 'Escreve só números, por exemplo 5 000 €.' };
+  const value = Number(m[1].replace(/\./g, ''));
+  if (m[2] && Number(m[2]) > 0) return { value, error: 'Usa um montante em euros inteiros, sem cêntimos.' };
+  return { value };
+}
+
+/** Quanto tempo o botão fica no estado "Compromisso confirmado" antes de o ritual continuar. */
+const DONE_HOLD_MS = 250;
+
+function CommitForm({ onCommitting, onCommitted }: { onCommitting: () => void; onCommitted: (m: CommitMoment) => void }) {
   const { lot, ctx, goTo } = useJourney();
   const game = useGame();
   const data = useData();
@@ -101,8 +119,12 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
   const step = lot.world === 'agua' ? 250 : 500;
   const [amount, setAmount] = useState(min);
   const [text, setText] = useState(num(min));
+  const [parseError, setParseError] = useState<string | undefined>();
   const [ack, setAck] = useState(false);
-  const valid = amount >= min && amount <= max && max > 0;
+  // depois da confirmação, o formulário fica imóvel (estado "confirmado") até o ritual continuar
+  const [committing, setCommitting] = useState(false);
+  const frozen = useRef<ReactNode>(null);
+  const valid = !parseError && amount >= min && amount <= max && max > 0;
   const shown = Math.max(min, Math.min(max, amount || 0));
   const phys = physicalForAmount(lot, shown);
   const funded = fundedFraction(lot);
@@ -132,39 +154,46 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
   ];
   const firstMissing = checks.find((c) => !c.done);
   const store = valid ? game.checkCommit(lot.id, amount) : undefined;
-  const reason = firstMissing
-    ? firstMissing.id === 'riscos'
-      ? `Faltam ler ${total - read} de ${total} fatores de risco.`
-      : firstMissing.id === 'analise'
-        ? 'Falta ler o boletim de análises do lote.'
-        : firstMissing.id === 'montante'
-          ? `O montante tem de estar entre ${eur(min)} e ${eur(max)}.`
-          : 'Para comprometer capital é preciso concluir o registo e a verificação.'
-    : !ack
-      ? 'Falta confirmar a declaração de risco.'
-      : store && !store.ok
-        ? store.message
-        : undefined;
+  const reason = game.teamView
+    ? TEAM_VIEW_MESSAGE
+    : firstMissing
+      ? firstMissing.id === 'riscos'
+        ? `Falta ler ${total - read} de ${total} fatores de risco.`
+        : firstMissing.id === 'analise'
+          ? 'Falta ler o boletim de análises do lote (capítulo 2, "Li o boletim").'
+          : firstMissing.id === 'montante'
+            ? parseError ?? `O montante tem de estar entre ${eur(min)} e ${eur(max)}.`
+            : 'Para comprometer capital é preciso concluir o registo e a verificação.'
+      : !ack
+        ? 'Falta confirmar a declaração de risco.'
+        : store && !store.ok
+          ? store.message
+          : undefined;
   const ready = !reason;
 
   const setFromText = (raw: string) => {
-    const digits = raw.replace(/\D/g, '').slice(0, 7);
     setText(raw);
-    setAmount(digits ? Number(digits) : 0);
+    const r = parseAmount(raw);
+    setParseError(r.error);
+    setAmount(Math.min(r.value, 9_999_999));
   };
 
   const confirm = () => {
     const prevFunded = fundedFraction(lot);
+    onCommitting();
+    setCommitting(true);
     const r = game.commitToLot(lot.id, amount);
     if (!r.ok) {
+      setCommitting(false);
       toast({ tone: 'warn', title: 'Compromisso não registado', description: r.message });
       return;
     }
-    toast({ tone: 'neutral', title: `Compromisso registado · ${lot.id}`, description: `${eur(amount)} · podes cancelar sem custos até ${fmtDate(reflectionEnd(r.position.committedAt))}.` });
-    onCommitted({ position: r.position, prevFunded, sealId: r.sealId, firstSeal: r.firstSealForOrigin, fresh: true });
+    // sem aviso flutuante: a confirmação aparece no próprio ecrã (estado do botão, título e região viva)
+    const moment: CommitMoment = { position: r.position, prevFunded, sealId: r.sealId, firstSeal: r.firstSealForOrigin, fresh: true };
+    window.setTimeout(() => onCommitted(moment), DONE_HOLD_MS);
   };
 
-  return (
+  const view = (
     <div className="grid min-w-0 gap-x-12 gap-y-10 lg:grid-cols-12">
       <div className="min-w-0 lg:col-span-7">
         {/* montante e tradução física */}
@@ -172,7 +201,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
           <Field
             label="Montante a comprometer"
             hint={`Entre ${eur(min)} e ${eur(max)}`}
-            error={!valid && text.trim() !== '' ? (amount < min ? `O mínimo neste lote é ${eur(min)}.` : `O máximo neste lote é ${eur(max)}.`) : undefined}
+            error={!valid && text.trim() !== '' ? (parseError ?? (amount < min ? `O mínimo neste lote é ${eur(min)}.` : `O máximo neste lote é ${eur(max)}.`)) : undefined}
           >
             {({ id, describedBy, invalid }) => (
               <Input
@@ -185,6 +214,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
                 value={text}
                 onChange={(ev) => setFromText(ev.target.value)}
                 onBlur={() => valid && setText(num(amount))}
+                readOnly={committing}
                 className="font-mono text-[1.125rem] tnum"
               />
             )}
@@ -200,8 +230,9 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
               onChange={(v) => {
                 setAmount(v);
                 setText(num(v));
+                setParseError(undefined);
               }}
-              disabled={max <= 0}
+              disabled={max <= 0 || committing}
             />
             <div className="flex justify-between font-mono text-xs text-muted tnum">
               <span>{eur(min)}</span>
@@ -265,7 +296,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
                   </button>
                 )}
                 {!c.done && c.id === 'kyc' && !blocked && (
-                  <TextLink to="/onboarding" className="min-h-11 shrink-0 content-center text-sm">
+                  <TextLink to={`/onboarding?lote=${lot.id}`} className="min-h-11 shrink-0 content-center text-sm">
                     Fazer o registo
                   </TextLink>
                 )}
@@ -273,19 +304,25 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
             ))}
           </ul>
 
-          {game.canCommit ? (
+          {game.teamView ? (
+            <div className="mt-4">
+              <HoldToConfirm label="Mantém premido para comprometer" disabled disabledReason={TEAM_VIEW_MESSAGE} alternative={false} onConfirm={() => undefined} />
+              <p className="mt-2 text-sm text-muted">O que a equipa lê ou joga nesta vista fica num perfil próprio e não conta para a diligência nem para os pontos da investidora.</p>
+            </div>
+          ) : game.canCommit ? (
             <>
               <Checkbox
                 className="mt-4"
                 checked={ack}
+                disabled={committing}
                 onChange={(ev) => setAck(ev.target.checked)}
-                label={`Li a ficha do lote ${lot.id}, os fatores de risco e a nota de capital em risco. Percebo que posso perder parte ou a totalidade de ${eur(shown)} e que não há mercado secundário.`}
+                label={`Li a ficha do lote ${lot.id}, os fatores de risco e a nota de capital em risco. Percebo que posso perder parte ou a totalidade de ${valid ? eur(amount) : 'o montante comprometido'} e que não há mercado secundário.`}
               />
               <HoldToConfirm
                 className="mt-4"
-                label={`Mantém premido para comprometer ${eur(shown)}`}
+                label={valid ? `Mantém premido para comprometer ${eur(amount)}` : 'Mantém premido para comprometer'}
                 confirmedLabel="Compromisso confirmado"
-                confirmText={`Confirmo o compromisso de ${eur(shown)} no lote ${lot.id}.`}
+                confirmText={`Confirmo o compromisso de ${valid ? eur(amount) : 'este montante'} no lote ${lot.id}.`}
                 disabled={!ready}
                 disabledReason={reason}
                 onConfirm={confirm}
@@ -310,7 +347,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
             <div className="mt-4 rounded-sm bg-surface-2 px-4 py-3">
               <p className="font-medium text-fg">{isVisitor ? 'Estás a ver como Visitante.' : 'Falta concluir o registo.'}</p>
               <p className="mt-1 text-sm text-muted">Para comprometer capital é preciso registo, verificação KYC/KYB e a confirmação de investidor qualificado. A diligência que fizeres aqui fica guardada.</p>
-              <ButtonLink to="/onboarding" variant="primary" className="mt-3">
+              <ButtonLink to={`/onboarding?lote=${lot.id}`} variant="primary" className="mt-3">
                 Começar o registo
               </ButtonLink>
             </div>
@@ -340,7 +377,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
                 Financiado hoje <span className="font-mono text-fg tnum">{pct(funded, 1)}</span> · com o teu compromisso <span className="font-mono text-fg tnum">{pct(after, 1)}</span>
               </p>
               <p className="mt-3 text-sm text-muted">
-                <span className="font-mono text-fg tnum">{num(lot.funding.coFinancers)}</span> co-financiadores. Todos podem pedir amostra do lote, seja qual for o montante.
+                <span className="font-mono text-fg tnum">{num(lot.funding.coFinancers)}</span> cofinanciadores. Todos podem pedir amostra do lote, seja qual for o montante.
               </p>
             </div>
           </div>
@@ -348,22 +385,42 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
       </div>
     </div>
   );
+  // durante a confirmação devolve o mesmo elemento: o formulário não volta a desenhar (o HoldToConfirm mantém o seu estado "confirmado")
+  if (!committing) frozen.current = view;
+  return committing && frozen.current ? frozen.current : view;
 }
 
 export function ChapterCompromisso({ label }: { label: string }) {
   const { lot, positions } = useJourney();
+  const no = useChapterNo('compromisso');
   const [moment, setMoment] = useState<CommitMoment | null>(null);
+  // entre a confirmação e o ritual (~250 ms) o formulário fica no ecrã, no estado "confirmado"
+  const [committing, setCommitting] = useState(false);
+  // região viva que fica montada (o botão e o formulário desmontam): anuncia o compromisso e o cancelamento
+  const [announce, setAnnounce] = useState('');
   const session = positions.filter((p) => p.session);
   const latest = session[session.length - 1];
   const live = moment && positions.some((p) => p.id === moment.position.id) ? moment : null;
-  const shown: CommitMoment | null = live ?? (latest ? { position: latest, prevFunded: fundedFraction(lot), firstSeal: false, fresh: false } : null);
+  const shown: CommitMoment | null = committing ? null : (live ?? (latest ? { position: latest, prevFunded: fundedFraction(lot), firstSeal: false, fresh: false } : null));
+
+  const onCommitted = (m: CommitMoment) => {
+    setMoment(m);
+    setCommitting(false);
+    setAnnounce(`Compromisso registado: ${eur(m.position.amount)} no lote ${lot.id}. Podes cancelar sem custos até ${fmtDate(reflectionEnd(m.position.committedAt))}.`);
+  };
+  const onCancelled = () => {
+    setMoment(null);
+    setAnnounce(`Compromisso no lote ${lot.id} cancelado, sem custos.`);
+    // o foco não cai para o corpo da página: volta ao título do capítulo (e o formulário fica logo abaixo)
+    window.requestAnimationFrame(() => document.getElementById('compromisso-titulo')?.focus());
+  };
 
   return (
     <section id="compromisso" data-chapter={label} aria-labelledby="compromisso-titulo" className="scroll-mt-6 py-14 sm:py-20">
       <Wrap>
         <ChapterHeading
           id="compromisso"
-          n={6}
+          n={no}
           title="Compromisso"
           lead={
             shown
@@ -371,9 +428,11 @@ export function ChapterCompromisso({ label }: { label: string }) {
               : 'Escolhe o montante e vê-o em mercadoria. Lê as condições, confirma a declaração e mantém premido para comprometer.'
           }
         />
-        <div className="mt-8">{shown ? <CommitDone moment={shown} onCancelled={() => setMoment(null)} /> : <CommitForm onCommitted={setMoment} />}</div>
+        <div className="mt-8">{shown ? <CommitDone moment={shown} onCancelled={onCancelled} /> : <CommitForm onCommitting={() => setCommitting(true)} onCommitted={onCommitted} />}</div>
+        <p className="sr-only" aria-live="polite">
+          {announce}
+        </p>
       </Wrap>
     </section>
   );
 }
-

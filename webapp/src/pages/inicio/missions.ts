@@ -1,7 +1,9 @@
 import { getProducer, getQuest, getQuestsByLot, getSeal, isInvestable, LEVEL_PERKS, LEVELS, MODULES, QUESTS } from '../../data';
-import type { CampaignEvent, LevelId, Lot, WorldId } from '../../data';
+import type { LevelId, Lot, Quest, WorldId } from '../../data';
+import type { FeedPauseReason } from '../../lib/useLiveFeed';
 import type { GameView, PositionView } from '../../state';
 import { num } from '../../lib/format';
+import { simLotFor } from '../lote/model';
 
 /* =====================================================================
    Motor de missões do Início. Gatilhos: conhecimento, diligência e eventos
@@ -68,21 +70,49 @@ function finish(m: Omit<Mission, 'done' | 'total' | 'href' | 'valueText'> & { hr
   return { ...m, done, total, href: m.href ?? next?.href ?? m.steps[0]?.href ?? '/academia', valueText: m.valueText ?? `${num(done)} de ${num(total)}` };
 }
 
+/** Nome curto do passo que cada missão representa (para dizer quando se ganha o selo). */
+function questShort(q: Quest): string {
+  switch (q.criteria.type) {
+    case 'analysis-read':
+      return 'o boletim';
+    case 'risk-read':
+      return 'os fatores de risco';
+    case 'sim-complete':
+      return 'uma campanha no simulador';
+    default:
+      return q.title.charAt(0).toLowerCase() + q.title.slice(1);
+  }
+}
+
+/** Uma campanha jogada no simulador com a carta deste lote (o lote fictício com os mesmos parâmetros). */
+export function playedLotCard(game: GameView, lot: Lot): boolean {
+  const card = simLotFor(lot);
+  return Boolean(card) && game.simRuns.some((r) => r.allocations.some((a) => a.amount > 0 && a.simLotId === card));
+}
+
 /** Diligência de um lote aberto: boletim, fatores de risco, uma campanha no simulador. */
 function lotDiligence(lot: Lot, game: GameView): Mission {
   const producer = getProducer(lot.producerId);
   const quests = getQuestsByLot(lot.id);
+  const simQuest = QUESTS.find((q) => q.criteria.type === 'sim-complete');
   const seal = quests.map((q) => q.sealId).find(Boolean);
   const sealDef = seal ? getSeal(seal) : undefined;
-  const points = sum(quests.map((q) => q.points));
+  // a recompensa completa da missão: as missões do lote e a do simulador (cada uma conta uma vez)
+  const missionQuests = [...quests, ...(simQuest ? [simQuest] : [])];
+  const points = sum(missionQuests.filter((q) => !game.isQuestDone(q.id)).map((q) => q.points));
+  const allPoints = sum(missionQuests.map((q) => q.points));
   const risks = game.riskRead(lot.id).length;
   const steps: MissionStep[] = [];
   if (lot.analyses.length) steps.push({ id: 'analise', label: 'Lê o boletim de análises', done: game.hasReadAnalysis(lot.id), href: `/lote/${lot.id}#analises` });
   steps.push({ id: 'riscos', label: `Abre os ${lot.riskFactors.length} fatores de risco`, done: risks >= lot.riskFactors.length, count: [risks, lot.riskFactors.length], href: `/lote/${lot.id}#riscos` });
-  steps.push({ id: 'sim', label: 'Joga esta campanha no simulador', done: game.simRuns.length > 0, href: '/academia/simulador' });
+  // só conta uma campanha jogada com um lote fictício do mesmo mundo (não qualquer simulação)
+  steps.push({ id: 'sim', label: 'Joga uma campanha com este lote no simulador', done: playedLotCard(game, lot), href: '/academia/simulador' });
   const rewardParts: string[] = [];
-  if (points) rewardParts.push(`+${points} pontos de conhecimento`);
-  if (sealDef && sealDef.earnable !== 'compromisso' && producer) rewardParts.push(`selo de origem ${producer.nome} · ${sealDef.campanha}`);
+  if (points) rewardParts.push(`+${points} pontos de conhecimento${points < allPoints ? ' (o resto já está contado)' : ''}`);
+  if (sealDef && sealDef.earnable !== 'compromisso' && producer) {
+    const when = sealDef.questIds.map((id) => getQuest(id)).filter((q): q is Quest => Boolean(q)).map(questShort);
+    rewardParts.push(`o selo de origem ${producer.nome} · ${sealDef.campanha}${when.length ? `, ao concluir ${when.join(' e ')}` : ''}`);
+  }
   return finish({
     id: `dd-${lot.id}`,
     kind: 'diligencia',
@@ -99,19 +129,19 @@ export interface MissionInput {
   game: GameView;
   lots: Lot[];
   positions: PositionView[];
-  /** eventos ao vivo desta sessão (só os gerados pela telemetria) */
-  liveEvents: CampaignEvent[];
+  /** leituras de telemetria dos lagares vistas no Diário (com o Diário à vista) */
+  readingsSeen: number;
   isVisitor: boolean;
   /** mundos já visitados pelo perfil ativo */
   worldsVisited: WorldId[];
   /** motivo de pausa da telemetria, se estiver parada */
-  feedPaused?: 'reduced-motion' | 'hidden' | 'disabled' | null;
+  feedPaused?: FeedPauseReason | null;
 }
 
 /** Leituras de telemetria precisas para a missão de campanha. */
 export const CAMPAIGN_READINGS = 3;
 
-export function buildMissions({ game, lots, positions, liveEvents, isVisitor, worldsVisited, feedPaused }: MissionInput): Mission[] {
+export function buildMissions({ game, lots, positions, readingsSeen, isVisitor, worldsVisited, feedPaused }: MissionInput): Mission[] {
   const out: Mission[] = [];
 
   /* primeiros passos (visitante e investidores por aprovar) */
@@ -149,7 +179,7 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
   }
 
   /* missão de campanha: acompanhar a extração em direto */
-  const readings = liveEvents.filter((e) => e.kind === 'telemetria' && e.world === 'azeite').length;
+  const readings = readingsSeen;
   const seasonQuest = getQuest(SEASON_QUEST_ID);
   const seasonDone = game.isQuestDone(SEASON_QUEST_ID);
   out.push(
@@ -158,12 +188,12 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
       kind: 'campanha',
       title: 'Acompanha a primeira extração da campanha',
       context:
-        feedPaused === 'reduced-motion'
-          ? 'Telemetria em pausa com movimento reduzido: a missão avança quando as leituras voltarem.'
-          : 'Leituras dos depósitos dos lagares, no Diário de campanha',
+        feedPaused === 'user'
+          ? 'O Diário está em pausa: retoma-o para a missão avançar.'
+          : 'Leituras dos depósitos dos lagares, seguidas no Diário de campanha (só contam com o Diário à vista)',
       world: 'azeite',
       live: true,
-      steps: [{ id: 'leituras', label: `${CAMPAIGN_READINGS} leituras de telemetria em direto`, done: seasonDone || readings >= CAMPAIGN_READINGS, count: [seasonDone ? CAMPAIGN_READINGS : readings, CAMPAIGN_READINGS], href: '/#diario' }],
+      steps: [{ id: 'leituras', label: `Segue ${CAMPAIGN_READINGS} leituras dos lagares no Diário`, done: seasonDone || readings >= CAMPAIGN_READINGS, count: [seasonDone ? CAMPAIGN_READINGS : readings, CAMPAIGN_READINGS], href: '/#diario' }],
       reward: `+${seasonQuest?.points ?? 0} pontos de conhecimento. Conta o que acompanhaste no Diário, nunca o que investiste.`,
       rewardLabel: 'Ganhas',
     }),

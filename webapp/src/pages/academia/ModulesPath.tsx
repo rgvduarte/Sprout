@@ -167,18 +167,20 @@ function ModuleBody({ module: m, done, onClose }: { module: KnowledgeModule; don
                   {q.options.map((o, i) => {
                     const isRight = st.solved && i === q.correct;
                     const isWrong = st.tried.includes(i);
+                    const locked = st.solved || isWrong;
                     return (
+                      // aria-disabled (não `disabled`): a opção escolhida continua focável, o foco do teclado não cai para a página
                       <button
                         key={i}
                         type="button"
-                        disabled={st.solved || isWrong}
-                        onClick={() => pick(q.id, i, q.correct)}
-                        aria-pressed={isRight || isWrong}
+                        aria-disabled={locked || undefined}
+                        onClick={() => !locked && pick(q.id, i, q.correct)}
                         className={cn(
                           'flex min-h-11 items-start gap-2 rounded-sm border px-3 py-2 text-left text-[0.9375rem] transition-[background-color,border-color,color] duration-150',
                           isRight && 'border-[color-mix(in_oklab,var(--ok)_45%,var(--border))] bg-[color-mix(in_oklab,var(--ok)_12%,var(--surface))] text-fg',
                           isWrong && 'cursor-not-allowed border-[color-mix(in_oklab,var(--crit)_35%,var(--border))] bg-[color-mix(in_oklab,var(--crit)_7%,var(--surface))] text-muted line-through decoration-1',
-                          !isRight && !isWrong && 'border-border bg-surface text-fg enabled:hover:border-[color-mix(in_oklab,var(--accent)_45%,var(--border))] enabled:hover:bg-surface-2 disabled:text-muted',
+                          !isRight && !isWrong && !st.solved && 'border-border bg-surface text-fg hover:border-[color-mix(in_oklab,var(--accent)_45%,var(--border))] hover:bg-surface-2',
+                          !isRight && !isWrong && st.solved && 'border-border bg-surface text-muted',
                         )}
                       >
                         {isRight && <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-ok-ink" strokeWidth={2.25} />}
@@ -192,7 +194,7 @@ function ModuleBody({ module: m, done, onClose }: { module: KnowledgeModule; don
                     );
                   })}
                 </div>
-                <div aria-live="polite">
+                <div aria-live="polite" role="status">
                   {st.solved && <p className="mt-2 text-sm text-ok-ink">{q.explanation}</p>}
                   {!st.solved && st.tried.length > 0 && <p className="mt-2 text-sm text-crit-ink">Não é esta. Relê o texto e tenta outra opção.</p>}
                 </div>

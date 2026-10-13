@@ -1,19 +1,23 @@
-import { useCallback, useRef, useState } from 'react';
-import { motion, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
-import { Check, FileText, Minus } from 'lucide-react';
+import { memo, useCallback, useRef, useState } from 'react';
+import { useInView, useReducedMotion } from 'motion/react';
+import { BookCheck, Check, FileText, Minus } from 'lucide-react';
+import { getQuestsByLot } from '../../data';
 import type { QualityAnalysis, QualityParam } from '../../data/types';
-import { Chapter, LotGauge, SeasonTrack, useMapRange } from '../../components/game';
+import { LotGauge, SeasonTrack } from '../../components/game';
 import { Badge, Button, Drawer, KeyValue } from '../../components/ui';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, num } from '../../lib/format';
-import { useFeed, useGame, useData } from '../../state';
+import { useFeed, useGame, useTelemetry } from '../../state';
 import { stockLabel } from './model';
-import { CheckMark, ChapterHeading, useDwell, useJourney, Wrap, CHROME_H } from './shared';
+import { CheckMark, ChapterHeading, useChapterNo, useJourney, Wrap } from './shared';
 
 /* =====================================================================
-   Capítulo 2 · Colheita e produção. O depósito enche com o scroll até ao
-   stock real; o boletim de análises entra parâmetro a parâmetro ao lado
-   dos limites legais. Chegar ao fim dá a missão "Lê o boletim".
+   Capítulo 2 · Colheita e produção. O depósito enche uma vez quando entra
+   no ecrã, até ao stock real (e fica cheio); o boletim de análises mostra
+   sempre os valores verdadeiros ao lado dos limites legais (um resultado
+   de laboratório não "enche"). A missão "Lê o boletim" só se cumpre com um
+   ato explícito ("Li o boletim"), igual em todos os ecrãs: passar pelo
+   capítulo com o scroll ou saltar por cima dele não conta.
    ===================================================================== */
 
 const DECIMALS: Record<string, number> = {
@@ -22,35 +26,34 @@ const DECIMALS: Record<string, number> = {
   humidade: 1, cat1: 0, total: 0, sca: 2,
 };
 
-const fmtParam = (p: QualityParam, v: number) => `${num(v, DECIMALS[p.id] ?? 2)}${p.unit === '%' ? ' %' : ''}`;
+const fmtParam = (p: QualityParam, v: number) => `${num(v, DECIMALS[p.id] ?? 2)}${p.unit === '%' ? ' %' : ''}`;
 
-function ParamRow({ p, t }: { p: QualityParam; t: MotionValue<number> }) {
-  const display = useTransform(t, (v) => (v <= 0.001 ? '—' : fmtParam(p, p.value * Math.min(1, v))));
+/** Um parâmetro do boletim: valor real, limite legal e a barra até ao limite (desenho estático). */
+function ParamRow({ p }: { p: QualityParam }) {
   const bounded = p.comparator === '≤' && p.limit > 0;
   const ratio = bounded ? Math.min(1, p.value / (p.limit * 1.25)) : 0;
-  const bar = useTransform(t, (v) => Math.min(1, v) * ratio);
   const unit = p.unit && p.unit !== '%' ? p.unit : '';
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto_1.25rem] items-center gap-x-3 gap-y-0.5 py-2 sm:grid-cols-[minmax(0,1fr)_5.5rem_7.5rem_6rem_1.25rem] sm:gap-x-4">
+    <li className="grid grid-cols-[minmax(0,1fr)_auto_1.25rem] items-center gap-x-3 gap-y-0.5 py-2 @xl:grid-cols-[minmax(0,1fr)_5.5rem_7.5rem_6rem_1.25rem] @xl:gap-x-4">
       <span className="col-start-1 row-start-1 min-w-0 text-[0.9375rem] text-fg" aria-hidden>
         {p.label}
         {unit && <span className="text-sm text-muted"> · {unit}</span>}
       </span>
-      <motion.span aria-hidden className="col-start-2 row-start-1 text-right font-mono text-[0.9375rem] font-medium text-fg tnum">
-        {display}
-      </motion.span>
-      <span aria-hidden className="col-start-1 row-start-2 font-mono text-sm text-muted tnum sm:col-start-3 sm:row-start-1 sm:text-right">
+      <span aria-hidden className="col-start-2 row-start-1 text-right font-mono text-[0.9375rem] font-medium text-fg tnum">
+        {fmtParam(p, p.value)}
+      </span>
+      <span aria-hidden className="col-start-1 row-start-2 font-mono text-sm text-muted tnum @xl:col-start-3 @xl:row-start-1 @xl:text-right">
         {p.limitLabel}
       </span>
-      <span aria-hidden className="relative hidden h-1.5 rounded-full bg-[color-mix(in_oklab,var(--world)_14%,var(--surface-2))] sm:col-start-4 sm:row-start-1 sm:block">
+      <span aria-hidden className="relative hidden h-1.5 rounded-full bg-[color-mix(in_oklab,var(--world)_14%,var(--surface-2))] @xl:col-start-4 @xl:row-start-1 @xl:block">
         {bounded && (
           <>
-            <motion.span className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-world" style={{ scaleX: bar }} />
+            <span className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-world" style={{ transform: `scaleX(${ratio})` }} />
             <span className="absolute -top-1 bottom-[-4px] w-0.5 bg-fg" style={{ left: '80%' }} />
           </>
         )}
       </span>
-      <span aria-hidden className="col-start-3 row-start-1 flex justify-end sm:col-start-5">
+      <span aria-hidden className="col-start-3 row-start-1 flex justify-end @xl:col-start-5">
         {p.pass ? <Check className="size-4 text-ok-ink" strokeWidth={2.25} /> : <Minus className="size-4 text-crit-ink" strokeWidth={2.25} />}
       </span>
       <span className="sr-only">
@@ -60,29 +63,22 @@ function ParamRow({ p, t }: { p: QualityParam; t: MotionValue<number> }) {
   );
 }
 
-function AnalysisSheet({ analysis, progress }: { analysis: QualityAnalysis; progress: MotionValue<number> }) {
-  const n = analysis.params.length;
+const AnalysisSheet = memo(function AnalysisSheet({ analysis }: { analysis: QualityAnalysis }) {
   return (
     <ol aria-label={`Parâmetros do boletim ${analysis.reportId}`} className="divide-y divide-border border-y border-border">
-      {analysis.params.map((p, i) => (
-        <ParamRowTimed key={p.id} p={p} i={i} n={n} progress={progress} />
+      {analysis.params.map((p) => (
+        <ParamRow key={p.id} p={p} />
       ))}
     </ol>
   );
-}
+});
 
-function ParamRowTimed({ p, i, n, progress }: { p: QualityParam; i: number; n: number; progress: MotionValue<number> }) {
-  const a = 0.38 + (i / n) * 0.42;
-  const b = a + 0.42 / n + 0.06;
-  const t = useMapRange(progress, [a, b], [0, 1]);
-  return <ParamRow p={p} t={t} />;
-}
-
+/** Telemetria do produtor, ao vivo: só este bloco re-renderiza a cada leitura. */
 function Telemetry() {
   const { lot, ctx } = useJourney();
-  const data = useData();
+  const telemetry = useTelemetry();
   const feed = useFeed();
-  const units = data.telemetry[lot.producerId] ?? [];
+  const units = telemetry[lot.producerId] ?? [];
   if (!units.length || !ctx.producer.telemetry.live) return null;
   const unitLabel = ctx.producer.telemetry.unitLabel;
   return (
@@ -111,46 +107,92 @@ function Telemetry() {
   );
 }
 
-function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
+/**
+ * Missão "Lê o boletim": cumpre-se com "Li o boletim", depois de o boletim
+ * estar à vista (no capítulo ou na gaveta do boletim completo). O foco fica
+ * na linha da missão quando o botão dá lugar ao estado cumprido.
+ */
+function ReadAck({ read, onRead, points, onOpen, compact }: { read: boolean; onRead: () => void; points?: number; onOpen?: () => void; compact?: boolean }) {
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  return (
+    <div className={cn('flex flex-wrap items-center justify-between gap-3 rounded-sm bg-world-soft px-3 py-2.5', compact && 'mt-6')}>
+      <p ref={statusRef} tabIndex={-1} className="flex min-w-0 items-center gap-2.5 text-sm outline-none" role="status">
+        <CheckMark done={read} />
+        <span className={cn('min-w-0', read ? 'text-fg' : 'text-world-ink')}>
+          {read ? 'Missão cumprida: boletim lido' : `Missão: lê o boletim e confirma${points ? ` · +${points} pts` : ''}`}
+        </span>
+      </p>
+      <div className="flex flex-wrap items-center gap-2">
+        {onOpen && (
+          <Button variant="secondary" size="sm" iconLeft={<FileText aria-hidden className="size-4" strokeWidth={1.75} />} onClick={onOpen}>
+            Abrir boletim completo
+          </Button>
+        )}
+        {!read && (
+          <Button
+            variant="primary"
+            size="sm"
+            iconLeft={<BookCheck aria-hidden className="size-4" strokeWidth={1.75} />}
+            onClick={() => {
+              onRead();
+              window.requestAnimationFrame(() => statusRef.current?.focus({ preventScroll: true }));
+            }}
+          >
+            Li o boletim
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ColheitaBody() {
   const { lot, ctx } = useJourney();
+  const no = useChapterNo('colheita');
   const game = useGame();
+  const reduce = useReducedMotion() ?? false;
   const [open, setOpen] = useState(false);
   const analysis = lot.analyses[lot.analyses.length - 1];
   const read = game.hasReadAnalysis(lot.id);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const firing = useRef(false);
+  const points = getQuestsByLot(lot.id).find((q) => q.criteria.type === 'analysis-read')?.points;
   const stockFrac = lot.quantity > 0 ? Math.min(1, lot.stock / lot.quantity) : 0;
-  const fill = useMapRange(progress, [0.04, 0.4], [0, stockFrac]);
-  const stockText = useTransform(fill, (v) => stockLabel(lot, Math.round(v * lot.quantity)));
+
+  // o depósito enche uma vez quando entra no ecrã (0,8 s) e fica no stock real; com movimento reduzido já está cheio
+  const gaugeRef = useRef<HTMLDivElement>(null);
+  const entered = useInView(gaugeRef, { once: true, amount: 0.35 });
+  const fill = reduce || entered ? stockFrac : 0;
 
   const markRead = useCallback(() => {
-    if (!analysis || firing.current || game.hasReadAnalysis(lot.id)) return;
-    firing.current = true;
+    if (!analysis || game.hasReadAnalysis(lot.id)) return;
     game.markAnalysisRead(lot.id);
   }, [analysis, game, lot.id]);
-
-  useMotionValueEvent(progress, 'change', (v) => {
-    if (rich && v > 0.88) markRead();
-  });
-  useDwell(sheetRef, !rich && Boolean(analysis) && !read, markRead, 1600);
 
   const colhido = lot.milestones.find((m) => m.stage === 'colhido');
   const analisado = lot.milestones.find((m) => m.stage === 'analisado');
 
   return (
     <Wrap className="min-w-0">
-      <ChapterHeading id="colheita" n={2} title={ctx.copy.colheitaTitle} lead={ctx.copy.colheitaLead} />
+      <ChapterHeading id="colheita" n={no} title={ctx.copy.colheitaTitle} lead={ctx.copy.colheitaLead} />
       <SeasonTrack world={lot.world} className="mt-6 max-w-[920px]" />
 
-      <div className="mt-7 grid min-w-0 gap-x-12 gap-y-8 lg:grid-cols-12">
+      <div className="mt-7 grid min-w-0 gap-x-12 gap-y-8 @4xl:grid-cols-12">
         {/* depósito a encher até ao stock real */}
-        <div className="min-w-0 lg:col-span-5">
-          <div className="flex items-end gap-6">
-            <LotGauge kind={lot.world} value={stockFrac} progress={fill} size="lg" label={`Stock físico do lote ${lot.id}`} valueText={stockLabel(lot)} className="w-[150px] shrink-0 sm:w-[200px] [&_svg]:h-auto [&_svg]:w-full" />
+        <div className="min-w-0 @4xl:col-span-5">
+          <div ref={gaugeRef} className="flex items-end gap-6">
+            <LotGauge
+              kind={lot.world}
+              value={fill}
+              size="lg"
+              label={`Stock físico do lote ${lot.id}`}
+              valueText={stockLabel(lot)}
+              className="w-[150px] shrink-0 sm:w-[200px] [&_svg]:h-auto [&_svg]:w-full"
+            />
             <div className="min-w-0 pb-3">
               <p className="text-sm text-muted">Stock do lote {ctx.copy.stockWhere}</p>
-              <motion.p className="mt-1 font-mono text-[1.75rem] font-medium leading-none text-fg tnum">{stockText}</motion.p>
-              <p className="mt-2 text-sm text-muted">de {stockLabel(lot, lot.quantity)} · {lot.storage.local}</p>
+              <p className="mt-1 font-mono text-[1.75rem] font-medium leading-none text-fg tnum">{stockLabel(lot)}</p>
+              <p className="mt-2 text-sm text-muted">
+                de {stockLabel(lot, lot.quantity)} · {lot.storage.local}
+              </p>
               <dl className="mt-4 grid gap-1 text-sm">
                 {colhido?.date && (
                   <div className="flex gap-2">
@@ -173,7 +215,7 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
         </div>
 
         {/* boletim de análises */}
-        <div ref={sheetRef} id={rich ? undefined : 'analises'} className="min-w-0 scroll-mt-6 lg:col-span-7">
+        <div id="analises" className="min-w-0 @container @4xl:col-span-7">
           {analysis ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -188,7 +230,7 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
                 </Badge>
               </div>
               <div className="mt-3">
-                <AnalysisSheet analysis={analysis} progress={progress} />
+                <AnalysisSheet analysis={analysis} />
               </div>
               {analysis.panel && (
                 <p className="mt-3 text-sm text-muted">
@@ -197,24 +239,8 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
                 </p>
               )}
               {!analysis.panel && analysis.note && <p className="mt-3 text-sm text-muted">{analysis.note}</p>}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-sm bg-world-soft px-3 py-2.5">
-                <p className="flex min-w-0 items-center gap-2.5 text-sm">
-                  <CheckMark done={read} />
-                  <span className={cn('min-w-0', read ? 'text-fg' : 'text-world-ink')}>
-                    {read ? 'Missão cumprida: boletim lido' : 'Missão: lê o boletim até ao fim'}
-                  </span>
-                </p>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  iconLeft={<FileText aria-hidden className="size-4" strokeWidth={1.75} />}
-                  onClick={() => {
-                    setOpen(true);
-                    markRead();
-                  }}
-                >
-                  Abrir boletim completo
-                </Button>
+              <div className="mt-4">
+                <ReadAck read={read} onRead={markRead} points={points} onOpen={() => setOpen(true)} />
               </div>
               <Drawer open={open} onClose={() => setOpen(false)} title={`Boletim ${analysis.reportId}`} description={`${analysis.lab} · ${fmtDate(analysis.date)}`} width="lg">
                 <KeyValue
@@ -259,6 +285,7 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
                     Este lote tem {lot.analyses.length} boletins. Mostramos o mais recente; as reanálises fazem-se a cada 4 meses de armazenagem.
                   </p>
                 )}
+                <ReadAck read={read} onRead={markRead} points={points} compact />
               </Drawer>
             </>
           ) : (
@@ -275,19 +302,14 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
   );
 }
 
+/**
+ * Capítulo de leitura (não fixo): o boletim é para ler ao ritmo de cada um.
+ * O único movimento ligado ao scroll é o enchimento do depósito à entrada.
+ */
 export function ChapterColheita({ label }: { label: string }) {
-  const { rich } = useJourney();
   return (
-    <div className="relative">
-      {/* âncora #analises: com capítulo fixo, leva ao fim do capítulo (boletim completo à vista) */}
-      {rich && <span id="analises" aria-hidden className="pointer-events-none absolute left-0 h-px w-px" style={{ top: 'calc(123vh + 80px)' }} />}
-      <Chapter id="colheita" label={label} heightVh={230} static={!rich} className={cn(!rich && 'scroll-mt-6 border-b border-border')} stickyClassName="justify-center" >
-        {(progress, isRich) => (
-          <div style={isRich ? { paddingTop: CHROME_H } : undefined} className="min-w-0">
-            <ColheitaBody progress={progress} rich={isRich} />
-          </div>
-        )}
-      </Chapter>
-    </div>
+    <section id="colheita" data-chapter={label} aria-labelledby="colheita-titulo" className="scroll-mt-6 border-b border-border py-14 sm:py-20">
+      <ColheitaBody />
+    </section>
   );
 }

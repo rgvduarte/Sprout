@@ -29,6 +29,10 @@ export interface KpiHistoryProps {
   track?: number[];
   /** nome acessível do indicador */
   label: string;
+  /** 'ends': só a primeira e a última etiqueta do eixo (datas que, juntas, ficariam ambíguas) */
+  ticks?: 'all' | 'ends';
+  /** escreve o valor por cima da última coluna */
+  showLast?: boolean;
   className?: string;
 }
 
@@ -43,7 +47,7 @@ function colPath(x: number, y: number, w: number, h: number, r = 3) {
 }
 
 /** Histórico curto de um indicador, com o alvo tracejado e o valor atual em destaque. */
-export function KpiHistory({ values, labels, kind, format, target, track, label, className }: KpiHistoryProps) {
+export function KpiHistory({ values, labels, kind, format, target, track, label, ticks = 'all', showLast = false, className }: KpiHistoryProps) {
   const n = values.length;
   const slot = (PLOT.x1 - PLOT.x0) / n;
   const all = [...values, ...(track ?? []), ...(target !== undefined ? [target] : [])];
@@ -58,8 +62,10 @@ export function KpiHistory({ values, labels, kind, format, target, track, label,
   const cx = (i: number) => PLOT.x0 + slot * i + slot / 2;
   const summary = `${label}, últimos ${n} períodos: ${values.map((v, i) => `${labels[i]} ${format(v)}`).join(', ')}${target !== undefined ? `. Alvo ${format(target)}` : ''}.`;
   const past = 'color-mix(in oklab, var(--fg) 26%, var(--surface))';
+  const last = values[n - 1];
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={summary} className={cn('block h-auto w-full max-w-[220px]', className)}>
+    <div className={cn('w-full max-w-[220px]', className)}>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={summary} className="block h-auto w-full">
       <line x1={PLOT.x0} x2={PLOT.x1} y1={PLOT.y1 + 0.5} y2={PLOT.y1 + 0.5} stroke="var(--chart-grid)" strokeWidth="1" />
       {target !== undefined && <line x1={PLOT.x0} x2={PLOT.x1} y1={y(target)} y2={y(target)} stroke="var(--chart-ref)" strokeWidth="1" strokeDasharray="3 3" />}
       {kind === 'columns' &&
@@ -87,12 +93,32 @@ export function KpiHistory({ values, labels, kind, format, target, track, label,
           <title>{`${labels[i]}: ${format(v)}${track?.[i] !== undefined ? ` de ${format(track[i])}` : ''}`}</title>
         </rect>
       ))}
-      {labels.map((l, i) => (
-        <text key={l + i} x={cx(i)} y={H - 5} textAnchor="middle" fontSize="11.5" fontFamily="var(--font-mono)" fill={i === n - 1 ? 'var(--fg)' : 'var(--muted)'}>
-          {l}
+      {showLast && kind === 'columns' && (
+        <text x={cx(n - 1) + 9} y={Math.max(11, y(last) - 4)} textAnchor="end" fontSize="11.5" fontFamily="var(--font-mono)" fill="var(--fg)">
+          {num(last)}
         </text>
-      ))}
+      )}
+      {labels.map((l, i) =>
+        ticks === 'ends' && i !== 0 && i !== n - 1 ? null : (
+          <text
+            key={l + i}
+            x={ticks === 'ends' ? (i === 0 ? PLOT.x0 : PLOT.x1) : cx(i)}
+            y={H - 5}
+            textAnchor={ticks === 'ends' ? (i === 0 ? 'start' : 'end') : 'middle'}
+            fontSize="11.5"
+            fontFamily="var(--font-mono)"
+            fill={i === n - 1 ? 'var(--fg)' : 'var(--muted)'}
+          >
+            {l}
+          </text>
+        ),
+      )}
     </svg>
+      {/* sem cursor não há títulos: num ecrã tátil, os dois últimos períodos ficam em texto */}
+      <p className="mt-1 hidden font-mono text-xs text-muted tnum pointer-coarse:block" aria-hidden>
+        {values.slice(-2).map((v, j) => `${labels[n - 2 + j]} ${format(v)}`).join(' · ')}
+      </p>
+    </div>
   );
 }
 
@@ -379,7 +405,7 @@ export function PriceRuler({ min, max, unit, today, stressed, marks, stressLabel
   const showStress = stressed !== undefined && Math.abs(stressed - today) > 1e-6;
   const sorted = [...marks].sort((a, b) => b.value - a.value);
   return (
-    <div className="min-w-0" role="img" aria-label={`Régua de preço em ${unit}. Referência hoje ${num(today, 2)}. ${showStress ? `${stressLabel}: ${num(stressed!, 2)}. ` : ''}Gatilhos: ${marks.map((m) => `${num(m.value, 2)} (${m.label})`).join('; ')}.`}>
+    <div className="min-w-0" role="img" aria-label={`Régua de preço em ${unit}. Índice hoje ${num(today, 2)}. ${showStress ? `${stressLabel}: ${num(stressed!, 2)}. ` : ''}Gatilhos: ${marks.map((m) => `${num(m.value, 2)} (${m.label})`).join('; ')}.`}>
       <div className="relative mx-2 h-[4.5rem]">
         {/* marcador de hoje e sob esforço */}
         <div className="absolute inset-x-0 top-0 h-9">

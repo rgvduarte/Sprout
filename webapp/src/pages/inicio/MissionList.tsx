@@ -81,7 +81,7 @@ export function MissionList({ missions, limit = 4, className }: { missions: Miss
   return (
     <div className={cn('min-w-0', className)}>
       {shown.length === 0 ? (
-        <p className="text-muted">Sem missões por fazer. Novas missões chegam com cada lote e com a campanha.</p>
+        <p className="text-muted">Sem missões por fazer. Novas missões de conhecimento chegam com cada lote e com a campanha.</p>
       ) : (
         <ul className="divide-y divide-border">
           {shown.map((m) => (

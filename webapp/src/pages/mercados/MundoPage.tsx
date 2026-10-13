@@ -46,9 +46,13 @@ function World({ world }: { world: WorldId }) {
     visitWorld(world);
   }, [world, visitWorld]);
 
-  const missions = useMemo(() => [...openLots(lots, world), ...upcomingLots(lots, world)], [lots, world]);
+  // cestos de água desta campanha (modelo de agente: sem financiamento) entram na mesma lista, com o seu estado
+  const cestos = useMemo(() => lots.filter((l) => l.world === world && l.status === 'cesto' && !l.illustrative), [lots, world]);
+  const missions = useMemo(() => [...openLots(lots, world), ...upcomingLots(lots, world), ...cestos], [lots, world, cestos]);
   const open = openLots(lots, world);
-  const running = lots.filter((l) => l.world === world && ['financiado', 'em-extensao', 'liquidado'].includes(l.status)).sort((a, b) => b.id.localeCompare(a.id));
+  const running = lots
+    .filter((l) => l.world === world && (['financiado', 'em-extensao', 'liquidado'].includes(l.status) || (l.status === 'cesto' && l.illustrative)))
+    .sort((a, b) => b.id.localeCompare(a.id));
   const chainLot = lots.find((l) => l.id === CHAIN[world].lotId) ?? (getLot(CHAIN[world].lotId) as Lot);
   const chain = chainFor(world, chainLot);
   const mg = miniGameFor(world);
@@ -126,19 +130,23 @@ function World({ world }: { world: WorldId }) {
         {/* ------------------------------------------------ missões */}
         <Section
           id="missoes"
-          title={preview ? 'Lotes em pré-visualização' : 'Missões abertas'}
+          title={preview ? 'Lotes em pré-visualização' : world === 'agua' ? 'Cestos desta campanha' : 'Lotes abertos'}
           description={
             preview
               ? 'Lotes em due diligence para a Fase 2. Podes abrir a jornada e jogá-los no simulador; ainda não se financiam.'
-              : `Cada lote é uma missão: ${world === 'agua' ? 'encher o armazém de paletes' : 'encher o depósito'} com o financiamento dos co-financiadores. Nos lotes em preparação, o medidor mostra o stock que o produtor já tem.`
+              : world === 'agua'
+                ? 'Na água a Sprout é agente: junta encomendas de HoReCa num cesto, o engarrafador fatura e entrega, e a Sprout recebe uma comissão. Não há lotes para financiar; podes abrir a jornada de cada cesto.'
+                : 'Cada lote tem um objetivo físico: os IBC de azeite que o financiamento dos cofinanciadores compra ao lagar. Nos lotes em preparação, o medidor mostra o stock que o produtor já tem.'
           }
           className="mt-12"
         >
           <Card>
-            <MissionList lots={missions} emptyText="Sem missões abertas neste mundo. A próxima abre com a campanha." />
-            <div className="mt-5 border-t border-border pt-4">
-              <RiskNote />
-            </div>
+            <MissionList lots={missions} emptyText="Sem lotes abertos neste mundo. O próximo abre com a campanha." />
+            {world !== 'agua' && (
+              <div className="mt-5 border-t border-border pt-4">
+                <RiskNote />
+              </div>
+            )}
           </Card>
           {running.length > 0 && (
             <Card className="mt-6">
@@ -154,7 +162,11 @@ function World({ world }: { world: WorldId }) {
         </Section>
 
         {/* ------------------------------------------------ preço e cadeia */}
-        <Section id="mercado" title="Preço e margem" description="A referência de mercado conta o risco de preço; a cadeia mostra de onde vem o desconto ao comprador.">
+        <Section
+          id="mercado"
+          title="Preço e margem"
+          description={world === 'azeite' ? 'O índice de origem (granel) mostra o risco de preço; as referências embaladas e a cadeia mostram de onde vem o preço ao comprador.' : 'A referência de mercado mostra o risco de preço; a cadeia mostra de onde vem o preço ao comprador.'}
+        >
           <div className="grid min-w-0 items-start gap-6 xl:grid-cols-2">
             <Card>
               <ReferenceChart

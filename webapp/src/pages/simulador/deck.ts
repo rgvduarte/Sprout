@@ -1,7 +1,7 @@
-import { SIM_EVENTS, SIM_LOTS, SIM_RULES } from '../../data';
+import { INVESTOR_SHARE, SIM_EVENTS, SIM_LOTS, SIM_RULES } from '../../data';
 import type { SimEvent, SimLot, WorldId } from '../../data/types';
 import { addMonths } from '../../lib/clock';
-import { eurToKg, eurToPaletes, eurToSacas, kgToBottles, MONTHS_SHORT, num, PALETE, SACA_KG, tidyDeep } from '../../lib/format';
+import { eurToKg, eurToPaletes, eurToSacas, kgToLitres, MONTHS_SHORT, num, PALETE, SACA_KG, tidyDeep } from '../../lib/format';
 
 /* =====================================================================
    Baralho do simulador: os lotes de cenário (SIM_LOTS), os acontecimentos
@@ -44,10 +44,12 @@ const LOCAL_EVENTS: SimEvent[] = tidyDeep([
 export const DECK_EVENTS: SimEvent[] = [...SIM_EVENTS, ...LOCAL_EVENTS];
 
 /**
- * Âmbito de cada acontecimento: "mundo" atinge todos os lotes desse mercado
- * ao mesmo tempo (um choque de preço não escolhe lotes); "lote" atinge um só.
+ * Âmbito de cada acontecimento: "economia" atinge todos os mercados ao mesmo
+ * tempo (uma recessão não escolhe mundos); "mundo" atinge todos os lotes
+ * desse mercado (um choque de preço não escolhe lotes); "lote" atinge um só.
  */
-export const EVENT_SCOPE: Record<string, 'mundo' | 'lote'> = {
+export const EVENT_SCOPE: Record<string, 'economia' | 'mundo' | 'lote'> = {
+  recessao: 'economia',
   'choque-preco': 'mundo',
   'choque-kc': 'mundo',
   'colheita-fraca': 'mundo',
@@ -59,6 +61,10 @@ export const EVENT_SCOPE: Record<string, 'mundo' | 'lote'> = {
   'atraso-vendas': 'lote',
   'quebra-qualidade': 'lote',
   'comprador-falha': 'lote',
+  'comprador-insolvente': 'lote',
+  'stock-danificado': 'lote',
+  derrame: 'lote',
+  humidade: 'lote',
   'procura-forte': 'lote',
 };
 
@@ -74,19 +80,19 @@ export const getSimLot = (id: string) => SCENARIO_LOTS.find((l) => l.id === id);
 
 /** Nome curto para listas apertadas. */
 export const SHORT_NAME: Record<string, string> = {
-  'sim-az-a': 'Azeite · Trás-os-Montes',
-  'sim-az-b': 'Azeite · Alentejo',
-  'sim-ag-a': 'Água mineral 1,5 L',
-  'sim-ag-b': 'Água de nascente 1,5 L',
+  'sim-az-a': 'Azeite · HoReCa',
+  'sim-az-b': 'Azeite · distribuidores',
+  'sim-ag-a': 'Água mineral (principal)',
+  'sim-ag-b': 'Água de nascente (principal)',
   'sim-cf-a': 'Café · Brasil',
 };
 export const shortName = (id: string) => SHORT_NAME[id] ?? getSimLot(id)?.nome ?? id;
 
-/** Margem bruta do lote (antes da partilha 65/35), a partir da margem dos co-financiadores. */
-export const grossMarginOf = (lot: SimLot, investorShare: number) => lot.expectedMargin / investorShare;
+/** Margem bruta do lote (antes da partilha 50/20/30), a partir da margem dos cofinanciadores. */
+export const grossMarginOf = (lot: SimLot) => lot.expectedMargin / INVESTOR_SHARE;
 
 /** Preço de venda base ao comprador (€/kg ou €/L). */
-export const buyerPriceOf = (lot: SimLot, investorShare: number) => lot.fundingPrice * (1 + grossMarginOf(lot, investorShare));
+export const buyerPriceOf = (lot: SimLot) => lot.fundingPrice * (1 + grossMarginOf(lot));
 
 /* ------------------------------------------------------------ calendário */
 
@@ -146,7 +152,7 @@ export interface SimPhysical {
 export function simPhysical(lot: SimLot, amount: number): SimPhysical {
   if (lot.world === 'azeite') {
     const kgv = eurToKg(amount, lot.fundingPrice);
-    return { units: kgv, unitLabel: 'kg', primary: `${num(kgv)}\u00a0kg`, secondary: `≈\u00a0${num(kgToBottles(kgv))}\u00a0garrafas de 0,75\u00a0L` };
+    return { units: kgv, unitLabel: 'kg', primary: `${num(kgv)}\u00a0kg`, secondary: `≈\u00a0${num(Math.floor(kgToLitres(kgv) / 5))}\u00a0garrafões de 5\u00a0L` };
   }
   if (lot.world === 'agua') {
     const paletes = eurToPaletes(amount, lot.fundingPrice);

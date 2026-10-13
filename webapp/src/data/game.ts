@@ -13,22 +13,36 @@ export const LEVELS: KnowledgeLevel[] = [
   { id: 'mestre', nome: 'Mestre de campanha', minPoints: 600, description: 'Conhece os três mundos e já jogou campanhas com perda e com ganho.' },
 ];
 
-/** Pontos atribuídos por completar uma campanha no simulador (uma vez). */
-export const SIM_COMPLETE_POINTS = 20;
+/**
+ * Pontos extra por completar uma campanha no simulador. Fica a 0: o simulador paga só os
+ * pontos da missão «Joga uma campanha completa no simulador» (q-simulador), uma vez.
+ */
+export const SIM_COMPLETE_POINTS = 0;
 
 /* ------------------------------------------------------------ selos */
 
+/** Campanhas encerradas: os seus selos já não se ganham e não contam para a completude do caderno. */
+export const CLOSED_CAMPAIGNS = ['2024/25', '2025/26'];
+export const CLOSED_CAMPAIGN_LABEL = 'Campanha encerrada';
+
+/**
+ * Selos de origem. Todos os selos de campanhas em curso ou futuras ganham-se por diligência
+ * (missões próprias, diferentes dos passos obrigatórios do compromisso) ou por compromisso num
+ * lote aberto da origem. A água não tem lotes financiáveis: os seus selos são só de diligência.
+ */
 export const SEALS: OriginSealDef[] = [
-  { id: 'seal-gardunha-2526', producerId: 'lagar-serra-gardunha', regionId: 'beira-interior', world: 'azeite', campanha: '2025/26', initials: 'SG', earnable: 'compromisso', questIds: [] },
-  { id: 'seal-fontefria-2526', producerId: 'aguas-fonte-fria', regionId: 'beira-interior', world: 'agua', campanha: '2025/26', initials: 'FF', earnable: 'compromisso', questIds: [] },
-  { id: 'seal-monteclaro-2526', producerId: 'herdade-monte-claro', regionId: 'ribatejo', world: 'azeite', campanha: '2025/26', initials: 'MC', earnable: 'compromisso', questIds: [] },
-  { id: 'seal-ribeira-2627', producerId: 'lagar-ribeira-alta', regionId: 'tras-os-montes', world: 'azeite', campanha: '2026/27', initials: 'RA', earnable: 'ambos', questIds: ['q-analise-az021', 'q-riscos-az021'] },
-  { id: 'seal-guadiana-2627', producerId: 'olival-guadiana', regionId: 'alentejo', world: 'azeite', campanha: '2026/27', initials: 'OG', earnable: 'compromisso', questIds: [] },
-  { id: 'seal-gardunha-2627', producerId: 'lagar-serra-gardunha', regionId: 'beira-interior', world: 'azeite', campanha: '2026/27', initials: 'SG', earnable: 'compromisso', questIds: [] },
-  { id: 'seal-fontefria-2627', producerId: 'aguas-fonte-fria', regionId: 'beira-interior', world: 'agua', campanha: '2026/27', initials: 'FF', earnable: 'ambos', questIds: ['q-analise-ag007', 'q-riscos-ag007'] },
+  { id: 'seal-gardunha-2526', producerId: 'lagar-serra-gardunha', regionId: 'beira-interior', world: 'azeite', campanha: '2025/26', initials: 'SG', earnable: 'compromisso', questIds: [], closed: true },
+  { id: 'seal-monteclaro-2526', producerId: 'herdade-monte-claro', regionId: 'ribatejo', world: 'azeite', campanha: '2025/26', initials: 'MC', earnable: 'compromisso', questIds: [], closed: true },
+  { id: 'seal-ribeira-2627', producerId: 'lagar-ribeira-alta', regionId: 'tras-os-montes', world: 'azeite', campanha: '2026/27', initials: 'RA', earnable: 'ambos', questIds: ['q-origem-ribeira', 'q-modulo-categorias'] },
+  { id: 'seal-guadiana-2627', producerId: 'olival-guadiana', regionId: 'alentejo', world: 'azeite', campanha: '2026/27', initials: 'OG', earnable: 'ambos', questIds: ['q-origem-guadiana', 'q-modulo-cobertura'] },
+  { id: 'seal-gardunha-2627', producerId: 'lagar-serra-gardunha', regionId: 'beira-interior', world: 'azeite', campanha: '2026/27', initials: 'SG', earnable: 'ambos', questIds: ['q-origem-gardunha', 'q-painel-3'] },
+  { id: 'seal-fontefria-2627', producerId: 'aguas-fonte-fria', regionId: 'beira-interior', world: 'agua', campanha: '2026/27', initials: 'FF', earnable: 'diligencia', questIds: ['q-analise-ag007', 'q-modulo-agua'] },
   { id: 'seal-serraverde-2627', producerId: 'nascente-serra-verde', regionId: 'minho', world: 'agua', campanha: '2026/27', initials: 'SV', earnable: 'diligencia', questIds: ['q-serra-verde', 'q-rotulo-3'] },
   { id: 'seal-altomogiana-2728', producerId: 'fazenda-alto-mogiana', regionId: 'alta-mogiana', world: 'cafe', campanha: '2027/28', initials: 'AM', earnable: 'diligencia', questIds: ['q-origens-cafe', 'q-cereja'] },
 ];
+
+/** O selo conta para a completude do caderno? Os de campanhas encerradas não. */
+export const countsTowardCompletion = (def: Pick<OriginSealDef, 'campanha' | 'closed'>) => !def.closed && !CLOSED_CAMPAIGNS.includes(def.campanha);
 
 /* ------------------------------------------------------------ módulos */
 
@@ -44,28 +58,28 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
       {
         heading: 'Um lote é mercadoria identificada',
         body: [
-          'Cada lote é uma quantidade concreta de produto, com origem, análise e local de armazenagem. Por exemplo: 24 000 kg de azeite virgem extra em 24 IBC selados no Lagar da Ribeira Alta.',
-          'Os co-financiadores pagam a compra ao produtor e os custos até à venda. A Sprout vende o lote a compradores B2B e, quando o comprador paga, liquida o lote.',
+          'Cada lote é uma quantidade concreta de produto, com origem, análise e local de armazenagem. Por exemplo: 24 000 kg de azeite virgem extra DOP Trás-os-Montes em 24 IBC selados no Lagar da Ribeira Alta.',
+          'Os cofinanciadores pagam a compra ao lagar e os custos até à venda, incluindo o embalamento num co-packer. A Sprout vende o lote embalado a compradores profissionais e, quando o comprador paga, liquida o lote.',
         ],
       },
       {
         heading: 'De onde vem a margem',
         body: [
-          'A Sprout compra diretamente ao produtor, sem embalador pelo meio, e vende ao comprador profissional abaixo da referência de mercado: o alvo é 10–15 %. O comprador paga menos; o produtor recebe mais cedo.',
-          'O que paga isto é o diferencial entre o preço a granel e o preço ao comprador, cerca de 1,28 €/kg no azeite hoje: embalamento, logística e margens de intermediação. A margem líquida do embalador é só uma parte, 0,19–0,50 €/kg. A tese dos fundadores (captar 80–90 % dessa margem) ainda está por validar no piloto.',
-          'A diferença entre o preço de venda e o custo total (aquisição, análises, armazenagem, seguro, logística e cobertura) é a margem bruta do lote. 65 % vai para os co-financiadores; o resto paga a operação e alimenta a reserva de primeira perda.',
+          'A Sprout compra azeite de origem identificada ao lagar, ao índice de origem a granel (≈ 3,50 €/kg) mais um prémio de 0,10–0,15 €/kg, e paga um co-packer para o embalar. Vende-o por dois canais: à HoReCa e a lojas gourmet 10 % abaixo de uma referência embalada (6,00 €/kg, ainda a validar no piloto), e a distribuidores e exportadores ao preço de saída do embalador (4,35 €/kg) mais um prémio de origem, sem desconto.',
+          'O que paga isto é o diferencial entre o granel e o preço embalado: embalamento (0,47–0,51 €/kg), logística e as margens dos intermediários. A margem líquida do embalador é só uma parte, 0,19–0,50 €/kg, e não chega sozinha para pagar um desconto de 10–15 %: a tese original dos fundadores está por validar.',
+          'A diferença entre o preço de venda e o custo total (aquisição, embalamento, logística, custódia, análises, seguros e provisões) é a margem bruta do lote: ≈ 0,60 €/kg na HoReCa e ≈ 0,20 €/kg nos distribuidores, no plano. 50 % vai para os cofinanciadores, 20 % paga a operação da Sprout e 30 % entra na reserva comum de primeira perda.',
         ],
       },
       {
         heading: 'O que pode correr mal',
         body: [
-          'O preço pode cair, o azeite pode perder categoria, a venda pode atrasar e um comprador pode não pagar. O capital está em risco e não há garantia de resultado.',
+          'O índice de origem pode cair, o azeite pode perder categoria, a venda pode atrasar e um comprador pode cancelar ou não pagar. A reserva comum só tem o que os lotes liquidados lhe deram e pode esgotar-se. O capital está em risco e não há garantia de resultado.',
         ],
       },
     ],
     quiz: [
-      { id: 'q1', prompt: 'O que financia um co-financiador?', options: ['A compra de mercadoria física identificada e os custos até à venda', 'Ações da Sprout', 'Um fundo de índices de matérias-primas', 'Um depósito com taxa fixa'], correct: 0, explanation: 'O dinheiro paga a compra do lote ao produtor e os custos até à venda ao comprador B2B.' },
-      { id: 'q2', prompt: 'A que preço vende a Sprout ao comprador B2B?', options: ['Ao preço de referência', '10–15 % abaixo da referência de mercado', '10–15 % acima da referência', 'Ao preço que o produtor definir'], correct: 1, explanation: 'É o alvo do piloto: sem embalamento nem intermediários, parte do diferencial granel → comprador passa para o comprador. Está por validar com cotações reais.' },
+      { id: 'q1', prompt: 'O que financia um cofinanciador?', options: ['A compra de mercadoria física identificada e os custos até à venda', 'Ações da Sprout', 'Um fundo de índices de matérias-primas', 'Um depósito com taxa fixa'], correct: 0, explanation: 'O dinheiro paga a compra do lote ao produtor e os custos até à venda ao comprador B2B.' },
+      { id: 'q2', prompt: 'A que preço vende a Sprout o azeite à HoReCa?', options: ['Ao preço do granel na origem', '10 % abaixo de uma referência HoReCa embalada', '10–15 % acima da referência', 'Ao preço que o lagar definir'], correct: 1, explanation: 'Embalado num co-packer, 10 % abaixo da referência HoReCa (6,00 €/kg no plano). Aos distribuidores vende ao preço de saída do embalador, sem desconto. A referência ainda tem de ser validada com cotações reais.' },
     ],
   },
   {
@@ -79,14 +93,14 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
       {
         heading: 'A janela de liquidação',
         body: [
-          'A janela conta 18 meses a partir do fecho do financiamento. A liquidação prevista acontece quando o lote está vendido e os compradores pagaram, o que pode ser antes do mês 18.',
+          'A janela conta 18 meses a partir do fecho do financiamento. A liquidação prevista acontece quando o lote está vendido e os compradores pagaram: num lote de distribuidores, com venda contratada, espera-se ao fim de 8 a 10 meses; num lote de HoReCa, que vende por tranches, ao fim de 10 a 12.',
           '"Liquidação prevista" é uma estimativa. Não é um prazo garantido nem um valor garantido.',
         ],
       },
       {
         heading: 'Extensão condicionada',
         body: [
-          'Se no mês 18 o preço de referência estiver 15 % ou mais abaixo do preço de entrada, ou se mais de 30 % do stock estiver por vender, a Tesouraria pode propor uma extensão de até 6 meses.',
+          'Se no mês 18 o índice de origem estiver 15 % ou mais abaixo do da abertura do lote, ou se mais de 30 % do stock estiver por vender, a Tesouraria pode propor uma extensão de até 6 meses. Cada lote escreve o seu limite em €/kg.',
           'A extensão é justificada por escrito, comunicada 30 dias antes do fim da janela e só acontece uma vez por lote. Durante a extensão, a armazenagem continua a custar dinheiro.',
         ],
       },
@@ -122,13 +136,13 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
         heading: 'Guardar sem luz nem ar',
         body: [
           'O azeite novo repousa em depósitos de inox, sob azoto, a 15–18 °C. Oxigénio, luz e calor fazem subir os peróxidos e o K232, e podem tirar ao azeite a categoria de virgem extra.',
-          'Num lote Sprout, o azeite passa para IBC de 1 000 kg selados com o número do lote, o que permite contá-lo e fotografá-lo em cada inventário.',
+          'Num lote Sprout, o azeite passa para IBC de 1 000 kg selados com o número do lote, o que permite contá-lo e fotografá-lo em cada inventário. O IBC é só a unidade de armazenagem: o azeite vende-se embalado, em garrafões de 5 L enchidos por tranches num co-packer.',
         ],
       },
     ],
     quiz: [
       { id: 'q1', prompt: 'Que defeito resulta de azeitona amontoada antes da moenda?', options: ['Ranço', 'Tulha', 'Metálico', 'Avinhado'], correct: 1, explanation: 'Tulha: fermentação anaeróbia da azeitona amontoada.' },
-      { id: 'q2', prompt: 'Quanto azeite leva um IBC?', options: ['100 kg', '500 kg', '1 000 kg', '25 000 kg'], correct: 2, explanation: 'Um IBC leva 1 000 kg, cerca de 1 092 litros de azeite.' },
+      { id: 'q2', prompt: 'Quanto azeite leva um IBC?', options: ['100 kg', '500 kg', '1 000 kg', '25 000 kg'], correct: 2, explanation: 'Um IBC leva 1 000 kg, cerca de 1 092 litros: dá para 218 garrafões de 5 L.' },
     ],
   },
   {
@@ -163,26 +177,26 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
     id: 'm-cobertura-azeite',
     world: 'azeite',
     title: 'Cobertura de preço no azeite',
-    summary: 'Sem futuros líquidos, a cobertura faz-se com vendas a prazo e indexação.',
+    summary: 'Sem futuros, a cobertura faz-se vendendo antes de comprar.',
     minutes: 6,
     points: 40,
     sections: [
       {
         heading: 'Vender antes de vender',
         body: [
-          'Não há um mercado de futuros líquido para azeite. A forma mais direta de fixar preço é vender a prazo: um comprador compromete-se hoje a comprar uma parte do lote, a um preço fixo, com entregas futuras.',
-          'O resto do lote fica indexado a uma referência pública de preços na origem: se o mercado cair, o preço de venda acompanha, e a margem encolhe.',
+          'Não há mercado de futuros para azeite: o de Jaén (MFAO) fechou em 2017. A forma de fixar preço é vender antes de comprar: nos lotes de distribuidores, pelo menos 85 % do volume fica contratado a preço fixo antes da compra ao lagar; nos lotes de HoReCa, uma parte vende-se a prazo a um grossista.',
+          'O resto do lote vende-se ao preço do mês, que acompanha o índice de origem: se o índice cair, o preço de venda cai com ele e a margem encolhe.',
         ],
       },
       {
         heading: 'Gatilhos',
         body: [
-          'Cada lote tem gatilhos escritos: por exemplo, se a referência descer abaixo de 4,10 €/kg, a cobertura sobe de 50 % para 70 %. Cobrir mais custa margem e reduz o ganho se o preço subir.',
+          'Cada lote tem gatilhos escritos: no AZ-2026-021, se o índice de origem descer abaixo de 3,15 €/kg, a venda a prazo sobe de 40 % para 60 %. Cobrir mais fixa o preço e tira o ganho se o índice subir.',
         ],
       },
     ],
     quiz: [
-      { id: 'q1', prompt: 'Como se cobre o preço de um lote de azeite?', options: ['Futuros de azeite em bolsa', 'Venda a prazo a compradores e indexação', 'Seguro de colheita', 'Não se cobre'], correct: 1, explanation: 'Vendas a prazo com preço fixado e cláusulas de indexação.' },
+      { id: 'q1', prompt: 'Como se cobre o preço de um lote de azeite?', options: ['Futuros de azeite em bolsa', 'Venda contratada antes da compra e venda a prazo', 'Seguro de colheita', 'Não se cobre'], correct: 1, explanation: 'Contratos a preço fixo com distribuidores e vendas a prazo na HoReCa. Não há futuros de azeite.' },
       { id: 'q2', prompt: 'O que acontece à cobertura se o preço subir muito?', options: ['Aumenta o ganho', 'Limita o ganho na parte coberta', 'Desaparece', 'Passa a garantir o capital'], correct: 1, explanation: 'A parte vendida a prazo fica ao preço fixado: protege na descida, limita na subida.' },
     ],
   },
@@ -218,7 +232,7 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
     id: 'm-agua-logistica',
     world: 'agua',
     title: 'Logística da água: paletes, prazos e custos',
-    summary: 'Porque é que a margem da água se joga no camião e no armazém.',
+    summary: 'Porque é que a água entra como cesto, com comissão, e não como lote financiado.',
     minutes: 5,
     points: 30,
     sections: [
@@ -226,14 +240,14 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
         heading: 'A palete',
         body: [
           'Uma palete de 1,5 L leva 84 packs de 6 garrafas: 504 garrafas, 756 litros. Um lote de 320 paletes são 241 920 litros.',
-          'Com uma margem de 2–3 cêntimos por litro, o transporte e o armazém pesam muito. Por isso o preço do frete fica fixado no contrato com o comprador.',
+          'A logística pesa 20–40 % do valor ex-fábrica. Como principal, a Sprout pagaria o transporte e adiantaria o depósito SDR numa margem de cêntimos por litro. Por isso a água entra como cesto: o engarrafador vende, fatura e entrega aos clientes HoReCa que já compram azeite, e a Sprout recebe 2 % de comissão. Não há lotes de água para financiar.',
         ],
       },
       {
         heading: 'Sazonalidade e depósito',
         body: [
           'A procura concentra-se entre maio e setembro. As linhas enchem stock no inverno, e é esse stock que se financia.',
-          'Desde 10/04/2026 cada embalagem paga um depósito de 0,10 € no sistema de depósito e reembolso (SDR). Não é margem: passa pelo preço e volta ao consumidor que devolve a garrafa.',
+          'Desde 10/04/2026 cada embalagem paga um depósito de 0,10 € no sistema de depósito e reembolso (SDR). Não é margem: passa pelo preço e volta ao consumidor que devolve a garrafa, mas alguém tem de o adiantar. No modelo de agente é o engarrafador.',
         ],
       },
     ],
@@ -254,14 +268,14 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
         heading: 'Da cereja ao grão verde',
         body: [
           'A cereja é colhida, seca ou despolpada e lavada, e descascada até ficar o grão verde. Lavado, natural e honey são os três processos principais; cada um muda o perfil na chávena.',
-          'O café verde viaja em sacas de juta de 60 kg, com humidade entre 10 e 12 %.',
+          'O café verde viaja em sacas de juta de 60 kg, com humidade entre 8 e 12,5 % (norma ICO).',
         ],
       },
       {
         heading: 'Preço e cobertura',
         body: [
           'O arábica forma preço no contrato de futuros ICE KC, em cêntimos de dólar por libra; cada contrato são 37 500 libras, cerca de 17 toneladas. O café físico negoceia-se com um diferencial sobre o KC.',
-          'Como há futuros líquidos, um lote de café pode cobrir 80 % do preço com venda de futuros enquanto o físico não é vendido. Falta cobrir o câmbio: o café paga-se em dólares.',
+          'Os futuros só compensam acima de 50–100 t por ano. Abaixo disso, o plano é comprar o verde em EUR, a preço fixo, a um importador da UE que seja o operador EUDR, contratar parte da venda às torrefações e cobrir o câmbio com um forward EUR/USD.',
         ],
       },
     ],
@@ -293,7 +307,7 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
       },
     ],
     quiz: [
-      { id: 'q1', prompt: 'Onde fica o dinheiro de um co-financiador?', options: ['Na conta corrente da Sprout', 'Numa conta segregada num PSP licenciado na UE', 'Em numerário no produtor', 'Numa carteira de criptoativos'], correct: 1, explanation: 'Conta segregada num prestador licenciado na UE.' },
+      { id: 'q1', prompt: 'Onde fica o dinheiro de um cofinanciador?', options: ['Na conta corrente da Sprout', 'Numa conta segregada num PSP licenciado na UE', 'Em numerário no produtor', 'Numa carteira de criptoativos'], correct: 1, explanation: 'Conta segregada num prestador licenciado na UE.' },
       { id: 'q2', prompt: 'Com que frequência se reconciliam as contas?', options: ['Mensalmente', 'Trimestralmente', 'Diariamente', 'No fim do lote'], correct: 2, explanation: 'A reconciliação é diária.' },
     ],
   },
@@ -309,13 +323,13 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
         heading: 'O que diz o Regulamento (UE) 2020/1503',
         body: [
           'As plataformas europeias de crowdfunding têm de fazer, a investidores não sofisticados, um teste de conhecimentos de entrada e de lhes pedir uma simulação da capacidade de suportar perdas, calculada como 10 % do património líquido.',
-          'O regulamento prevê ainda um período de reflexão pré-contratual de 4 dias e um aviso quando o investimento passa de 1 000 € ou de 5 % do património líquido.',
+          'O regulamento prevê ainda um período de reflexão pré-contratual de 4 dias e um aviso quando o investimento passa do maior de dois valores: 1 000 € ou 5 % do património líquido.',
         ],
       },
       {
         heading: 'Como aplicamos isto no piloto',
         body: [
-          'O piloto está fechado a investidores qualificados, a quem estas regras não se aplicam da mesma forma. Mesmo assim, o Simulador de campanha mostra, com dinheiro fictício, campanhas que acabam em perda, e faz parte do percurso antes do primeiro compromisso.',
+          'O piloto está fechado a investidores profissionais e qualificados e não é uma plataforma ECSP: estas regras não se aplicam. O Simulador de campanha segue o espírito delas, com dinheiro fictício e campanhas que acabam em perda, mas não substitui o teste nem a simulação legais. Se o retalho entrar um dia, será através de uma plataforma ECSP autorizada, que faz esse teste.',
         ],
       },
     ],
@@ -329,19 +343,25 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
 /* ------------------------------------------------------------ missões */
 
 export const QUESTS: Quest[] = tidyDeep([
-  { id: 'q-painel-3', title: 'Identifica 3 atributos no painel de prova', description: 'No mini-jogo Painel de prova, associa à primeira três descrições sensoriais ao atributo ou defeito certo.', world: 'azeite', points: 20, criteria: { type: 'manual' }, href: '/academia#painel-prova' },
+  { id: 'q-painel-3', title: 'Identifica 3 atributos no painel de prova', description: 'No mini-jogo Painel de prova, associa à primeira três descrições sensoriais ao atributo ou defeito certo.', world: 'azeite', points: 20, sealId: 'seal-gardunha-2627', criteria: { type: 'manual' }, href: '/academia#painel-prova' },
   { id: 'q-extensao', title: 'Percebe o que acontece numa extensão', description: 'Completa o módulo sobre o ciclo de 18 meses.', world: 'geral', points: 15, criteria: { type: 'module', moduleId: 'm-ciclo-18m' }, href: '/academia#m-ciclo-18m' },
-  { id: 'q-comparar-preco', title: 'Compara o preço de entrada com a referência', description: 'No mundo do azeite, vê quanto abaixo da referência é vendido um lote aberto.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/mercados/azeite' },
+  { id: 'q-comparar-preco', title: 'Compara o granel com o preço ao comprador', description: 'No mundo do azeite, vê quanto vale o azeite a granel na origem e quanto paga o comprador pelo mesmo azeite embalado.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/mercados/azeite' },
   { id: 'q-cobertura', title: 'Encontra a cobertura de preço de um lote de azeite', description: 'Abre um lote de azeite e lê a secção de cobertura.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/lote/AZ-2026-021#cobertura' },
-  { id: 'q-analise-az021', title: 'Lê o boletim de análises do AZ-2026-021', description: 'Abre o boletim do lote e confirma em que categoria o azeite está.', world: 'azeite', points: 15, lotId: 'AZ-2026-021', sealId: 'seal-ribeira-2627', criteria: { type: 'analysis-read', lotId: 'AZ-2026-021' }, href: '/lote/AZ-2026-021#analises' },
-  { id: 'q-riscos-az021', title: 'Lê os 6 fatores de risco do AZ-2026-021', description: 'Abre cada fator de risco do lote antes de decidir.', world: 'azeite', points: 15, lotId: 'AZ-2026-021', sealId: 'seal-ribeira-2627', criteria: { type: 'risk-read', lotId: 'AZ-2026-021' }, href: '/lote/AZ-2026-021#riscos' },
+  { id: 'q-analise-az021', title: 'Lê o boletim de análises do AZ-2026-021', description: 'Abre o boletim do lote e confirma em que categoria o azeite está.', world: 'azeite', points: 15, lotId: 'AZ-2026-021', criteria: { type: 'analysis-read', lotId: 'AZ-2026-021' }, href: '/lote/AZ-2026-021#analises' },
+  { id: 'q-riscos-az021', title: 'Lê os 6 fatores de risco do AZ-2026-021', description: 'Abre cada fator de risco do lote antes de decidir.', world: 'azeite', points: 15, lotId: 'AZ-2026-021', criteria: { type: 'risk-read', lotId: 'AZ-2026-021' }, href: '/lote/AZ-2026-021#riscos' },
+  { id: 'q-origem-ribeira', title: 'Explora a origem do Lagar da Ribeira Alta', description: 'No mapa do Olival, abre Trás-os-Montes e a ficha do lagar: socalcos de xisto, Verdeal e DOP.', world: 'azeite', points: 10, sealId: 'seal-ribeira-2627', criteria: { type: 'region-visit', regionId: 'tras-os-montes' }, href: '/mercados/azeite' },
+  { id: 'q-modulo-categorias', title: 'Aprende a ler um boletim de azeite', description: 'Completa o módulo Categorias e análises do azeite.', world: 'azeite', points: 15, sealId: 'seal-ribeira-2627', criteria: { type: 'module', moduleId: 'm-categorias-azeite' }, href: '/academia#m-categorias-azeite' },
+  { id: 'q-origem-guadiana', title: 'Explora a origem do Olival do Guadiana', description: 'No mapa do Olival, abre o Alentejo e a ficha do produtor.', world: 'azeite', points: 10, sealId: 'seal-guadiana-2627', criteria: { type: 'region-visit', regionId: 'alentejo' }, href: '/mercados/azeite' },
+  { id: 'q-modulo-cobertura', title: 'Percebe como se cobre o preço do azeite', description: 'Completa o módulo Cobertura de preço no azeite.', world: 'azeite', points: 15, sealId: 'seal-guadiana-2627', criteria: { type: 'module', moduleId: 'm-cobertura-azeite' }, href: '/academia#m-cobertura-azeite' },
+  { id: 'q-origem-gardunha', title: 'Explora a origem do Lagar Serra da Gardunha', description: 'No mapa do Olival, abre a Beira Interior e a ficha do lagar.', world: 'azeite', points: 10, sealId: 'seal-gardunha-2627', criteria: { type: 'region-visit', regionId: 'beira-interior' }, href: '/mercados/azeite' },
   { id: 'q-analise-ag007', title: 'Lê o boletim de análises do AG-2026-007', description: 'Confirma a mineralização e a conformidade microbiológica do lote.', world: 'agua', points: 15, lotId: 'AG-2026-007', sealId: 'seal-fontefria-2627', criteria: { type: 'analysis-read', lotId: 'AG-2026-007' }, href: '/lote/AG-2026-007#analises' },
-  { id: 'q-riscos-ag007', title: 'Lê os 5 fatores de risco do AG-2026-007', description: 'Abre cada fator de risco do lote de água.', world: 'agua', points: 15, lotId: 'AG-2026-007', sealId: 'seal-fontefria-2627', criteria: { type: 'risk-read', lotId: 'AG-2026-007' }, href: '/lote/AG-2026-007#riscos' },
+  { id: 'q-riscos-ag007', title: 'Lê os 5 pontos de atenção do AG-2026-007', description: 'Abre cada ponto de atenção do lote de água: modelo de agente, procura, SDR, conservação e crédito.', world: 'agua', points: 15, lotId: 'AG-2026-007', criteria: { type: 'risk-read', lotId: 'AG-2026-007' }, href: '/lote/AG-2026-007#riscos' },
+  { id: 'q-modulo-agua', title: 'Distingue água mineral natural de água de nascente', description: 'Completa o módulo Água mineral natural e água de nascente.', world: 'agua', points: 10, sealId: 'seal-fontefria-2627', criteria: { type: 'module', moduleId: 'm-agua-tipos' }, href: '/academia#m-agua-tipos' },
   { id: 'q-rotulo-3', title: 'Classifica 3 águas no Lê o rótulo', description: 'Acerta a classificação de três rótulos de água.', world: 'agua', points: 20, sealId: 'seal-serraverde-2627', criteria: { type: 'minigame', gameId: 'le-o-rotulo', minScore: 3 }, href: '/academia#le-o-rotulo' },
   { id: 'q-serra-verde', title: 'Visita a Nascente da Serra Verde no mapa', description: 'No mundo da água, abre a região do Minho e a ficha do produtor.', world: 'agua', points: 10, sealId: 'seal-serraverde-2627', criteria: { type: 'region-visit', regionId: 'minho' }, href: '/mercados/agua' },
   { id: 'q-simulador', title: 'Joga uma campanha completa no simulador', description: 'Distribui o orçamento fictício, joga os 18 meses e lê o balanço final.', world: 'geral', points: 25, criteria: { type: 'sim-complete' }, href: '/academia/simulador' },
-  { id: 'q-origens-cafe', title: 'Explora as origens de café', description: 'Entra em A Plantação: o mapa mostra as origens em avaliação para a Fase 2.', world: 'cafe', points: 10, sealId: 'seal-altomogiana-2728', criteria: { type: 'world-visit', worldId: 'cafe' }, href: '/mercados/cafe' },
-  { id: 'q-cereja', title: 'Ordena as etapas da cereja à chávena', description: 'No mini-jogo Da cereja à chávena, acerta pelo menos 4 respostas.', world: 'cafe', points: 20, sealId: 'seal-altomogiana-2728', criteria: { type: 'minigame', gameId: 'cereja-chavena', minScore: 4 }, href: '/academia#cereja-chavena' },
+  { id: 'q-origens-cafe', title: 'Explora as origens de café', description: 'Entra em A Plantação: o mapa mostra as origens em diligência para a Fase 2.', world: 'cafe', points: 10, sealId: 'seal-altomogiana-2728', criteria: { type: 'world-visit', worldId: 'cafe' }, href: '/mercados/cafe' },
+  { id: 'q-cereja', title: 'Acerta 4 respostas no Da cereja à chávena', description: 'No mini-jogo Da cereja à chávena, acerta pelo menos 4 respostas sobre as etapas do café.', world: 'cafe', points: 20, sealId: 'seal-altomogiana-2728', criteria: { type: 'minigame', gameId: 'cereja-chavena', minScore: 4 }, href: '/academia#cereja-chavena' },
   { id: 'q-primeira-extracao', title: 'Acompanha a primeira extração da campanha', description: 'Segue no Diário de campanha três leituras de telemetria dos depósitos dos lagares, em direto.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/#diario' },
   { id: 'q-contas', title: 'Percebe para onde vai o dinheiro', description: 'Completa o módulo sobre PSP, contas segregadas e reconciliação.', world: 'geral', points: 10, criteria: { type: 'module', moduleId: 'm-rails' }, href: '/academia#m-rails' },
 ]);
@@ -385,8 +405,8 @@ export const LEVEL_PERKS: Record<LevelId, { short: string; unlocks: string[] }> 
     unlocks: ['Certificado de Provador', 'Prova guiada online com o mestre lagareiro, em sessões mensais durante a campanha'],
   },
   lagareiro: {
-    short: 'relatório técnico completo dos lotes e visita ao lagar na campanha',
-    unlocks: ['Relatório técnico completo dos lotes: boletins integrais, atas do painel e inventários fotográficos', 'Visita ao lagar durante a colheita'],
+    short: 'leitura técnica anotada de um lote e visita ao lagar na campanha',
+    unlocks: ['Leitura técnica anotada de um lote, por vídeo, com o laboratório e o responsável de qualidade', 'Visita ao lagar durante a colheita'],
   },
   mestre: {
     short: 'sessão com a equipa de risco e prova de cafés de origem antes da Fase 2',
@@ -401,7 +421,7 @@ export const REWARDS: RewardDef[] = tidyDeep([
     title: 'Amostra do lote que acompanhas',
     what: 'Um frasco de 250 ml de azeite, ou uma garrafa de água, do próprio lote, com o boletim de análises impresso.',
     unlock: { participation: true },
-    unlockText: 'Para quem co-financia o lote, seja qual for o montante',
+    unlockText: 'Para quem cofinancia o lote, seja qual for o montante',
     action: 'Pedir amostra',
     kind: 'amostra',
     places: [
@@ -437,13 +457,13 @@ export const REWARDS: RewardDef[] = tidyDeep([
   },
   {
     id: 'relatorio',
-    title: 'Relatório técnico completo dos lotes',
-    what: 'Boletins integrais do laboratório, atas do painel de prova e o inventário fotográfico de cada IBC ou palete.',
+    title: 'Leitura técnica anotada de um lote',
+    what: 'Uma sessão de 45 minutos por vídeo com o laboratório e o responsável de qualidade: como se lê cada parâmetro do boletim, o que dizem as atas do painel e o que se procura num inventário fotográfico. Os boletins integrais, as atas e os inventários estão abertos a quem estuda ou cofinancia o lote, em qualquer nível.',
     unlock: { level: 'lagareiro' },
     unlockText: 'Nível Lagareiro',
-    action: 'Pedir relatório',
+    action: 'Pedir sessão',
     kind: 'relatorio',
-    after: 'Segue para o email registado em até 2 dias úteis.',
+    after: 'A equipa propõe duas datas por email em até 2 dias úteis.',
   },
   {
     id: 'visita-lagar',

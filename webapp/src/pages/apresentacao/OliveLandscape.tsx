@@ -6,9 +6,10 @@ import { clamp01 } from './model';
 
 /* =====================================================================
    Paisagem do olival, desenhada à mão em SVG geométrico: curvas de nível,
-   filas de oliveiras como grelha de pontos em perspetiva, o lagar com os
-   quatro depósitos de inox, IBC de 1 000 kg numa palete e o camião que
-   sai para o comprador. Três camadas com o mesmo viewBox; as duas do fundo
+   filas de oliveiras como grelha de pontos em perspetiva, o lagar (moega de
+   receção, tapete elevador, venezianas, porta de cargas) com os quatro
+   depósitos de inox, IBC de 1 000 kg numa palete e o camião (cabina e caixa)
+   que sai para o cliente. Três camadas com o mesmo viewBox; as duas do fundo
    têm parallax decorativo (desligado < 900 px e com movimento reduzido).
    ===================================================================== */
 
@@ -18,8 +19,11 @@ export const LS_H = 520;
 /** Colunas das etiquetas (em fração da largura) e x dos fios que lhes chegam. */
 export const LABEL_COLUMNS = [0.57, 0.7133, 0.8567] as const;
 const LEADER_X = LABEL_COLUMNS.map((c) => Math.round(c * LS_W) + 3);
-/** Base das etiquetas (y no viewBox): os fios param 8 unidades abaixo. */
-export const LABEL_BASE_Y = 150;
+/**
+ * Topo comum das etiquetas (y no viewBox): as três alinham pelo topo, numa só
+ * linha, e o fio de cada uma sobe pela margem esquerda até ao título.
+ */
+export const LABEL_TOP_Y = 66;
 
 const smooth = (a: number, b: number, x: number) => {
   const t = clamp01((x - a) / (b - a));
@@ -145,12 +149,12 @@ export function OliveLandscape({ deposits, leaders = true, crop = false, childre
         <Truck />
         {leaders && (
           <g stroke="var(--ls-line)" strokeWidth="1" fill="var(--ls-line)">
-            <line x1={LEADER_X[0]} y1={348} x2={LEADER_X[0]} y2={LABEL_BASE_Y + 8} />
+            <line x1={LEADER_X[0]} y1={348} x2={LEADER_X[0]} y2={LABEL_TOP_Y + 4} />
             <circle cx={LEADER_X[0]} cy={350} r="2.5" stroke="none" />
-            <line x1={LEADER_X[1]} y1={356} x2={LEADER_X[1]} y2={LABEL_BASE_Y + 8} />
+            <line x1={LEADER_X[1]} y1={356} x2={LEADER_X[1]} y2={LABEL_TOP_Y + 4} />
             <circle cx={LEADER_X[1]} cy={358} r="2.5" stroke="none" />
-            <line x1={LEADER_X[2]} y1={400} x2={LEADER_X[2]} y2={LABEL_BASE_Y + 8} />
-            <circle cx={LEADER_X[2]} cy={402} r="2.5" stroke="none" />
+            <line x1={LEADER_X[2]} y1={396} x2={LEADER_X[2]} y2={LABEL_TOP_Y + 4} />
+            <circle cx={LEADER_X[2]} cy={398} r="2.5" stroke="none" />
           </g>
         )}
       </svg>
@@ -167,14 +171,38 @@ function Lagar() {
   // o vértice do telhado fica no fio da primeira etiqueta
   const ax = LEADER_X[0];
   const x0 = ax - 64;
+  const wall = 'color-mix(in oklab, var(--fg) 4%, var(--surface))';
+  const dark = 'color-mix(in oklab, var(--fg) 18%, var(--surface))';
   return (
     <g>
-      <rect x={x0 + 46} y={354} width={11} height={24} fill="var(--surface)" {...STROKE} />
-      <rect x={x0} y={384} width={128} height={60} fill="var(--surface)" {...STROKE} />
-      <polygon points={`${x0 - 8},386 ${ax},350 ${x0 + 136},386`} fill="color-mix(in oklab, var(--fg) 12%, var(--surface))" {...STROKE} />
-      <rect x={x0 + 51} y={410} width={26} height={34} fill="color-mix(in oklab, var(--fg) 18%, var(--surface))" {...STROKE} />
-      <rect x={x0 + 12} y={398} width={22} height={14} fill="var(--ls-steel)" {...STROKE} />
-      <rect x={x0 + 94} y={398} width={22} height={14} fill="var(--ls-steel)" {...STROKE} />
+      {/* chaminé do aquecimento das termobatedeiras */}
+      <rect x={x0 + 96} y={352} width={9} height={24} fill="var(--surface)" {...STROKE} />
+      {/* nave: paredes e telhado de duas águas, baixo */}
+      <rect x={x0} y={382} width={128} height={62} fill={wall} {...STROKE} />
+      <polygon points={`${x0 - 8},384 ${ax},354 ${x0 + 136},384`} fill={dark} {...STROKE} />
+      {/* venezianas de ventilação na empena */}
+      <rect x={ax - 9} y={364} width={18} height={14} rx={1} fill="var(--surface)" {...STROKE} strokeWidth={1.1} />
+      {[367.5, 371, 374.5].map((y) => (
+        <line key={y} x1={ax - 7} x2={ax + 7} y1={y} y2={y} stroke="var(--ls-line)" strokeWidth="1" />
+      ))}
+      {/* porta de cargas de enrolar */}
+      <rect x={x0 + 70} y={402} width={40} height={42} fill={dark} {...STROKE} />
+      {[409, 416, 423, 430, 437].map((y) => (
+        <line key={y} x1={x0 + 72} x2={x0 + 108} y1={y} y2={y} stroke="var(--ls-line)" strokeWidth="0.9" opacity={0.7} />
+      ))}
+      {/* venezianas da nave */}
+      <rect x={x0 + 14} y={398} width={30} height={16} rx={1} fill="var(--surface)" {...STROKE} strokeWidth={1.1} />
+      {[402, 406, 410].map((y) => (
+        <line key={y} x1={x0 + 16} x2={x0 + 42} y1={y} y2={y} stroke="var(--ls-line)" strokeWidth="1" />
+      ))}
+      {/* moega de receção da azeitona e tapete elevador até à nave */}
+      <path d={`M${x0 - 46} 408 H${x0 - 14} L${x0 - 22} 424 H${x0 - 38} Z`} fill="var(--ls-steel)" {...STROKE} />
+      <path d={`M${x0 - 40} 424 V444 M${x0 - 20} 424 V444`} stroke="var(--ls-line)" strokeWidth="1.5" />
+      <path d={`M${x0 - 30} 418 L${x0 + 4} 390`} stroke="var(--ls-line)" strokeWidth="5" strokeLinecap="round" />
+      <path d={`M${x0 - 30} 418 L${x0 + 4} 390`} stroke="var(--surface)" strokeWidth="2.2" strokeLinecap="round" />
+      {[0.3, 0.55, 0.8].map((t) => (
+        <circle key={t} cx={x0 - 44 + 26 * t + 4} cy={410 + 2} r={2.2} fill="var(--ls-canopy)" />
+      ))}
     </g>
   );
 }
@@ -222,12 +250,20 @@ function IbcStack() {
 function Truck() {
   const ax = LEADER_X[2];
   const x0 = ax - 40;
+  const cab = x0 + 70;
   return (
     <g>
-      <rect x={x0} y={402} width={68} height={34} rx={2} fill="var(--surface)" {...STROKE} />
-      <path d={`M${x0 + 68} 412 H${x0 + 86} L${x0 + 94} 424 V436 H${x0 + 68} Z`} fill="var(--surface)" {...STROKE} />
-      <path d={`M${x0 + 72} 415 H${x0 + 84} L${x0 + 89} 423 H${x0 + 72} Z`} fill="var(--ls-steel)" {...STROKE} strokeWidth={1.1} />
-      {[x0 + 14, x0 + 50, x0 + 82].map((wx) => (
+      {/* chassis */}
+      <rect x={x0 - 2} y={433} width={100} height={4} rx={1} fill="var(--ls-line)" />
+      {/* caixa de carga, com as portas de trás */}
+      <rect x={x0} y={396} width={66} height={37} rx={2} fill="var(--surface)" {...STROKE} />
+      <path d={`M${x0 + 6} 396 V433 M${x0 + 33} 400 V429`} stroke="var(--ls-line)" strokeWidth="1" opacity={0.75} />
+      <path d={`M${x0 + 2} 425 H${x0 + 64}`} stroke="var(--ls-line)" strokeWidth="1" opacity={0.5} />
+      {/* cabina separada da caixa, com para-brisas inclinado */}
+      <path d={`M${cab} 433 V408 Q${cab} 405 ${cab + 3} 405 H${cab + 15} L${cab + 25} 419 V433 Z`} fill="color-mix(in oklab, var(--accent) 22%, var(--surface))" {...STROKE} />
+      <path d={`M${cab + 4} 409 H${cab + 14} L${cab + 20} 418 H${cab + 4} Z`} fill="var(--ls-steel)" {...STROKE} strokeWidth={1.1} />
+      <path d={`M${cab + 10} 422 H${cab + 15}`} stroke="var(--ls-line)" strokeWidth="1.2" />
+      {[x0 + 14, x0 + 50, cab + 15].map((wx) => (
         <circle key={wx} cx={wx} cy={441} r={6} fill="var(--ls-line)" stroke="var(--surface)" strokeWidth="1.5" />
       ))}
     </g>

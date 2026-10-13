@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
 import type { GaugeKind, WorldId } from '../../data/types';
 import { cn } from '../../lib/cn';
@@ -22,6 +22,11 @@ export interface LotGaugeProps {
   value: number;
   /** fatia destacada [de, até] em 0–1 (p.ex. o compromisso acabado de fazer) */
   highlight?: [number, number];
+  /**
+   * 'projected' (por omissão): a fatia desenha-se por cima do nível atual (pré-visualização).
+   * 'inside': a fatia faz parte do líquido e aparece à medida que o nível sobe (compromisso feito).
+   */
+  highlightMode?: 'projected' | 'inside';
   size?: keyof typeof SIZE_PX;
   /** nome acessível, p.ex. "Financiamento do lote AZ-2026-021" */
   label: string;
@@ -58,18 +63,19 @@ function useFill(value: number, progress: MotionValue<number> | undefined, anima
   return clamped;
 }
 
-export function LotGauge({ kind, value, highlight, size = 'md', label, valueText, progress, animateOnMount = false, showScale, caption, className }: LotGaugeProps) {
+export function LotGauge({ kind, value, highlight, highlightMode = 'projected', size = 'md', label, valueText, progress, animateOnMount = false, showScale, caption, className }: LotGaugeProps) {
   const k = resolveKind(kind);
   const world = WORLD_BY_KIND[k];
   const fill = useFill(value, progress, animateOnMount);
   const px = SIZE_PX[size];
   const scale = showScale ?? (size === 'lg' || size === 'xl');
   const text = valueText ?? `${Math.round(Math.max(0, Math.min(1, value)) * 100)} %`;
-  const vbW = k === 'ibc' && scale ? 214 : 200;
+  // a escala lateral do IBC (25 %, 50 %, 75 %) precisa de largura para o símbolo de percentagem
+  const vbW = k === 'ibc' && scale ? 228 : 200;
   return (
     <figure className={cn('inline-flex min-w-0 flex-col items-center gap-2', className)} data-world={world}>
       <svg role="img" aria-label={`${label}: ${text}`} viewBox={`0 0 ${vbW} 224`} width={(px * vbW) / 200} height={(px * 224) / 200} className="block h-auto max-w-full overflow-visible">
-        {k === 'ibc' && <IbcTank fill={fill} highlight={highlight} scale={scale} detail={size !== 'xs' && size !== 'sm'} />}
+        {k === 'ibc' && <IbcTank fill={fill} highlight={highlight} inside={highlightMode === 'inside'} scale={scale} detail={size !== 'xs' && size !== 'sm'} />}
         {k === 'pallet' && <PalletStack fill={fill} highlight={highlight} detail={size !== 'xs'} />}
         {k === 'sacks' && <SackStack fill={fill} highlight={highlight} detail={size !== 'xs'} />}
       </svg>
@@ -83,7 +89,8 @@ export function LotGauge({ kind, value, highlight, size = 'md', label, valueText
 const INK = 'var(--world-ink)';
 const BODY = 'var(--world)';
 const LINE = 'color-mix(in oklab, var(--fg) 55%, var(--surface))';
-const FAINT = 'color-mix(in oklab, var(--fg) 14%, var(--surface))';
+/** contorno das unidades por encher: ≥ 3:1 contra a superfície nos dois temas (é o medidor, não decoração) */
+const FAINT = 'color-mix(in oklab, var(--fg) 40%, var(--surface))';
 
 function PalletBase() {
   return (
@@ -109,16 +116,21 @@ function HatchDefs({ id }: { id: string }) {
 
 const TANK = { x: 24, y: 30, w: 152, h: 162 };
 
-function IbcTank({ fill, highlight, scale, detail }: { fill: MotionValue<number>; highlight?: [number, number]; scale: boolean; detail: boolean }) {
+function IbcTank({ fill, highlight, inside, scale, detail }: { fill: MotionValue<number>; highlight?: [number, number]; inside: boolean; scale: boolean; detail: boolean }) {
   const uid = useId().replace(/:/g, '');
   const levelY = useTransform(fill, (v) => TANK.y + TANK.h * (1 - v));
-  const reduce = useReducedMotion();
   const hl = highlight ? [Math.max(0, highlight[0]), Math.min(1, highlight[1])] : null;
+  // a fatia tracejada vive dentro do líquido: aparece à medida que o nível sobe (não tapa o enchimento)
+  const liquidClip = useRef<SVGRectElement>(null);
+  useMotionValueEvent(levelY, 'change', (y) => liquidClip.current?.setAttribute('y', y.toFixed(2)));
   return (
     <g>
       <defs>
         <clipPath id={`tank-${uid}`}>
           <rect x={TANK.x} y={TANK.y} width={TANK.w} height={TANK.h} rx="10" />
+        </clipPath>
+        <clipPath id={`liquid-${uid}`}>
+          <rect ref={liquidClip} x={TANK.x} y={levelY.get()} width={TANK.w} height={TANK.h + 4} />
         </clipPath>
         <HatchDefs id={`hatch-${uid}`} />
       </defs>
@@ -131,16 +143,10 @@ function IbcTank({ fill, highlight, scale, detail }: { fill: MotionValue<number>
         {/* menisco */}
         <motion.line x1={TANK.x} x2={TANK.x + TANK.w} stroke="color-mix(in oklab, var(--world) 55%, var(--surface))" strokeWidth="2" style={{ y: levelY }} y1={0} y2={0} />
         {hl && (
-          <motion.rect
-            x={TANK.x}
-            width={TANK.w}
-            fill={`url(#hatch-${uid})`}
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, ease: EASE_OUT }}
-            y={TANK.y + TANK.h * (1 - hl[1])}
-            height={Math.max(0, TANK.h * (hl[1] - hl[0]))}
-          />
+          <g clipPath={inside ? `url(#liquid-${uid})` : undefined}>
+            <rect x={TANK.x} width={TANK.w} fill={`url(#hatch-${uid})`} y={TANK.y + TANK.h * (1 - hl[1])} height={Math.max(0, TANK.h * (hl[1] - hl[0]))} />
+            <line x1={TANK.x} x2={TANK.x + TANK.w} y1={TANK.y + TANK.h * (1 - hl[0])} y2={TANK.y + TANK.h * (1 - hl[0])} stroke="var(--world-ink)" strokeWidth="1.25" strokeDasharray="4 3" />
+          </g>
         )}
       </g>
       {/* graduações impressas no IBC */}
@@ -156,8 +162,8 @@ function IbcTank({ fill, highlight, scale, detail }: { fill: MotionValue<number>
           return (
             <g key={t}>
               <line x1="186" x2="191" y1={y} y2={y} stroke={LINE} strokeWidth="1.25" />
-              <text x="194" y={y + 4} fontSize="11" fontFamily="var(--font-mono)" fill="var(--muted)">
-                {Math.round(t * 100)}
+              <text x="194" y={y + 4} fontSize="12" fontFamily="var(--font-mono)" fill="var(--muted)">
+                {Math.round(t * 100)}{'\u00a0'}%
               </text>
             </g>
           );

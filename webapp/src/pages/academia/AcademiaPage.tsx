@@ -89,7 +89,7 @@ export default function AcademiaPage() {
       <Section id="missoes" title="Missões de conhecimento" description="Pequenas tarefas de diligência. Cada uma tem um gatilho: o evento que a fecha no momento em que acontece." className="scroll-mt-20 pt-4">
         <div className="grid min-w-0 items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           <MissionsHub />
-          <aside className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-20" aria-label="Objetivo e regras das missões">
+          <section className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-20" aria-label="Objetivo e regras das missões">
             <LearningGoalPanel />
             <div className="px-1 text-sm">
               <h3 className="text-base">Como disparam as missões</h3>
@@ -98,7 +98,7 @@ export default function AcademiaPage() {
               </p>
               <p className="mt-1.5 text-fg">Nunca com depósitos, montantes ou volume investido.</p>
             </div>
-          </aside>
+          </section>
         </div>
       </Section>
 

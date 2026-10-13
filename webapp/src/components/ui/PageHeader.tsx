@@ -68,7 +68,7 @@ export function Section({ title, description, actions, children, className, id }
         <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           <div className="min-w-0 flex-[1_1_16rem]">
             {title && (
-              <h2 id={id ? `${id}-title` : undefined} className="text-[1.375rem] leading-tight">
+              <h2 id={id ? `${id}-title` : undefined} tabIndex={id ? -1 : undefined} className="text-[1.375rem] leading-tight outline-none">
                 {title}
               </h2>
             )}

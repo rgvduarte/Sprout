@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
 import { ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
 import { cn } from '../../lib/cn';
@@ -20,12 +20,13 @@ export interface NavChapter {
   count?: string;
 }
 
-export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; lotId: string; onGo: (id: string) => void }) {
+export function JornadaNav({ chapters, lotId, onGo, agent }: { chapters: NavChapter[]; lotId: string; onGo: (id: string) => void; agent?: boolean }) {
   const { scrollYProgress } = useScroll();
   const reduce = useReducedMotion();
   const smooth = useSpring(scrollYProgress, { stiffness: 220, damping: 40, restDelta: 0.001 });
   const [active, setActive] = useState(chapters[0]?.id);
   const ids = chapters.map((c) => c.id).join('|');
+  const listRef = useRef<HTMLOListElement>(null);
 
   useEffect(() => {
     const els = ids
@@ -44,6 +45,15 @@ export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; 
     return () => io.disconnect();
   }, [ids]);
 
+  // a lista larga nunca esconde um capítulo: o ativo fica sempre à vista dentro dela
+  useEffect(() => {
+    const list = listRef.current;
+    const btn = list?.querySelector<HTMLElement>('[aria-current="location"]');
+    if (!list || !btn || list.scrollWidth <= list.clientWidth) return;
+    const left = btn.offsetLeft - list.offsetLeft;
+    if (left < list.scrollLeft || left + btn.offsetWidth > list.scrollLeft + list.clientWidth) list.scrollTo({ left: Math.max(0, left - 24), behavior: 'auto' });
+  }, [active]);
+
   const idx = Math.max(0, chapters.findIndex((c) => c.id === active));
   const current = chapters[idx];
   const go = (i: number) => {
@@ -57,13 +67,14 @@ export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; 
   return (
     <nav
       aria-label={`Capítulos da jornada do lote ${lotId}`}
-      className="sticky z-10 border-b border-border bg-[color-mix(in_oklab,var(--bg)_95%,transparent)]"
+      data-chrome="jornada"
+      className="sticky z-10 border-b border-border bg-bg"
       style={{ top: TOPBAR_H, height: NAV_H }}
     >
       <motion.div aria-hidden className="absolute inset-x-0 bottom-[-1px] h-0.5 origin-left bg-world-ink" style={{ scaleX: reduce ? scrollYProgress : smooth }} />
       <div className="mx-auto flex h-full max-w-[1240px] items-center gap-2 px-2 sm:px-4 lg:px-6">
-        {/* telemóvel: capítulo atual + anterior/seguinte */}
-        <div className="flex min-w-0 items-center gap-1 md:hidden">
+        {/* até 1280 px: capítulo atual + anterior/seguinte (nenhum capítulo fica escondido numa lista cortada) */}
+        <div className="flex min-w-0 items-center gap-1 xl:hidden">
           <button type="button" onClick={() => go(idx - 1)} disabled={idx === 0} aria-label="Capítulo anterior" className="relative inline-flex size-9 items-center justify-center rounded-sm text-fg after:absolute after:-inset-1 after:content-[''] hover:bg-surface-2 disabled:text-muted">
             <ChevronLeft aria-hidden className="size-5" strokeWidth={1.75} />
           </button>
@@ -72,15 +83,35 @@ export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; 
               {idx + 1}/{chapters.length}
             </span>{' '}
             {current?.label}
-            {current?.count && <span className="text-muted"> · {current.count}</span>}
+            {current?.count && !current.done && <span className="text-muted"> · {current.count}</span>}
           </p>
           <button type="button" onClick={() => go(idx + 1)} disabled={idx === chapters.length - 1} aria-label="Capítulo seguinte" className="relative inline-flex size-9 items-center justify-center rounded-sm text-fg after:absolute after:-inset-1 after:content-[''] hover:bg-surface-2 disabled:text-muted">
             <ChevronRight aria-hidden className="size-5" strokeWidth={1.75} />
           </button>
+          {/* números dos outros capítulos, para saltar sem passar pelos do meio (tablet e portátil) */}
+          <ol className="ml-2 hidden items-center gap-0.5 md:flex" aria-label="Ir para o capítulo">
+            {chapters.map((c, i) => (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => go(i)}
+                  aria-current={c.id === active ? 'location' : undefined}
+                  aria-label={`${String(i + 1).padStart(2, '0')} ${c.label}${c.done ? ', missão cumprida' : c.count ? `, ${c.count}` : ''}`}
+                  className={cn(
+                    'relative inline-flex h-9 min-w-9 items-center justify-center rounded-xs px-1.5 font-mono text-xs tnum transition-colors duration-150 after:absolute after:-inset-y-1 after:inset-x-0 after:content-[""]',
+                    c.id === active ? 'bg-world-soft font-semibold text-fg' : 'text-muted hover:bg-surface-2 hover:text-fg',
+                  )}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                  {c.done && <span aria-hidden className="absolute right-0.5 top-1 size-1.5 rounded-full bg-accent" />}
+                </button>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        {/* ecrãs largos: todos os capítulos */}
-        <ol className="hidden min-w-0 items-center gap-0.5 overflow-x-auto no-scrollbar md:flex">
+        {/* ≥ 1280 px: todos os capítulos com o rótulo */}
+        <ol ref={listRef} className="hidden min-w-0 items-center gap-0.5 overflow-x-auto no-scrollbar xl:flex">
           {chapters.map((c, i) => (
             <li key={c.id} className="shrink-0">
               <button
@@ -88,7 +119,7 @@ export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; 
                 onClick={() => go(i)}
                 aria-current={c.id === active ? 'location' : undefined}
                 className={cn(
-                  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-xs px-2.5 text-sm transition-colors duration-150',
+                  'relative inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-xs px-2.5 text-sm transition-colors duration-150 after:absolute after:-inset-y-1 after:inset-x-0 after:content-[""]',
                   c.id === active ? 'bg-world-soft font-medium text-fg' : 'text-muted hover:bg-surface-2 hover:text-fg',
                 )}
               >
@@ -102,17 +133,22 @@ export function JornadaNav({ chapters, lotId, onGo }: { chapters: NavChapter[]; 
         </ol>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <Tooltip side="bottom" content="J: capítulo seguinte · K: capítulo anterior">
-            <span tabIndex={0} className="hidden items-center gap-1 rounded-xs text-xs text-muted xl:inline-flex" aria-label="Atalhos: J para o capítulo seguinte, K para o anterior">
-              <kbd className="rounded-xs border border-border bg-surface px-1.5 py-0.5 font-mono text-[11px] text-fg">J</kbd>
-              <kbd className="rounded-xs border border-border bg-surface px-1.5 py-0.5 font-mono text-[11px] text-fg">K</kbd>
+          <Tooltip side="bottom" content="Com o foco nesta barra: J capítulo seguinte · K capítulo anterior">
+            <span tabIndex={0} className="hidden items-center gap-1 rounded-xs text-xs text-muted 2xl:inline-flex" aria-label="Atalhos com o foco na barra de capítulos: J para o capítulo seguinte, K para o anterior">
+              <kbd className="rounded-xs border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-fg">J</kbd>
+              <kbd className="rounded-xs border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-fg">K</kbd>
             </span>
           </Tooltip>
-          <p className="flex items-center gap-1.5 text-sm text-fg">
-            <ShieldAlert aria-hidden className="size-4 shrink-0 text-warn-ink" strokeWidth={1.75} />
-            <span className="font-medium">Capital em risco</span>
-            <span className="hidden text-muted lg:inline">· liquidação prevista não garantida</span>
-          </p>
+          {agent ? (
+            // cesto de água (modelo de agente): não há capital de cofinanciadores neste lote
+            <p className="whitespace-nowrap text-sm font-medium text-fg">Cesto · sem financiamento</p>
+          ) : (
+            <p className="flex items-center gap-1.5 text-sm text-fg">
+              <ShieldAlert aria-hidden className="size-4 shrink-0 text-warn-ink" strokeWidth={1.75} />
+              <span className="whitespace-nowrap font-medium">Capital em risco</span>
+              <span className="hidden text-muted 2xl:inline">· liquidação prevista não garantida</span>
+            </p>
+          )}
         </div>
       </div>
     </nav>

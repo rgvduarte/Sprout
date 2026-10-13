@@ -694,7 +694,7 @@ const DOCS: Record<DocTopic, { title: string; intro: string; items: { h: string;
       { h: 'Pagamentos', b: 'Só por transferência SEPA de uma conta em teu nome para uma conta segregada num prestador de serviços de pagamento ou instituição de moeda eletrónica licenciado na UE. Sem numerário. Reconciliação diária entre o saldo do prestador e o registo da Sprout.' },
       { h: 'Período de reflexão', b: 'Podes cancelar um compromisso sem custos durante 4 dias depois de o fazeres. É uma política da Sprout, ao estilo do período de reflexão do Reg. (UE) 2020/1503.' },
       { h: 'Liquidez', b: 'No piloto não há mercado secundário: o capital fica no lote até à liquidação.' },
-      { h: 'Informação', b: 'Extrato do lote a cada etapa da jornada (análise, depósito, venda, expedição, liquidação) e extrato trimestral da tua conta.' },
+      { h: 'Informação', b: 'Extrato mensal no dia 5, extrato do lote a cada etapa da jornada (análise, depósito, venda, expedição) e relatório final na liquidação.' },
       { h: 'Força maior', b: 'Os contratos com produtores e compradores têm cláusulas de força maior. Um evento de força maior pode alongar a janela além da extensão.' },
     ],
   },

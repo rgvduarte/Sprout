@@ -13,7 +13,7 @@ import { ChapterPreco } from './ChapterPreco';
 import { ChapterRiscos } from './ChapterRiscos';
 import { JornadaNav, type NavChapter } from './JornadaNav';
 import { PhaseTwoLot, UnknownLot } from './LoteStates';
-import { endingFor, ENDING_LABEL, WORLD_COPY } from './model';
+import { endingFor, ENDING_LABEL, isAgentLot, WORLD_COPY, type ChapterId } from './model';
 import { journeyBase, JourneyProvider, scrollToChapter, useEffectiveLot, useJourney, type Journey } from './shared';
 
 /* =====================================================================
@@ -23,10 +23,8 @@ import { journeyBase, JourneyProvider, scrollToChapter, useEffectiveLot, useJour
    movimento reduzido.
    ===================================================================== */
 
-const STICKY = new Set(['colheita', 'preco', 'ciclo']);
-
 function JornadaContent() {
-  const { lot, goTo, ending } = useJourney();
+  const { lot, goTo, ending, order } = useJourney();
   const game = useGame();
   const diligence = useDiligence();
   const copy = WORLD_COPY[lot.world];
@@ -34,26 +32,26 @@ function JornadaContent() {
   const read = game.riskRead(lot.id).filter((id) => lot.riskFactors.some((r) => r.id === id)).length;
   const total = lot.riskFactors.length;
 
-  const chapters: NavChapter[] = useMemo(
-    () => [
-      { id: 'origem', label: 'Origem' },
-      { id: 'colheita', label: copy.colheitaNav, done: lot.analyses.length ? game.hasReadAnalysis(lot.id) : undefined },
-      { id: 'preco', label: 'Preço' },
-      { id: 'ciclo', label: 'Ciclo' },
-      { id: 'riscos', label: 'Riscos', done: read >= total, count: `${read}/${total}` },
-      { id: ending, label: ENDING_LABEL[ending] },
-    ],
-    [copy.colheitaNav, lot.analyses.length, lot.id, game, read, total, ending],
-  );
+  const chapters: NavChapter[] = useMemo(() => {
+    const all: Record<string, NavChapter> = {
+      origem: { id: 'origem', label: 'Origem' },
+      colheita: { id: 'colheita', label: copy.colheitaNav, done: lot.analyses.length ? game.hasReadAnalysis(lot.id) : undefined },
+      preco: { id: 'preco', label: 'Preço' },
+      ciclo: { id: 'ciclo', label: 'Ciclo' },
+      riscos: { id: 'riscos', label: 'Riscos', done: read >= total, count: `${read}/${total}` },
+    };
+    return order.map((id) => all[id] ?? { id, label: ENDING_LABEL[id] });
+  }, [copy.colheitaNav, lot.analyses.length, lot.id, game, read, total, order]);
 
-  // J / K: capítulo seguinte / anterior (fora de campos de texto e diálogos)
+  // J / K: capítulo seguinte / anterior, só com o foco na barra de capítulos (WCAG 2.1.4: atalhos de uma
+  // tecla não disparam enquanto se lê ou escreve noutro sítio da página)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.toLowerCase();
       if (k !== 'j' && k !== 'k') return;
       const target = e.target as HTMLElement | null;
-      if (target?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [role="alertdialog"]')) return;
+      if (!target?.closest('[data-chrome="jornada"]')) return;
       const line = window.innerHeight * 0.4;
       let idx = 0;
       chapters.forEach((c, i) => {
@@ -71,11 +69,11 @@ function JornadaContent() {
 
   return (
     <>
-      <JornadaNav chapters={chapters} lotId={lot.id} onGo={goTo} />
+      <JornadaNav chapters={chapters} lotId={lot.id} onGo={goTo} agent={isAgentLot(lot)} />
       <ChapterOrigem diligence={diligence} />
       <ChapterColheita label={copy.colheitaNav} />
       <ChapterPreco label="Preço" />
-      <ChapterCiclo label="Ciclo" />
+      {order.includes('ciclo') && <ChapterCiclo label="Ciclo" />}
       <ChapterRiscos label="Riscos" />
       {ending === 'compromisso' ? <ChapterCompromisso label="Compromisso" /> : <ChapterFim id={ending} label={ENDING_LABEL[ending]} />}
     </>
@@ -88,12 +86,14 @@ function Jornada({ lotId }: { lotId: string }) {
   const tall = useMediaQuery('(min-height: 720px)', true);
   const reduce = useReducedMotion() ?? false;
   const rich = richMotion && tall;
-  const goTo = useCallback((id: string) => scrollToChapter(id, { reduce, sticky: rich && STICKY.has(id) }), [reduce, rich]);
+  const goTo = useCallback((id: string) => scrollToChapter(id, { reduce }), [reduce]);
   const value: Journey | null = useMemo(() => {
     if (!lot) return null;
     // um compromisso que feche o lote mantém o capítulo de compromisso (reflexão e cancelamento)
     const ending = lot.status === 'financiado' && positions.some((p) => p.session) ? 'compromisso' : endingFor(lot);
-    return { lot, positions, rich, goTo, ending, ...journeyBase(lot) };
+    // o cesto de água (modelo de agente) não tem financiamento nem janela de 18 meses: sem o capítulo do ciclo
+    const order: ChapterId[] = isAgentLot(lot) ? ['origem', 'colheita', 'preco', 'riscos', ending] : ['origem', 'colheita', 'preco', 'ciclo', 'riscos', ending];
+    return { lot, positions, rich, goTo, ending, order, ...journeyBase(lot) };
   }, [lot, positions, rich, goTo]);
   if (!value) return null;
   return (

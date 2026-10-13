@@ -50,6 +50,28 @@ function isStrongPhase(ph?: SeasonPhase) {
   return ph?.kind === 'colheita' || ph?.kind === 'engarrafamento';
 }
 
+/** Rótulo curto de cada fase, para bandas estreitas (nunca cortar o nome a meio). */
+const PHASE_SHORT: Record<SeasonPhase['kind'], string> = {
+  colheita: 'Colheita',
+  armazenagem: 'Armazenagem',
+  vendas: 'Vendas',
+  engarrafamento: 'Engarrafamento',
+  procura: 'Época alta',
+  secagem: 'Secagem',
+  embarque: 'Embarque',
+  floracao: 'Floração',
+};
+
+/**
+ * Largura a partir da qual o nome completo da fase cabe numa linha (texto de 12 px),
+ * por comprimento do nome. Classes estáticas para o Tailwind as encontrar.
+ */
+function fit(label = ''): { full: string; short: string } {
+  if (label.length <= 20) return { full: '@min-[8.5rem]:inline', short: '@min-[8.5rem]:hidden' };
+  if (label.length <= 25) return { full: '@min-[10.75rem]:inline', short: '@min-[10.75rem]:hidden' };
+  return { full: '@min-[12.75rem]:inline', short: '@min-[12.75rem]:hidden' };
+}
+
 /** Tracejado diagonal (projeção, extensão): padrão SVG na tinta do mundo. */
 function Hatched({ id }: { id: string }) {
   return (
@@ -101,6 +123,7 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
   const w = getWorld(world);
   const harvest = w.season.phases.find(isStrongPhase);
   const fallback = useMotionValue(0);
+  // o cursor anda por transform (translateX em % da largura da faixa), nunca por `left` (sem layout a cada frame)
   const playX = useTransform(progress ?? fallback, (v) => `${(a + (b - a) * Math.max(0, Math.min(1, v))) * 100}%`);
   const summary = `Janela de ${months} meses de ${fmtDate(start)} a ${fmtDate(end)}${extEnd ? `, estendida até ${fmtDate(extEnd)}` : ''}. ${harvest ? `${harvest.label}: ${MONTHS_SHORT[harvest.startMonth - 1]}–${MONTHS_SHORT[harvest.endMonth - 1]}.` : ''}${showToday ? ` Hoje: ${fmtDate(today)}.` : ''}`;
 
@@ -132,9 +155,11 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
         )}
         {/* cursor do scroll */}
         {progress && (
-          <motion.div aria-hidden className="pointer-events-none absolute -top-1 bottom-[-4px] w-0" style={{ left: playX }}>
-            <div className="absolute inset-y-0 -left-[1.5px] w-[3px] rounded-full bg-accent" />
-          </motion.div>
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-1 bottom-[-4px] overflow-x-clip">
+            <motion.div className="absolute inset-y-0 left-0 w-full" style={{ x: playX }}>
+              <div className="absolute inset-y-0 -left-[1.5px] w-[3px] rounded-full bg-accent" />
+            </motion.div>
+          </div>
         )}
         {/* marcos */}
         {markers.map((mk) => {
@@ -149,7 +174,7 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
           const hideOnPhone = totalMonths > 13 ? i % 3 !== 0 : i % 2 === 1;
           const showYear = cell.m === 1 || (i === 0 && cell.m <= 10);
           return (
-            <div key={i} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center font-mono text-[11px] leading-4 text-muted">
+            <div key={i} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center font-mono text-xs leading-4 text-muted">
               <span className={cn('block', hideOnPhone && 'max-sm:invisible')}>{MONTHS_SHORT[cell.m - 1]}</span>
               {showYear && <span className="block text-fg">{cell.y}</span>}
             </div>
@@ -242,14 +267,17 @@ export function SeasonTrack({ world = 'azeite', today = TODAY_DATE, compact, cla
             return (
             <div
               key={i}
-              className="flex h-full items-center overflow-hidden border-r border-border px-2 last:border-r-0"
+              className="@container flex h-full min-w-0 items-center overflow-hidden border-r border-border px-2 last:border-r-0"
               style={{
                 flex: g.to - g.from + 1,
                 background: isStrongPhase(g.phase) ? PHASE_BG.strong : PHASE_BG.light,
                 paddingLeft: hasToday ? `calc(${(local / 12) * 100}% + 8px)` : undefined,
               }}
+              title={g.phase?.label}
             >
-              <span className="truncate text-xs font-medium text-world-ink">{g.phase?.label}</span>
+              {/* nome completo quando cabe, rótulo curto quando a banda é estreita, nada quando nem esse cabe (nunca reticências) */}
+              <span className={cn('hidden whitespace-nowrap text-xs font-medium text-world-ink', fit(g.phase?.label).full)}>{g.phase?.label}</span>
+              <span className={cn('hidden whitespace-nowrap text-xs font-medium text-world-ink @min-[5.75rem]:inline', fit(g.phase?.label).short)}>{g.phase ? PHASE_SHORT[g.phase.kind] : ''}</span>
             </div>
             );
           })}
@@ -260,7 +288,7 @@ export function SeasonTrack({ world = 'azeite', today = TODAY_DATE, compact, cla
       </div>
       <div className="mt-1 flex" aria-hidden>
         {cells.map((c, i) => (
-          <div key={i} className={cn('flex-1 text-center font-mono text-[11px] text-muted', i % 2 === 1 && 'max-sm:invisible')}>
+          <div key={i} className={cn('flex-1 text-center font-mono text-xs text-muted', i % 2 === 1 && 'max-sm:invisible')}>
             {MONTHS_SHORT[c.m - 1]}
           </div>
         ))}

@@ -43,7 +43,7 @@ function WorldHeading({ world, onMap }: { world: WorldId; onMap: (w: WorldId) =>
         </h2>
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <CommodityChip world={world} />
-          {w.investable ? <StatusPill label="Piloto · Fase 1" tone="accent" /> : <StatusPill label={w.faseLabel!} tone="cafe" />}
+          {w.investable ? <StatusPill label="Piloto · Fase 1" tone="accent" /> : <StatusPill label={w.faseLabel!} tone={world === 'cafe' ? 'cafe' : 'neutral'} />}
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -58,17 +58,23 @@ function WorldHeading({ world, onMap }: { world: WorldId; onMap: (w: WorldId) =>
   );
 }
 
-/** As missões abertas do mundo, com o medidor de cada lote. */
+/** Os lotes abertos do mundo, com o medidor de cada lote (na água, os cestos desta campanha). */
 function OpenMissions({ world, open, upcoming }: { world: WorldId; open: Lot[]; upcoming: Lot[] }) {
   const preview = world === 'cafe';
   const mg = miniGameFor(world);
+  const { lots } = useData();
+  const cestos = world === 'agua' ? lots.filter((l) => l.world === 'agua' && l.status === 'cesto' && !l.illustrative) : [];
   return (
     <div className="min-w-0">
-      <p className="text-sm text-muted">{preview ? 'Missões' : 'Missões abertas'}</p>
+      <p className="text-sm text-muted">{preview ? 'Lotes' : world === 'agua' ? 'Cestos desta campanha' : 'Lotes abertos'}</p>
       <p className="mt-0.5 text-fg">
         {preview ? (
           <>
-            <span className="font-medium">Nenhuma para financiar.</span> {plural(open.length, 'lote', 'lotes')} em pré-visualização da Fase 2.
+            <span className="font-medium">Nenhum para financiar.</span> {plural(open.length, 'lote', 'lotes')} em pré-visualização da Fase 2.
+          </>
+        ) : world === 'agua' ? (
+          <>
+            <span className="font-medium">Nenhum lote para financiar.</span> A água funciona como cesto: o engarrafador fatura e entrega, a Sprout recebe uma comissão.
           </>
         ) : (
           <>
@@ -87,6 +93,18 @@ function OpenMissions({ world, open, upcoming }: { world: WorldId; open: Lot[]; 
                 <span className="block truncate text-sm text-muted">{getProducer(l.producerId)?.nome}</span>
               </span>
               <span className="shrink-0 font-mono text-sm text-fg tnum">{preview ? 'Fase 2' : `${Math.round(fundedFraction(l) * 100)} %`}</span>
+            </Link>
+          </li>
+        ))}
+        {cestos.map((l) => (
+          <li key={l.id}>
+            <Link to={`/lote/${l.id}`} className="group -mx-2 flex min-h-11 items-center gap-3 rounded-sm px-2 py-1.5 hover:bg-surface-2">
+              <LotGauge kind={world} value={l.quantity ? l.stock / l.quantity : 0} size="xs" label={`Stock engarrafado do cesto ${l.id}`} />
+              <span className="min-w-0 flex-1">
+                <span className="block font-mono text-sm text-fg tnum">{l.id}</span>
+                <span className="block truncate text-sm text-muted">{getProducer(l.producerId)?.nome}</span>
+              </span>
+              <span className="shrink-0 text-sm text-muted">cesto</span>
             </Link>
           </li>
         ))}
@@ -114,7 +132,7 @@ function OpenMissions({ world, open, upcoming }: { world: WorldId; open: Lot[]; 
 function Margin({ world, sentence }: { world: WorldId; sentence: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-sm text-muted">De onde vem a margem do lote</p>
+      <p className="text-sm text-muted">{world === 'agua' ? 'Como funciona o cesto' : 'De onde vem a margem do lote'}</p>
       <p className="mt-0.5 text-[0.9375rem] text-fg">{sentence}</p>
       <TextLink to={{ pathname: `/mercados/${world}`, hash: '#cadeia' }} className="mt-1 inline-block text-sm">
         Ver a cadeia completa
@@ -175,7 +193,13 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
 
   return (
     <Card as="article" padding="none" data-world={world} className={cn('grid overflow-hidden lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]', className)} aria-label={w.nome}>
-      <div className="flex flex-col justify-center border-b border-world-line bg-world-soft pt-3 lg:border-b-0 lg:border-r">{art}</div>
+      {/* a coluna da ilustração leva também o calendário da safra: as duas colunas têm conteúdo até ao fim */}
+      <div className="flex flex-col border-b border-world-line bg-world-soft pt-3 lg:border-b-0 lg:border-r">
+        {art}
+        <div className="mt-auto px-4 pb-5 pt-2">
+          <SeasonTrack world={world} />
+        </div>
+      </div>
       <div className="min-w-0 p-5 sm:p-6">
         <WorldHeading world={world} onMap={onMap} />
         <p className="measure mt-3 text-[0.9375rem] text-muted">{w.tagline}</p>
@@ -186,7 +210,6 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
           </div>
           <div className="min-w-0">
             <MiniReferenceChart world={world} lot={chainLot} />
-            <SeasonTrack world={world} className="mt-6" />
           </div>
         </div>
       </div>
@@ -219,14 +242,17 @@ export default function MercadosPage() {
     <Page>
       <PageHeader
         title="Mercados"
-        description={<span className="block max-w-[58ch]">Três mundos, o mesmo ciclo: a Sprout compra o lote ao produtor, vende-o 10–15 % abaixo da referência a compradores B2B e liquida aos co-financiadores numa janela de 18 meses.</span>}
+        description={<span className="block max-w-[58ch]">Três mundos, dois modelos. No azeite, a Sprout compra o lote ao lagar, manda-o embalar e vende-o a compradores B2B, e liquida aos cofinanciadores numa janela de 18 meses; na água é agente de um cesto de HoReCa, sem financiamento. O café é a Fase 2.</span>}
         meta={
           <>
             <Badge tone="accent" dot>
-              Piloto fechado: azeite e água
+              Piloto fechado: azeite
+            </Badge>
+            <Badge tone="agua" dot>
+              Água: {getWorld('agua').faseLabel?.toLowerCase()}
             </Badge>
             <Badge tone="cafe" dot>
-              Café: Fase 2, abre em 2027
+              Café: {getWorld('cafe').faseLabel}
             </Badge>
             <Badge>Só investidores qualificados</Badge>
           </>

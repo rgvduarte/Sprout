@@ -4,7 +4,8 @@ import { PRODUCERS, getRegion } from '../../data';
 import type { Producer, TelemetryUnit } from '../../data';
 import { LotGauge, EASE_OUT } from '../../components/game';
 import { TextLink } from '../../components/ui';
-import { useData, useFeed } from '../../state';
+import { FeedLiveHeader } from '../../components/game';
+import { useTelemetry } from '../../state';
 import { cn } from '../../lib/cn';
 import { num } from '../../lib/format';
 
@@ -91,11 +92,11 @@ function ProducerBlock({ producer, units, index }: { producer: Producer; units: 
   const unitWord = isOlive ? 'kg' : 'paletes';
   const region = getRegion(producer.regionId);
   return (
-    <li className="min-w-0" data-world={producer.world}>
-      <p className="truncate text-sm font-medium leading-tight text-fg">{producer.nome}</p>
-      <p className="truncate text-xs leading-5 text-muted">
-        {producer.localidade} · {region?.nome}
-      </p>
+    <li className="min-w-0 snap-start" data-world={producer.world}>
+      {/* nomes e lugares em até duas linhas: um nome cortado esconde o produtor */}
+      <p className="line-clamp-2 text-sm font-medium leading-tight text-fg">{producer.nome}</p>
+      <p className="mt-0.5 line-clamp-2 text-xs leading-4 text-muted">{producer.localidade}</p>
+      <p className="text-xs leading-4 text-muted">{region?.nome}</p>
       <div className="mt-2 flex h-[60px] items-end">
         {isOlive ? (
           <div className="flex items-end gap-1" aria-label={`${units.length} depósitos`} role="group">
@@ -132,31 +133,33 @@ function ProducerBlock({ producer, units, index }: { producer: Producer; units: 
   );
 }
 
-const LIVE = PRODUCERS.filter((p) => p.fase === 1 && p.telemetry.kind !== 'nenhuma');
+/** Produtores com telemetria ao vivo na campanha (os lagares a moer e as nascentes a engarrafar). */
+const LIVE = PRODUCERS.filter((p) => p.fase === 1 && p.telemetry.kind !== 'nenhuma' && p.telemetry.live);
 
 export function ProducerTanks({ className }: { className?: string }) {
-  const { telemetry } = useData();
-  const feed = useFeed();
-  const olive = LIVE.filter((p) => p.world === 'azeite');
+  const telemetry = useTelemetry();
+  // azeite novo: só os depósitos dos lagares (um armazém de IBC de campanhas anteriores não é azeite novo)
+  const olive = LIVE.filter((p) => p.world === 'azeite' && p.telemetry.kind === 'depositos');
   const water = LIVE.filter((p) => p.world === 'agua');
   const oliveTotal = olive.reduce((s, p) => s + (telemetry[p.id] ?? []).reduce((a, u) => a + u.level, 0), 0);
   return (
     <section className={cn('min-w-0', className)} aria-labelledby="agora-title">
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="agora-title" className="text-[1.1875rem] leading-tight">
           Agora nos produtores
         </h2>
-        <p className="flex items-center gap-2 text-sm text-muted">
-          <span aria-hidden className={cn('size-2 rounded-full', feed.paused ? 'bg-muted' : 'bg-ok')} />
-          {feed.paused ? (feed.pauseReason === 'reduced-motion' ? 'Telemetria em pausa (movimento reduzido)' : 'Telemetria em pausa') : 'Telemetria em direto'}
-        </p>
+        <TextLink to="/#diario" className="text-sm">
+          Ver no Diário
+        </TextLink>
       </div>
+      <FeedLiveHeader className="mb-2" />
       <p className="mb-4 text-sm text-muted">
-        <span className="font-mono text-fg tnum">{num(oliveTotal)} kg</span> de azeite novo nos depósitos dos{' '}
+        <span className="font-mono text-fg tnum">{num(oliveTotal)}{'\u00a0'}kg</span> de azeite novo nos depósitos dos{' '}
         <TextLink to="/mercados/azeite">{olive.length} lagares</TextLink>{' '}
         do piloto. Cada leitura entra no Diário de campanha.
       </p>
-      <ul className="grid min-w-0 grid-cols-2 gap-x-4 gap-y-5 sm:gap-x-6">
+      {/* telemóvel: uma faixa que desliza (sem esticar a página); a partir de 640 px, grelha */}
+      <ul tabIndex={0} aria-label="Depósitos e armazéns dos produtores" className="-mx-1 flex min-w-0 snap-x gap-x-5 overflow-x-auto px-1 pb-2 [mask-image:linear-gradient(to_right,#000_85%,transparent)] sm:mx-0 sm:grid sm:snap-none sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-y-5 sm:overflow-visible sm:px-0 sm:pb-0 sm:[mask-image:none] [&>li]:w-[9.5rem] [&>li]:shrink-0 sm:[&>li]:w-auto">
         {olive.map((p, i) => (
           <ProducerBlock key={p.id} producer={p} units={telemetry[p.id] ?? p.telemetry.units} index={i} />
         ))}

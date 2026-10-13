@@ -17,6 +17,7 @@ export { CampaignFeed, FeedLiveHeader } from './CampaignFeed';
 export type { CampaignFeedProps } from './CampaignFeed';
 export {
   Chapter,
+  chapterScrollTop,
   ScrollProgress,
   Reveal,
   ParallaxLayer,

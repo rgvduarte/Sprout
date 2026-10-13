@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import type { WorldId } from '../../data/types';
@@ -37,11 +37,43 @@ function inkOn(fillHex: string, light: string, dark: string): string {
   return contrast(L, luminance(light)) >= contrast(L, luminance(dark)) ? light : dark;
 }
 
-const SHORT: Record<ChainSegment['id'], string> = { produtor: 'Produtor', premio: 'Prémio', custos: 'Custos', spread: 'Spread do lote', desconto: 'Desconto' };
+/** Mistura simples de duas cores #rrggbb (t = peso de a). */
+function mixHex(a: string, b: string, t: number): string {
+  const pa = /^#?([0-9a-f]{6})$/i.exec(a.trim());
+  const pb = /^#?([0-9a-f]{6})$/i.exec(b.trim());
+  if (!pa || !pb) return a;
+  const na = parseInt(pa[1], 16);
+  const nb = parseInt(pb[1], 16);
+  const ch = (n: number, s: number) => (n >> s) & 255;
+  const c = [16, 8, 0].map((sh) => Math.round(ch(na, sh) * t + ch(nb, sh) * (1 - t)));
+  return `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** Largura de um elemento em px (para decidir se um rótulo cabe dentro do segmento). */
+function useBoxWidth(ref: RefObject<HTMLElement | null>): number {
+  const [w, setW] = useState(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setW(el.getBoundingClientRect().width);
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return w;
+}
+
+const SHORT: Record<ChainSegment['id'], string> = { produtor: 'Produtor', premio: 'Prémio', custos: 'Custos', spread: 'Margem', desconto: 'Desconto' };
+
+/** Um rótulo dentro de um segmento só quando o segmento tem pelo menos isto de largura (senão vai para cima, com o valor). */
+const INSIDE_MIN_PX = 72;
+/** Distância mínima entre dois limites no eixo ampliado. */
+const TICK_GAP_PX = 32;
 
 const MIDDLE_SPROUT: Record<WorldId, string> = {
-  azeite: 'Sprout · lote em IBC',
-  agua: 'Sprout · lote em paletes',
+  azeite: 'Sprout · co-packer',
+  agua: 'Sprout · cesto (agente)',
   cafe: 'Sprout · lote em sacas (Fase 2)',
 };
 
@@ -50,6 +82,8 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
   const reduce = useReducedMotion();
   const uid = useId().replace(/:/g, '');
   const ref = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const barW = useBoxWidth(barRef);
   const inView = useInView(ref, { once: true, amount: 0.5 });
   const [mode, setMode] = useState<Mode>('sprout');
   const armed = useRef(false);
@@ -76,11 +110,13 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
   const worldHex = world === 'azeite' ? tokens.azeite : world === 'agua' ? tokens.agua : tokens.cafe;
   const darkInk = tokens.dark ? tokens.bg : tokens.fg;
   const lightInk = tokens.dark ? tokens.fg : tokens.surface;
+  // a margem do lote é o segmento-chave: tinta do mundo, escura no claro e média no escuro (nunca um bloco quase branco)
+  const spreadHex = tokens.dark ? mixHex(worldHex, tokens.bg, 0.62) : mixHex(worldHex, tokens.fg, 0.5);
   const FILL: Record<ChainSegment['id'], { bg: string; ink: string }> = {
     produtor: { bg: 'color-mix(in oklab, var(--fg) 10%, var(--surface-2))', ink: 'var(--fg)' },
     premio: { bg: 'var(--world)', ink: inkOn(worldHex, lightInk, darkInk) },
     custos: { bg: 'var(--muted)', ink: inkOn(tokens.muted, lightInk, darkInk) },
-    spread: { bg: 'var(--fg)', ink: inkOn(tokens.fg, lightInk, darkInk) },
+    spread: { bg: spreadHex, ink: inkOn(spreadHex, lightInk, darkInk) },
     desconto: { bg: 'var(--surface)', ink: 'var(--fg)' },
   };
   const poolStart = trad / refPrice;
@@ -146,14 +182,30 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
           <div className="absolute inset-y-0 right-0 rounded-r-xs bg-muted" style={{ left: `calc(${poolStart * 100}% + 2px)` }} />
           {sprout && <div className="absolute -bottom-1 -top-1 w-0.5 bg-fg" style={{ left: `${(chain.buyer / refPrice) * 100}%` }} aria-hidden />}
         </div>
-        {/* conectores do zoom */}
+        {/* conectores do zoom: um parêntese que abre o diferencial (as duas arestas convergem para o bloco de cima) */}
         <svg aria-hidden className="block h-7 w-full" viewBox="0 0 100 28" preserveAspectRatio="none">
-          <line x1={poolStart * 100} y1="0" x2="0.2" y2="28" stroke="var(--border)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-          <line x1="99.8" y1="0" x2="99.8" y2="28" stroke="var(--border)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <path d={`M${poolStart * 100},0 L0.3,28 M99.7,0 L99.7,28`} fill="none" stroke="color-mix(in oklab, var(--fg) 40%, var(--surface))" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
+          <path d={`M${poolStart * 100},0.6 H99.7`} fill="none" stroke="color-mix(in oklab, var(--fg) 40%, var(--surface))" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
         </svg>
 
+        {/* rótulos por cima dos segmentos estreitos (o nome e o valor não cabem dentro) */}
+        {sprout && barW > 0 && (
+          <div aria-hidden className="relative mb-1 h-4 text-xs font-medium text-fg">
+            {zoom
+              .filter((sg) => ((pos(sg.to) - pos(sg.from)) / 100) * barW < INSIDE_MIN_PX)
+              .map((sg) => {
+                const mid = (pos(sg.from) + pos(sg.to)) / 2;
+                return (
+                  <span key={sg.id} className={cn('absolute top-0 whitespace-nowrap', mid < 15 ? 'translate-x-0' : mid > 85 ? '-translate-x-full' : '-translate-x-1/2')} style={{ left: `${mid < 15 ? pos(sg.from) : mid > 85 ? pos(sg.to) : mid}%` }}>
+                    {SHORT[sg.id]} <span className="font-mono tnum text-muted">{fmt(sg.value)}</span>
+                  </span>
+                );
+              })}
+          </div>
+        )}
+
         {/* o diferencial produtor → comprador, ampliado */}
-        <div className="relative h-14">
+        <div ref={barRef} className="relative h-14">
           {zoom.map((s, i) => {
             const left = pos(s.from);
             const width = pos(s.to) - pos(s.from);
@@ -186,15 +238,17 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
                     <rect width="100%" height="100%" fill="none" stroke="var(--world-ink)" strokeWidth="2" />
                   </svg>
                 )}
-                <span
-                  className={cn(
-                    'absolute inset-0 hidden items-center px-2 text-[0.8125rem] font-medium leading-tight motion-safe:transition-opacity motion-safe:duration-300 sm:flex',
-                    sprout ? 'opacity-100' : 'opacity-0',
-                  )}
-                  aria-hidden
-                >
-                  <span className={cn('truncate', isDiscount && 'rounded-xs bg-surface px-1 text-fg')}>{SHORT[s.id]}</span>
-                </span>
+                {(width / 100) * barW >= INSIDE_MIN_PX && (
+                  <span
+                    className={cn(
+                      'absolute inset-0 flex items-center px-2 text-[0.8125rem] font-medium leading-tight motion-safe:transition-opacity motion-safe:duration-300',
+                      sprout ? 'opacity-100' : 'opacity-0',
+                    )}
+                    aria-hidden
+                  >
+                    <span className={cn('whitespace-nowrap', isDiscount && 'rounded-xs bg-surface px-1 text-fg')}>{SHORT[s.id]}</span>
+                  </span>
+                )}
               </div>
             );
           })}
@@ -211,7 +265,10 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
         <div className="relative mt-3 h-5 font-mono text-xs text-muted tnum" aria-hidden>
           {[trad, ...zoom.map((s) => s.to)].map((v, i, arr) => {
             const x = pos(v);
-            const show = sprout || i === 0 || i === arr.length - 1;
+            // limites intermédios a menos de 32 px do anterior ou do último saem (os valores estão na lista por baixo)
+            const px = (q: number) => (pos(q) / 100) * barW;
+            const crowded = i !== 0 && i !== arr.length - 1 && barW > 0 && (px(v) - px(arr[i - 1]) < TICK_GAP_PX || px(arr[arr.length - 1]) - px(v) < TICK_GAP_PX);
+            const show = (sprout || i === 0 || i === arr.length - 1) && !crowded;
             return (
               <span
                 key={i}
@@ -232,43 +289,52 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
       </div>
 
       {/* leitura: cada parte, por ordem */}
+      {/* cada linha é um <div> filho direto do <dl>, só com <dt>/<dd>; a amostra de cor vive dentro do <dt> */}
       <dl className="mt-5 grid gap-x-6 gap-y-3 sm:grid-cols-2" id={`${uid}-d`}>
         {zoom.map((s) => (
-          <div key={s.id} className="flex min-w-0 items-start gap-3">
-            <span aria-hidden className="mt-1 inline-block size-3 shrink-0 overflow-hidden rounded-[2px]" style={{ background: s.id === 'desconto' ? 'transparent' : FILL[s.id].bg, border: s.id === 'desconto' ? '1px solid var(--world-ink)' : undefined }}>
-              {s.id === 'desconto' && (
-                <svg viewBox="0 0 12 12" className="block size-full">
-                  <path d="M-2 4 L4 -2 M-2 10 L10 -2 M2 14 L14 2 M8 14 L14 8" stroke="var(--world-ink)" strokeWidth="1.3" />
-                </svg>
-              )}
-            </span>
-            <div className="min-w-0">
-              <dt className="text-sm text-muted">{s.label}</dt>
-              <dd className="font-mono text-[0.9375rem] text-fg tnum">
-                {unitPrice(world, s.value)} <span className="whitespace-nowrap font-sans text-sm text-muted">· {pct(s.value / pool, 0)} do diferencial</span>
-              </dd>
-              <dd className="text-sm text-muted">{s.description}</dd>
-            </div>
+          <div key={s.id} className="relative min-w-0 pl-6">
+            <dt className="text-sm text-muted">
+              <span aria-hidden className="absolute left-0 top-1 inline-block size-3 overflow-hidden rounded-[2px]" style={{ background: s.id === 'desconto' ? 'transparent' : FILL[s.id].bg, border: s.id === 'desconto' ? '1px solid var(--world-ink)' : undefined }}>
+                {s.id === 'desconto' && (
+                  <svg viewBox="0 0 12 12" className="block size-full">
+                    <path d="M-2 4 L4 -2 M-2 10 L10 -2 M2 14 L14 2 M8 14 L14 8" stroke="var(--world-ink)" strokeWidth="1.3" />
+                  </svg>
+                )}
+              </span>
+              {s.label}
+            </dt>
+            <dd className="font-mono text-[0.9375rem] text-fg tnum">
+              {unitPrice(world, s.value)} <span className="whitespace-nowrap font-sans text-sm text-muted">· {pct(s.value / pool, 0)} do diferencial</span>
+            </dd>
+            <dd className="text-sm text-muted">{s.description}</dd>
           </div>
         ))}
       </dl>
 
       <div className="mt-5 border-t border-border pt-4">
-        <p className="measure text-[0.9375rem] text-fg">
-          <strong className="font-semibold">
-            {pct(chain.captured, 0)} do {CHAIN_DIFFERENTIAL[world].label.charAt(0).toLowerCase() + CHAIN_DIFFERENTIAL[world].label.slice(1)} muda de mãos
-          </strong>
-          : {unitPrice(world, chain.discount)} ficam com o comprador, {unitPrice(world, chain.premium)} com o produtor e {unitPrice(world, chain.spread)} com o lote. Os outros {unitPrice(world, chain.costs)} pagam os custos do lote. O diferencial inclui {CHAIN_DIFFERENTIAL[world].contains}; não é a margem de um só intermediário.
-        </p>
+        {chain.agent ? (
+          <p className="measure text-[0.9375rem] text-fg">
+            <strong className="font-semibold">No cesto, o {CHAIN_DIFFERENTIAL[world].label.charAt(0).toLowerCase() + CHAIN_DIFFERENTIAL[world].label.slice(1)} divide-se de outra forma</strong>: {unitPrice(world, chain.discount)} ficam com o comprador, {unitPrice(world, chain.premium)} com o engarrafador (que passa a pagar a entrega) e {unitPrice(world, chain.spread)} com a Sprout, como comissão. Não há lote financiado nem cofinanciadores.
+          </p>
+        ) : (
+          <p className="measure text-[0.9375rem] text-fg">
+            <strong className="font-semibold">
+              {pct(chain.captured, 0)} do {CHAIN_DIFFERENTIAL[world].label.charAt(0).toLowerCase() + CHAIN_DIFFERENTIAL[world].label.slice(1)} muda de mãos
+            </strong>
+            : {unitPrice(world, chain.discount)} ficam com o comprador, {unitPrice(world, chain.premium)} com o produtor e {unitPrice(world, chain.spread)} com o lote. Os outros {unitPrice(world, chain.costs)} pagam os custos até à venda{world === 'azeite' ? ', incluindo o embalamento no co-packer' : ''}. O diferencial inclui {CHAIN_DIFFERENTIAL[world].contains}; não é a margem de um só intermediário.
+          </p>
+        )}
         {world === 'azeite' && (
           <p className="measure mt-2 text-sm text-muted">
             A tese original dos fundadores fala em captar {pct(FOUNDERS_THESIS.packagerMarginCaptured[0], 0).replace(' %', '')}–{pct(FOUNDERS_THESIS.packagerMarginCaptured[1], 0)} da margem do embalador. Está por validar: a margem líquida do embalador verificada é de {unitPrice(world, OLIVE_CHAIN_FACTS.packagerNetMargin[0])} a {unitPrice(world, OLIVE_CHAIN_FACTS.packagerNetMargin[1])} ({pct(OLIVE_CHAIN_FACTS.packagerNetMarginOfRetail[0], 1)} a {pct(OLIVE_CHAIN_FACTS.packagerNetMarginOfRetail[1], 1)} do preço de venda ao público) e, sozinha, não paga um desconto de {pct(FOUNDERS_THESIS.buyerDiscount[0], 0).replace(' %', '')}–{pct(FOUNDERS_THESIS.buyerDiscount[1], 0)} ao comprador. O piloto mede-o com cotações reais.
           </p>
         )}
         <p className="measure mt-2 text-sm text-muted">
-          {model.note} O spread do lote divide-se em {pct(lot.economics.investorShare, 0)} para os co-financiadores ({unitPrice(world, chain.split.investors)}), {pct(lot.economics.reserveShare, 0)} para a reserva de primeira perda ({unitPrice(world, chain.split.reserve)}) e {pct(1 - lot.economics.investorShare - lot.economics.reserveShare, 0)} para a Sprout ({unitPrice(world, chain.split.sprout)}).
+          {model.note}
+          {!chain.agent &&
+            ` A margem bruta do lote divide-se em ${pct(lot.economics.investorShare, 0)} para os cofinanciadores (${unitPrice(world, chain.split.investors)}), ${pct(lot.economics.reserveShare, 0)} para a reserva comum de primeira perda (${unitPrice(world, chain.split.reserve)}) e ${pct(1 - lot.economics.investorShare - lot.economics.reserveShare, 0)} para a Sprout (${unitPrice(world, chain.split.sprout)}).`}
         </p>
-        <RiskNote compact className="mt-3" />
+        {!chain.agent && <RiskNote compact className="mt-3" />}
       </div>
     </div>
   );

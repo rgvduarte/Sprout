@@ -1,24 +1,20 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { fundedFraction, getProducer, getRegion, isInvestable, priceUnit } from '../../data';
-import type { Lot, WorldId } from '../../data';
+import type { Lot } from '../../data';
 import { LotGauge } from '../../components/game';
 import { ButtonLink, CommodityChip } from '../../components/ui';
 import { useGame } from '../../state';
 import { cn } from '../../lib/cn';
-import { date as fmtDate, eur, monthYear, num, pct, price } from '../../lib/format';
+import { date as fmtDate, eur, monthYear, num, price } from '../../lib/format';
 import { stockFraction, unitWord } from '../carteira/positions';
+import { lotGoalTitle } from '../mercados/model';
 
 /* =====================================================================
-   Novas missões: lotes abertos a financiamento, cada um com o seu medidor
-   físico. Sem escassez, sem contagens decrescentes: factos e a jornada.
+   Lotes abertos: cada um com o seu objetivo físico e o seu medidor. Não
+   são missões (financiar não dá pontos). Sem escassez, sem contagens
+   decrescentes: factos e a jornada.
    ===================================================================== */
-
-export const MISSION_VERB: Record<WorldId, string> = {
-  azeite: 'Missão: encher o depósito',
-  agua: 'Missão: completar as paletes',
-  cafe: 'Missão: encher as sacas',
-};
 
 function OpenLotCard({ lot }: { lot: Lot }) {
   const game = useGame();
@@ -32,7 +28,7 @@ function OpenLotCard({ lot }: { lot: Lot }) {
   return (
     <article className="flex min-w-0 flex-col rounded-md border border-border bg-surface p-4 sm:p-5" data-world={lot.world} aria-labelledby={`nm-${lot.id}`}>
       <h3 id={`nm-${lot.id}`} className="text-[1.125rem] leading-snug">
-        {MISSION_VERB[lot.world]}
+        {lotGoalTitle(lot)}
       </h3>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <CommodityChip world={lot.world} label="world" />
@@ -51,21 +47,20 @@ function OpenLotCard({ lot }: { lot: Lot }) {
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Preço ao comprador</dt>
+            <dt className="text-muted">Preço ao comprador · {lot.economics.channelLabel}</dt>
             <dd className="text-fg">
               <span className="font-mono tnum">{price(lot.economics.buyerPrice, u)}</span>
-              <span className="text-muted"> · {pct(lot.economics.discountPct, 0)} abaixo da referência de </span>
-              <span className="font-mono tnum">{price(lot.economics.refPrice, u)}</span>
+              <span className="text-muted"> · {lot.economics.priceBasis}</span>
             </dd>
           </div>
           <div>
-            <dt className="text-muted">Co-financiadores</dt>
+            <dt className="text-muted">Cofinanciadores</dt>
             <dd className="font-mono text-fg tnum">{num(lot.funding.coFinancers)}</dd>
           </div>
         </dl>
       </div>
       <p className="mt-4 text-sm text-muted">
-        Bilhete mínimo <span className="font-mono text-fg tnum">{eur(lot.funding.minTicket)}</span> · janela de 18 meses
+        Investimento mínimo <span className="font-mono text-fg tnum">{eur(lot.funding.minTicket)}</span> · janela de 18 meses
         {settle && (
           <>
             {' '}

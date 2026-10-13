@@ -331,7 +331,7 @@ export function BlockedView({ c, profileId, onReview, since }: { c: { nome: stri
       <aside className="flex min-w-0 flex-col gap-6" aria-label="Aprendizagem">
         <LearningGoalPanel profileId={profileId} />
         <Disclaimer kind="regulatorio" boxed title="Porque é fechado">
-          Na fase 1, a Sprout é um mercado fechado: coorte de azeite e água, investidores qualificados e contratos padronizados, com compliance desde o primeiro dia. Abrir a mais investidores depende de provar o risco e a tesouraria no piloto.
+          Na fase 1, a Sprout é um mercado fechado: coorte de azeite (a água em cesto, sem financiamento), investidores qualificados e contratos padronizados, com compliance desde o primeiro dia. Abrir a mais investidores depende de provar o risco e a tesouraria no piloto.
         </Disclaimer>
       </aside>
     </div>

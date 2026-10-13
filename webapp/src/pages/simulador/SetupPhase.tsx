@@ -7,21 +7,21 @@ import { Button, Card, CardHeader, CommodityChip, Divider, Field, Input, Slider 
 import { LotGauge, QuestList } from '../../components/game';
 import { useGame } from '../../state';
 import { cn } from '../../lib/cn';
-import { num, pct, price } from '../../lib/format';
-import { INVESTOR_SHARE } from '../../data';
+import { num, pct, price, tidyText } from '../../lib/format';
 import { SCENARIO_LOTS, buyerPriceOf, monthLabel, shortName, simPhysical, getSimLot } from './deck';
 import type { Allocation } from './engine';
 import { DEFAULT_DRAFT, DEFAULT_SEED, nextSeed, type SimSession } from './store';
+import { LEAGUE_SEED } from './league';
 import { fe, Switch, WORLD_BG } from './parts';
 
 const STEP = 2500;
 const MAX_LOTS = 4;
 const MIN_LOTS = 2;
 
-const GROUPS: { world: WorldId; title: string; note: string }[] = [
-  { world: 'azeite', title: 'O Olival', note: 'Preço volátil. Há cobertura: venda a prazo ou indexação de parte do volume.' },
-  { world: 'agua', title: 'A Nascente', note: 'Preço estável, sem cobertura. O risco está no ritmo das vendas e nos custos.' },
-  { world: 'cafe', title: 'A Plantação', note: 'Fase 2, só para treino: no piloto não há lotes de café. Cobertura com futuros ICE KC.' },
+const GROUPS: { world: WorldId; title: string; note: string; tag?: string }[] = [
+  { world: 'azeite', title: 'O Olival', note: 'Os dois canais do plano: HoReCa, com margem maior e stock em aberto, e distribuidores, com margem fina e venda contratada. O preço segue o índice de origem a granel; cobre-se vendendo antes.' },
+  { world: 'agua', title: 'A Nascente', note: 'Hipótese de estudo: no piloto a água é cesto, em modelo de agente, e não se financia. Aqui joga-se como se a Sprout comprasse as paletes: preço estável, mas o risco está no comprador, no calor do armazém, no verão e no depósito SDR adiantado.', tag: 'Hipótese de estudo' },
+  { world: 'cafe', title: 'A Plantação', note: 'Fase 2, só para treino: no piloto não há lotes de café. Verde comprado em EUR a um importador, com parte da venda contratada.', tag: 'Fase 2 · não investível' },
 ];
 
 export interface SetupProps {
@@ -74,7 +74,11 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
     const worlds = new Set(v.selected.map((a) => getSimLot(a.simLotId)!.world));
     if (worlds.size === 1) {
       const w = [...worlds][0];
-      nudges.push(w === 'agua' ? 'Tudo em água: preço estável, mas um verão chuvoso atrasa todos os lotes ao mesmo tempo.' : `Tudo ${w === 'azeite' ? 'no azeite' : 'no café'}: um choque de preço atinge todos os lotes ao mesmo tempo.`);
+      nudges.push(
+        w === 'agua'
+          ? 'Tudo em água: o preço é estável, mas um verão chuvoso, um armazém quente ou um comprador insolvente atingem margens de cêntimos por litro.'
+          : `Tudo ${w === 'azeite' ? 'no azeite' : 'no café'}: um choque de preço atinge todos os lotes ao mesmo tempo.`,
+      );
     }
     const naked = v.selected.filter((a) => getSimLot(a.simLotId)!.hedge.available && !a.hedged).reduce((s, a) => s + a.amount, 0);
     if (naked / v.total > 0.4) nudges.push(`${pct(naked / v.total, 0)} do montante está em preço volátil sem cobertura.`);
@@ -89,7 +93,7 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
             Escolhe 2 a 4 lotes do baralho
           </h2>
           <p className="measure mt-1 text-muted">
-            São lotes de cenário, fictícios, com os parâmetros dos mercados do piloto. Os montantes vão de {fe(SIM_RULES.minAllocation)} a {fe(SIM_RULES.maxPerLot)} por lote, em passos de {fe(STEP)}.
+            São lotes de cenário, fictícios, com os números do business plan para o azeite. Os montantes vão de {fe(SIM_RULES.minAllocation)} a {fe(SIM_RULES.maxPerLot)} por lote, em passos de {fe(STEP)}.
           </p>
         </div>
 
@@ -99,7 +103,7 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
               <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
                 <h3 className="text-[1.125rem]">{g.title}</h3>
                 <CommodityChip world={g.world} />
-                {g.world === 'cafe' && <span className="text-sm font-medium text-cafe-ink">Fase 2 · abre em 2027</span>}
+                {g.tag && <span className={cn('text-sm font-medium', g.world === 'cafe' ? 'text-cafe-ink' : 'text-agua-ink')}>{g.tag}</span>}
               </div>
               <p className="measure mb-3 text-sm text-muted">{g.note}</p>
               <ul className="flex flex-col gap-3">
@@ -155,10 +159,10 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
           <Divider />
           <h3 className="text-[1rem]">Regras do jogo</h3>
           <dl className="mt-2 flex flex-col gap-2.5 text-sm">
-            <Rule term="Partilha">{pct(INVESTOR_SHARE, 0)} da margem bruta vai para os co-financiadores. A perda não é partilhada.</Rule>
-            <Rule term="Reserva de primeira perda">Absorve perdas até {pct(SIM_RULES.firstLossReservePct, 0)} do montante de cada lote.</Rule>
-            <Rule term="Extensão">No mês 18, se a referência estiver 15 % abaixo da entrada ou faltar vender mais de 30 % do stock: até 6 meses, a 0,3 % ao mês.</Rule>
-            <Rule term="Refunding">Depois de um choque de preço, se a perda prevista passar a reserva: 4 meses de armazenagem refinanciada, por 1,5 % do lote.</Rule>
+            <Rule term="Partilha">{tidyText(`Num lote com ganho, ${pct(SIM_RULES.shares.investors, 0)} da margem bruta vai para os cofinanciadores, ${pct(SIM_RULES.shares.sprout, 0)} para a operação da Sprout e ${pct(SIM_RULES.shares.reserve, 0)} para a reserva comum. A perda não é partilhada.`)}</Rule>
+            <Rule term="Reserva comum de primeira perda">{tidyText(`Começa com ${pct(SIM_RULES.reserve.initialOfInvested, 0)} do investido e recebe ${pct(SIM_RULES.reserve.shareOfMargin, 0)} da margem dos lotes que liquidam com ganho, até ${pct(SIM_RULES.reserve.capOfInvested, 0)}. Paga as perdas pela ordem em que os lotes liquidam e pode esgotar-se.`)}</Rule>
+            <Rule term="Extensão">{tidyText(`No mês 18, se o índice de origem estiver 15 % ou mais abaixo da abertura ou faltar vender mais de 30 % do stock: até ${SIM_RULES.extension.maxMonths} meses, a ${pct(SIM_RULES.extension.monthlyCostPct, 1)} ao mês.`)}</Rule>
+            <Rule term="Refunding">{tidyText(`Depois de um choque de preço, se a perda prevista do lote passar o saldo da reserva: 4 meses de armazenagem refinanciada, por ${pct(SIM_RULES.refunding.costPct, 1)} do lote.`)}</Rule>
           </dl>
 
           <Divider />
@@ -183,7 +187,11 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
             </Button>
           </div>
           <p id={`seed-${seedId}-hint`} className="mt-1.5 text-sm text-muted">
-            A mesma semente repete os mesmos acontecimentos.
+            A mesma semente repete os mesmos acontecimentos. A liga da época usa a semente{' '}
+            <button type="button" className="inline-flex min-h-11 items-center font-mono text-accent underline underline-offset-[0.2em] tnum sm:min-h-0" onClick={() => update({ draftSeed: LEAGUE_SEED })}>
+              {LEAGUE_SEED}
+            </button>
+            .
           </p>
 
           {needsPause && (
@@ -278,7 +286,7 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
   const uid = useId().replace(/:/g, '');
   const selected = alloc.amount > 0;
   const phys = simPhysical(lot, alloc.amount);
-  const buyer = buyerPriceOf(lot, INVESTOR_SHARE);
+  const buyer = buyerPriceOf(lot);
   const d = lot.priceUnit === 'L' ? 3 : 2;
   const titleId = `deck-${uid}`;
   return (
@@ -301,7 +309,9 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
               <h4 id={titleId} className="text-[1.0625rem] leading-snug">
                 {lot.nome}
               </h4>
-              <p className="text-sm text-muted">{lot.origem}</p>
+              <p className="text-sm text-muted">
+                {lot.origem} · {lot.canal}
+              </p>
             </div>
             <Button
               variant={selected ? 'ghost' : 'secondary'}
@@ -316,14 +326,15 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
             </Button>
           </div>
 
+          {lot.hypothesis && <p className="mt-2 text-sm font-medium text-agua-ink">{lot.hypothesis}</p>}
           <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
-            <Fact label="Entrada (tudo incluído)" value={price(lot.fundingPrice, lot.priceUnit, d)} />
+            <Fact label="Entrada" value={price(lot.fundingPrice, lot.priceUnit, d)} />
             <Fact label="Venda base" value={price(buyer, lot.priceUnit, d)} />
-            <Fact label="Margem base, 18 meses" value={pct(lot.expectedMargin, 1)} />
-            <Fact label="Oscilação mensal" value={`± ${pct(lot.monthlyVolatility, 1)}`} />
+            <Fact label="Margem 18 m" value={pct(lot.expectedMargin, 1)} />
+            <Fact label="Oscilação/mês" value={`± ${pct(lot.monthlyVolatility, 1)}`} />
           </dl>
           <p className="mt-2 text-sm text-muted">
-            Vendas previstas de {monthLabel(lot.salesWindow[0])} a {monthLabel(lot.salesWindow[1])} (meses {lot.salesWindow[0]} a {lot.salesWindow[1]}).
+            Entrada tudo incluído; margem dos cofinanciadores se nada correr mal. Vendas previstas de {monthLabel(lot.salesWindow[0])} a {monthLabel(lot.salesWindow[1])} (meses {lot.salesWindow[0]} a {lot.salesWindow[1]}).
           </p>
 
           <div className="mt-4">
@@ -397,8 +408,8 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <dt className="text-muted">{label}</dt>
-      <dd className="font-mono text-fg tnum">{value}</dd>
+      <dt className="truncate whitespace-nowrap text-muted">{label}</dt>
+      <dd className="whitespace-nowrap font-mono text-fg tnum">{value}</dd>
     </div>
   );
 }

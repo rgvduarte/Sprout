@@ -44,7 +44,7 @@ const BASE = scenario('base', false);
 export function payouts(lots: Lot[]): Payout[] {
   const out: Payout[] = [];
   for (const lot of lots) {
-    if (lot.world === 'cafe') continue;
+    if (lot.world === 'cafe' || lot.economics.model !== 'principal') continue;
     const settle = lot.milestones.find((m) => m.stage === 'liquidado');
     if (lot.status === 'financiado' && lot.stage === 'expedido' && settle?.planned) {
       const r = evaluateLot(lot, BASE).result;
@@ -55,7 +55,7 @@ export function payouts(lots: Lot[]): Payout[] {
         kind: 'liquidacao',
         lotId: lot.id,
         lot,
-        counterparty: `${lot.funding.coFinancers} co-financiadores`,
+        counterparty: `${lot.funding.coFinancers} cofinanciadores`,
         amount: Math.round(lot.funding.goal * (1 + result)),
         due: settle.planned,
         condition: receipt ? `Executa depois da receção de ${eur(receipt.amount)} (${receipt.counterparty}).` : 'Executa depois da última receção do comprador.',

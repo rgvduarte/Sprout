@@ -45,7 +45,15 @@ export interface GateCriterion {
   text: string;
   /** cumprido quando estas ações estiverem concluídas; sem ações = medido no piloto */
   actionIds?: string[];
+  /** de onde vem o critério: o documento de 13/10, o business plan ou uma proposta da equipa */
+  source: 'documento' | 'business-plan' | 'proposta';
 }
+
+export const CRITERION_SOURCE: Record<GateCriterion['source'], string> = {
+  documento: 'Documento de 13/10',
+  'business-plan': 'Business plan (cenário Recomendado)',
+  proposta: 'Proposta (não consta do documento de 13/10)',
+};
 
 export interface Phase {
   id: string;
@@ -59,90 +67,108 @@ export interface Phase {
   gate?: { title: string; criteria: GateCriterion[] };
 }
 
+/** Fases e gates do business plan (docs/business-plan, cap. 9 e 14), sobre as ações do documento de 13/10. */
 export const PHASES: Phase[] = tidyDeep([
   {
     id: 'f0',
-    name: 'Fase 0 · Fundações',
-    window: 'a partir de 13/10/2026 · datas por fixar',
+    name: 'Fase 0 · Preparação',
+    window: '13/10/2026 a 31/01/2027',
     from: '2026-10',
-    to: '2026-12',
-    summary: 'Fechar a prioridade zero antes de entrar o primeiro euro de um investidor.',
-    scope: ['Estrutura jurídica e restrições de promoção', 'Jurisdição, PSP e contas segregadas', 'Contratos padrão (18 meses, extensão, força maior)', 'Política de hedge e playbook de refunding', 'Auditoria do backoffice'],
+    to: '2027-01',
+    summary: 'Comprar a informação que decide tudo antes de entrar dinheiro de terceiros: o parecer jurídico, as cotações de referência e a prioridade zero.',
+    scope: [
+      'Parecer jurídico escrito às perguntas 2, 4 e 10 (SPV, quem comercializa, PRIIPs)',
+      'Pelo menos 20 cotações de azeite de origem identificada para a referência HoReCa',
+      'Resposta escrita de 2 ou mais distribuidores sobre o prémio de origem',
+      'Jurisdição, PSP e contas segregadas; contratos padrão; política de hedge',
+      'Auditoria do backoffice',
+    ],
     gate: {
-      title: 'Go/no-go do piloto',
+      title: 'Go/no-go do piloto · 31/01/2027',
       criteria: [
-        { text: 'Estrutura jurídica e restrições de promoção na UE mapeadas (nota de 2 páginas)', actionIds: ['ai-01'] },
-        { text: 'Jurisdição primária e rails PSP/E-money UE escolhidos, com risco de repatriação avaliado', actionIds: ['ai-02'] },
-        { text: 'Contratos padrão Produtor↔Plataforma e Plataforma↔Investidor redigidos', actionIds: ['ai-03'] },
-        { text: 'Feed de stock, curva de produção e SLA de expedição da âncora; lotes mínimos e máximos validados', actionIds: ['ai-04', 'ai-05'] },
-        { text: 'Coorte piloto de investidores qualificados e processo KYC definidos', actionIds: ['ai-07'] },
-        { text: 'Backoffice auditado, sem dependências de "reverse engineering" sensíveis', actionIds: ['ai-09'] },
-        { text: 'PSP/KYC-AML integrados com segregação de contas e reconciliação diária', actionIds: ['ai-10'] },
-        { text: 'Política de hedge e playbook de refunding aprovados', actionIds: ['ai-12'] },
+        { text: 'Estrutura jurídica e restrições de promoção na UE mapeadas (nota de 2 páginas)', actionIds: ['ai-01'], source: 'documento' },
+        { text: 'Jurisdição primária e rails PSP/E-money UE escolhidos, com risco de repatriação avaliado', actionIds: ['ai-02'], source: 'documento' },
+        { text: 'Contratos padrão Produtor↔Plataforma e Plataforma↔Investidor redigidos', actionIds: ['ai-03'], source: 'documento' },
+        { text: 'Feed de stock, curva de produção e SLA de expedição da âncora; lotes mínimos e máximos validados', actionIds: ['ai-04', 'ai-05'], source: 'documento' },
+        { text: 'Política de hedge e playbook de refunding aprovados', actionIds: ['ai-12'], source: 'documento' },
+        { text: 'Pelo menos 20 cotações de origem identificada com mediana ≥ 6,00 €/kg', source: 'business-plan' },
+        { text: 'Parecer favorável às perguntas 2, 4 e 10 do jurídico', source: 'business-plan' },
+        { text: 'Resposta escrita de pelo menos 2 distribuidores sobre o prémio de origem', source: 'business-plan' },
       ],
     },
   },
   {
     id: 'f1',
-    name: 'Fase 1 · Piloto fechado azeite + água',
-    window: 'campanha 2026/27 · indicativo',
-    from: '2027-01',
-    to: '2027-09',
-    summary: 'Marketplace fechado, coorte restrita de produtores e investidores qualificados, contratos padronizados.',
-    scope: ['Azeite e água engarrafada', 'Só investidores qualificados', 'Descontos fixos de 10–15 % ao comprador', 'Liquidação a 18 meses com extensão condicionada'],
+    name: 'Fase 1 · Piloto fechado',
+    window: '01/02/2027 a 31/07/2027 · gate a 31/08/2027',
+    from: '2027-02',
+    to: '2027-08',
+    summary: 'Dois lagares, cerca de 36 compradores e 20 t de azeite de origem identificada, com capital próprio: mede-se o preço e a operação antes de levantar dinheiro de investidores.',
+    scope: [
+      'Azeite: 2 lotes de 10 t, com o Lagar do Val até 50 % do volume; 85 % com venda contratada',
+      'Água como produto de cesto, em modelo de agente (2 % de comissão)',
+      'Compradores: 25 HoReCa média e alta, 8 lojas gourmet e 3 distribuidores',
+      'Stock financiado com capital próprio: sem obrigações antes do gate',
+      'HoReCa 10 % abaixo da referência embalada; distribuidores ao preço de saída do embalador',
+    ],
     gate: {
-      title: 'Go/no-go da Fase 2',
+      title: 'Gate de 31/08/2027: avançar, mudar ou parar',
       criteria: [
-        { text: 'Fill rate de encomendas ≥ 95 % em dois trimestres seguidos' },
-        { text: 'Variação de base dentro da banda de 10–15 % abaixo da referência' },
-        { text: 'SLA de pagamento a produtores (D+2) ≥ 95 % e liquidações a investidores 100 % dentro da janela' },
-        { text: 'Reconciliação diária sem diferenças em aberto há mais de 1 dia útil' },
-        { text: 'Nenhum bloqueio bancário nem incidente regulatório' },
-        { text: 'Corretor de futuros KC e cobertura cambial EUR/USD contratados para o café' },
+        { text: 'Auditoria do backoffice fechada, sem vulnerabilidades críticas ou altas', actionIds: ['ai-09'], source: 'business-plan' },
+        { text: '60 dias seguidos com segregação = 0 e nenhuma divergência de reconciliação acima de D+5', actionIds: ['ai-10'], source: 'business-plan' },
+        { text: 'Responsável de Risco nomeado e política aprovada', actionIds: ['ai-12'], source: 'business-plan' },
+        { text: '100 % dos pagamentos a produtores em 30 dias ou menos; nenhum incidente AML', source: 'business-plan' },
+        { text: 'Pelo menos 2 lagares além do Lagar do Val, collateral manager, 3PL e servicer de reserva contratados', source: 'business-plan' },
+        { text: 'Desempenho, pelo menos 6 de 8: GMV ≥ 90 k€; margem HoReCa ≥ 0,30 €/kg; margem dos distribuidores ≥ 0; fill rate de encomendas ≥ 95 %; ≥ 25 compradores com ≥ 60 % de recorrência; DSO ≤ 35 dias; incumprimento ≤ 0,5 %; ≥ 1 contrato ≥ 10 t para 2027/28', source: 'business-plan' },
       ],
     },
   },
   {
     id: 'f2',
-    name: 'Fase 2 · Café e mais produtores',
-    window: 'campanha 2027/28 · abre em 2027',
-    from: '2027-10',
-    to: '2028-09',
-    summary: 'Entra o café verde, com cobertura em futuros ICE KC, e alargam-se as coortes de produtores de azeite e água.',
-    scope: ['Café verde de origens já em diligência', 'Mais lagares e nascentes', 'Mesma coorte de investidores qualificados'],
+    name: 'Fase 2 · Primeira série e escala',
+    window: 'a partir de 01/09/2027 · campanha 2027/28',
+    from: '2027-09',
+    to: '2028-12',
+    summary: 'Primeira série de obrigações da SPV a investidores profissionais, mais lagares de origem identificada, granel certificado em corretagem e exportação embalada.',
+    scope: [
+      '1.ª série de 150 k€: 100 k€ de obrigações sénior e 50 k€ de capital da SPV, para 2 a 4 profissionais',
+      'Mais lagares de origem identificada; granel certificado em corretagem (0,75 % do valor)',
+      'Café: só diligência e Academia; abre com go/no-go próprio, e o business plan recomendado não o prevê antes de 2030',
+    ],
     gate: {
-      title: 'Go/no-go da abertura progressiva',
+      title: 'Go/no-go da 1.ª série',
       criteria: [
-        { text: 'Duas campanhas liquidadas dentro da janela, com relatório final por lote' },
-        { text: 'Licença ou enquadramento para investidores não sofisticados (ECSP ou equivalente), com teste de conhecimentos e simulação de perdas' },
-        { text: 'Parecer jurídico favorável sobre a promoção a retalho' },
-        { text: 'Tesouraria e reserva de primeira perda dimensionadas para o volume novo' },
+        { text: 'Gate de 31/08/2027 cumprido', source: 'business-plan' },
+        { text: 'Parecer favorável às perguntas 2, 4 e 10; SPV com 12 meses de registo ou exceção confirmada', source: 'business-plan' },
+        { text: 'Seed fechada ou autonomia comprometida de 18 meses ou mais', source: 'business-plan' },
+        { text: 'Servicer de reserva contratado e capital da SPV intacto (≥ 50 000 €)', source: 'business-plan' },
       ],
     },
   },
   {
     id: 'f3',
     name: 'Fase 3 · Abertura progressiva',
-    window: 'a partir de 2028 · condicionada',
-    from: '2028-10',
+    window: 'a partir de 2029 · condicionada',
+    from: '2029-01',
     to: '2029-09',
-    summary: 'Expansão gradual depois de provado o risco e a tesouraria, sempre dentro do enquadramento aprovado.',
-    scope: ['Novas coortes de investidores, por patamares', 'Novos mercados só com cobertura adequada'],
+    summary: 'Expansão gradual depois de provados o preço, o risco e a tesouraria, sempre dentro do enquadramento aprovado.',
+    scope: ['Trader de granel e exportação embalada (Brasil)', 'Café verde para microtorrefações, se o go/no-go o aprovar (2030 no cenário recomendado)', 'Retalho só como promotor numa plataforma ECSP de terceiros'],
   },
 ]);
 
 export const PILOT_SCOPE = {
   inScope: tidyDeep([
-    { label: 'Coorte restrita', text: 'Azeite + Água, com contratos padronizados e cláusulas de força maior.' },
-    { label: 'Âncora de oferta', text: 'Lagar do Val (Pedro Marques): feed de stock e curva de produção.' },
-    { label: 'Investidores', text: 'Só qualificados, com KYC/AML e marketplace fechado.' },
-    { label: 'Preço ao comprador', text: 'Política de descontos fixos, 10–15 % abaixo da referência de mercado.' },
-    { label: 'Ciclo financeiro', text: 'Liquidação em 18 meses com regras de extensão condicionada e playbook de refunding.' },
+    { label: 'Coorte restrita', text: 'Azeite de origem identificada; água como produto de cesto, em modelo de agente. Contratos padronizados com cláusulas de força maior.' },
+    { label: 'Âncora de oferta', text: 'Lagar do Val (Pedro Marques): feed de stock e curva de produção, até 50 % do volume do piloto.' },
+    { label: 'Investidores', text: 'Só qualificados e profissionais, com KYC/AML e marketplace fechado. No piloto, o stock é financiado com capital próprio; a 1.ª série de obrigações só sai depois do gate.' },
+    { label: 'Preço ao comprador', text: 'HoReCa e lojas gourmet: 10 % abaixo da referência embalada (6,00 €/kg, a validar com 20 cotações). Distribuidores: preço de saída do embalador mais prémio de origem, sem desconto. O documento de 13/10 falava em 10–15 % para todos.' },
+    { label: 'Ciclo financeiro', text: 'Documento de 13/10: liquidação em 18 meses com extensão condicionada e playbook de refunding. Business plan: os 18 meses passam a vencimento legal, com vencimento esperado numa campanha (M12) e extensão condicionada até M18. Reserva comum de primeira perda com 30 % da margem de cada lote, até 5 % do capital em curso.' },
     { label: 'Pagamentos', text: 'PSPs/E-money licenciados na UE; segregação de fundos, reconciliação diária; proibição de cash-in-transit.' },
-    { label: 'Métricas', text: 'Fill rate, variação de base vs. preço de mercado, SLA de pagamentos a produtor e investidor, SLA diário de reconciliação.' },
+    { label: 'Métricas', text: 'Fill rate de encomendas, desconto realizado, SLA de pagamentos a produtor (≤ 30 dias) e investidor, SLA diário de reconciliação.' },
   ]),
   outOfScope: tidyDeep([
-    'Café (fica para a Fase 2; explorável na Academia, não investível)',
+    'Café (Fase 2: só diligência e Academia, não investível; o business plan recomendado não o prevê antes de 2030)',
+    'Água como lote financiado: entra como cesto, em modelo de agente',
     'Investidores não qualificados e promoção ao retalho',
     'Mercado secundário de posições',
     'Numerário e jurisdições sem ponte bancária segura na UE',
@@ -193,6 +219,30 @@ export const DECISION_STATUS: Record<Decision['status'], { label: string; tone: 
 
 export const SEED_DECISIONS: Decision[] = tidyDeep([
   {
+    id: 'd-11',
+    date: '2026-10-13',
+    title: 'Os 18 meses passam a vencimento legal: vencimento esperado numa campanha (M12), extensão condicionada até M18',
+    context: 'Segurar azeite 18 meses custa carry e risco de preço sem futuros para cobrir; o business plan proíbe-o por política e tira «refunding» do vocabulário do investidor. Os lotes de demonstração da webapp ainda seguem a decisão d-04 (janela de 18 meses e extensão de 6): falta alinhar.',
+    origin: 'Business plan de 13/10/2026',
+    status: 'proposta',
+  },
+  {
+    id: 'd-10',
+    date: '2026-10-13',
+    title: 'Calendário do business plan: Fase 0 até 31/01/2027, piloto de fevereiro a julho de 2027 com capital próprio, gate a 31/08/2027',
+    context: 'Hoje é Fase 0. Os lotes e posições anteriores ao piloto que a webapp mostra são histórico ilustrativo, com dados fictícios.',
+    origin: 'Business plan de 13/10/2026',
+    status: 'proposta',
+  },
+  {
+    id: 'd-09',
+    date: '2026-10-13',
+    title: 'Economia do azeite pelo cenário Recomendado do business plan',
+    context: 'Compra ao lagar ao índice de origem (≈ 3,50 €/kg) mais prémio; embalamento num co-packer; HoReCa 10 % abaixo da referência embalada de 6,00 €/kg (a validar); distribuidores ao preço de saída do embalador (4,35 €/kg) mais 0,10 €/kg de prémio de origem. Água em modelo de agente. Uma só regra de reserva: 30 % da margem de cada lote, até 5 % do capital em curso.',
+    origin: 'Business plan de 13/10/2026',
+    status: 'proposta',
+  },
+  {
     id: 'd-08',
     date: '2026-10-13',
     title: 'Responsável de Risco & Tesouraria: a designar',
@@ -236,7 +286,7 @@ export const SEED_DECISIONS: Decision[] = tidyDeep([
     id: 'd-03',
     date: '2026-10-13',
     title: 'Piloto com coorte azeite + água; café fica para a Fase 2',
-    context: 'Coorte restrita, contratos padronizados com cláusulas de força maior.',
+    context: 'Coorte restrita, contratos padronizados com cláusulas de força maior. O business plan põe a água no cesto, em modelo de agente, sem lotes para financiar.',
     origin: 'Reunião de 13/10',
     status: 'decidida',
   },
@@ -252,7 +302,7 @@ export const SEED_DECISIONS: Decision[] = tidyDeep([
     id: 'd-01',
     date: '2026-10-13',
     title: 'Tese económica original: captar 80–90 % da margem do embalador, com 10–15 % de desconto ao cliente',
-    context: 'Por validar no piloto. Os valores verificados (Observatório da cadeia alimentar de Espanha) dão 0,19–0,50 €/kg de margem líquida ao embalador, uma parte pequena do diferencial granel → comprador (≈ 1,28 €/kg), que paga também embalamento, logística e outras margens. Sozinha, essa margem não financia 10–15 % de desconto. O piloto mede a referência HoReCa e o prémio de origem com cotações reais.',
+    context: 'Por validar no piloto. Os valores verificados (Observatório da cadeia alimentar de Espanha) dão 0,19–0,50 €/kg de margem líquida ao embalador, uma parte pequena do diferencial entre o granel e o embalado (0,85 €/kg até ao preço de saída do embalador; 2,50 €/kg até à referência HoReCa), que paga também embalamento, logística e outras margens. Sozinha, essa margem não financia 10–15 % de desconto. O piloto mede a referência HoReCa e o prémio de origem com cotações reais.',
     origin: 'Reunião de 13/10; revista com a base factual',
     status: 'em-aberto',
   },

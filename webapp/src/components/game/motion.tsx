@@ -227,18 +227,65 @@ export interface ChapterProps {
   static?: boolean;
   /** altura do que fica fixo por cima (barra superior, barra de capítulos), em px: o painel fixa-se por baixo */
   topOffset?: number;
+  /**
+   * Progresso estável (0–1) em que o capítulo já mostra tudo: os saltos da
+   * navegação aterram aqui (data-stable na secção).
+   */
+  stableAt?: number;
+}
+
+/** Altura útil do painel fixo (sem o padding). */
+function innerHeight(el: HTMLElement): number {
+  const cs = window.getComputedStyle(el);
+  return el.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
 }
 
 /**
  * Capítulo com painel fixo (sticky) e orçamento de altura ≤ 250vh.
- * Abaixo de 900 px ou com movimento reduzido: secção empilhada, estado final.
+ * Abaixo de 900 px, com movimento reduzido ou quando o conteúdo não cabe no
+ * ecrã (medido com ResizeObserver): secção empilhada, estado final. Nunca
+ * corta conteúdo: o painel centra com `safe center` (alinha ao topo se não
+ * couber) e, se não couber, o capítulo passa a estático até o ecrã crescer.
  */
-export function Chapter({ id, label, heightVh = 200, children, className, stickyClassName, static: forceStatic, topOffset = 0 }: ChapterProps) {
+export function Chapter({ id, label, heightVh = 200, children, className, stickyClassName, static: forceStatic, topOffset = 0, stableAt = 0.92 }: ChapterProps) {
   const ref = useRef<HTMLElement>(null);
-  const rich = useRichMotion() && !forceStatic;
+  const panelRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const wantsRich = useRichMotion() && !forceStatic;
+  // conteúdo mais alto do que o ecrã: estático até a largura mudar ou a altura chegar ao que o conteúdo pede
+  const [tooTall, setTooTall] = useState<{ w: number; need: number } | null>(null);
+  const rich = wantsRich && !tooTall;
   const { scrollYProgress } = useScroll({ target: ref, offset: [`start ${topOffset}px`, 'end end'] });
   const finalState = useStaticProgress(1);
   const h = Math.max(100, Math.min(250, heightVh));
+
+  useLayoutEffect(() => {
+    if (!rich) return;
+    const panel = panelRef.current;
+    const content = contentRef.current;
+    if (!panel || !content) return;
+    const check = () => {
+      const need = content.getBoundingClientRect().height;
+      const avail = innerHeight(panel);
+      if (need > avail + 1) setTooTall({ w: window.innerWidth, need: Math.ceil(need + (panel.clientHeight - avail) + topOffset) });
+    };
+    check();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(check);
+    ro.observe(content);
+    ro.observe(panel);
+    return () => ro.disconnect();
+  }, [rich, topOffset]);
+
+  useEffect(() => {
+    if (!tooTall) return;
+    const retry = () => {
+      if (window.innerWidth !== tooTall.w || window.innerHeight >= tooTall.need) setTooTall(null);
+    };
+    window.addEventListener('resize', retry);
+    return () => window.removeEventListener('resize', retry);
+  }, [tooTall]);
+
   const content = typeof children === 'function' ? children(rich ? scrollYProgress : finalState, rich) : children;
   if (!rich) {
     return (
@@ -248,12 +295,29 @@ export function Chapter({ id, label, heightVh = 200, children, className, sticky
     );
   }
   return (
-    <section ref={ref} id={id} data-chapter={label} className={cn('relative', className)} style={{ height: `${h}vh` }}>
-      <div className={cn('sticky flex flex-col justify-center overflow-hidden', stickyClassName)} style={{ top: topOffset, height: `calc(100dvh - ${topOffset}px)` }}>
-        {content}
+    <section ref={ref} id={id} data-chapter={label} data-stable={stableAt} className={cn('relative', className)} style={{ height: `${h}vh` }}>
+      <div ref={panelRef} className={cn('sticky flex flex-col overflow-hidden [justify-content:safe_center]', stickyClassName)} style={{ top: topOffset, height: `calc(100dvh - ${topOffset}px)` }}>
+        <div ref={contentRef} className="w-full min-w-0 shrink-0">
+          {content}
+        </div>
       </div>
     </section>
   );
+}
+
+/**
+ * Posição de scroll (px) para aterrar num capítulo: no progresso estável de um
+ * capítulo fixo (tudo à vista) ou no topo de uma secção normal, por baixo de
+ * `offset` px de barras fixas.
+ */
+export function chapterScrollTop(el: HTMLElement, offset = 0): number {
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  const stable = Number(el.dataset.stable);
+  if (Number.isFinite(stable) && stable > 0) {
+    const travel = el.offsetHeight - window.innerHeight;
+    return Math.max(0, top + Math.max(0, travel) * stable);
+  }
+  return Math.max(0, top - offset);
 }
 
 /* ------------------------------------------------------------ ScrollProgress */
@@ -287,13 +351,18 @@ export function ScrollProgress({ chapters, className, top = 0 }: { chapters: Scr
     return () => io.disconnect();
   }, [chapters]);
 
+  // aterra por baixo da barra (não com scroll-padding genérico): os capítulos fixos aterram no progresso estável
+  const barRef = useRef<HTMLElement>(null);
   const go = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    const el = document.getElementById(id);
+    if (!el) return;
+    const bar = (barRef.current?.offsetHeight ?? 44) + top;
+    window.scrollTo({ top: chapterScrollTop(el, bar), behavior: reduce ? 'auto' : 'smooth' });
   };
   const activeChapter = chapters.find((c) => c.id === active);
 
   return (
-    <nav aria-label="Capítulos" className={cn('sticky z-30 border-b border-border bg-[color-mix(in_oklab,var(--bg)_94%,transparent)]', className)} style={{ top }}>
+    <nav ref={barRef} aria-label="Capítulos" className={cn('sticky z-30 border-b border-border bg-bg', className)} style={{ top }}>
       <motion.div aria-hidden className="absolute inset-x-0 bottom-[-1px] h-0.5 origin-left bg-accent" style={{ scaleX: reduce ? scrollYProgress : smooth }} />
       <div className="mx-auto flex h-11 max-w-[1440px] items-center gap-1 overflow-x-auto px-4 no-scrollbar sm:px-6">
         <span className="mr-2 shrink-0 text-sm text-muted md:hidden">{activeChapter?.label}</span>
@@ -305,7 +374,7 @@ export function ScrollProgress({ chapters, className, top = 0 }: { chapters: Scr
                 onClick={() => go(c.id)}
                 aria-current={c.id === active ? 'location' : undefined}
                 className={cn(
-                  'inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-xs px-2.5 text-sm transition-colors',
+                  'relative inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-xs px-2.5 text-sm transition-colors after:absolute after:-inset-x-0 after:-inset-y-1 after:content-[""]',
                   c.id === active ? 'bg-accent-soft text-fg' : 'text-muted hover:text-fg',
                 )}
               >

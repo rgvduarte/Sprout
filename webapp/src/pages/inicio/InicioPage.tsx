@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, ServerCog } from 'lucide-react';
-import { PRODUCERS } from '../../data';
+import { countsTowardCompletion, PRODUCERS } from '../../data';
 import { CampaignFeed, HarvestBand, KnowledgeLevelBadge, OriginSeal } from '../../components/game';
 import { Button, ButtonLink, Card, Page, PageHeader, RiskNote, Section, SimulationLabel, TextLink } from '../../components/ui';
-import { useData, useFeed, useGame, useRole } from '../../state';
+import { useCampaignEvents, useData, useFeed, useGame, useRole } from '../../state';
 import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, num, pct } from '../../lib/format';
 import { plannedSettlement, positionState, windowOf } from '../carteira/positions';
 import { LevelPanel } from './LevelPanel';
+import { useReadingsSeen, useWatchDiary } from './diaryWatch';
 import { buildMissions, CAMPAIGN_READINGS, SEASON_QUEST_ID } from './missions';
 import { MissionList } from './MissionList';
 import { MyLots } from './MyLots';
@@ -21,29 +22,50 @@ import { SeasonCard } from './SeasonCard';
 
 const DAY = daysBetween(CAMPAIGN.start, TODAY_DATE) + 1;
 
+/**
+ * Diário de campanha do Início: só este bloco re-renderiza a cada leitura ao
+ * vivo. As leituras dos lagares que ficam à vista aqui contam para a missão
+ * de campanha (esperar noutra página não conta).
+ */
+function DiaryFeed({ watchKey }: { watchKey: string }) {
+  const events = useCampaignEvents();
+  const [limit, setLimit] = useState(7);
+  const ref = useRef<HTMLDivElement>(null);
+  useWatchDiary(ref, watchKey, events.slice(0, limit));
+  return (
+    <div ref={ref}>
+      <CampaignFeed events={events} live limit={limit} />
+      <div className="mt-2 border-t border-border pt-2">
+        <Button variant="ghost" size="sm" onClick={() => setLimit((n) => (n > 7 ? 7 : 18))} aria-expanded={limit > 7}>
+          {limit > 7 ? 'Mostrar menos' : 'Mostrar mais acontecimentos'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function InicioPage() {
-  const { isVisitor, isTeam } = useRole();
+  const { isVisitor, isTeam, role } = useRole();
   const game = useGame();
   const data = useData();
-  const feed = useFeed();
+  const { pauseReason } = useFeed();
   const worldsVisited = game.worldsVisited;
-  const [feedLimit, setFeedLimit] = useState(7);
+  const readingsSeen = useReadingsSeen(role);
 
   const approved = game.onboarding.status === 'aprovado';
   const active = data.positions.filter((p) => p.status !== 'liquidado');
   const hasLots = active.length > 0;
 
   const missions = useMemo(
-    () => buildMissions({ game, lots: data.lots, positions: data.positions, liveEvents: feed.events, isVisitor, worldsVisited, feedPaused: feed.pauseReason }),
-    [game, data.lots, data.positions, feed.events, isVisitor, worldsVisited, feed.pauseReason],
+    () => buildMissions({ game, lots: data.lots, positions: data.positions, readingsSeen, isVisitor, worldsVisited, feedPaused: pauseReason }),
+    [game, data.lots, data.positions, readingsSeen, isVisitor, worldsVisited, pauseReason],
   );
-  // Missão de campanha: fecha quando o Diário mostrou as leituras em direto (dá pontos de conhecimento).
-  const campaignReadings = feed.events.filter((e) => e.kind === 'telemetria' && e.world === 'azeite').length;
+  // Missão de campanha: fecha quando o leitor seguiu as leituras no Diário (dá pontos de conhecimento).
   const { completeQuest } = game;
   const extractionDone = game.isQuestDone(SEASON_QUEST_ID);
   useEffect(() => {
-    if (campaignReadings >= CAMPAIGN_READINGS && !extractionDone) completeQuest(SEASON_QUEST_ID);
-  }, [campaignReadings, extractionDone, completeQuest]);
+    if (readingsSeen >= CAMPAIGN_READINGS && !extractionDone) completeQuest(SEASON_QUEST_ID);
+  }, [readingsSeen, extractionDone, completeQuest]);
   const goal = missions.find((m) => m.kind === 'aprendizagem');
   const listMissions = missions.filter((m) => m.kind !== 'aprendizagem');
   const nextStep = listMissions.find((m) => m.done < m.total && m.kind !== 'campanha');
@@ -104,9 +126,8 @@ export default function InicioPage() {
         }
       />
 
-      <SeasonCard />
-
-      <div className="mt-10 flex min-w-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-6">
+      {/* ecrã de trabalho: primeiro o que é teu e o que acontece a seguir; a estação vem logo depois */}
+      <div className="mt-2 flex min-w-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-6">
         {/* coluna principal: os lotes (ou os primeiros passos) e as missões */}
         <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
           {hasLots ? (
@@ -154,12 +175,7 @@ export default function InicioPage() {
           {/* Diário de campanha */}
           <Section id="diario" title="Diário de campanha" description="Leituras e acontecimentos dos produtores, à medida que chegam." className="order-2 !mt-0 min-w-0 lg:order-none">
             <Card padding="md">
-              <CampaignFeed events={data.events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={feedLimit} />
-              <div className="mt-2 border-t border-border pt-2">
-                <Button variant="ghost" size="sm" onClick={() => setFeedLimit((n) => (n > 7 ? 7 : 18))} aria-expanded={feedLimit > 7}>
-                  {feedLimit > 7 ? 'Mostrar menos' : 'Mostrar mais acontecimentos'}
-                </Button>
-              </div>
+              <DiaryFeed watchKey={role} />
             </Card>
           </Section>
 
@@ -171,7 +187,9 @@ export default function InicioPage() {
         </div>
       </div>
 
-      <Section id="novas" title="Novas missões" description="Lotes abertos a financiamento. Abre a jornada, lê a análise e os riscos antes de qualquer decisão.">
+      <SeasonCard className="mt-10" />
+
+      <Section id="novas" title="Lotes abertos" description="Lotes abertos a financiamento e os que vêm a seguir. Abre a jornada, lê a análise e os riscos antes de qualquer decisão.">
         <NovasMissoes lots={data.lots} />
         <div className="mt-5 flex flex-col gap-2">
           <RiskNote compact />
@@ -231,7 +249,9 @@ export default function InicioPage() {
                     <span className="font-mono tnum">{fmtDate(latestSeal.earned.at)}</span>
                   </p>
                   <p className="mt-2 text-sm text-muted">
-                    <span className="font-mono text-fg tnum">{data.earnedSeals.length}</span> de <span className="font-mono tnum">{data.seals.length}</span> selos no Caderno.
+                    {/* só contam os selos das campanhas em curso ou futuras (as encerradas ficam no Caderno, à parte) */}
+                    <span className="font-mono text-fg tnum">{data.earnedSeals.filter((s) => countsTowardCompletion(s.def)).length}</span> de{' '}
+                    <span className="font-mono tnum">{data.seals.filter((s) => countsTowardCompletion(s.def)).length}</span> selos da campanha no Caderno.
                   </p>
                   <TextLink to="/caderno" className="mt-1 inline-block text-sm">
                     Abrir o Caderno de colheita

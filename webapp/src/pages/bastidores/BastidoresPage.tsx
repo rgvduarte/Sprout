@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, CircleAlert, Info } from 'lucide-react';
-import { KYC_QUEUE, type Lot } from '../../data';
+import { ILLUSTRATIVE_LABEL, KYC_QUEUE, type Lot } from '../../data';
 import { Badge, ButtonLink, Page, PageHeader, Tabs, type TabItem } from '../../components/ui';
 import { useData } from '../../state';
 import { daysBetween, TODAY, TODAY_DATE } from '../../lib/clock';
@@ -103,10 +103,11 @@ export default function BastidoresPage() {
     <Page>
       <PageHeader
         title="Bastidores"
-        description="O piloto fechado visto por dentro: operação, risco, tesouraria e compliance, com os mesmos números que os investidores veem."
+        description="O piloto fechado visto por dentro: operação, risco, tesouraria e compliance, com os mesmos números que os investidores veem. O piloto só começa em fevereiro de 2027: os lotes, os indicadores e os movimentos passados são histórico ilustrativo."
         meta={
           <>
-            <Badge tone="accent">Piloto fechado · azeite + água</Badge>
+            <Badge tone="accent">Piloto fechado · azeite + água em cesto</Badge>
+            <Badge tone="warn">{ILLUSTRATIVE_LABEL}</Badge>
             <Badge tone="neutral">Só equipa Sprout</Badge>
             <span className="font-mono text-sm text-muted tnum">Dados de {dateTime(TODAY)}</span>
           </>

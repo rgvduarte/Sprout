@@ -19,10 +19,11 @@ export function useVisitorCase(): KycCase | null {
   const ob = ctx?.state.profiles.visitante.onboarding;
   if (!ob || ob.status === 'nao-iniciado') return null;
   const status: KycStatus = ob.status === 'em-curso' ? 'pendente' : ob.status === 'em-analise' ? 'em-analise' : ob.status === 'aprovado' ? 'aprovado' : 'bloqueado';
-  const flags = ['Registo feito em /onboarding nesta sessão'];
+  // só alertas reais: a origem do registo (esta sessão) aparece no selo "Registo desta sessão", não como alerta
+  const flags: string[] = [];
   // registo submetido: o processo completo (PEP, rota de qualificação, respostas de conhecimento)
   const submitted = kycCaseFromOnboarding(ob);
-  if (submitted) return { ...submitted, id: SESSION_CASE_ID, flags: [...flags, ...submitted.flags] };
+  if (submitted) return { ...submitted, id: SESSION_CASE_ID, flags: [...submitted.flags] };
   if (ob.status === 'em-curso') flags.push(ob.reviewDecision === 'pedir-info' ? 'Informação pedida pela Compliance: registo reaberto' : `Registo ainda em curso (passo ${ob.step + 1})`);
   if (ob.classe === 'nao-qualificado') flags.push('Declarou-se não qualificado: piloto fechado');
   if (ob.blockedReason) flags.push(ob.blockedReason);

@@ -34,15 +34,15 @@ export function LevelPanel({ goal }: { goal?: Mission }) {
           const last = i === LEVELS.length - 1;
           return (
             <li key={l.id} className="relative flex gap-3 pb-5 last:pb-0" aria-current={current ? 'step' : undefined}>
-              {!last && <span aria-hidden className={cn('absolute left-[17px] top-9 h-[calc(100%-32px)] w-0.5 rounded-full', game.points >= LEVELS[i + 1].minPoints ? 'bg-accent' : 'bg-border')} />}
+              {!last && <span aria-hidden className={cn('absolute left-[19px] top-10 h-[calc(100%-36px)] w-0.5 rounded-full', game.points >= LEVELS[i + 1].minPoints ? 'bg-accent' : 'bg-border')} />}
               <span
                 aria-hidden
                 className={cn(
-                  'relative inline-flex size-9 shrink-0 items-center justify-center rounded-full border-2',
+                  'relative inline-flex size-10 shrink-0 items-center justify-center rounded-full border-2',
                   reached ? 'border-accent bg-accent text-accent-fg' : isNext ? 'border-accent bg-surface text-accent' : 'border-border bg-surface text-muted',
                 )}
               >
-                <LevelGlyph level={l.id} className="size-[18px]" />
+                <LevelGlyph level={l.id} className="size-6" />
               </span>
               <div className="min-w-0 flex-1 pt-1">
                 <p className="flex flex-wrap items-baseline gap-x-2">
@@ -58,8 +58,8 @@ export function LevelPanel({ goal }: { goal?: Mission }) {
                   <Meter
                     className="mt-2"
                     value={game.levelProgress}
-                    label={`Progresso até ${l.nome}`}
-                    valueLabel={`${num(game.points)} de ${num(l.minPoints)} pts`}
+                    label={`Até ${l.nome}`}
+                    valueLabel={`${num(game.points)}/${num(l.minPoints)}\u00a0pts`}
                     size="sm"
                   />
                 )}

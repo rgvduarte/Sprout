@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { animate, motion, useMotionValue, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import { Chapter, EASE_OUT, JourneyTrack, LotGauge } from '../../components/game';
 import { RiskNote, TextLink } from '../../components/ui';
 import { fundedFraction } from '../../data';
 import type { TelemetryUnit } from '../../data/types';
-import { useData, useFeed } from '../../state';
+import { useCampaignEvents, useData, useFeed, useTelemetry } from '../../state';
 import { useNow } from '../../lib/clock';
-import { eur, kg, num, pct, relative, tidyText } from '../../lib/format';
+import { date, eur, kg, num, pct, relative, tidyText } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { cn } from '../../lib/cn';
 import { FOCUS_LOT_ID, FOCUS_PRODUCER_ID, LAGAR } from './model';
@@ -14,42 +14,54 @@ import { ChapterHead, Frame, useRange } from './parts';
 
 /* =====================================================================
    3 · Um lote, de perto. Os depósitos do lagar enchem-se até à leitura real
-   da telemetria, o IBC do lote enche-se até ao financiamento e a jornada
-   acende os marcos cumpridos. A linha "ao vivo" segue o Diário de campanha.
+   da telemetria e o IBC do lote até ao financiamento enquanto o capítulo
+   entra no ecrã: quando fica fixo, os desenhos já mostram o estado real.
+   Com o capítulo fixo, a jornada acende os marcos cumpridos. Os números
+   impressos são sempre os reais. Lote de demonstração, dados fictícios.
    ===================================================================== */
 
 export function LotChapter({ tall }: { tall: boolean }) {
   return (
-    <Chapter id="lote" label="Um lote" heightVh={250} static={!tall} stickyClassName="pt-14 pb-4" className="bg-[color-mix(in_oklab,var(--c-azeite)_5%,var(--bg))]">
+    <Chapter id="lote" label="Um lote" heightVh={170} static={!tall} stickyClassName="pt-14 pb-4" className="bg-[color-mix(in_oklab,var(--c-azeite)_5%,var(--bg))]">
       {(progress, rich) => <LotScene progress={progress} rich={rich} />}
     </Chapter>
   );
 }
 
 function LotScene({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
-  const { getLot, telemetry } = useData();
+  const { getLot } = useData();
   const lot = getLot(FOCUS_LOT_ID)!;
-  const units = telemetry[FOCUS_PRODUCER_ID] ?? [];
   const funded = fundedFraction(lot);
-  const tanks = useRange(progress, [0.02, 0.4], [0, 1]);
-  const gauge = useRange(progress, [0.3, 0.66], [0, funded]);
-  const journey = useRange(progress, [0.6, 0.9], [0, 1]);
+  const milled = lot.milestones.find((m) => m.stage === 'colhido')?.date;
+
+  // entrada do capítulo: do topo da secção no fundo do ecrã até ao topo (o momento em que fixa)
+  const rootRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    sectionRef.current = rootRef.current?.closest('section') ?? null;
+  }, []);
+  const { scrollYProgress: entry } = useScroll({ target: sectionRef, offset: ['start end', 'start start'] });
+  const fillBase = rich ? entry : progress;
+  const tanks = useRange(fillBase, [0.3, 0.9], [0, 1]);
+  const gauge = useRange(fillBase, [0.45, 1], [0, funded]);
+  const journey = useRange(progress, [0.05, 0.6], [0, 1]);
 
   return (
     <Frame>
-      <div data-world="azeite" className="min-w-0">
+      <div ref={rootRef} data-world="azeite" className="min-w-0">
         <ChapterHead
           title="Um lote, de perto"
-          lead={`O ${lot.id} são ${kg(lot.quantity)} de virgem extra ${LAGAR.variedades}, moídos a 05/10 no ${LAGAR.nome}, em ${LAGAR.localidade}. O azeite já existe e está medido; o que se financia é a compra e o caminho até ao comprador.`}
+          lead={`O ${lot.id} são ${kg(lot.quantity)} de virgem extra ${LAGAR.variedades}${milled ? `, moídos a ${date(milled).slice(0, 5)}` : ''} no ${LAGAR.nome}, em ${LAGAR.localidade}. O azeite já existe e está analisado; o que se financia é a compra, o embalamento e o caminho até ao cliente.`}
         />
+        <p className="mt-3 max-w-[60ch] text-sm text-muted">Lote de demonstração, com dados fictícios. O piloto começa em fevereiro de 2027, com capital próprio.</p>
         <div className="mt-8 grid min-w-0 gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
           <section aria-labelledby="apr-depositos" className="min-w-0">
             <h3 id="apr-depositos" className="text-[1.1875rem]">Depósitos do lagar, por telemetria</h3>
-            <Tanks units={units} progress={tanks} lotKg={lot.quantity} />
+            <Tanks progress={tanks} lotKg={lot.quantity} />
             <LiveLine />
           </section>
-          <section aria-labelledby="apr-missao" className="min-w-0">
-            <h3 id="apr-missao" className="text-[1.1875rem]">Missão: encher o depósito</h3>
+          <section aria-labelledby="apr-financiamento" className="min-w-0">
+            <h3 id="apr-financiamento" className="text-[1.1875rem]">Financiamento do lote</h3>
             <div className="mt-4 flex min-w-0 flex-col gap-6 sm:flex-row sm:items-end">
               <LotGauge kind="ibc" value={funded} progress={gauge} size="md" label={`Financiamento do lote ${lot.id}`} valueText={pct(funded)} className="shrink-0 self-start sm:self-auto [&_svg]:w-[176px]" />
               <FundingFacts />
@@ -70,8 +82,11 @@ function LotScene({ progress, rich }: { progress: MotionValue<number>; rich: boo
 
 const TANK = { w: 72, h: 150, gap: 30, top: 14, x0: 8 };
 
-function Tanks({ units, progress, lotKg }: { units: TelemetryUnit[]; progress: MotionValue<number>; lotKg: number }) {
-  const width = TANK.x0 * 2 + units.length * TANK.w + (units.length - 1) * TANK.gap;
+/** Widget de telemetria: só ele volta a desenhar a cada leitura do Diário. */
+function Tanks({ progress, lotKg }: { progress: MotionValue<number>; lotKg: number }) {
+  const telemetry = useTelemetry();
+  const units: TelemetryUnit[] = telemetry[FOCUS_PRODUCER_ID] ?? [];
+  const width = TANK.x0 * 2 + units.length * TANK.w + Math.max(0, units.length - 1) * TANK.gap;
   const lotUnits = ['D1', 'D2'];
   const bracketTo = TANK.x0 + 2 * TANK.w + TANK.gap;
   const height = TANK.top + TANK.h + 44;
@@ -103,7 +118,7 @@ function Tanks({ units, progress, lotKg }: { units: TelemetryUnit[]; progress: M
 function Tank({ unit, x, progress, inLot }: { unit: TelemetryUnit; x: number; progress: MotionValue<number>; inLot: boolean }) {
   const fraction = unit.capacity ? Math.min(1, unit.level / unit.capacity) : 0;
   const reduce = useReducedMotion();
-  // nível da telemetria (anima quando chega uma leitura) × progresso do scroll
+  // nível da telemetria (anima quando chega uma leitura) × enchimento da entrada
   const level = useMotionValue(fraction);
   useEffect(() => {
     if (reduce) {
@@ -129,19 +144,18 @@ function Tank({ unit, x, progress, inLot }: { unit: TelemetryUnit; x: number; pr
   );
 }
 
-/** Última leitura do lagar no Diário de campanha. */
+/** Última leitura do lagar no Diário de campanha (widget do Diário). */
 function LiveLine() {
-  const { events } = useData();
+  const events = useCampaignEvents();
   const feed = useFeed();
   const nowValue = useNow(15_000);
   const latest = events.find((e) => e.producerId === FOCUS_PRODUCER_ID && (e.kind === 'telemetria' || e.kind === 'rececao'));
   if (!latest) return null;
-  const status = feed.paused ? (feed.pauseReason === 'reduced-motion' ? 'Diário em pausa (movimento reduzido)' : 'Diário em pausa') : 'Ao vivo';
   return (
     <div className="mt-5 min-w-0 max-w-[460px] border-t border-border pt-3 text-sm" aria-live="polite">
       <p className="flex items-center gap-2 text-[13px] text-muted">
         <span aria-hidden className={cn('size-2 shrink-0 rounded-full', feed.paused ? 'bg-border' : 'bg-ok')} />
-        {status} · {relative(latest.at, nowValue)}
+        {feed.paused ? 'Diário em pausa' : 'Ao vivo, em demonstração'} · {relative(latest.at, nowValue)}
       </p>
       <p className="mt-1 font-medium text-fg">{latest.title}</p>
     </div>
@@ -158,7 +172,7 @@ function FundingFacts() {
   return (
     <div className="min-w-0 pb-1">
       <p className="font-display text-[2rem] font-bold leading-none text-fg">{pct(fundedFraction(lot))}</p>
-      <p className="mt-1 text-sm text-muted">financiado pelos co-financiadores</p>
+      <p className="mt-1 text-sm text-muted">financiado pelos cofinanciadores</p>
       <dl className="mt-4 flex flex-col gap-2.5 text-sm">
         <div>
           <dt className="text-muted">Montante financiado</dt>
@@ -167,11 +181,11 @@ function FundingFacts() {
           </dd>
         </div>
         <div>
-          <dt className="text-muted">Co-financiadores</dt>
+          <dt className="text-muted">Cofinanciadores</dt>
           <dd className="font-medium text-fg tnum">{num(f.coFinancers)}</dd>
         </div>
         <div>
-          <dt className="text-muted">Bilhete mínimo</dt>
+          <dt className="text-muted">Investimento mínimo</dt>
           <dd className="font-medium text-fg tnum">
             {eur(f.minTicket)} <span className="font-normal text-muted">= {tidyText(`${ticket.primary}, ${ticket.secondary}`)}</span>
           </dd>
