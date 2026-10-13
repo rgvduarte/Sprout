@@ -1,0 +1,80 @@
+
+<!-- ================================ 15 RISCOS ================================ -->
+<section class="chapter" id="c15">
+  <header class="ch-head">
+    <span class="ch-num">15</span>
+    <h1>Riscos principais e mitigação</h1>
+    <p class="standfirst">Os riscos que podem acabar com o projeto não são de mercado. São um preço de venda que ninguém verificou, uma emissão ou uma promoção fora da lei, um backoffice de origem duvidosa e capital que não chega. Probabilidade e impacto são juízos nossos [I], de 1 a 5.</p>
+  </header>
+
+  <div class="risk-grid">
+    <figure>
+      <p class="fig-title">Probabilidade × impacto</p>
+      <p class="fig-sub">Números = linhas da tabela; tom mais escuro = produto maior</p>
+      {{svg_matriz_risco}}
+    </figure>
+    <div class="small">
+      <p><b>Como ler.</b> Os três riscos no canto de cima à direita (1, 9, 12) são os que decidem o projeto e dependem de decisões dos fundadores, não do mercado: medir o preço antes de vender, limpar o backoffice e não pedir capital sem evidência nova. Os riscos de impacto 5 com probabilidade 2 (2, 3, 7) são raros só enquanto as regras forem cumpridas; um único caso basta para acabar com bancos, investidores e reputação.</p>
+      <p>O risco de preço do azeite (4) está no centro, e não no canto, porque a política o limita: stock aberto ≤ 15 %, nunca curto, almofada de 33 % na 1.ª série. Sem a política, seria 4·5 (cap. 8).</p>
+      <p>A ordem da tabela segue o produto P × I. Os donos são os do documento-fonte; «Risco» é o responsável de Risco e Tesouraria, ainda por designar.</p>
+    </div>
+  </div>
+  <table class="compact wrap risk-tbl">
+      <colgroup><col style="width:6mm"><col style="width:40mm"><col style="width:9mm"><col><col style="width:22mm"></colgroup>
+      <thead><tr><th>#</th><th>Risco</th><th class="num">P·I</th><th>Mitigação e sinal precoce</th><th>Dono</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">1</td><td>Referência HoReCa abaixo de 6,00 €/kg documentados</td><td class="num">4·4</td><td>20–30 cotações até 31-01-2027; paragem se mediana &lt; 5,40 €/kg</td><td>Speaker 1</td></tr>
+        <tr><td class="mono">12</td><td>Seed não levantada depois do gate</td><td class="num">4·5</td><td>Pré-seed cobre até dez. 2027 com 150 k€ de caixa; só pedir seed com evidência nova; plano de encerramento ordenado</td><td>Fundadores</td></tr>
+        <tr><td class="mono">9</td><td>Backoffice «reverse engineered»</td><td class="num">4·4</td><td>Quarentena, auditoria de proveniência, <i>clean room</i> para ledger, pagamentos e KYC</td><td>Speaker 2</td></tr>
+        <tr><td class="mono">2</td><td>Emissão antes do prazo do CSC ou sem KID</td><td class="num">2·5</td><td>Parecer go/no-go (perguntas 2 e 10); 1.ª série só a profissionais; SPV registada até nov. 2026</td><td>G. Almeida</td></tr>
+        <tr><td class="mono">3</td><td>Promoção a retalho ou gamificação de retornos</td><td class="num">2·5</td><td>Só profissionais; revisão de compliance de cada <i>release</i> e material; nada nas redes</td><td>G. Almeida</td></tr>
+        <tr><td class="mono">7</td><td>Falha de custódia ou stock fictício</td><td class="num">2·5</td><td>Tanque selado, depósito tripartido, collateral manager, contagem trimestral</td><td>Risco</td></tr>
+        <tr><td class="mono">4</td><td>Índice −30 % com stock em aberto</td><td class="num">3·4</td><td>Aberto ≤ 15 % (piloto); gatilhos a −10/−20/−30 %; almofada de 33 % na 1.ª série</td><td>Risco</td></tr>
+        <tr><td class="mono">6</td><td>Concentração e conflito no Lagar do Val</td><td class="num">3·4</td><td>≤ 50 % do volume; 2 lagares extra antes da 1.ª série; regras de parte relacionada</td><td>P. Marques</td></tr>
+        <tr><td class="mono">13</td><td>Responsável de Risco por contratar</td><td class="num">3·4</td><td>Recrutamento já; sem ele, não há emissão</td><td>Speaker 1</td></tr>
+        <tr><td class="mono">10</td><td>Banco recusa conta da SPV ou PSP congela fundos</td><td class="num">2·4</td><td>Parecer e fluxograma AML na 1.ª reunião; 2–3 bancos; nunca PSP para investidores</td><td>Speaker 2</td></tr>
+        <tr><td class="mono">5</td><td>Incumprimento de compradores HoReCa</td><td class="num">3·3</td><td>SDD B2B, pré-pagamento inicial, limites, DSO diário</td><td>Risco</td></tr>
+        <tr><td class="mono">11</td><td>Retaliação de embaladores e cash &amp; carry</td><td class="num">3·3</td><td>Não competir no <i>standard</i>; offtake plurianual com lagares</td><td>Speaker 1</td></tr>
+        <tr><td class="mono">8</td><td>Desclassificação do lote</td><td class="num">3·2</td><td>Entrada exigente, análise a cada 4 meses, venda em 30 dias no gatilho</td><td>P. Marques</td></tr>
+      </tbody>
+    </table>
+</section>
+
+<!-- ================================ 16 ALERTAS ================================ -->
+<section class="chapter" id="c16">
+  <header class="ch-head">
+    <span class="ch-num">16</span>
+    <h1>Alertas do conselheiro</h1>
+    <p class="standfirst">O que diria a um sócio meu antes de assinar. O projeto tem uma ideia boa escondida dentro de uma tese que não fecha. A ideia boa é a verificação de lotes físicos com pagamento rápido ao produtor e capital profissional. A tese que não fecha é desconto, captura de margem e investidores de retalho.</p>
+  </header>
+
+  <h2><span class="sn">16.1</span>O que tem de ser verdade</h2>
+  <ol class="alerts">
+    <li><b>Há compradores que hoje pagam ≥ 6,00 €/kg sem IVA</b> por azeite equivalente ao de origem identificada, documentados por cotações; a 5,65 €/kg o lote HoReCa dá 0,347 €/kg; a 6,00 dá 0,609 €/kg.</li>
+    <li><b>Distribuidores e exportadores pagam prémio por origem verificada</b>, pelo menos 0,10 €/kg sobre o preço de saída do embalador, assinado num offtake.</li>
+    <li><b>≥ 85 % de cada lote está vendido back-to-back</b> antes de o comprar, e ≥ 300 clientes HoReCa ativos para o stock HoReCa rodar em ≤ 45 dias; abaixo disso, com obrigações, a margem HoReCa cai para ~0,15 €/kg.</li>
+    <li><b>Um banco aceita pagar a verificação</b> de stock de terceiros; sem isso, a receita de serviços é residual (18 k€ líquidos em 2031 no base).</li>
+    <li><b>Há capital para chegar lá</b>: pelo menos 4,0 M€ de capital próprio até 2031 no recomendado, ainda a subir, ou um desenho mais leve do que o modelado.</li>
+  </ol>
+
+  <h2><span class="sn">16.2</span>O que deixar de fazer já</h2>
+  <div class="stop">
+    <div><strong>«Jogadores» e retalho</strong>Prometer retorno a retalho com «refunding» é captação de fundos reembolsáveis (RGICSF art. 200.º, crime) e o padrão Afinsa/Cimovelpark. Nenhum material, conversa ou lista de espera de retalho até haver ECSP de terceiros.</div>
+    <div><strong>«Monetizar em 12 horas»</strong>Só existe do lado B2B. Do lado do investidor, o mínimo é SPV registada + 12 meses + parecer + contas. Pressa aqui é o que gera dinheiro preso e bloqueios bancários.</div>
+    <div><strong>O backoffice «reverse engineered»</strong>Quarentena até à auditoria; nada de dinheiro real nem dados de investidores lá dentro; ledger, pagamentos e KYC reescritos de raiz.</div>
+    <div><strong>«80–90 %», «88 % redistribuído», «hedge funds»</strong>Afirmações enganosas perante investidores. Usar margem em €/kg por canal, EBITDA, e o instrumento físico (back-to-back, indexação, offtake).</div>
+    <div><strong>Desconto contra marca branca e AOVE <i>standard</i></strong>Aritmeticamente impossível contra 3,99–4,57 €/kg; e o 5 L <i>standard</i> é o chamariz do cash &amp; carry.</div>
+    <div><strong>Co-financiamento por lote e partilha de margem na app</strong>Retorno indexado ao lote aproxima o produto de OIC ou derivado. A app vende uma série de obrigações de cupão fixo.</div>
+    <div><strong>A analogia dos combustíveis</strong>Oligopólio integrado e carga fiscal, não comissões. Usar a cadeia de valor do azeite, o Liv-ex e o <i>en primeur</i>.</div>
+    <div><strong>«HNWI» como «qualificado»</strong>Só profissionais <i>per se</i> ou classificados por banco ou empresa de investimento; ≥ 100 000 € sem ser profissional é retalho para os PRIIPs.</div>
+  </div>
+
+  <h2><span class="sn">16.3</span>As cinco decisões dos próximos 30 dias</h2>
+  <ol class="decisions">
+    <li><h3>Constituir e registar a Sprout Capital, SA até nov. 2026</h3> com 50 000 € de capital: o relógio de 12 meses do CSC art. 348.º/2 começa aí. Contratar o escritório independente do parecer, com as perguntas 2 (CSC/RGICSF) e 10 (PRIIPs) primeiro. <span class="muted">Gonçalo Almeida.</span></li>
+    <li><h3>Nomear o responsável de Risco e Tesouraria</h3> ou abrir já o recrutamento (perfil de <i>trade finance</i>, ~60 k€ brutos no modelo), e aprovar a política de cobertura v0.1 e o playbook de liquidez (minutas em 40 §7–8). <span class="muted">Speaker 1 e Gonçalo Almeida.</span></li>
+    <li><h3>Pôr o backoffice em quarentena</h3> e encomendar a auditoria de proveniência e o <i>pentest</i> (10–25 k€ [E]); começar o ledger de dupla entrada e abrir contas em 2–3 bancos portugueses. <span class="muted">Speaker 2.</span></li>
+    <li><h3>Medir o preço antes de vender</h3>: 20–30 cotações de referência até 31-01-2027; perguntas escritas a 3 distribuidores e exportadores sobre prémio de origem; definir com o Lagar do Val o lote de origem identificada, o <i>feed</i> diário e as regras de parte relacionada. <span class="muted">Speaker 1 e Pedro Marques.</span></li>
+    <li><h3>Fixar o pré-seed e as regras de paragem</h3>: 1,1 M€ (ou 0,8 M€ + bridge firme de 0,3 M€), com o gate de 31-08-2027 e os critérios de 14.2 assinados por todos antes do primeiro euro; corrigir o deck e a app para o desenho recomendado. <span class="muted">Todos.</span></li>
+  </ol>
+</section>

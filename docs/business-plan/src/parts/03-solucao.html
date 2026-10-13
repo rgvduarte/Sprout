@@ -1,0 +1,63 @@
+
+<!-- ================================ 3 SOLUÇÃO ================================ -->
+<section class="chapter" id="c3">
+  <header class="ch-head">
+    <span class="ch-num">03</span>
+    <h1>A solução: Sprout</h1>
+    <p class="standfirst">Um marketplace fechado que compra azeite só quando já o vendeu, uma SPV que financia esse stock com obrigações de cupão fixo, e uma app que mostra ao investidor os lotes físicos por trás da sua série. Os dois negócios, mercadoria e capital, ficam juridicamente separados desde o primeiro dia.</p>
+  </header>
+
+  <h2><span class="sn">3.1</span>Três lados e uma plataforma</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:24mm"><col style="width:42mm"><col style="width:36mm"><col style="width:42mm"><col></colgroup>
+    <thead><tr><th>Lado</th><th>Quem</th><th>O que dá</th><th>O que recebe</th><th>Contrato</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">Produtores</td><td>Lagares do Alentejo e de Trás-os-Montes: Lagar do Val e mais dois; engarrafadores com captação reconhecida pela DGEG</td><td>Lote individualizado, ficha analítica, embalamento no lagar, telemetria do tanque</td><td>Índice (média de 2 semanas SIMA + Poolred) mais prémio de origem; pagamento em ≤ 30 dias por SCT Inst</td><td>Compra; depósito tripartido; força maior com lista fechada</td></tr>
+      <tr><td class="lbl">Compradores B2B</td><td>HoReCa média e alta, lojas gourmet, distribuidores <i>foodservice</i>, exportadores</td><td>Encomenda firme ou offtake; mandato SDD B2B</td><td>HoReCa: origem rastreável ~10 % abaixo da referência documentada. Distribuidores: preço de saída do embalador, lote verificado, prazo</td><td>Condições gerais de venda; offtake acima de 10 t</td></tr>
+      <tr><td class="lbl">Financiadores</td><td>Desde a 1.ª série (nov. 2027–jan. 2028): clientes profissionais. Fase 2: banco parceiro para stock de terceiros</td><td>Capital para stock e recebíveis</td><td>Cupão fixo de 8 % em 2028, 7,5 % em 2029 e 7 % desde 2030 (base e recomendado), garantido pelos lotes e pela cessão de recebíveis; sem exposição ao preço do azeite</td><td>Termos e condições das obrigações; representante comum</td></tr>
+      <tr><td class="lbl">Plataforma</td><td>Sprout Marketplace (OpCo), Sprout Capital, SA (SPV), collateral manager independente</td><td>Curadoria, verificação, custódia, logística, crédito, ledger e reconciliação diária</td><td>Margem de principal no azeite; comissão de agente na água; comissões de verificação (fase 2)</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p class="tblnote">Fonte: 01 §1.3. O azeite é comprado e revendido pela OpCo como principal (é a única forma de capturar parte do diferencial granel → prateleira); a água fica em modelo de agente com faturação direta do engarrafador ao comprador, sem fundos de terceiros nas contas do Sprout.</p>
+
+  <h2><span class="sn">3.2</span>Mercadoria, dinheiro e título: quem passa o quê a quem</h2>
+  <figure>
+    {{svg_fluxos}}
+    <figcaption><strong>Cada fila é um fluxo; as colunas são os mesmos atores.</strong> O lagar transmite à SPV a propriedade de um lote individualizado (tanque, selo, kg medidos, ficha analítica: sem individualização, a propriedade de coisa genérica não se transfere, CC art. 408.º/2 [L]). O lote fica no lagar sob depósito tripartido e só sai com ordem escrita; a parte HoReCa é embalada por tranches e passa para um 3PL com conta de custódia. A OpCo vende com reserva de propriedade e cede os recebíveis à SPV, notificados ao devedor (CC arts. 577.º e 583.º [L]). As cobranças entram numa conta da série e seguem em cascata diária, depois de reconciliadas. <span class="ref">01 §1.4</span></figcaption>
+  </figure>
+
+  <h2><span class="sn">3.3</span>O ciclo de um lote: 2 a 6 meses, não 18</h2>
+  <table class="compact wrap">
+      <thead><tr><th style="width:20mm">Dia</th><th>Evento</th><th style="width:42mm">Dinheiro</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">D−30</td><td>Offtake de distribuidores e encomendas HoReCa cobrem ≥ 85 % do lote; análise de pré-compra</td><td>—</td></tr>
+        <tr><td class="mono">D0</td><td>Tanque selado, inspeção de entrada, ficha do lote; propriedade passa para a SPV</td><td>Compromisso de pagamento</td></tr>
+        <tr><td class="mono">D0–D90</td><td>Distribuidores levantam paletes (até D60); parte HoReCa embalada por tranches e entregue via 3PL</td><td>—</td></tr>
+        <tr><td class="mono">D30</td><td>Pagamento ao lagar</td><td>SCT Inst, SPV → lagar</td></tr>
+        <tr><td class="mono">D35–D125</td><td>Cobranças por SDD B2B ou SCT com referência RF</td><td>Cascata diária</td></tr>
+        <tr><td class="mono">D125</td><td>Lote fechado; capital reutilizado ou amortizado. Com &lt; 300 clientes HoReCa, a parte HoReCa pode ir até ~D215</td><td>Cash sweep</td></tr>
+        <tr><td class="mono">M12 / M18</td><td>Reembolso esperado da série / vencimento legal, com uma extensão condicionada</td><td>SPV → investidores</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p><span class="lbl">Os 18 meses mudaram de sítio.</span> O produtor tem de ser pago em ≤ 30 dias (perecíveis) ou ≤ 60 dias (restantes produtos agroalimentares), Dir. 2019/633 e DL 118/2010, na redação do DL 76/2021 <span class="ref">00 §5</span>. Segurar azeite 18 meses custa ~20 % em carry e arrisca 37–57 % em preço [E]; não há futuros para o cobrir. Por isso «18 meses» passa a ser só o vencimento legal das obrigações: esperado em M12 (uma campanha), com uma extensão condicionada até M18.</p>
+      <p>No piloto (fev.–jul. 2027) o calendário é o mesmo, mas sem série: o lote é pago com capital próprio, porque a SPV só pode emitir 12 meses depois do registo (CSC art. 348.º/2 [L]).</p>
+    </div>
+
+  <h2><span class="sn">3.4</span>O que mudou face ao documento de 13/10</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:46mm"><col style="width:62mm"><col></colgroup>
+    <thead><tr><th>Documento-fonte</th><th>Desenho recomendado</th><th>Porquê</th></tr></thead>
+    <tbody>
+      <tr><td>«80–90 % da margem do embalador»</td><td>Margem de contribuição em €/kg por canal, e EBITDA</td><td>A margem do embalador (0,19–0,50 €/kg) não paga o desconto (cap. 6)</td></tr>
+      <tr><td>«10–15 % de desconto ao cliente»</td><td>Até 10 %, só HoReCa/gourmet, contra referência documentada; 0 % a distribuidores e exportadores</td><td>Com 15 %, a margem HoReCa cai para 0,07 €/kg no base</td></tr>
+      <tr><td>HoReCa com azeite <i>standard</i>; água como 2.º produto</td><td>Azeite de origem identificada (DOP, monovarietal, ficha, lagar âncora); água só no cabaz, como agente</td><td>O 5 L <i>standard</i> é o chamariz do cash &amp; carry; a água não tem embalador a desintermediar</td></tr>
+      <tr><td>—</td><td>Granel certificado back-to-back (0 → 3 500 t) e exportação embalada como alavanca de escala</td><td>Os bolos grandes estão a montante (cap. 5)</td></tr>
+      <tr><td>Café como 3.º mercado</td><td>Adiado para 2030; sourcing de verde em EUR, ICE só acima de 50–100 t/ano, conformidade EUDR</td><td>HoReCa presa a comodatos; EUDR a 30-12-2026</td></tr>
+      <tr><td>«Ciclo de 18 meses», «refunding»</td><td>Vencimento esperado M12, legal M18; reserva de 1.ª perda, extensão, cash sweep, refinanciamento voluntário</td><td>Prazos legais ao produtor; «reembolso garantido» é captação de fundos reembolsáveis</td></tr>
+      <tr><td>«Hedge funds / taxas de cobertura»</td><td>Back-to-back, indexação SIMA + Poolred, offtake, limites de stock aberto</td><td>Não há futuros de azeite desde o fecho do MFAO (2016–17)</td></tr>
+      <tr><td>HNWI e «jogadores»</td><td>Só profissionais na 1.ª série; retalho só mais tarde, como promotor numa ECSP de terceiros</td><td>Reserva bancária, PRIIPs, precedentes Afinsa e Asset Land (cap. 7)</td></tr>
+      <tr><td>Equipa a 17 FTE em 2031</td><td>5,5 → 12 FTE, contratações presas aos gates</td><td>A margem por kg não paga a estrutura do base</td></tr>
+    </tbody>
+  </table>
+</section>

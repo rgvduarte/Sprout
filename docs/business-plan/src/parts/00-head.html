@@ -90,6 +90,8 @@
   table.t-fin td:first-child { width: 78mm; }
   table.t-fin td.num, table.t-fin th.num { width: 18mm; }
   table.wrap td { white-space: normal; }
+  .cols + table, .cols + figure, .cols + .note { margin-top: 2.8mm; }
+  th.grp-h { text-align: center; border-bottom: 0.5pt solid var(--rule-strong); font-weight: 600; }
   .tblnote { font-size: 6.9pt; color: var(--muted); line-height: 1.38; margin: -1.6mm 0 3mm; }
 
   /* ---------- figuras ---------- */
@@ -122,6 +124,12 @@
   .exec-grid ul { font-size: 8.5pt; line-height: 1.4; margin: 0; }
   .exec-grid li { margin-bottom: 0.6mm; }
   .exec-grid .wide { grid-column: 1 / -1; }
+  ol.path { column-count: 2; column-gap: 8mm; margin: 0 0 1.6mm; }
+  ol.path > li { font-size: 8.4pt; line-height: 1.38; break-inside: avoid; }
+  ol.path > li::before { content: counter(li, lower-alpha) ")"; }
+  .verdict-line { font-size: 8.5pt; line-height: 1.4; border-top: 0.5pt solid var(--rule); padding-top: 1.4mm; }
+  .verdict-line .lbl { font-weight: 600; }
+  .verdict-line .lbl.crit { color: var(--crit); }
 
   /* ---------- listas de decisões e alertas ---------- */
   ol.decisions > li { padding-left: 7mm; margin-bottom: 2mm; break-inside: avoid; }
@@ -150,6 +158,17 @@
   .gloss-cols dd { display: inline; margin: 0; }
   .ref { font-size: 6.5pt; }
   .keep-together { break-inside: avoid; }
+  .risk-grid { display: grid; grid-template-columns: 74mm 1fr; column-gap: 8mm; align-items: start; margin-bottom: 2mm; }
+  .risk-grid figure { margin: 0; }
+  table.risk-tbl td.num { font-size: 7.4pt; }
+  table.t-lote td:first-child { width: 74mm; }
+  table.t-canais td:first-child { width: 68mm; }
+  table.t-scen4 td:first-child { width: 62mm; }
+  table.t-scen4 td.em, table.t-scen4 th.em { background: var(--panel); }
+  table.t-scen td:first-child { width: 48mm; }
+  table.t-sens td:first-child { width: 50mm; }
+  table.t-press td:nth-child(2), table.t-press td:nth-child(3) { width: 46mm; }
+  table.t-fundos td:first-child { width: 58mm; }
 </style>
 </head>
 <body>

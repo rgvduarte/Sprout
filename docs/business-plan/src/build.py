@@ -179,9 +179,9 @@ def _arrow_defs(ids):
 
 @gen('svg_fluxos')
 def _():
-    W, left = 680, 92
-    cols = ['Investidores\nprofissionais', 'Sprout Capital, SA\n(SPV)', 'Sprout Marketplace\n(OpCo)', 'Lagar\n(produtor)',
-            'Tanque selado\n+ collateral manager', 'Armazém 3PL\n(custódia)', 'Comprador B2B\n(HoReCa, distrib.)']
+    W, left = 680, 84
+    cols = ['Investidores\nprofissionais', 'SPV\nSprout Capital, SA', 'OpCo\nSprout Marketplace', 'Lagar\nprodutor',
+            'Tanque selado\n+ collateral manager', 'Armazém 3PL\ncom custódia', 'Comprador B2B\nHoReCa, distrib.']
     cw = (W - left) / len(cols)
     cx = [left + cw * (i + 0.5) for i in range(len(cols))]
     rows = [('Mercadoria', 66, 132, '#8C8A16', 'g'), ('Dinheiro', 132, 266, '#3F5A1E', 'm'), ('Título e\ngarantias', 266, 386, '#1A1E16', 't')]
@@ -192,7 +192,7 @@ def _():
     for i, c in enumerate(cols):
         l1, l2 = c.split('\n')
         o.append(_txt(cx[i], 20, l1, 9.6, weight=600))
-        o.append(_txt(cx[i], 32, l2, 8.8, fill='#5B6352'))
+        o.append(_txt(cx[i], 32, l2, 8.2, fill='#5B6352'))
         o.append(f'<line x1="{cx[i]:.1f}" x2="{cx[i]:.1f}" y1="44" y2="{H - 6}" stroke="#E6E9DD" stroke-width="1"/>')
     o.append(f'<line x1="0" x2="{W}" y1="50" y2="50" stroke="#1A1E16" stroke-width="0.9"/>')
     for name, y0, y1, col, key in rows:
@@ -257,10 +257,7 @@ def _():
     for key, lab in LINE_LABELS:
         bk, bl, rk, rl = b['eur_kg'][key], b['eur_lote'][key], r['eur_kg'][key], r['eur_lote'][key]
         cls = 'total' if key == 'margem' else ('sep' if key in ('price', 'gr') else '')
-        if key in ('arm', 'seg'):
-            dec = 4
-        else:
-            dec = 3
+        dec = 3
         out.append(f'<tr class="{cls}"><td>{lab}</td><td class="num">{nf(bk, dec)}</td><td class="num">{nf(bl)}</td>'
                    f'<td class="num">{nf(rk, dec)}</td><td class="num">{nf(rl)}</td></tr>')
     out.append(f'<tr class="memo"><td>Margem em % da receita</td><td class="num">{pct(b["margem_pct"])}</td><td></td>'
@@ -329,10 +326,12 @@ def _():
 @gen('tbl_tese_literal')
 def _():
     t = SE['tese_literal_horeca_base_2029']
-    out = ['<table class="compact t-grid"><thead><tr><th>Saldo para o Sprout, €/kg</th>']
-    for lab, key in (('margem média 0,297', 'margem_embalador_med'), ('margem recorde 0,499', 'margem_embalador_max')):
+    out = ['<table class="compact t-grid"><thead>'
+           '<tr><th rowspan="2">Saldo para o Sprout, €/kg</th><th class="num grp-h" colspan="3">Margem do embalador média, 0,297 €/kg</th>'
+           '<th class="num grp-h" colspan="3">Margem de 2019/20, 0,499 €/kg</th></tr><tr>']
+    for key in ('margem_embalador_med', 'margem_embalador_max'):
         for c in t[key]['captura']:
-            out.append(f'<th class="num">{int(round(c * 100))} %<span class="sub">{lab if c == 0.85 else "&nbsp;"}</span></th>')
+            out.append(f'<th class="num">captura {int(round(c * 100))} %</th>')
     out.append('</tr></thead><tbody>')
     for i, dsc in enumerate(t['margem_embalador_med']['desconto']):
         row = f'<tr><td>Desconto de {nf(dsc * 100, 1 if dsc == 0.125 else 0)} %</td>'
@@ -353,7 +352,7 @@ def _():
     a4 = a3 + cup
     return chart('barChart', {
         'ariaLabel': 'Tese literal: o que se captura da margem do embalador contra o desconto, os custos diretos e o cupão, em euros por quilo',
-        'thickness': 12, 'rowGap': 9, 'labelWidth': 210,
+        'thickness': 12, 'rowGap': 8, 'labelWidth': 230,
         'x': {'min': -0.7, 'max': 0.35, 'ticks': [-0.6, -0.4, -0.2, 0, 0.2], 'format': {'dec': 1}},
         'data': [
             {'label': 'Captura de 85 % da margem do embalador', 'value': round(a1, 4), 'valueLabel': '+' + nf(cap, 2), 'color': 'neutral.1'},
@@ -363,6 +362,27 @@ def _():
             {'label': 'Saldo para o Sprout', 'value': round(a4, 4), 'valueLabel': nf(a4, 2), 'color': 'accent', 'emphasis': True},
         ],
     })
+
+
+@gen('tbl_receitas')
+def _():
+    mb, mr = B['margem_contribuicao'], RC['margem_contribuicao']
+    rows = [
+        ('Azeite HoReCa/gourmet (principal)', 'Venda a 90 % da referência documentada; custos diretos e cupão deduzidos', 'azeite_horeca_gourmet', '2027'),
+        ('Azeite distribuidores e exportação (principal)', 'Preço de saída do embalador, sem desconto; recomendado: +0,10 €/kg de prémio de origem', 'azeite_distribuidores_exportacao', '2027'),
+        ('Granel certificado (principal, back-to-back)', 'Comprado ao índice, vendido a embaladores e exportadores a índice + 0,15 €/kg; lotes de 100 t', 'azeite_granel_certificado', '2028 (rec.)'),
+        ('Café verde (principal)', 'Compra em EUR a importador UE; venda a microtorrefatores', 'cafe_verde', '2029 / 2030'),
+        ('Água (agente)', 'Comissão de 2 % do GMV, faturada ao engarrafador; sem stock nem fundos de terceiros', 'agua', '2027'),
+        ('Verificação para terceiros', '0,75 % por utilização × 2 + 0,5 %/ano da carteira de um banco parceiro; no recomendado o banco paga a custódia', 'verificacao_terceiros_liquida', '2028'),
+        ('Dados e índice', 'Subscrição de preços de lotes verificados', 'dados', '2030'),
+    ]
+    out = ['<table class="compact wrap t-rec"><colgroup><col style="width:50mm"><col><col style="width:16mm"><col style="width:19mm"><col style="width:22mm"></colgroup>'
+           '<thead><tr><th>Fonte de receita</th><th>Mecânica</th><th>Início</th><th class="num">Base 2031<span class="sub">k€ de margem</span></th><th class="num">Recomendado 2031<span class="sub">k€ de margem</span></th></tr></thead><tbody>']
+    for lab, mec, key, ini in rows:
+        out.append(f'<tr><td class="lbl">{lab}</td><td>{mec}</td><td>{ini}</td><td class="num">{k(mb[key][4], 0)}</td><td class="num">{k(mr[key][4], 0)}</td></tr>')
+    out.append(f'<tr class="total"><td>Margem de contribuição total</td><td></td><td></td><td class="num">{k(mb["total"][4])}</td><td class="num">{k(mr["total"][4])}</td></tr>')
+    out.append('</tbody></table>')
+    return ''.join(out)
 
 # ---------------------------------------------------------------- capítulo 13: financeiro
 
@@ -492,10 +512,10 @@ def _():
         'x': {'type': 'linear', 'ticks': YEARS, 'format': {'group': False}},
         'y': {'min': 0, 'max': 6000, 'ticks': [0, 2000, 4000, 6000], 'format': {'dec': 0}, 'unit': 'k€'},
         'series': [
-            {'name': 'Pessimista', 'color': 'neutral.2', 'points': pts(PE), 'endLabel': f'Pessimista {M(PE["necessidade_capital_proprio"])} M€', 'endDy': 3},
-            {'name': 'Otimista', 'color': 'neutral.2', 'points': pts(OT), 'endLabel': f'Otimista {M(OT["necessidade_capital_proprio"])} M€', 'endDy': -2},
-            {'name': 'Base', 'color': 'neutral.1', 'points': pts(B), 'endLabel': f'Base {M(B["necessidade_capital_proprio"])} M€', 'markers': 'ends', 'endDy': -3},
-            {'name': 'Recomendado', 'color': 'accent', 'points': pts(RC), 'endLabel': f'Recomendado {M(RC["necessidade_capital_proprio"])} M€', 'emphasis': True, 'markers': 'ends', 'endDy': 6},
+            {'name': 'Pessimista', 'color': 'neutral.2', 'points': pts(PE), 'endLabel': f'Pessimista {M(PE["necessidade_capital_proprio"])}', 'endDy': 2},
+            {'name': 'Otimista', 'color': 'neutral.2', 'points': pts(OT), 'endLabel': f'Otimista {M(OT["necessidade_capital_proprio"])}', 'endDy': 3},
+            {'name': 'Base', 'color': 'neutral.1', 'points': pts(B), 'endLabel': f'Base {M(B["necessidade_capital_proprio"])}', 'markers': 'ends', 'endDy': -6},
+            {'name': 'Recomendado', 'color': 'accent', 'points': pts(RC), 'endLabel': f'Recomendado {M(RC["necessidade_capital_proprio"])}', 'emphasis': True, 'markers': 'ends', 'endDy': 5},
         ],
     })
 

@@ -1,0 +1,84 @@
+
+<!-- ================================ ANEXO A ================================ -->
+<section class="chapter annex" id="ca">
+  <header class="ch-head">
+    <span class="ch-num">A</span>
+    <h1>Anexo A · Plano de ação</h1>
+    <p class="standfirst">Os entregáveis do documento-fonte, com os responsáveis que ele nomeia. Todos estavam sem prazo («[TBD]»); os prazos abaixo são uma proposta alinhada com o calendário da fase 0, para decidir na próxima reunião.</p>
+  </header>
+  <table class="compact wrap">
+    <colgroup><col style="width:6mm"><col style="width:27mm"><col style="width:56mm"><col><col style="width:20mm"></colgroup>
+    <thead><tr><th>#</th><th>Responsável</th><th>Entregável no documento-fonte</th><th>Como fica no desenho recomendado</th><th>Prazo proposto</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">1</td><td>Gonçalo Almeida</td><td>Nota de 2 páginas: estrutura jurídica (SPV ou plataforma de intermediação) e restrições de promoção na UE</td><td>Decisão OpCo + SPV PT; nota substituída pelo parecer independente com as 10 perguntas de 01 §3.5 (2 e 10 primeiro)</td><td class="mono">31-10-2026</td></tr>
+      <tr><td class="mono">2</td><td>Gonçalo Almeida</td><td>Jurisdição primária e rails PSP/IME UE, com risco de repatriação</td><td>Portugal; bancos PT (SCT Inst, VoP, SDD B2B); sem PSP para dinheiro de investidores; Luxemburgo só acima de 5–10 M€</td><td class="mono">31-10-2026</td></tr>
+      <tr><td class="mono">3</td><td>Gonçalo Almeida</td><td>Contratos-padrão produtor↔plataforma e plataforma↔investidor com 18 meses, extensão e força maior</td><td>Produtor: compra ao índice + prémio, pagamento ≤ 30 dias, depósito tripartido, força maior com lista fechada. Investidor: termos das obrigações (M12/M18, uma extensão, <i>step-up</i>, cash sweep, representante comum)</td><td class="mono">15-12-2026<span class="sub">investidor: 30-09-2027</span></td></tr>
+      <tr><td class="mono">4</td><td>Pedro Marques</td><td>Feed de stock (formato e frequência), curva de produção anual, SLA de expedição</td><td>CSV diário por SFTP desde a semana 1; API nos meses 1–2; radar a cada 15 min até ao mês 4; lista de tanques para orçamentar sensores</td><td class="mono">31-10-2026</td></tr>
+      <tr><td class="mono">5</td><td>Pedro Marques</td><td>Capacidade mínima e máxima de lote; requisitos de qualidade e auditoria</td><td>Lote de 20 t; critérios de entrada mais exigentes do que a lei; laboratório e calendário de análises; regras de parte relacionada</td><td class="mono">30-11-2026</td></tr>
+      <tr><td class="mono">6</td><td>Speaker 1</td><td>Produtores iniciais (azeite, água, café) com volumes, preços e desconto-alvo de 10–15 %</td><td>20–30 cotações de referência; 3 lagares e 2 engarrafadores; café fora; desconto até 10 % só para HoReCa e contra referência documentada</td><td class="mono">31-01-2027</td></tr>
+      <tr><td class="mono">7</td><td>Speaker 1</td><td>Coorte piloto de investidores qualificados, elegibilidade e KYC</td><td>Zero investidores no piloto; 1.ª série a 2–4 profissionais com ticket ≥ 25 000 €</td><td class="mono">30-09-2027</td></tr>
+      <tr><td class="mono">8</td><td>Speaker 1</td><td>Deck de <i>roadshow</i> com métricas, estrutura de risco e disclaimers aprovados</td><td>Deck rotulado como comunicação publicitária, aprovado no parecer; sem «80–90 %», «hedge funds» nem combustíveis</td><td class="mono">30-09-2027</td></tr>
+      <tr><td class="mono">9</td><td>Speaker 2</td><td>Auditoria do backoffice (segurança, conformidade, logs); remover dependências de reverse engineering</td><td>Quarentena; auditoria em três camadas; <i>clean room</i> para ledger, pagamentos e KYC; critério obrigatório do gate</td><td class="mono">15-12-2026</td></tr>
+      <tr><td class="mono">10</td><td>Speaker 2</td><td>Integrar PSP e KYC/AML (UE); segregação de contas e reconciliação diária</td><td>Bancos PT + fornecedor KYC dedicado; ledger de dupla entrada em € e kg; SLA 07h–09h–10h</td><td class="mono">31-01-2027</td></tr>
+      <tr><td class="mono">11</td><td>Speaker 2</td><td>Painel de risco: mercado contra contrato, gatilhos de hedge, PnL do lote</td><td>Lê do ledger; inclui stock aberto, almofada, idade e qualidade dos lotes, DSO e concentração</td><td class="mono">31-01-2027</td></tr>
+      <tr><td class="mono">12</td><td><span class="st crit">Risco e Tesouraria</span><span class="sub">a designar</span></td><td>Política de hedge (instrumentos, limites de custo, contrapartes, gatilhos) e playbook de refunding por lote</td><td>Política de cobertura e playbook de liquidez e extensão (minutas em 40 §7–8): v0.1 já, v1 aprovada pelos órgãos antes da 1.ª emissão</td><td class="mono">30-11-2026<span class="sub">v1: 31-10-2027</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================================ ANEXO B ================================ -->
+<section class="chapter annex" id="cb">
+  <header class="ch-head">
+    <span class="ch-num">B</span>
+    <h1>Anexo B · Glossário</h1>
+  </header>
+  <div class="gloss-cols">
+    <dl class="gloss">
+      <div><dt>AOVE</dt><dd>Azeite virgem extra: acidez ≤ 0,8 %, painel sem defeitos, frutado &gt; 0 (Reg. Del. 2022/2104).</dd></div>
+      <div><dt>Back-to-back</dt><dd>Comprar um lote só contra uma venda já contratada, a preço fixo ou indexado ao mesmo índice; elimina o risco de preço do lote.</dd></div>
+      <div><dt>Bolo de intermediação</dt><dd>Referência do comprador menos granel, embalamento e logística: o que hoje fica com embalador, distribuidor e retalhista.</dd></div>
+      <div><dt>Borrowing base</dt><dd>Montante que uma série pode usar: stock elegível × <i>advance rate</i> + recebíveis elegíveis × <i>advance rate</i>.</dd></div>
+      <div><dt>Break</dt><dd>Diferença entre o saldo do ledger e o saldo externo (banco, PSP, stock) que a reconciliação não explica.</dd></div>
+      <div><dt>camt.053</dt><dd>Extrato bancário de fim de dia em ISO 20022; fonte de verdade da reconciliação D+1.</dd></div>
+      <div><dt>Carry</dt><dd>Custo de manter stock: armazenagem, seguro, capital, análises, perdas e desclassificação.</dd></div>
+      <div><dt>Cash sweep</dt><dd>Amortização antecipada automática das obrigações com a caixa livre da série.</dd></div>
+      <div><dt>Cliente profissional</dt><dd>Categoria MiFID II, Anexo II: <i>per se</i> (instituições) ou a pedido, classificado por banco ou empresa de investimento (2 de 3 critérios).</dd></div>
+      <div><dt>Collateral manager</dt><dd>Inspetora independente que detém o stock por conta do credor, certifica existências e autoriza libertações.</dd></div>
+      <div><dt>Cupão</dt><dd>Juro fixo pago aos obrigacionistas; no modelo, 8 % em 2028 a 7 % em 2031.</dd></div>
+      <div><dt>DOP</dt><dd>Denominação de Origem Protegida, p. ex. Azeite de Trás-os-Montes.</dd></div>
+      <div><dt>DSO</dt><dd>Prazo médio de recebimento dos clientes, em dias.</dd></div>
+      <div><dt>ECSP</dt><dd>Prestador de serviços de crowdfunding (Reg. 2020/1503); teto de 5 M€ por promotor em 12 meses.</dd></div>
+      <div><dt>EUDR</dt><dd>Regulamento da UE contra a desflorestação; aplica-se ao café a 30-12-2026 (grandes e médios).</dd></div>
+      <div><dt>Extensão</dt><dd>Prorrogação única, por opção do emitente, do vencimento esperado (M12) até ao legal (M18), com <i>step-up</i> do cupão.</dd></div>
+      <div><dt>FIA / OIC</dt><dd>Fundo de investimento alternativo / organismo de investimento coletivo: capital de vários investidores aplicado segundo uma política, com retorno agregado.</dd></div>
+      <div><dt>Fill rate</dt><dd>Linhas de encomenda entregues completas e a tempo ÷ linhas aceites.</dd></div>
+      <div><dt>Gate</dt><dd>Decisão de 31-08-2027 de avançar, mudar ou parar, com critérios escritos (cap. 14).</dd></div>
+      <div><dt>GMV</dt><dd>Valor bruto transacionado; no azeite coincide com a receita (principal), na água é o valor que passa entre engarrafador e comprador.</dd></div>
+      <div><dt>HoReCa</dt><dd>Hotelaria, restauração e cafetaria.</dd></div>
+      <div><dt>Índice contratual</dt><dd>Média de 2 semanas do SIMA (Alentejo, AOVE) e do Poolred; ~3,42–3,47 €/kg a out. 2026; o modelo usa 3,50.</dd></div>
+      <div><dt>KID / PRIIPs</dt><dd>Documento de informação fundamental exigido para produtos de investimento vendidos a retalho (Reg. 1286/2014).</dd></div>
+      <div><dt>Margem de contribuição</dt><dd>Receita menos custo das mercadorias, custos variáveis e cupão; antes de pessoal e opex.</dd></div>
+      <div><dt>Offtake</dt><dd>Compromisso de compra de um volume mínimo por um comprador profissional, por período.</dd></div>
+      <div><dt>OpCo / SPV</dt><dd>Sprout Marketplace (operação comercial) / Sprout Capital, SA (veículo que detém os lotes e emite obrigações).</dd></div>
+      <div><dt>Principal / agente</dt><dd>Principal compra e revende em nome próprio; agente intermedeia e cobra comissão, sem tocar no dinheiro do comprador.</dd></div>
+      <div><dt>Reserva de 1.ª perda</dt><dd>Conta empenhada aos obrigacionistas, alimentada por 30 % da margem de cada lote até 5 % do saldo vivo.</dd></div>
+      <div><dt>SCT Inst / VoP</dt><dd>Transferência SEPA imediata / verificação do nome do beneficiário contra o IBAN, obrigatórias desde 09-10-2025.</dd></div>
+      <div><dt>SDD B2B</dt><dd>Débito direto SEPA entre empresas, sem direito a reembolso de cobranças autorizadas.</dd></div>
+      <div><dt>Step-up</dt><dd>Aumento do cupão durante a extensão: +250 p.b.</dd></div>
+      <div><dt>3PL</dt><dd>Operador logístico terceiro que armazena e expede, aqui com conta de custódia por conta da SPV.</dd></div>
+      <div><dt>UTP</dt><dd>Práticas comerciais desleais na cadeia agroalimentar (Dir. 2019/633): pagamento ao produtor em ≤ 30/60 dias.</dd></div>
+      <div><dt>VaR 95 %</dt><dd>Perda que só é excedida em 5 % dos casos, num horizonte dado.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ================================ ANEXO C ================================ -->
+<section class="chapter annex" id="cc">
+  <header class="ch-head">
+    <span class="ch-num">C</span>
+    <h1>Anexo C · Fontes</h1>
+    <p class="standfirst">As {{n_fontes}} fontes da base factual (docs/research/00-base-factual.md), todas com acesso a 13-10-2026. Foram consultadas pelas notas 10–50 através de extratos de motor de pesquisa, salvo indicação; [C] marca a referência canónica não acedida. As URL completas de cada facto, com etiqueta e confiança, estão na base factual e nas notas 10–50.</p>
+  </header>
+  <div class="small"><p><b>Documentos internos:</b> docs/fonte/plano-estrategico-10-13.md (documento-fonte); docs/research/00-base-factual.md, 01-desenho-do-modelo.md, 10-mercado.md, 20-regulatorio.md, 30-pagamentos-infra.md, 40-risco-coberturas.md, 50-concorrencia.md; docs/business-plan/Sprout-Modelo-Financeiro.xlsx, modelo/pressupostos.json, modelo/resultados.json, modelo/calculo_referencia.py; protótipo em https://rgvduarte.github.io/Sprout/ (dados fictícios).</p></div>
+  {{lista_fontes}}
+</section>

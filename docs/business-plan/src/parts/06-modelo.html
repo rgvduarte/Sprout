@@ -1,0 +1,47 @@
+
+<!-- ================================ 6 MODELO DE NEGÓCIO ================================ -->
+<section class="chapter" id="c6">
+  <header class="ch-head">
+    <span class="ch-num">06</span>
+    <h1>Modelo de negócio e unit economics</h1>
+    <p class="standfirst">Economicamente, o Sprout é um distribuidor especializado com verificação de lotes, de margem baixa. Ganha por kg, por canal, e só ganha bem num canal: azeite de origem identificada vendido à HoReCa média e alta contra uma referência documentada. A tese mede-se em €/kg e em EBITDA, não em «% da margem do embalador».</p>
+  </header>
+
+  <h2><span class="sn">6.1</span>Fontes de receita</h2>
+  {{tbl_receitas}}
+  <p class="tblnote">O que não cobramos: comissões de gestão ou de desempenho aos investidores. Cobrar «spread retido» a quem financia é cobrar como gestor de ativos e reforça a leitura de organismo de investimento coletivo <span class="ref">01 §6.1</span>. No recomendado, a margem média do azeite em 2031 é de 0,098 €/kg, abaixo dos 0,122 €/kg do base, porque o granel certificado dilui a média; o EBITDA melhora pela estrutura mais leve e pelos serviços.</p>
+
+  <h2><span class="sn">6.2</span>O lote-tipo: 20 t de AOVE para HoReCa e gourmet</h2>
+  {{tbl_lote_horeca}}
+  <p class="tblnote">Regime de 2029: stock médio de 45 dias, ciclo líquido de 50 dias, obrigações a 90 % do capital empregue com utilização de 80 %, cupão de 7,5 %/ano. Recomendado: referência de 6,00 €/kg de origem identificada (por verificar) e prémio de 0,15 €/kg ao lagar. <span class="ref">Modelo · Unit economics · 01 §2.2</span></p>
+  <figure>
+    <p class="fig-title">Para onde vão os 5,65 €/kg da referência no lote base</p>
+    <p class="fig-sub">€/kg sem IVA, desconto de 10 %. A barra de baixo amplia o bolo de intermediação: o que hoje fica com embalador, distribuidor e retalhista.</p>
+    {{fig_lote_valuechain}}
+    <figcaption>No recomendado, o bolo é de 1,52 €/kg e reparte-se em 39 % desconto, 3 % cupão, 17 % custos diretos e 40 % margem. A repartição explica; não mede: a antiga «taxa de redistribuição» dava 70–90 % até em lotes com margem negativa. <span class="ref">01 §2.3 · Modelo</span></figcaption>
+  </figure>
+  <div class="cols">
+    <p><b>Do lado do investidor.</b> No lote base, 83 000 € ficam imobilizados durante ~50 dias. Estão-lhe afetos 93 375 € de obrigações (o excedente fica em caixa na série) e o cupão do ciclo é de 959 €: 7,5 %/ano bruto, ~5,4 % líquido para um particular residente, com retenção de 28 % [L]. Os 10 % de capital subordinado (8 300 €) são do patrocinador.</p>
+    <p>O investidor não ganha nem perde com o preço do azeite enquanto a almofada (margem do lote, reserva de 1.ª perda, subordinado) absorver as perdas: é um credor colateralizado, não um dono de stock. É isso que mantém o produto fora das leituras de derivado e de organismo de investimento coletivo (cap. 7).</p>
+  </div>
+
+  <h2><span class="sn">6.3</span>Os outros canais: volume, não margem</h2>
+  {{tbl_lotes_canais}}
+  <div class="cols">
+    <p><b>Distribuidores e exportadores</b> compram ao embalador a 4,16–4,51 €/kg; o Sprout não lhes pode dar desconto. No base, a 4,35 €/kg, o canal ganha 0,064 €/kg (1,5 %) e só não perde dinheiro acima de 4,29 €/kg. O recomendado assume um prémio de origem de 0,10 €/kg (4,45 €/kg) e 55 dias de recebimento: 0,155 €/kg. Cada 0,10 €/kg vale ~178 k€ de EBITDA em 2031 no base <span class="ref">01 §2.5</span>.</p>
+    <p><b>Granel certificado</b>, em lotes de 100 t comprados ao índice e vendidos a índice + 0,15 €/kg, deixa 0,035 €/kg (0,9 %). Dá escala, historial de verificação e colateral para o banco parceiro; não dá margem. No piloto, sem cupão, a HoReCa faz 0,341 €/kg e os distribuidores 0,096 €/kg (base).</p>
+  </div>
+
+  <h2><span class="sn">6.4</span>O veredicto sobre «80–90 % da margem do embalador» e «10–15 % de desconto»</h2>
+  <figure>
+    <p class="fig-title">A tese literal num lote HoReCa base, €/kg</p>
+    <p class="fig-sub">Captura de 85 % da margem média do embalador nas três campanhas do Observatorio (0,297 €/kg), contra o que o lote tem de pagar</p>
+    {{fig_tese_waterfall}}
+    <figcaption>O desconto de 10 % custa 2,24 vezes o que a captura rende; depois dos custos diretos e do cupão, sobram −0,62 €/kg. <span class="ref">Modelo · unit economics</span></figcaption>
+  </figure>
+  {{tbl_tese_literal}}
+  <p class="tblnote">As 18 combinações de captura (80, 85, 90 %), desconto (10, 12,5, 15 %) e margem do embalador (média ou a mais alta das três campanhas) dão saldo negativo. <span class="ref">Modelo · sensibilidade</span></p>
+  <div class="note">
+    <p><span class="lbl crit">O que tem de ceder.</span> «80–90 %» sai do deck e da app: usá-lo perante investidores seria uma afirmação enganosa (Reg. 2017/1129, art. 22.º; CVM, art. 7.º [L]). O desconto é de até 10 %, só para HoReCa e gourmet, e só contra uma referência documentada em €/kg; distribuidores e exportadores têm 0 %. O cupão (~0,05 €/kg) é custo pago pela margem do lote, não «redistribuição». No base, qualquer destas alavancas sozinha fecharia o buraco de 2031: +0,69 €/kg pagos pelos distribuidores, uma referência HoReCa de 8,99 €/kg ou −78 % de custos fixos. Nenhuma é realista (cap. 13).</p>
+  </div>
+</section>

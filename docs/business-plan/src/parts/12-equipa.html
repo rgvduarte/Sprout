@@ -1,0 +1,38 @@
+
+<!-- ================================ 12 EQUIPA ================================ -->
+<section class="chapter" id="c12">
+  <header class="ch-head">
+    <span class="ch-num">12</span>
+    <h1>Equipa e governança</h1>
+    <p class="standfirst">Quatro sócios com responsabilidades claras e uma cadeira vazia, a de Risco e Tesouraria, que é a que os investidores vão olhar primeiro. A governança tem de existir antes do primeiro euro de terceiros, e tem de resolver dois conflitos de interesses que já estão em cima da mesa.</p>
+  </header>
+
+  <h2><span class="sn">12.1</span>Quem já está</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:34mm"><col style="width:66mm"><col></colgroup>
+    <thead><tr><th>Responsável e área</th><th>Entregáveis do documento-fonte</th><th>Nota do conselheiro</th></tr></thead>
+    <tbody>
+      <tr><td><b>Gonçalo Almeida</b><span class="sub">Jurídico e compliance</span></td><td>Nota sobre SPV e restrições de promoção na UE; jurisdição e rails PSP; minutas produtor↔plataforma e plataforma↔investidor</td><td>É sócio e advogado do projeto: o parecer que bancos e investidores vão ler tem de vir de escritório independente. É também um seguro para ele</td></tr>
+      <tr><td><b>Pedro Marques</b><span class="sub">Operações e oferta; âncora Lagar do Val</span></td><td>Feed de stock, curva de produção anual, SLA de expedição; capacidade de lote e requisitos de qualidade e auditoria</td><td>É ao mesmo tempo operações e fornecedor âncora: nunca aprova preço, qualidade ou libertação dos lotes do Lagar do Val</td></tr>
+      <tr><td><b>Speaker 1</b><span class="sub">Produto e comercial; CEO no modelo</span></td><td>Produtores iniciais com volumes e desconto-alvo; coorte de investidores qualificados; deck de <i>roadshow</i></td><td>Primeiro entregável real: 20–30 cotações de referência. O deck não pode dizer «80–90 %» nem «hedge funds»</td></tr>
+      <tr><td><b>Speaker 2</b><span class="sub">Tecnologia e sistemas; CTO no modelo</span></td><td>Auditoria do backoffice; PSP e KYC/AML com segregação e reconciliação diária; painel de risco</td><td>Concentra tecnologia, segurança e pagamentos: quatro olhos e acessos separados desde o dia 1</td></tr>
+      <tr><td><b>Risco e Tesouraria</b><span class="st crit">a designar</span></td><td>Política de cobertura (instrumentos, limites, contrapartes, gatilhos) e playbook por lote</td><td>Perfil: <i>trade finance</i> ou tesouraria de <i>trading</i> de mercadorias. Sem esta pessoa, sem política aprovada e sem membro independente, não há 1.ª emissão</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="sn">12.2</span>Contratações por etapas, presas aos gates</h2>
+  <div class="fig-side">
+    {{tbl_fte}}
+    <div class="small">
+      <p>Os fundadores estão a 60 % até ao gate de 31-08-2027 e a 100 % depois. Risco e Tesouraria entra a meio de 2027, antes do gate e da 1.ª série; o engenheiro só depois do gate; gestores de conta à razão de ~400 contas HoReCa ativas, com encomenda <i>self-service</i> e SDD recorrente [I, NV] (num modelo assistido, 250–300 por pessoa, seriam mais; no base isso custaria −102 k€ em 2031); trader de granel e exportação desde 2029; contabilidade externa em vez de <i>controller</i>. Salários são estimativas de mercado em Lisboa e no Porto, não verificadas contra guias salariais; TSU de 23,75 % [L] <span class="ref">01 §6.2 · pressupostos.json</span>.</p>
+      <p>Cada contratação acima do piloto só abre se o KPI que a justifica estiver cumprido: o segundo gestor de conta com ≥ 300 contas ativas; o trader com ≥ 1 offtake de granel assinado; o assistente com a reconciliação estável.</p>
+    </div>
+  </div>
+
+  <h2><span class="sn">12.3</span>Governança, conselheiros e conflitos</h2>
+  <div class="cols">
+    <p><b>Órgãos.</b> Administrador independente na SPV desde a constituição; Comité de Risco mensal (Risco e Tesouraria preside; CEO, operações, jurídico, compliance) com um membro independente com direito de veto em matérias da SPV, e reuniões extraordinárias a cada gatilho laranja ou vermelho; representante comum dos obrigacionistas e ROC desde a 1.ª emissão. Custo das funções independentes: ~15 k€ em 2027 e ~30 k€/ano depois, mais ~25 k€/ano de manutenção da SPV [E, NV]. A política de cobertura é aprovada pelos órgãos da OpCo e da SPV antes da 1.ª emissão e revista todos os anos.</p>
+    <p><b>Conselheiros a recrutar</b> [I]: um banqueiro de <i>trade finance</i> com experiência de <i>collateral management</i>; um técnico de qualidade de azeite com painel reconhecido; um advogado de valores mobiliários independente do projeto; um gestor de distribuição <i>foodservice</i>. Pagos em tempo, não em promessas de retorno.</p>
+    <p><b>Conflitos de interesses.</b> (1) <b>Lagar do Val</b>: preço sempre ao índice + prémio aprovado por terceiros; collateral manager independente (o depositário não certifica o próprio stock); concentração ≤ 50 % no piloto e ≤ 35 % depois; se o lagar for parte relacionada de um sócio, os investidores sabem-no por escrito. (2) <b>Advogado-sócio</b>: parecer de escritório independente. (3) <b>Acessos</b>: ninguém aprova sozinho alterações de IBAN, pagamentos acima de 25 k€ ou libertações de lotes financiados.</p>
+  </div>
+</section>

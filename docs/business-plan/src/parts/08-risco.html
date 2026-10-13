@@ -1,0 +1,67 @@
+
+<!-- ================================ 8 RISCO ================================ -->
+<section class="chapter" id="c8">
+  <header class="ch-head">
+    <span class="ch-num">08</span>
+    <h1>Gestão de risco</h1>
+    <p class="standfirst">Não existe «hedge» de azeite em bolsa. A cobertura do Sprout é comercial: comprar só o que já está vendido, indexar o resto, nunca vender a prazo sem físico, e manter o stock em aberto abaixo do que a almofada aguenta. O risco que a estrutura não aguenta, segurar stock 18 meses, fica proibido por política.</p>
+  </header>
+
+  <h2><span class="sn">8.1</span>Cobertura por mercadoria</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:18mm"><col style="width:60mm"><col style="width:42mm"><col></colgroup>
+    <thead><tr><th></th><th>Permitido</th><th>Proibido</th><th>Limites</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl"><span class="cm azeite">Azeite</span></td><td>Venda back-to-back a preço fixo ou indexado; compra indexada (média de 2 semanas SIMA + Poolred) ± prémio; compra a prazo só com venda casada; preço mínimo/máximo embutido em contrato físico</td><td>Derivados liquidados em dinheiro (incl. opções OTC: MiFID C(5)); cobertura cruzada com outros óleos; venda a prazo sem físico; detenção especulativa</td><td>Aberto ≤ 15 % do <i>book</i> no piloto; em regime ≤ min(25 %; almofada ÷ 0,30); curto = 0; idade ≤ 6 meses à entrada e ≤ 15 no balanço; lagar ≤ 50 % (piloto) e ≤ 35 % (2028+); comprador ≤ 20 % dos recebíveis</td></tr>
+      <tr><td class="lbl"><span class="cm cafe">Café</span></td><td>Compra em EUR a preço fixo a importador UE operador EUDR; preço a fixar com fixação simultânea; <i>forward</i> EUR/USD entregável (0,1–0,5 % [E])</td><td>ICE abaixo de 50–100 t/ano</td><td>USD em aberto ≤ 10 % das compras de 3 meses; ICE só com linha de liquidez ≥ 30 % do nocional (um contrato KC = ~17 t, ~107 mil USD)</td></tr>
+      <tr><td class="lbl"><span class="cm agua">Água</span></td><td>Contratual: preço anual indexado com teto ±5–8 %, sobretaxa de combustível, capacidade de verão</td><td>Qualquer derivado</td><td>Modelo agente: o risco de preço fica no engarrafador</td></tr>
+      <tr><td class="lbl">Crédito</td><td>SDD B2B para HoReCa recorrente; pré-pagamento nas 3 primeiras encomendas; seguro de crédito desde 2028 (0,4 % das vendas no modelo)</td><td>Vendas a crédito sem mandato</td><td>DSO ≤ 35 dias; alerta a 40; suspensão a 45</td></tr>
+    </tbody>
+  </table>
+  <p class="tblnote">Custo total de cobertura ≤ 30 % da margem bruta esperada; acima disso, reduz-se a exposição em vez de cobrir mais caro. O MFAO (Jaén) iniciou a dissolução em 2016 e o código de mercado expirou em jan. 2017. <span class="ref">00 §7 · 01 §4.1 · 40 §7</span></p>
+
+  <h2><span class="sn">8.2</span>Porque é que o stock não pode ficar 18 meses</h2>
+  <div class="cols">
+    <table class="compact">
+      <thead><tr><th>Horizonte</th><th class="num">Carry [E]</th><th class="num">VaR 95 % [E]</th></tr></thead>
+      <tbody>
+        <tr><td>3 meses</td><td class="num">3,6 %</td><td class="num">17–29 %</td></tr>
+        <tr><td>6 meses</td><td class="num">6,6 %</td><td class="num">24–39 %</td></tr>
+        <tr><td>12 meses</td><td class="num">13,2 %</td><td class="num">32–50 %</td></tr>
+        <tr><td>18 meses</td><td class="num">19,8 %</td><td class="num">37–57 %</td></tr>
+      </tbody>
+    </table>
+    <p class="small">Carry: armazenagem 4 €/t/mês, seguro 0,2 %/ano, capital 8 %/ano, análises, perdas e desclassificação; VaR com volatilidade de 23–42 % <span class="ref">40 §1.3, §5.2</span>.</p>
+    <p>Contra uma margem de lote de 6,8 % (base), segurar o stock 18 meses sem venda arrisca perder 50–70 % do lote; com a margem de ~11 % do lote recomendado, 45–65 % <span class="ref">Modelo · risco de preço</span>. Nenhuma almofada absorve isto. Um choque de −30 % num lote HoReCa base totalmente em aberto custa 24 900 €, 3,6 vezes a margem do lote; com 15 % em aberto, 3 735 €.</p>
+    <p>À escala de 2031, com o stock médio do modelo, um choque de −30 % custaria 242 k€ no base (90 % da margem anual do azeite) e 362 k€ no recomendado (67 %) se todo o stock estivesse em aberto; com o limite de 15 %, 36 k€ e 54 k€. Por isso o limite de stock aberto é a regra que segura o resto.</p>
+  </div>
+
+  <h2><span class="sn">8.3</span>Almofada de primeira perda, extensão e refinanciamento</h2>
+  <div class="cols">
+    <p><b>Almofada.</b> Capital subordinado do patrocinador: 33 % da 1.ª série (os 50 000 € de capital social da SPV sobre 150 000 €) e 10 % em regime. Reserva de 1.ª perda: 30 % da margem de cada lote, até 5 % do saldo vivo, numa conta empenhada aos obrigacionistas por penhor de direitos de crédito (CC arts. 679.º ss. [L]); só será penhor financeiro se um banco for beneficiário ou agente de garantias (DL 105/2004 [L]). <b>Cascata:</b> margem do lote → reserva → subordinado → extensão com cash sweep → obrigacionistas sénior.</p>
+    <p><b>Extensão</b> (opção do emitente): uma só, de M12 a M18, com aviso até M12 − 30 dias, gatilho objetivo (índice ≤ −20 % face à entrada, ou procura contratada &lt; 50 % do stock a M12 − 60 dias) e teste de racionalidade validado pelo membro independente; <i>step-up</i> de +250 p.b., cash sweep de 100 % e distribuições ao patrocinador suspensas. <b>Cash sweep</b> mensal acima de 10 % de caixa livre. <b>Refinanciamento</b>: troca voluntária para a série seguinte; o reembolso da série antiga nunca depende da nova. <b>Proibido:</b> «reembolso garantido», «capital protegido», recompra prometida, liquidação em espécie a investidores <span class="ref">01 §4.2–4.3 · 40 §8</span>.</p>
+  </div>
+
+  <h2><span class="sn">8.4</span>Stress tests da 1.ª série</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:88mm"><col style="width:20mm"><col style="width:32mm"><col></colgroup>
+    <thead><tr><th>Cenário (<i>book</i> de 150 000 €, ~36 t, 85 % back-to-back, recebíveis de 60 000 €)</th><th class="num">Perda</th><th>Almofada de 15 %</th><th>Almofada de 33 % (capital da SPV)</th></tr></thead>
+    <tbody>
+      <tr><td>S1 · índice −30 % (15 % em aberto; 20 % dos compradores renegoceiam)</td><td class="num">14,4 k€</td><td>Absorvida</td><td>Absorvida</td></tr>
+      <tr><td>S2 · quebra de colheita, preço +60 % (stock já em tanque)</td><td class="num">0</td><td>O aberto ganha ~13,5 k€</td><td>Sem perda</td></tr>
+      <tr><td>S2b · venda a prazo sem físico, preço +60 %</td><td class="num">90 k€</td><td>Destrói a série</td><td><b>Proibido por política</b></td></tr>
+      <tr><td>S3 · 10 % dos recebíveis em incumprimento, recuperação de 50 %</td><td class="num">3,0 k€</td><td>Absorvida</td><td>Absorvida</td></tr>
+      <tr><td>S4 · 25 % do stock desclassificado a 0,45 €/kg</td><td class="num">4,1 k€</td><td>Absorvida</td><td>Absorvida</td></tr>
+      <tr class="sub-total"><td>S5 · S1 + S3 + S4 + 3 meses de atraso nas vendas (carry de 5,4 k€)</td><td class="num">26,9 k€</td><td>Sénior perde 4,4 k€ (3,4 %)</td><td>Sénior intacto; sobram 23,1 k€</td></tr>
+    </tbody>
+  </table>
+  <p class="tblnote">Fonte: 01 §4.4 [E]. Num <i>book</i> de regime de 500 k€ (147 t, almofada de 15 %), S1 com a política custa 60 k€ (absorvido); S5 custa ~100 k€ e excede a almofada em ~25 k€ (5,6 % do sénior): ativa a extensão com cash sweep. No modelo, um preço do AOVE −30 % com repasse proporcional leva o EBITDA de 2031 para −1 814 k€ no base e −987 k€ no recomendado (cap. 13).</p>
+
+  <h2><span class="sn">8.5</span>Os outros riscos</h2>
+  <div class="cols">
+    <p><b>Contraparte.</b> Compradores: SDD B2B, limites por cliente, seguro de crédito quando o volume diluir o prémio mínimo (0,1–0,6 % [E/NV]); 66 mil empresas portuguesas estão em risco de atrasos acima de 90 dias. Produtores: força maior com lista fechada (o art. 437.º do CC não cobre a volatilidade, risco próprio do contrato), tolerância de ±10 %, penalização de reposição e retenção de 5–10 % do preço; prova de seguro de colheitas (SIPAC) <span class="ref">40 §4</span>.</p>
+    <p><b>Qualidade e vida útil.</b> Limites legais do AOVE: acidez ≤ 0,8 %, peróxidos ≤ 20, K232 ≤ 2,50, K270 ≤ 0,22, painel sem defeito (Reg. Del. 2022/2104 [L]). Entrada mais exigente (K232 ≤ 2,10; peróxidos ≤ 12; frutado ≥ 2,5), análise acreditada à entrada e a cada 4 meses, venda obrigatória em 30 dias se K232 ≥ 2,30. A desclassificação não é segurável.</p>
+    <p><b>Custódia e fraude.</b> Os desastres do <i>trade finance</i> (Greensill, Stenn, Qingdao, Hin Leong) foram de colateral, não de tecnologia. Tanques dedicados e selados, depósito tripartido, collateral manager, contagem física trimestral, confirmação independente de cada recebível, quatro olhos em IBAN e libertações; nada se financia antes de existir em tanque.</p>
+    <p><b>Regulatório e reputacional.</b> Um único alerta da CMVM fecha bancos e investidores para o resto do projeto. Mitigação: parecer independente antes do primeiro euro, só profissionais, revisão de compliance de cada <i>release</i> da app e de cada material, e nenhum contacto com retalho.</p>
+  </div>
+</section>

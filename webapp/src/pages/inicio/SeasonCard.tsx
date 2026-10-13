@@ -55,7 +55,7 @@ function Agenda() {
               <span className="w-[4.5rem] shrink-0 font-mono text-fg tnum">{dateShort(it.date)}</span>
               <CommodityGlyph world={it.lot.world} className="size-4 text-world-ink" />
               <span className="min-w-0 flex-1 text-muted">
-                <span className="font-mono text-fg tnum">{it.lot.id}</span> · {it.text}
+                <span className="whitespace-nowrap font-mono text-fg tnum">{it.lot.id}</span> · {it.text}
               </span>
               {it.mine && <Badge tone="accent">na tua carteira</Badge>}
             </Link>

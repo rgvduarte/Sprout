@@ -1,0 +1,80 @@
+
+<!-- ================================ 4 PRODUTO ================================ -->
+<section class="chapter" id="c4">
+  <header class="ch-head">
+    <span class="ch-num">04</span>
+    <h1>Produto</h1>
+    <p class="standfirst">A webapp é uma app de investimento gamificada em que o jogo vive na colheita e no saber, nunca no dinheiro. O investidor aprende o mercado, acompanha lotes físicos e joga campanhas com dinheiro fictício. Quando compromete dinheiro real, a app fica séria, lenta e neutra.</p>
+  </header>
+
+  <div class="shots">
+    <figure>
+      <img src="img/app-lote-missao.jpg" alt="Página de lote: missão encher o depósito, com um IBC a 60 % e missões de diligência">
+      <figcaption><strong>Lote como missão.</strong> Medidor físico (IBC) e missões de diligência: ler o boletim de análises, ler os fatores de risco.</figcaption>
+    </figure>
+    <figure>
+      <img src="img/app-caderno.jpg" alt="Caderno de colheita com selos de origem por produtor e campanha">
+      <figcaption><strong>Caderno de colheita.</strong> Selos de origem por produtor, região e campanha. «Nada aqui depende do montante investido.»</figcaption>
+    </figure>
+    <figure>
+      <img src="img/app-simulador.jpg" alt="Simulador de campanha com 50 000 euros fictícios e a etiqueta de simulação educativa">
+      <figcaption><strong>Simulador de campanha.</strong> 18 meses de azeite e água com 50 000 € fictícios, incluindo campanhas que acabam em perda. Capturas do protótipo a 13/10/2026, com dados fictícios.</figcaption>
+    </figure>
+  </div>
+
+  <h2><span class="sn">4.1</span>Onde vive o jogo</h2>
+  <table class="compact wrap">
+    <colgroup><col style="width:31mm"><col style="width:76mm"><col></colgroup>
+    <thead><tr><th>Peça</th><th>O que é</th><th>Como se avança</th></tr></thead>
+    <tbody>
+      <tr><td class="lbl">Mundos</td><td>O Olival (azeite), A Nascente (água), A Plantação (café, visível como fase 2 e não investível), cada um com mapa de origens e vocabulário próprio</td><td>Explorar origens e aprender; o mapa marca «por explorar», «aprendido» e «participado»</td></tr>
+      <tr><td class="lbl">Estações</td><td>A campanha agrícola é a estação: colheita out.–jan., armazenagem e vendas fev.–set.; o Diário de campanha mostra eventos dos produtores e leituras de telemetria</td><td>O tempo passa sozinho; não há nada a «manter vivo»</td></tr>
+      <tr><td class="lbl">Lotes como missões</td><td>Cada lote tem um medidor físico (IBC, palete, sacas) e uma jornada: colhido → analisado → em depósito → em venda → expedido → liquidado</td><td>Missões de diligência: ler o boletim de análises, os fatores de risco, a ficha do lagar</td></tr>
+      <tr><td class="lbl">Caderno de colheita</td><td>Selos de origem em lacre, um por produtor × região × campanha</td><td>Ganham-se por compromisso <i>ou</i> por missões de diligência; nunca por montante</td></tr>
+      <tr><td class="lbl">Níveis de conhecimento</td><td>Aprendiz → Provador → Lagareiro → Mestre de campanha</td><td>Só por aprendizagem e diligência</td></tr>
+      <tr><td class="lbl">Mini-jogos</td><td>Painel de prova, Lê o rótulo, Da cereja à chávena: conteúdo real sobre categorias, defeitos e rotulagem</td><td>Pontos de conhecimento, separados de qualquer saldo</td></tr>
+      <tr><td class="lbl">Simulador de campanha</td><td>O único sítio onde retorno e risco se jogam, com dinheiro fictício: cobertura, reserva de 1.ª perda, extensão e perdas. Liga opcional, com pseudónimo, ordenada pela pontuação de gestão do risco e não pelo resultado</td><td>Campanhas jogadas, balanço «e se?»</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="sn">4.2</span>O ritual de compromisso e os Bastidores</h2>
+  <div class="cols">
+    <p><b>Com dinheiro real</b>, a app muda de registo. O ritual tem cinco passos: ler os fatores de risco do lote; ver o montante traduzido em mercadoria (quantos kg, que tanque); manter premido para confirmar, sem botão de um clique; um selo de lacre que regista o compromisso; e próximos passos calmos (transferência SEPA para a conta segregada da série). Todas as vistas com dinheiro real levam a nota «capital em risco · liquidação prevista não garantida» e linguagem neutra: «montante financiado», «liquidação prevista», nunca «lucro».</p>
+    <p><b>Bastidores</b> é a vista da equipa, com os mesmos números que os investidores veem: indicadores do piloto contra as metas do gate (cap. 14); risco (preço de mercado contra contrato, gatilhos, PnL por lote, concentração); tesouraria (reconciliação D+1, breaks, pagamentos a aprovar com quatro olhos); compliance (casos KYC/KYB, pré-check de enquadramento do produto); o motor de missões; e uma revisão da gamificação que lista cada mecânica e a sua classificação de risco antes de cada <i>release</i>.</p>
+  </div>
+
+  <h2><span class="sn">4.3</span>O que fica deliberadamente fora do jogo, e porquê</h2>
+  <div class="cols">
+    <p>A ESMA identificou a gamificação, os empurrões (<i>nudging</i>), as notificações <i>push</i> e os <i>dark patterns</i> como riscos de proteção do investidor (ESMA35-43-3682, dez. 2023); as orientações de <i>product governance</i> pedem que se avalie se a gamificação serve o mercado-alvo. A IOSCO publicou em 19-05-2025 boas práticas sobre práticas de envolvimento digital e gamificação. A CMVM avisou que um <i>disclaimer</i> não basta <span class="ref">00 §5 · 20 §6</span>.</p>
+    <p>Para o emitente que vende as próprias obrigações, a publicidade tem de ser exata e não enganosa (Reg. 2017/1129, art. 22.º; CVM, art. 7.º [L]); se houver intermediário, aplica-se a MiFID II, art. 24.º(3), e o Reg. Del. 2017/565, art. 44.º. Mecânicas com prémio aleatório ligado a dinheiro podem cair no regime do jogo (DL 66/2015) [L]. A Estratégia de Investimento de Retalho, com aplicação estimada em ~2029 [E], vai apertar estas regras.</p>
+  </div>
+  <table class="compact wrap">
+    <colgroup><col style="width:52mm"><col style="width:56mm"><col></colgroup>
+    <thead><tr><th>Mecânica</th><th>No conhecimento e no simulador</th><th>Com dinheiro real</th></tr></thead>
+    <tbody>
+      <tr><td>Pontos, níveis, selos</td><td>Sim: por aprendizagem e diligência</td><td>Proibido ligá-los a montantes investidos</td></tr>
+      <tr><td>Rankings e comparação social</td><td>Só a liga do simulador: opcional, pseudónimo, ordenada pela gestão do risco</td><td>Proibido: a carteira mostra os lotes do investidor e mais nada</td></tr>
+      <tr><td>Streaks, confetes, celebrações</td><td>Não</td><td>Proibido</td></tr>
+      <tr><td>Contagens decrescentes, escassez («faltam 2 vagas»)</td><td>Não</td><td>Proibido</td></tr>
+      <tr><td>P&amp;L verde/vermelho a piscar; roletas, caixas-surpresa</td><td>Não</td><td>Proibido</td></tr>
+      <tr><td>Retornos prometidos ou «garantidos»</td><td>O simulador mostra ganhos e perdas fictícios, rotulados</td><td>Proibido; só «cupão fixo», «capital em risco»</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="sn">4.4</span>O simulador e a simulação de perdas do ECSP</h2>
+  <div class="cols">
+    <p>O art. 21.º do Reg. (UE) 2020/1503 exige que uma plataforma de crowdfunding faça ao investidor não sofisticado um teste de conhecimentos e uma simulação da capacidade de suportar perdas (10 % do património líquido), com aviso acima do maior de 1 000 € ou 5 % do património <span class="ref">00 §5</span>. O Simulador de campanha cumpre o espírito dessa regra: obriga a jogar perdas, extensões e choques de preço antes de se investir.</p>
+    <p>Não a substitui. Na fase 1 só há investidores profissionais e não há ECSP; quando o retalho entrar (fase 3, via plataforma ECSP de terceiros), o teste e a simulação legais são da plataforma, não do Sprout. O simulador é educação e diferenciação de marca, não conformidade.</p>
+  </div>
+
+  <div class="note">
+    <h3>O que o protótipo tem de mudar antes de ser mostrado a um investidor</h3>
+    <p>As capturas acima são do protótipo publicado. A mecânica de jogo está certa; a mecânica financeira ainda é a da tese original, e contradiz este plano:</p>
+    <ul>
+      <li><b>Unidade de investimento.</b> O protótipo vende co-financiamento de um lote, com bilhetes de 5 000–25 000 € e «7 co-financiadores». No desenho recomendado, o investidor subscreve uma <b>série de obrigações</b> (só profissionais; 25 000 € mínimo na 1.ª série) que financia uma carteira de lotes. A página do lote fica como janela transparente sobre essa carteira.</li>
+      <li><b>O medidor enche com o quê.</b> «Por financiar: 33 820 €» a encher um depósito é uma deixa de urgência. O IBC deve encher com stock físico e com a percentagem já vendida back-to-back.</li>
+      <li><b>Retorno.</b> O simulador reparte «65 % da margem bruta pelos co-financiadores»: retorno indexado ao lote, a leitura que aproxima o produto de OIC ou derivado. O instrumento real paga cupão fixo, com almofada e extensão com <i>step-up</i>; «refunding» sai do vocabulário do investidor.</li>
+      <li><b>Números de demonstração.</b> Lote «12 % abaixo da referência de 4,48 €/kg» e custo de 3,53 €/kg não batem com o modelo (referência HoReCa 5,65–6,00 €/kg; distribuidores 4,35–4,45 €/kg; granel 3,50 €/kg). O PRODUCT.md da webapp ainda descreve «80–90 % da margem do embalador».</li>
+    </ul>
+  </div>
+</section>

@@ -287,7 +287,9 @@
   code, kbd, samp, .font-mono { font-variant-numeric: tabular-nums slashed-zero; }
   /* Em monoespaçada, o espaço de agrupamento pt-PT (U+00A0) ocupa uma célula inteira
      ("4 958 kg" fica largo). word-spacing aplica-se também ao espaço inseparável. */
-  .font-mono { word-spacing: -0.22em; }
+  .font-mono { word-spacing: -0.2em; }
+  /* word-spacing herda-se: texto não monoespaçado dentro de um bloco mono volta ao normal */
+  .font-mono :is(.font-sans, .font-display) { word-spacing: normal; }
 
   hr { border: 0; border-top: 1px solid var(--border); }
 
