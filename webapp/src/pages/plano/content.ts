@@ -251,9 +251,9 @@ export const SEED_DECISIONS: Decision[] = tidyDeep([
   {
     id: 'd-01',
     date: '2026-10-13',
-    title: 'Tese económica: captura de 80–90 % da margem do embalador, com 10–15 % de desconto ao cliente',
-    context: 'Desintermediação produtiva com spread operacional retido e coberto.',
-    origin: 'Reunião de 13/10',
-    status: 'decidida',
+    title: 'Tese económica original: captar 80–90 % da margem do embalador, com 10–15 % de desconto ao cliente',
+    context: 'Por validar no piloto. Os valores verificados (Observatório da cadeia alimentar de Espanha) dão 0,19–0,50 €/kg de margem líquida ao embalador, uma parte pequena do diferencial granel → comprador (≈ 1,28 €/kg), que paga também embalamento, logística e outras margens. Sozinha, essa margem não financia 10–15 % de desconto. O piloto mede a referência HoReCa e o prémio de origem com cotações reais.',
+    origin: 'Reunião de 13/10; revista com a base factual',
+    status: 'em-aberto',
   },
 ]);

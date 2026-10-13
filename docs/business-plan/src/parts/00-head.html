@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-PT" data-await-ready>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprout · Business plan</title>
+<meta name="description" content="Business plan do Sprout (nome de trabalho), versão de trabalho de 13/10/2026: lotes de azeite português verificados, vendidos back-to-back e financiados por obrigações a investidores profissionais.">
+<meta name="author" content="Sprout (nome de trabalho)">
+<link rel="stylesheet" href="../tools/print.css">
+<style>
+  :root { --fs-body: 9pt; --lh-body: 1.44; }
+  @page {
+    @top-right { content: "Business plan · versão de trabalho de 13/10/2026"; }
+    @bottom-left { content: "Documento confidencial · versão de trabalho · nome de trabalho · não constitui oferta nem recomendação de investimento"; }
+  }
+  @page :first {
+    @top-left { content: none; border-bottom: 0; }
+    @top-center { content: none; border-bottom: 0; }
+    @top-right { content: none; border-bottom: 0; }
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+  }
+
+  /* ---------- capa ---------- */
+  .cover { min-height: calc(var(--page-content-h) - 1mm); display: flex; flex-direction: column; break-after: page; }
+  .cover .mark { display: flex; align-items: center; gap: 2.4mm; font-family: var(--f-display); font-stretch: 87.5%; font-weight: 700; font-size: 13pt; }
+  .cover .mark svg { width: 8mm; height: 8mm; }
+  .cover h1.display { font-size: 44pt; line-height: 0.98; letter-spacing: -0.022em; margin: 52mm 0 0; max-width: 150mm; }
+  .cover .subtitle { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 600; font-size: 15pt; line-height: 1.22; letter-spacing: -0.006em; margin: 6mm 0 0; max-width: 150mm; text-wrap: balance; }
+  .cover .verdict { margin-top: 16mm; border-top: 0.9pt solid var(--ink); padding-top: 3.2mm; max-width: 150mm; font-size: 10pt; line-height: 1.45; }
+  .cover .verdict p { margin-bottom: 2mm; }
+  .cover .meta-block { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 2.5mm; font-size: 7.8pt; line-height: 1.4; color: var(--ink); border-top: 0.5pt solid var(--rule); padding-top: 3mm; }
+  .cover .meta-block .k { display: block; color: var(--muted); font-size: 7pt; }
+  .cover .date { font-family: var(--f-mono); font-size: 9pt; font-weight: 500; }
+  .cover .fine { grid-column: 1 / -1; color: var(--muted); font-size: 7pt; }
+
+  /* ---------- índice ---------- */
+  .toc-page h1 { font-size: 22pt; margin-bottom: 6mm; }
+  ol.toc { counter-reset: none; margin: 0 0 8mm; padding: 0; columns: 2; column-gap: 10mm; }
+  ol.toc > li { display: grid; grid-template-columns: 9mm 1fr 10mm; padding: 1.55mm 0; margin: 0; border-bottom: 0.5pt solid var(--rule); break-inside: avoid; font-size: 9.6pt; }
+  ol.toc > li::before { content: none; }
+  ol.toc .toc-n { font-family: var(--f-mono); color: var(--muted); font-size: 8.6pt; padding-top: 0.5pt; }
+  ol.toc .toc-t { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 600; }
+  ol.toc .toc-p { font-family: var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; font-size: 8.6pt; }
+  .howto { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10mm; row-gap: 4mm; font-size: 8pt; line-height: 1.4; }
+  .howto h3 { margin: 0 0 1mm; font-size: 9pt; }
+  .howto dl.defs { row-gap: 1mm; }
+  .howto dl.defs dt { font-family: var(--f-mono); font-weight: 500; font-size: 7.6pt; }
+
+  /* ---------- capítulos ---------- */
+  .chapter { break-before: page; }
+  .ch-head { display: grid; grid-template-columns: 13mm 1fr; border-top: 1.4pt solid var(--ink); padding-top: 2.6mm; margin: 0 0 5mm; break-after: avoid; }
+  .ch-head .ch-num { font-family: var(--f-mono); font-size: 12pt; font-weight: 500; color: var(--muted); padding-top: 5.5pt; font-variant-numeric: tabular-nums; }
+  .ch-head h1 { font-size: 22pt; line-height: 1.05; letter-spacing: -0.016em; margin: 0; }
+  .ch-head .standfirst { grid-column: 2; margin-top: 2.4mm; max-width: 158mm; font-size: 10.4pt; line-height: 1.38; text-wrap: pretty; }
+  h2 { font-size: 11.6pt; margin: 6.5mm 0 2.2mm; }
+  h2 .sn, h3 .sn { font-family: var(--f-mono); font-weight: 500; color: var(--muted); font-size: 0.82em; margin-right: 2.2mm; font-variant-numeric: tabular-nums; }
+  .ch-head + h2, .ch-head + .cols > h2:first-child { margin-top: 0; }
+  h3 { font-size: 9.6pt; margin: 3.6mm 0 1.2mm; }
+  .cols { column-count: 2; column-gap: 7mm; }
+  .cols > :first-child { margin-top: 0; }
+  .cols h3 { break-after: avoid; }
+  .cols p, .cols li { text-wrap: pretty; }
+  .cols .note, .cols table, .cols figure { break-inside: avoid; }
+  .lede { font-size: 10.4pt; line-height: 1.42; margin: 0 0 3mm; max-width: 170mm; }
+  .b { font-weight: 600; }
+  .muted { color: var(--muted); }
+  .em { font-weight: 600; }
+  p.small, .small p { font-size: 8.2pt; }
+
+  /* ---------- tabelas ---------- */
+  table { font-size: 7.9pt; }
+  td.num { font-size: 7.5pt; }
+  th .sub { font-weight: 400; color: var(--muted); }
+  tr.sub-total td { font-weight: 600; }
+  tr.total td { border-top: 0.9pt solid var(--ink); }
+  tr.memo td { color: var(--muted); font-size: 7.2pt; border-bottom-color: transparent; padding-top: 0.8mm; padding-bottom: 0.8mm; }
+  tr.memo:first-of-type td { border-top: 0; }
+  tr.dim td { color: var(--muted); }
+  tr.dim td:first-child { padding-left: 2mm; }
+  tr.sep td { border-top: 0.5pt solid var(--rule-strong); }
+  tr.grp td { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 650; font-size: 8.6pt; padding-top: 2.6mm; border-bottom: 0.5pt solid var(--rule-strong); }
+  tr.em td, td.em, th.em { font-weight: 600; }
+  tr.em td:first-child { font-weight: 600; }
+  td.ref-cell { font-family: var(--f-mono); font-size: 6.6pt; color: var(--muted); white-space: nowrap; }
+  td.lbl { font-weight: 600; }
+  td ul { margin: 0; }
+  td li { margin-bottom: 0.4mm; }
+  table.t-fin td:first-child { width: 78mm; }
+  table.t-fin td.num, table.t-fin th.num { width: 18mm; }
+  table.wrap td { white-space: normal; }
+  .tblnote { font-size: 6.9pt; color: var(--muted); line-height: 1.38; margin: -1.6mm 0 3mm; }
+
+  /* ---------- figuras ---------- */
+  figure { margin: 2.6mm 0 3.6mm; }
+  figure img { display: block; width: 100%; height: auto; border: 0.5pt solid var(--rule); border-radius: 1mm; }
+  .shots { display: grid; grid-template-columns: 0.94fr 1fr 1.38fr; column-gap: 4mm; align-items: start; }
+  .shots figure { margin: 0; }
+  .shots figcaption { margin-top: 1.2mm; }
+  .fig-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  .fig-row figure { margin-top: 0; }
+  .fig-side { display: grid; grid-template-columns: 1.15fr 1fr; column-gap: 7mm; align-items: start; }
+
+  /* ---------- notas ---------- */
+  .note { font-size: 8.1pt; }
+  .note h3 { margin: 0 0 1mm; font-size: 9pt; }
+  .note p { margin-bottom: 1.4mm; }
+  .note ul { margin: 0; }
+  .note li { margin-bottom: 0.6mm; }
+  .verdict-box { border-top: 0.9pt solid var(--ink); border-bottom: 0.9pt solid var(--ink); padding: 2.4mm 0; margin: 3mm 0 4mm; font-size: 9.4pt; line-height: 1.42; }
+  .verdict-box p { margin-bottom: 1.4mm; }
+  .verdict-box .lbl { font-weight: 600; }
+  .verdict-box .lbl.crit { color: var(--crit); }
+  .verdict-box .lbl.ok { color: var(--ok); }
+
+  /* ---------- sumário ---------- */
+  .exec-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 3.2mm; }
+  .exec-grid section { border-top: 0.5pt solid var(--rule-strong); padding-top: 1.6mm; }
+  .exec-grid h3 { margin: 0 0 0.8mm; font-size: 9.6pt; }
+  .exec-grid p { font-size: 8.5pt; line-height: 1.4; margin-bottom: 1.2mm; }
+  .exec-grid ul { font-size: 8.5pt; line-height: 1.4; margin: 0; }
+  .exec-grid li { margin-bottom: 0.6mm; }
+  .exec-grid .wide { grid-column: 1 / -1; }
+
+  /* ---------- listas de decisões e alertas ---------- */
+  ol.decisions > li { padding-left: 7mm; margin-bottom: 2mm; break-inside: avoid; }
+  ol.decisions > li::before { font-size: 10pt; color: var(--ink); font-weight: 600; top: -0.5pt; }
+  ol.decisions h3 { display: inline; font-size: 9.6pt; margin: 0; }
+  ol.alerts > li { padding-left: 6mm; margin-bottom: 1.6mm; break-inside: avoid; }
+  ol.alerts > li::before { color: var(--ink); font-weight: 600; }
+  .stop { display: grid; grid-template-columns: 1fr 1fr; column-gap: 7mm; row-gap: 0; }
+  .stop > div { border-top: 0.5pt solid var(--rule); padding: 1.6mm 0; font-size: 8.3pt; line-height: 1.38; break-inside: avoid; }
+  .stop strong { display: block; font-size: 8.8pt; }
+
+  /* ---------- anexos ---------- */
+  ul.src { column-count: 2; column-gap: 6mm; margin: 0 0 2.4mm; }
+  ul.src > li { font-family: var(--f-mono); font-size: 5.9pt; line-height: 1.32; padding-left: 2.6mm; margin-bottom: 0.4mm; word-break: break-all; break-inside: avoid; }
+  ul.src > li::before { top: 0.55em; width: 1.2mm; }
+  ul.src a { color: var(--ink); text-decoration: none; }
+  .annex h4 { font-family: var(--f-display); font-stretch: 87.5%; font-size: 8.4pt; margin: 2.6mm 0 1mm; }
+  dl.gloss { display: grid; grid-template-columns: 34mm 1fr; column-gap: 4mm; row-gap: 1.2mm; font-size: 8pt; line-height: 1.36; margin: 0; }
+  dl.gloss dt { font-weight: 600; }
+  dl.gloss dd { margin: 0; }
+  .gloss-cols { column-count: 2; column-gap: 8mm; }
+  .gloss-cols dl.gloss { display: block; }
+  .gloss-cols dl.gloss > div { break-inside: avoid; margin-bottom: 1.4mm; font-size: 7.9pt; line-height: 1.36; }
+  .gloss-cols dt { display: inline; font-weight: 600; }
+  .gloss-cols dt::after { content: " · "; font-weight: 400; color: var(--muted); }
+  .gloss-cols dd { display: inline; margin: 0; }
+  .ref { font-size: 6.5pt; }
+  .keep-together { break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<!-- ================================ CAPA ================================ -->
+<section class="cover" aria-label="Capa">
+  <div class="mark">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#3F5A1E"/><path d="M16 27V14" stroke="#F4F5EF" stroke-width="2.4" stroke-linecap="round"/><path d="M16 16.5c0-5.2 3.4-8.6 9-9.2 0 5.6-3.5 9.2-9 9.2z" fill="#E1E8CF"/><path d="M16 20c0-4.2-2.9-7.2-8-7.8 0 4.7 3 7.8 8 7.8z" fill="#E1E8CF"/></svg>
+    <span>Sprout</span>
+  </div>
+  <h1 class="display">Business plan 2027–2031</h1>
+  <p class="subtitle">Lotes de azeite português verificados, vendidos back-to-back e financiados por obrigações a investidores profissionais, com uma app de investimento em que o jogo vive na colheita e no saber, nunca no dinheiro.</p>
+  <div class="verdict">
+    <p>Tal como foi descrito a 13/10, o negócio não chega ao break-even até 2031 em nenhum cenário. No caso base, o EBITDA de 2031 é de −1,22 M€ e o capital próprio necessário passa os 5,5 M€, ainda a subir.</p>
+    <p>O desenho que a investigação recomenda reduz o prejuízo de 2031 para −0,53 M€ e a necessidade de capital para 4,0 M€. Também não fecha dentro do horizonte. Este plano pede o dinheiro de um piloto que compre informação, 1,1 M€ de pré-seed, com um gate a 31-08-2027 e regras de paragem escritas antes de começar.</p>
+  </div>
+  <div class="meta-block">
+    <div><span class="k">Data</span><span class="date">13-10-2026</span></div>
+    <div><span class="k">Estado</span>Documento confidencial · versão de trabalho · «Sprout» é nome de trabalho</div>
+    <div><span class="k">Para</span>Fundadores; Gonçalo Almeida (jurídico); Pedro Marques (operações, âncora Lagar do Val); investidores qualificados prospetivos</div>
+    <div><span class="k">Base</span>Base factual verificada (00), desenho do modelo (01), relatórios 10–50 e Sprout-Modelo-Financeiro.xlsx (26 475 fórmulas, 0 erros)</div>
+    <p class="fine">Não é oferta pública, recomendação de investimento nem parecer jurídico. Os números financeiros são projeções de um modelo, não previsões. As normas marcadas [L] aguardam confirmação escrita de advogado independente.</p>
+  </div>
+</section>
+
+<!-- ================================ ÍNDICE ================================ -->
+<section class="toc-page" aria-label="Índice">
+  <h1>Índice</h1>
+  {{toc}}
+  <div class="howto">
+    <div>
+      <h3>Como ler as referências</h3>
+      <dl class="defs">
+        <dt>00 §1.4</dt><dd>Base factual consolidada, secção 1.4 (docs/research/00-base-factual.md). É a única base numérica autorizada.</dd>
+        <dt>01 §2.2</dt><dd>Desenho do modelo de negócio recomendado (01-desenho-do-modelo.md).</dd>
+        <dt>10 · 20 · 30 · 40 · 50</dt><dd>Relatórios de mercado, regulação, pagamentos e infraestrutura, risco e coberturas, concorrência.</dd>
+        <dt>Modelo</dt><dd>Sprout-Modelo-Financeiro.xlsx, lido de modelo/resultados.json depois de recalculado. Todas as tabelas e gráficos financeiros deste documento são gerados a partir desse ficheiro.</dd>
+      </dl>
+    </div>
+    <div>
+      <h3>Etiquetas de evidência</h3>
+      <dl class="defs">
+        <dt>[F]</dt><dd>Facto com fonte e URL (anexo C), em regra recolhido por extrato de motor de pesquisa: confiança média.</dd>
+        <dt>[L]</dt><dd>Norma ou especificação citada do texto de referência, não relida online a 13/10/2026. Confirmar com advogado.</dd>
+        <dt>[E]</dt><dd>Estimativa nossa, com método.</dd>
+        <dt>[I]</dt><dd>Inferência ou opinião nossa.</dd>
+        <dt>NV</dt><dd>Não verificado; não usar em materiais externos.</dd>
+      </dl>
+    </div>
+    <div>
+      <h3>Os quatro cenários do modelo</h3>
+      <p><b>Pessimista, base e otimista</b> são a tese do documento-fonte (HoReCa e distribuição com desconto de 10–15 %, água como segundo produto, obrigações a 18 meses) com as 53 correções verificadas aplicadas, sem retoques. <b>Recomendado</b> é o desenho reestruturado que a investigação aponta (capítulo 3); cada pressuposto alterado está listado, com fonte, em pressupostos.json e no capítulo 13.</p>
+    </div>
+    <div>
+      <h3>Unidades e convenções</h3>
+      <p>Euros correntes, sem IVA. Azeite em kg (1 L = 0,916 kg) e t; água em paletes de 750 L. Anos 2027–2031; preços das mercadorias constantes ao nível de out. 2026, porque o modelo compra back-to-back. «k€» = milhares de euros. Data de referência: 13-10-2026.</p>
+    </div>
+  </div>
+</section>

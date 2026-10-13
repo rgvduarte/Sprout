@@ -1,4 +1,5 @@
 import { tidyDeep } from '../../lib/format';
+import { WATER_LABELS } from '../../data/minigames';
 import type { CoffeeProcess, LearningFocus, MiniGameId, OliveSample, WaterLabel } from '../../data/types';
 
 /* =====================================================================
@@ -110,21 +111,13 @@ export const OLIVE_PARAMS: {
 
 /* ------------------------------------------------------------ Lê o rótulo */
 
-/** Iões que completam o rótulo (somados dão a mineralização total). */
-export const WATER_EXTRA: Record<WaterLabel['id'], { potassio: number; cloreto: number; sulfato: number; nitrato: number; carbonato?: number }> = {
-  w1: { potassio: 0.6, cloreto: 5.3, sulfato: 1.6, nitrato: 2.1 },
-  w2: { potassio: 0.4, cloreto: 4.1, sulfato: 0.8, nitrato: 1.5 },
-  w3: { potassio: 1.9, cloreto: 21.4, sulfato: 26.8, nitrato: 4.6 },
-  w4: { potassio: 41, cloreto: 88, sulfato: 14, nitrato: 0.5 },
-  w5: { potassio: 1.4, cloreto: 42, sulfato: 30, nitrato: 0.6, carbonato: 21 },
-};
+/** Iões que completam o rótulo (agora nos dados partilhados, WATER_LABELS). */
+export const WATER_EXTRA: Record<WaterLabel['id'], { potassio: number; cloreto: number; sulfato: number; nitrato: number; carbonato?: number }> = Object.fromEntries(
+  WATER_LABELS.map((w) => [w.id, { potassio: w.potassio, cloreto: w.cloreto, sulfato: w.sulfato, nitrato: w.nitrato, carbonato: w.carbonato }]),
+);
 
-/** Mineralização total = soma dos iões dissolvidos + sílica (mg/L). */
-export function mineralizacaoTotal(w: WaterLabel): number {
-  const x = WATER_EXTRA[w.id];
-  const sum = w.bicarbonato + w.sodio + w.calcio + w.magnesio + w.silica + w.fluoreto + x.potassio + x.cloreto + x.sulfato + x.nitrato + (x.carbonato ?? 0);
-  return Math.round(sum);
-}
+/** Mineralização total (dados partilhados). */
+export { mineralizacaoTotal } from '../../data/minigames';
 
 export type SalinityClass = 'hipossalina' | 'fracamente' | 'mesossalina' | 'hipersalina';
 

@@ -51,7 +51,8 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
       {
         heading: 'De onde vem a margem',
         body: [
-          'A Sprout compra diretamente ao produtor, sem embalador pelo meio, e vende ao comprador 10–15 % abaixo da referência de mercado. O comprador paga menos do que pagaria ao embalador; o produtor recebe mais cedo.',
+          'A Sprout compra diretamente ao produtor, sem embalador pelo meio, e vende ao comprador profissional abaixo da referência de mercado: o alvo é 10–15 %. O comprador paga menos; o produtor recebe mais cedo.',
+          'O que paga isto é o diferencial entre o preço a granel e o preço ao comprador, cerca de 1,28 €/kg no azeite hoje: embalamento, logística e margens de intermediação. A margem líquida do embalador é só uma parte, 0,19–0,50 €/kg. A tese dos fundadores (captar 80–90 % dessa margem) ainda está por validar no piloto.',
           'A diferença entre o preço de venda e o custo total (aquisição, análises, armazenagem, seguro, logística e cobertura) é a margem bruta do lote. 65 % vai para os co-financiadores; o resto paga a operação e alimenta a reserva de primeira perda.',
         ],
       },
@@ -64,7 +65,7 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
     ],
     quiz: [
       { id: 'q1', prompt: 'O que financia um co-financiador?', options: ['A compra de mercadoria física identificada e os custos até à venda', 'Ações da Sprout', 'Um fundo de índices de matérias-primas', 'Um depósito com taxa fixa'], correct: 0, explanation: 'O dinheiro paga a compra do lote ao produtor e os custos até à venda ao comprador B2B.' },
-      { id: 'q2', prompt: 'A que preço vende a Sprout ao comprador B2B?', options: ['Ao preço de referência', '10–15 % abaixo da referência de mercado', '10–15 % acima da referência', 'Ao preço que o produtor definir'], correct: 1, explanation: 'O desconto ao comprador é possível porque não há embalador a reter margem.' },
+      { id: 'q2', prompt: 'A que preço vende a Sprout ao comprador B2B?', options: ['Ao preço de referência', '10–15 % abaixo da referência de mercado', '10–15 % acima da referência', 'Ao preço que o produtor definir'], correct: 1, explanation: 'É o alvo do piloto: sem embalamento nem intermediários, parte do diferencial granel → comprador passa para o comprador. Está por validar com cotações reais.' },
     ],
   },
   {

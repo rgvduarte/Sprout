@@ -64,11 +64,11 @@ export const OLIVE_CATEGORIES: { id: OliveCategory; label: string; rule: string 
 /* ------------------------------------------------------------ Lê o rótulo */
 
 export const WATER_LABELS: WaterLabel[] = [
-  { id: 'w1', marca: 'Águas da Fonte Fria', tipo: 'mineral natural', origem: 'Serra da Estrela, 1 050 m', residuoSeco: 29, ph: 5.8, sodio: 3.1, bicarbonato: 6.8, calcio: 1.2, magnesio: 0.4, silica: 9.6, fluoreto: 0.1 },
-  { id: 'w2', marca: 'Nascente da Serra Verde', tipo: 'de nascente', origem: 'Gerês, granito', residuoSeco: 22, ph: 6.1, sodio: 2.8, bicarbonato: 5.2, calcio: 0.9, magnesio: 0.3, silica: 8.1, fluoreto: 0.05 },
-  { id: 'w3', marca: 'Fonte da Lameira Alta', tipo: 'mineral natural', origem: 'Beira Litoral, calcário', residuoSeco: 312, ph: 7.6, sodio: 12.4, bicarbonato: 228, calcio: 68, magnesio: 9.8, silica: 14.2, fluoreto: 0.2 },
-  { id: 'w4', marca: 'Nascente do Vale Fundo', tipo: 'mineral natural', origem: 'Trás-os-Montes, falha granítica', residuoSeco: 2380, ph: 6.4, sodio: 612, bicarbonato: 1985, calcio: 92, magnesio: 31, silica: 58, fluoreto: 1.6, co2Livre: 2100 },
-  { id: 'w5', marca: 'Fonte de São Brás do Monte', tipo: 'mineral natural', origem: 'Algarve, sienito', residuoSeco: 268, ph: 9.4, sodio: 46, bicarbonato: 98, calcio: 1.6, magnesio: 0.2, silica: 31, fluoreto: 1.2 },
+  { id: 'w1', marca: 'Águas da Fonte Fria', tipo: 'mineral natural', origem: 'Serra da Estrela, 1 050 m', residuoSeco: 29, ph: 5.8, sodio: 3.1, bicarbonato: 6.8, calcio: 1.2, magnesio: 0.4, silica: 9.6, fluoreto: 0.1, potassio: 0.6, cloreto: 5.3, sulfato: 1.6, nitrato: 2.1 },
+  { id: 'w2', marca: 'Nascente da Serra Verde', tipo: 'de nascente', origem: 'Gerês, granito', residuoSeco: 22, ph: 6.1, sodio: 2.8, bicarbonato: 5.2, calcio: 0.9, magnesio: 0.3, silica: 8.1, fluoreto: 0.05, potassio: 0.4, cloreto: 4.1, sulfato: 0.8, nitrato: 1.5 },
+  { id: 'w3', marca: 'Fonte da Lameira Alta', tipo: 'mineral natural', origem: 'Beira Litoral, calcário', residuoSeco: 312, ph: 7.6, sodio: 12.4, bicarbonato: 228, calcio: 68, magnesio: 9.8, silica: 14.2, fluoreto: 0.2, potassio: 1.9, cloreto: 21.4, sulfato: 26.8, nitrato: 4.6 },
+  { id: 'w4', marca: 'Nascente do Vale Fundo', tipo: 'mineral natural', origem: 'Trás-os-Montes, falha granítica', residuoSeco: 2380, ph: 6.4, sodio: 612, bicarbonato: 1985, calcio: 92, magnesio: 31, silica: 58, fluoreto: 1.6, co2Livre: 2100, potassio: 41, cloreto: 88, sulfato: 14, nitrato: 0.5 },
+  { id: 'w5', marca: 'Fonte de São Brás do Monte', tipo: 'mineral natural', origem: 'Algarve, sienito', residuoSeco: 268, ph: 9.4, sodio: 46, bicarbonato: 98, calcio: 1.6, magnesio: 0.2, silica: 31, fluoreto: 1.2, potassio: 1.4, cloreto: 42, sulfato: 30, nitrato: 0.6, carbonato: 21 },
 ];
 
 /** Menções de rotulagem (Diretiva 2009/54/CE, anexo III; DL 156/98). */
@@ -85,7 +85,12 @@ export const WATER_CLASSES: WaterClass[] = [
   { id: 'gasocarbonica', label: 'Naturalmente gaseificada', rule: 'CO₂ livre de origem > 250 mg/L', test: (w) => (w.co2Livre ?? 0) > 250 },
 ];
 
-/** Classe principal de mineralização (pergunta do jogo). */
+/** Mineralização total = soma dos iões dissolvidos + sílica (mg/L). */
+export function mineralizacaoTotal(w: WaterLabel): number {
+  return Math.round(w.bicarbonato + w.sodio + w.calcio + w.magnesio + w.silica + w.fluoreto + w.potassio + w.cloreto + w.sulfato + w.nitrato + (w.carbonato ?? 0));
+}
+
+/** Menção de mineralização da UE, pelo resíduo seco (Diretiva 2009/54/CE). */
 export function mineralizationClass(w: WaterLabel): string {
   if (w.residuoSeco <= 50) return 'muito-pouco';
   if (w.residuoSeco <= 500) return 'pouco';
@@ -144,6 +149,6 @@ export const COFFEE_SAMPLES: CoffeeSample[] = [
   { id: 'c1', label: 'Amostra 1', origem: 'Huila, Colômbia', processo: 'lavado', humidade: 10.9, defeitosCat1: 0, defeitosCompletosCat2: 2, pontuacao: 85.5, notas: 'Laranja, panela, acidez brilhante.' },
   { id: 'c2', label: 'Amostra 2', origem: 'Alta Mogiana, Brasil', processo: 'natural', humidade: 11.4, defeitosCat1: 0, defeitosCompletosCat2: 4, pontuacao: 82.25, notas: 'Chocolate, frutos secos, corpo médio.' },
   { id: 'c3', label: 'Amostra 3', origem: 'Sidama, Etiópia', processo: 'natural', humidade: 10.2, defeitosCat1: 0, defeitosCompletosCat2: 3, pontuacao: 88, notas: 'Mirtilo, jasmim, doçura alta.' },
-  { id: 'c4', label: 'Amostra 4', origem: 'Sul de Minas, Brasil', processo: 'honey', humidade: 12.9, defeitosCat1: 2, defeitosCompletosCat2: 9, pontuacao: 78.5, notas: 'Madeira, fermentado; humidade acima do limite.' },
-  { id: 'c5', label: 'Amostra 5', origem: 'Planalto Central, Vietname', processo: 'natural', humidade: 12.1, defeitosCat1: 1, defeitosCompletosCat2: 12, pontuacao: 74, notas: 'Robusta comercial: terroso, amargo, corpo pesado.' },
+  { id: 'c4', label: 'Amostra 4', origem: 'Sul de Minas, Brasil', processo: 'honey', humidade: 12.9, defeitosCat1: 2, defeitosCompletosCat2: 9, pontuacao: 78.5, notas: 'Madeira, fermentado; humidade de 12,9 %, acima dos 10–12 % recomendados para armazenar e transportar.' },
+  { id: 'c5', label: 'Amostra 5', origem: 'Planalto Central, Vietname', processo: 'natural', humidade: 11.8, defeitosCat1: 1, defeitosCompletosCat2: 12, pontuacao: 74, notas: 'Robusta comercial: terroso, amargo, corpo pesado.' },
 ];

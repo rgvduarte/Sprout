@@ -1,0 +1,11 @@
+
+<script type="module">
+  import { renderAll } from '../tools/svg-charts.mjs';
+  try {
+    renderAll();
+  } finally {
+    document.documentElement.dataset.ready = '1';
+  }
+</script>
+</body>
+</html>

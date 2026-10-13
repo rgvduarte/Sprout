@@ -425,6 +425,12 @@ export interface WaterLabel {
   silica: number;
   fluoreto: number;
   co2Livre?: number;
+  /** restantes iões do rótulo (mg/L): somados aos anteriores e à sílica dão a mineralização total */
+  potassio: number;
+  cloreto: number;
+  sulfato: number;
+  nitrato: number;
+  carbonato?: number;
 }
 
 export interface WaterClass {
