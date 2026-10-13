@@ -1,25 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PRODUCERS } from '../data/producers';
 import type { CampaignEvent, TelemetryUnit } from '../data/types';
 import { now } from './clock';
 import { kg, num } from './format';
 import { createRng } from './prng';
-import { useMediaQuery, usePageVisible } from './useMediaQuery';
+import { readStorage, STORAGE_KEYS, writeStorage } from './storage';
+import { usePageVisible } from './useMediaQuery';
 
 /**
  * Diário de campanha "ao vivo": gera eventos de telemetria dos produtores
  * (enchimento de depósitos, receção de azeitona, paletes engarrafadas) a cada
- * poucos segundos, a partir de uma semente fixa. Pausa com movimento reduzido,
- * com o separador escondido, ou quando `enabled` é falso.
+ * poucos segundos, a partir de uma semente fixa. Os dados continuam com
+ * movimento reduzido (só a animação dos widgets desliga). Pausa com o
+ * separador escondido, por ação explícita do utilizador ("Pausar Diário",
+ * guardado neste browser, WCAG 2.2.2) ou quando `enabled` é falso.
  */
 export type TelemetryState = Record<string, TelemetryUnit[]>;
+
+/**
+ * Motivo de pausa. 'reduced-motion' já não é produzido (os dados continuam com
+ * movimento reduzido); fica no tipo só por compatibilidade com código antigo.
+ */
+export type FeedPauseReason = 'user' | 'hidden' | 'disabled' | 'reduced-motion';
 
 export interface LiveFeed {
   /** só os eventos gerados nesta sessão, mais recente primeiro */
   events: CampaignEvent[];
   telemetry: TelemetryState;
   paused: boolean;
-  pauseReason: 'reduced-motion' | 'hidden' | 'disabled' | null;
+  pauseReason: FeedPauseReason | null;
+  /** pausa pedida pelo utilizador (botão "Pausar Diário") */
+  userPaused: boolean;
+  setUserPaused: (paused: boolean) => void;
 }
 
 const initialTelemetry = (): TelemetryState =>
@@ -28,8 +40,12 @@ const initialTelemetry = (): TelemetryState =>
 const LIVE_PRODUCERS = PRODUCERS.filter((p) => p.telemetry.live);
 
 export function useLiveFeed({ enabled = true, intervalMs = 6500, maxEvents = 30 }: { enabled?: boolean; intervalMs?: number; maxEvents?: number } = {}): LiveFeed {
-  const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
   const visible = usePageVisible();
+  const [userPaused, setUserPausedState] = useState(() => readStorage(STORAGE_KEYS.diario, ['pausado', 'ativo'] as const, 'ativo') === 'pausado');
+  const setUserPaused = useCallback((p: boolean) => {
+    setUserPausedState(p);
+    writeStorage(STORAGE_KEYS.diario, p ? 'pausado' : 'ativo');
+  }, []);
   const [events, setEvents] = useState<CampaignEvent[]>([]);
   const [telemetry, setTelemetry] = useState<TelemetryState>(initialTelemetry);
   const rngRef = useRef(createRng('diario-ao-vivo-2026'));
@@ -37,7 +53,7 @@ export function useLiveFeed({ enabled = true, intervalMs = 6500, maxEvents = 30 
   const telemetryRef = useRef(telemetry);
   telemetryRef.current = telemetry;
 
-  const pauseReason: LiveFeed['pauseReason'] = !enabled ? 'disabled' : reduced ? 'reduced-motion' : !visible ? 'hidden' : null;
+  const pauseReason: LiveFeed['pauseReason'] = !enabled ? 'disabled' : userPaused ? 'user' : !visible ? 'hidden' : null;
 
   useEffect(() => {
     if (pauseReason) return;
@@ -95,5 +111,8 @@ export function useLiveFeed({ enabled = true, intervalMs = 6500, maxEvents = 30 
     return () => window.clearInterval(id);
   }, [pauseReason, intervalMs, maxEvents]);
 
-  return { events, telemetry, paused: pauseReason !== null, pauseReason };
+  return useMemo(
+    () => ({ events, telemetry, paused: pauseReason !== null, pauseReason, userPaused, setUserPaused }),
+    [events, telemetry, pauseReason, userPaused, setUserPaused],
+  );
 }

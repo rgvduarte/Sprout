@@ -16,4 +16,4 @@ export function writeStorage(key: string, value: string): void {
   }
 }
 
-export const STORAGE_KEYS = { role: 'sprout.role', theme: 'sprout.theme' } as const;
+export const STORAGE_KEYS = { role: 'sprout.role', theme: 'sprout.theme', diario: 'sprout.diario' } as const;

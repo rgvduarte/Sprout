@@ -13,7 +13,7 @@ export { HoldToConfirm } from './HoldToConfirm';
 export type { HoldToConfirmProps } from './HoldToConfirm';
 export { KnowledgeLevelBadge, LevelProgress, LevelGlyph, QuestList } from './Knowledge';
 export type { QuestListProps } from './Knowledge';
-export { CampaignFeed } from './CampaignFeed';
+export { CampaignFeed, FeedLiveHeader } from './CampaignFeed';
 export type { CampaignFeedProps } from './CampaignFeed';
 export {
   Chapter,
