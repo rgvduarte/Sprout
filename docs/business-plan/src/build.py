@@ -91,7 +91,7 @@ def _():
         ('Otimista', OT, 'tese da fonte, referência 6,00'),
         ('Recomendado', RC, 'desenho reestruturado'),
     ]
-    out = ['<table class="compact t-scen"><thead><tr><th>Cenário</th><th class="num">GMV 2031<span class="sub">M€</span></th>'
+    out = ['<table class="compact tight t-scen"><thead><tr><th>Cenário</th><th class="num">GMV 2031<span class="sub">M€</span></th>'
            '<th class="num">Margem de contrib. 2031<span class="sub">k€</span></th><th class="num">EBITDA 2027<span class="sub">k€</span></th>'
            '<th class="num">EBITDA 2031<span class="sub">k€</span></th><th class="num">Capital próprio necessário<span class="sub">M€, até 2031</span></th></tr></thead><tbody>']
     for name, s, sub in rows:
@@ -143,7 +143,8 @@ def _():
         'heightMm': 46,
         'x': {'type': 'time', 'min': '2022-01-01', 'max': '2026-12-31', 'ticks': ['2022-01-01', '2023-01-01', '2024-01-01', '2025-01-01', '2026-01-01'], 'format': {'yearOnly': True}},
         'y': {'min': 0, 'max': 10, 'ticks': [0, 2, 4, 6, 8, 10], 'format': {'dec': 0}, 'unit': '€/kg'},
-        'bands': [{'y0': 2.81, 'y1': 4.61, 'label': 'custo de produção ES: 2,81–4,61', 'labelAt': '2022-02-01', 'labelPos': 'bottom'}],
+        'margin': {'r': 36},
+        'bands': [{'y0': 2.81, 'y1': 4.61, 'label': 'custo de produção ES: 2,81–4,61', 'labelAt': '2023-05-01', 'labelPos': 'bottom'}],
         'series': [{'name': 'AOVE na origem', 'color': 'series.azeite', 'markers': False, 'format': {'dec': 2, 'suffix': ' €/kg'},
                     'points': [
                         ['2022-04-07', 3.45, {'label': '3,45', 'anchor': 'start', 'dx': 6, 'dy': 11, 'marker': True}],
@@ -235,8 +236,8 @@ def _():
 LINE_LABELS = [
     ('ref', 'Valor à referência'), ('desc', 'Desconto ao comprador'), ('price', 'Receita (preço Sprout)'),
     ('gr', 'Granel ao lagar (índice + prémio)'), ('emb', 'Embalamento'), ('log', 'Logística'), ('3pl', 'Armazém 3PL e picking'),
-    ('arm', 'Armazenagem'), ('seg', 'Seguro do stock'), ('anal', 'Análises'), ('perdas', 'Perdas físicas'),
-    ('descl', 'Desclassificação esperada'), ('cust', 'Custódia (collateral manager)'), ('pag', 'Pagamentos bancários'),
+    (('arm', 'seg', 'perdas', 'descl'), 'Armazenagem, seguro, perdas e desclassificação'), ('anal', 'Análises'),
+    ('cust', 'Custódia (collateral manager)'), ('pag', 'Pagamentos bancários'),
     ('prov', 'Provisão de crédito'), ('cupao', 'Cupão das obrigações'), ('margem', 'Margem de contribuição'),
 ]
 
@@ -244,11 +245,12 @@ LINE_LABELS = [
 @gen('tbl_lote_horeca')
 def _():
     b, r = UE['horeca_gourmet_20t']['base'], UE['horeca_gourmet_20t']['recomendado']
-    out = ['<table class="compact t-lote"><thead><tr><th>Lote HoReCa/gourmet de 20 t, regime de 2029</th>'
+    out = ['<table class="compact tight t-lote"><thead><tr><th>Lote HoReCa/gourmet de 20 t, regime de 2029</th>'
            '<th class="num">Base<span class="sub">€/kg</span></th><th class="num">Base<span class="sub">€ por lote</span></th>'
            '<th class="num">Recomendado<span class="sub">€/kg</span></th><th class="num">Recomendado<span class="sub">€ por lote</span></th></tr></thead><tbody>']
     for key, lab in LINE_LABELS:
-        bk, bl, rk, rl = b['eur_kg'][key], b['eur_lote'][key], r['eur_kg'][key], r['eur_lote'][key]
+        keys = key if isinstance(key, tuple) else (key,)
+        bk, bl, rk, rl = (sum(d[x] for x in keys) for d in (b['eur_kg'], b['eur_lote'], r['eur_kg'], r['eur_lote']))
         cls = 'total' if key == 'margem' else ('sep' if key in ('price', 'gr') else '')
         dec = 3
         out.append(f'<tr class="{cls}"><td>{lab}</td><td class="num">{nf(bk, dec)}</td><td class="num">{nf(bl)}</td>'
@@ -303,7 +305,7 @@ def _():
             return e['cust'] + e['pag'] + e['prov']
         return e[key]
     cols = [('HoReCa 20 t', h['base']), ('HoReCa 20 t', h['recomendado']), ('Distrib. 30 t', d['base']), ('Distrib. 30 t', d['recomendado']), ('Granel cert. 100 t', g['recomendado'])]
-    out = ['<table class="compact t-canais"><thead><tr><th>€/kg, regime de 2029</th>']
+    out = ['<table class="compact tight t-canais"><thead><tr><th>€/kg, regime de 2029</th>']
     for (lab, _), scen in zip(cols, ['base', 'recom.', 'base', 'recom.', 'recom.']):
         out.append(f'<th class="num">{lab}<span class="sub">{scen}</span></th>')
     out.append('</tr></thead><tbody>')
@@ -319,7 +321,7 @@ def _():
 @gen('tbl_tese_literal')
 def _():
     t = SE['tese_literal_horeca_base_2029']
-    out = ['<table class="compact t-grid"><thead>'
+    out = ['<table class="compact tight t-grid"><thead>'
            '<tr><th rowspan="2">Saldo para o Sprout, €/kg</th><th class="num grp-h" colspan="3">Margem do embalador média, 0,297 €/kg</th>'
            '<th class="num grp-h" colspan="3">Margem de 2019/20, 0,499 €/kg</th></tr><tr>']
     for key in ('margem_embalador_med', 'margem_embalador_max'):
@@ -369,7 +371,7 @@ def _():
         ('Verificação para terceiros', '0,75 % por utilização × 2 + 0,5 %/ano da carteira de um banco parceiro; no recomendado o banco paga a custódia', 'verificacao_terceiros_liquida', '2028'),
         ('Dados e índice', 'Subscrição de preços de lotes verificados', 'dados', '2030'),
     ]
-    out = ['<table class="compact wrap t-rec"><colgroup><col style="width:50mm"><col><col style="width:16mm"><col style="width:19mm"><col style="width:22mm"></colgroup>'
+    out = ['<table class="compact tight wrap t-rec"><colgroup><col style="width:50mm"><col><col style="width:16mm"><col style="width:19mm"><col style="width:22mm"></colgroup>'
            '<thead><tr><th>Fonte de receita</th><th>Mecânica</th><th>Início</th><th class="num">Base 2031<span class="sub">k€ de margem</span></th><th class="num">Recomendado 2031<span class="sub">k€ de margem</span></th></tr></thead><tbody>']
     for lab, mec, key, ini in rows:
         out.append(f'<tr><td class="lbl">{lab}</td><td>{mec}</td><td>{ini}</td><td class="num">{k(mb[key][4], 0)}</td><td class="num">{k(mr[key][4], 0)}</td></tr>')
@@ -470,7 +472,7 @@ def _():
     rows = [('Pré-arranque (Q4 2026) e capital social da SPV', 'pre_arranque_e_capital_spv'), ('Perdas operacionais acumuladas (cash)', 'perdas_operacionais'),
             ('Capex (telemetria, plataforma, equipamento)', 'capex'), ('Capital de giro não coberto por obrigações, reserva e float', 'capital_giro_reserva_float'),
             ('Caixa mínima operacional', 'caixa_minima'), ('Necessidade de capital próprio até 2031', 'total')]
-    out = ['<table class="compact t-fundos"><thead><tr><th>Aplicação de fundos, 2026–2031</th><th class="num">Recomendado<span class="sub">k€</span></th><th class="num">Base<span class="sub">k€</span></th></tr></thead><tbody>']
+    out = ['<table class="compact tight t-fundos"><thead><tr><th>Aplicação de fundos, 2026–2031</th><th class="num">Recomendado<span class="sub">k€</span></th><th class="num">Base<span class="sub">k€</span></th></tr></thead><tbody>']
     for lab, key in rows:
         cls = ' class="total"' if key == 'total' else ''
         out.append(f'<tr{cls}><td>{lab}</td><td class="num">{k(a[key])}</td><td class="num">{k(b_[key])}</td></tr>')
@@ -483,7 +485,7 @@ def _():
     def pts(s):
         return [[y, round(v / 1000)] for y, v in zip(YEARS, s['ebitda'])]
     return chart('lineChart', {
-        'ariaLabel': 'EBITDA por cenário, 2027 a 2031, em milhares de euros', 'heightMm': 50,
+        'ariaLabel': 'EBITDA por cenário, 2027 a 2031, em milhares de euros', 'heightMm': 50, 'margin': {'r': 98},
         'x': {'type': 'linear', 'ticks': YEARS, 'format': {'group': False}},
         'y': {'min': -1400, 'max': 200, 'ticks': [-1200, -800, -400, 0], 'format': {'dec': 0}, 'unit': 'k€'},
         'refLines': [{'y': 0, 'label': 'break-even'}],
@@ -501,7 +503,7 @@ def _():
     def pts(s):
         return [[y, round(v / 1000)] for y, v in zip(YEARS, s['capital_proprio_levantado_acumulado'])]
     return chart('lineChart', {
-        'ariaLabel': 'Capital próprio levantado acumulado por cenário, 2027 a 2031', 'heightMm': 50,
+        'ariaLabel': 'Capital próprio levantado acumulado por cenário, 2027 a 2031', 'heightMm': 50, 'margin': {'r': 98},
         'x': {'type': 'linear', 'ticks': YEARS, 'format': {'group': False}},
         'y': {'min': 0, 'max': 6000, 'ticks': [0, 2000, 4000, 6000], 'format': {'dec': 0}, 'unit': 'k€'},
         'series': [
@@ -542,7 +544,7 @@ def _():
     seg.sort(key=lambda t: -t[1])
     return chart('barChart', {
         'ariaLabel': 'Margem de contribuição de 2031 no cenário recomendado, por canal, em milhares de euros',
-        'thickness': 10, 'rowGap': 7, 'labelWidth': 150,
+        'thickness': 10, 'rowGap': 7, 'labelWidth': 178,
         'x': {'min': 0, 'max': 300, 'ticks': [0, 100, 200, 300], 'format': {'dec': 0}},
         'data': [{'label': a, 'value': round(v / 1000), 'valueLabel': k(v), 'color': c} for a, v, c in seg],
     })
@@ -559,7 +561,7 @@ def _():
         ('Corte nos custos fixos (pessoal + opex)', f'{MINUS}{nf(b["corte_custos_fixos_pct"] * 100)} %', f'{MINUS}{nf(r["corte_custos_fixos_pct"] * 100)} %', ''),
         ('Carteira de verificação para terceiros', f'{M(b["carteira_terceiros_eur"], 0)} M€', f'{M(r["carteira_terceiros_eur"], 1)} M€', 'modelado: 5 M€'),
     ]
-    out = ['<table class="compact t-tds"><thead><tr><th>Uma alavanca de cada vez, para EBITDA de 2031 = 0</th><th class="num">Base</th><th class="num">Recomendado</th><th>Contexto</th></tr></thead><tbody>']
+    out = ['<table class="compact tight t-tds"><thead><tr><th>Uma alavanca de cada vez, para EBITDA de 2031 = 0</th><th class="num">Base</th><th class="num">Recomendado</th><th>Contexto</th></tr></thead><tbody>']
     for a, b_, c, d in rows:
         out.append(f'<tr><td>{a}</td><td class="num">{b_}</td><td class="num">{c}</td><td class="muted">{d}</td></tr>')
     out.append('</tbody></table>')
@@ -625,8 +627,8 @@ def _():
                      'color': 'accent' if v > c0 else 'neutral.1'})
     return chart('barChart', {
         'ariaLabel': f'Sensibilidade do EBITDA de 2031 do cenário recomendado, a partir de {c0} mil euros',
-        'thickness': 11, 'rowGap': 8, 'labelWidth': 300,
-        'x': {'min': -1050, 'max': 50, 'ticks': [-1000, -750, -500, -250, 0], 'format': {'dec': 0}},
+        'thickness': 11, 'rowGap': 8, 'labelWidth': 250,
+        'x': {'min': -1050, 'max': 0, 'ticks': [-1000, -750, -500, -250], 'format': {'dec': 0}},
         'data': data,
     })
 
@@ -636,9 +638,9 @@ def _():
     L = RC['linhas']
     roles = [('ceo_comercial', 'CEO / comercial (fundador)'), ('cto', 'CTO (fundador)'), ('risco_tesouraria', 'Responsável de Risco e Tesouraria'),
              ('compliance_aml', 'Compliance/AML'), ('operacoes_supply', 'Operações e supply'), ('tecnico_qualidade_azeite', 'Técnico(a) de qualidade do azeite'),
-             ('engenheiro_software', 'Engenheiro(a) de software'), ('gestor_conta_b2b', 'Gestor(a) de conta B2B (~400 contas)'),
+             ('engenheiro_software', 'Engenheiro(a) de software'), ('gestor_conta_b2b', 'Gestor(a) de conta B2B'),
              ('trader_granel_exportacao', 'Trader de granel e exportação'), ('assistente_operacoes', 'Assistente de operações')]
-    out = ['<table class="compact t-fte">', years_head('FTE, recomendado'), '<tbody>']
+    out = ['<table class="compact tight t-fte">', years_head('FTE, recomendado'), '<tbody>']
     f = (lambda v: nf(v, 1) if v % 1 else nf(v, 0))
     for key, lab in roles:
         out.append(num_row(lab, L['pf_' + key], fmt=lambda v: '·' if v == 0 else f(v)))
@@ -819,8 +821,8 @@ def _():
 
 @gen('svg_posicionamento')
 def _():
-    W, H = 680, 330
-    L, T, Rr, Bm = 36, 14, 674, 300
+    W, H = 680, 300
+    L, T, Rr, Bm = 36, 10, 674, 272
     def X(v): return L + v * (Rr - L)
     def Y(v): return Bm - v * (Bm - T)
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="Mapa de posicionamento: cliente comercial a investidor no eixo horizontal, integração física no vertical" style="width:100%;height:auto">']
@@ -936,7 +938,8 @@ def _():
                 tag = ' <span class="tag-ev">[C]</span>'
             elif 'lido diretamente' in rest:
                 tag = ' <span class="tag-ev">lido diretamente</span>'
-            out.append(f'<li><a href="{esc(url)}">{esc(url)}</a>{tag}</li>')
+            shown = re.sub(r'^https?://(www\.)?', '', url)
+            out.append(f'<li><a href="{esc(url)}">{esc(shown)}</a>{tag}</li>')
     out.append('</ul>')
     return ''.join(out)
 

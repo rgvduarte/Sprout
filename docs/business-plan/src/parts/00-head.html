@@ -35,9 +35,9 @@
   .cover .fine { grid-column: 1 / -1; color: var(--muted); font-size: 7pt; }
 
   /* ---------- índice ---------- */
-  .toc-page h1 { font-size: 22pt; margin-bottom: 6mm; }
+  .toc-page h1 { font-size: 22pt; line-height: 1.2; padding-top: 1.5mm; margin-bottom: 5mm; }
   ol.toc { counter-reset: none; margin: 0 0 8mm; padding: 0; columns: 2; column-gap: 10mm; }
-  ol.toc > li { display: grid; grid-template-columns: 9mm 1fr 10mm; padding: 1.55mm 0; margin: 0; border-bottom: 0.5pt solid var(--rule); break-inside: avoid; font-size: 9.6pt; }
+  ol.toc > li { display: grid; grid-template-columns: 9mm 1fr 10mm; align-items: baseline; padding: 1.55mm 0; margin: 0; border-bottom: 0.5pt solid var(--rule); break-inside: avoid; font-size: 9.6pt; }
   ol.toc > li::before { content: none; }
   ol.toc .toc-n { font-family: var(--f-mono); color: var(--muted); font-size: 8.6pt; padding-top: 0.5pt; }
   ol.toc .toc-t { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 600; }
@@ -49,6 +49,8 @@
 
   /* ---------- capítulos ---------- */
   .chapter { break-before: page; }
+  .chapter.flow { break-before: auto; margin-top: 9mm; }
+  .chapter.flow .ch-head h1 { font-size: 18pt; }
   .ch-head { display: grid; grid-template-columns: 13mm 1fr; border-top: 1.4pt solid var(--ink); padding-top: 2.6mm; margin: 0 0 5mm; break-after: avoid; }
   .ch-head .ch-num { font-family: var(--f-mono); font-size: 12pt; font-weight: 500; color: var(--muted); padding-top: 5.5pt; font-variant-numeric: tabular-nums; }
   .ch-head h1 { font-size: 22pt; line-height: 1.05; letter-spacing: -0.016em; margin: 0; }
@@ -103,6 +105,7 @@
   .fig-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
   .fig-row figure { margin-top: 0; }
   .fig-side { display: grid; grid-template-columns: 1.15fr 1fr; column-gap: 7mm; align-items: start; }
+  .fig-side + .cols, .fig-side + p, .fig-side + table { margin-top: 3mm; }
 
   /* ---------- notas ---------- */
   .note { font-size: 8.1pt; }
@@ -158,9 +161,11 @@
   .gloss-cols dd { display: inline; margin: 0; }
   .ref { font-size: 6.5pt; }
   .keep-together { break-inside: avoid; }
+  h2.page-start { break-before: page; margin-top: 0; }
   .risk-grid { display: grid; grid-template-columns: 74mm 1fr; column-gap: 8mm; align-items: start; margin-bottom: 2mm; }
   .risk-grid figure { margin: 0; }
   table.risk-tbl td.num { font-size: 7.4pt; }
+  .risk-grid + table { margin-top: 3mm; }
   table.t-lote td:first-child { width: 74mm; }
   table.t-canais td:first-child { width: 68mm; }
   table.t-scen4 td:first-child { width: 62mm; }

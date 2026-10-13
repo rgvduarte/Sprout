@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
 import { BookOpen } from 'lucide-react';
 import { SIM_COMPLETE_POINTS, SIM_RULES, getQuest } from '../../data';
@@ -6,7 +7,7 @@ import type { SimRunResult } from '../../data/types';
 import { Badge, ButtonLink, Page, PageHeader, Section, Stepper, Tabs } from '../../components/ui';
 import { useGame, useRole, useToast } from '../../state';
 import { now } from '../../lib/clock';
-import { SCENARIO_LOTS, monthLabel } from './deck';
+import { SCENARIO_LOTS, monthLabel, shortName } from './deck';
 import { simulate, type Allocation } from './engine';
 import { DebriefPhase } from './DebriefPhase';
 import { HistoryPanel } from './HistoryPanel';
@@ -62,6 +63,26 @@ export default function SimuladorPage() {
     const top = el.getBoundingClientRect().top;
     if (top < 0 || top > window.innerHeight * 0.6) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }, [phaseKey, reduce]);
+
+  // Vinda da Jornada do lote (?lote=sim-…): põe o lote de cenário com os mesmos parâmetros no
+  // baralho, com o montante mínimo, se ainda não estiver e houver espaço. Nunca troca a fase.
+  const [params] = useSearchParams();
+  const fromLot = params.get('lote');
+  const [preselected, setPreselected] = useState<string | null>(null);
+  useEffect(() => {
+    if (!fromLot || session.phase !== 'setup' || !SCENARIO_LOTS.some((l) => l.id === fromLot)) return;
+    setPreselected(fromLot);
+    update((s) => {
+      const current = s.draft.find((a) => a.simLotId === fromLot);
+      if (!current || current.amount > 0) return {};
+      const selected = s.draft.filter((a) => a.amount > 0);
+      const used = selected.reduce((sum, a) => sum + a.amount, 0);
+      if (selected.length >= 4 || SIM_RULES.budget - used < SIM_RULES.minAllocation) return {};
+      return { draft: s.draft.map((a) => (a.simLotId === fromLot ? { ...a, amount: SIM_RULES.minAllocation } : a)) };
+    });
+    // só ao chegar com o parâmetro
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromLot]);
 
   // a série de campanhas seguidas termina quando se sai do simulador
   useEffect(() => () => update({ streak: 0, pauseAcknowledgedAt: 0 }), [update]);
@@ -125,6 +146,11 @@ export default function SimuladorPage() {
         }
       />
       <SimBand />
+      {preselected && session.phase === 'setup' && (
+        <p className="mt-3 text-sm text-muted" role="status">
+          Vieste da jornada de um lote: o lote de cenário com os mesmos parâmetros, <span className="font-medium text-fg">{shortName(preselected)}</span>, está no baralho. Ajusta os montantes como quiseres.
+        </p>
+      )}
 
       <div ref={phaseRef} className="scroll-mt-[72px] pt-6">
         <Stepper steps={STEPS} current={PHASE_INDEX[session.phase]} className="mb-6" />

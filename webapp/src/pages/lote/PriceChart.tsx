@@ -120,7 +120,7 @@ export function PriceChart({ lot, end, progress, today = '2026-10-13' }: { lot: 
 
   return (
     <ChartFrame
-      title={`Referência de mercado e preços do lote ${lot.id}`}
+      title={<>Referência de mercado e preços do lote <span className="whitespace-nowrap">{lot.id}</span></>}
       description={`${series.label}, ${series.unit}. Índice ilustrativo, dados fictícios. À direita de hoje só estão os preços do lote, não uma previsão de mercado.`}
       height={H}
       legend={[
