@@ -53,14 +53,15 @@
   .synopsis p { margin-bottom: 1.4mm; }
   .pull { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 600; font-size: 10.6pt; line-height: 1.25; margin: 2.4mm 0 0; max-width: 165mm; }
   table.components { font-size: 7.6pt; margin-bottom: 1mm; }
-  table.components td:first-child { font-weight: 600; width: 22mm; }
-  table.components td:nth-child(2) { width: 66mm; }
-  table.components td:nth-child(3) { width: 21mm; }
+  table.components td { white-space: nowrap; }
+  table.components td:first-child { font-weight: 600; width: 25mm; }
+  table.components td:nth-child(2) { width: 61mm; }
+  table.components td:nth-child(3) { width: 24mm; }
   table.risk { font-size: 7.6pt; margin-bottom: 1.5mm; }
   table.risk td:first-child { width: 88mm; font-weight: 600; }
 
   /* ---- Página 3 ---- */
-  .exec ul { font-size: 8.2pt; line-height: 1.38; margin: 0; }
+  .exec ul { font-size: 8pt; line-height: 1.36; margin: 0; }
   .exec li { margin-bottom: 0.9mm; }
   table.owners { font-size: 7.4pt; margin-bottom: 1mm; }
   table.owners td { padding-top: 1.5mm; padding-bottom: 1.5mm; }
@@ -79,7 +80,7 @@
 
   /* ---- Página 4 ---- */
   ol.findings { margin: 0; }
-  ol.findings > li { padding: 1.25mm 0 1.25mm 6mm; margin: 0; border-top: 0.5pt solid var(--rule); display: grid; grid-template-columns: 1fr 21mm; column-gap: 4mm; font-size: 7.9pt; line-height: 1.34; }
+  ol.findings > li { padding: 1.25mm 0 1.25mm 6mm; margin: 0; border-top: 0.5pt solid var(--rule); display: grid; grid-template-columns: 1fr 23mm; column-gap: 3mm; font-size: 7.9pt; line-height: 1.34; }
   ol.findings > li:first-child { border-top: 0.9pt solid var(--ink); }
   ol.findings > li:last-child { border-bottom: 0.9pt solid var(--ink); }
   ol.findings > li::before { top: 1.25mm; font-size: 7.9pt; color: var(--ink); font-weight: 600; }
@@ -87,8 +88,8 @@
   .charts-2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-top: 3.2mm; }
   .charts-2 figure { margin: 0; }
   .path h2 { margin-top: 3.6mm; }
-  .path ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 7mm; row-gap: 1mm; margin: 0; }
-  .path ol > li { font-size: 7.8pt; line-height: 1.34; margin: 0; }
+  .path ol { column-count: 2; column-gap: 7mm; margin: 0; }
+  .path ol > li { font-size: 7.8pt; line-height: 1.34; margin: 0 0 1mm; break-inside: avoid; }
   .path ol > li::before { content: counter(li, lower-alpha) ")"; }
   .verdict { margin-top: 2.2mm; }
   .closing { display: grid; grid-template-columns: 1fr auto; column-gap: 6mm; align-items: baseline; margin-top: 2.6mm; border-top: 0.9pt solid var(--ink); padding-top: 1.8mm; font-size: 7.4pt; line-height: 1.38; }
@@ -202,13 +203,13 @@
   <table class="components compact">
     <thead><tr><th>Componente</th><th>Proposta do documento-fonte</th><th>Estado</th><th>O que a verificação mudou</th></tr></thead>
     <tbody>
-      <tr><td>Oferta</td><td>Produtores mapeados, com vantagem logística e de qualidade e stock quase em tempo real.</td><td><span class="st warn">Por provar</span></td><td>Feed de stock e curva de produção por entregar; Lagar do Val até 50 % do volume.</td></tr>
-      <tr><td>Margem</td><td>80–90 % da margem do embalador; 10–15 % de desconto ao cliente; spread retido.</td><td><span class="st crit">Não fecha</span></td><td>O desconto de 10 % custa 1,3 a 5,6 vezes o que se captura (figura abaixo).</td></tr>
-      <tr><td>Ciclo financeiro</td><td>Janelas de 18 meses; refunding e extensão em choque de preços.</td><td><span class="st warn">A corrigir</span></td><td>Produtor pago em 30/60 dias; 18 meses = vencimento das obrigações.</td></tr>
-      <tr><td>Risco</td><td>Coberturas («hedge funds/taxas de cobertura») contra volatilidade e choques.</td><td><span class="st warn">A corrigir</span></td><td>Sem futuros de azeite: back-to-back, indexação, offtake e limites.</td></tr>
-      <tr><td>Legal</td><td>Âncora jurídica; decisão de jurisdição e de regras de promoção.</td><td><span class="st crit">Bloqueante</span></td><td>Parecer escrito de escritório independente antes do 1.º euro de investidor.</td></tr>
-      <tr><td>Go-to-market</td><td>Roadshows a investidores não sofisticados: ativo palpável contra day trading.</td><td><span class="st crit">Fora na fase 1</span></td><td>Só profissionais; retalho mais tarde, via plataforma ECSP de terceiros.</td></tr>
-      <tr><td>Sistema-alvo</td><td>Marketplace fechado na fase 1; expansão após prova de risco e tesouraria.</td><td><span class="st ok">Confirmado</span></td><td>Mantém-se, com gate de decisão a 31/08/2027.</td></tr>
+      <tr><td>Oferta</td><td>Produtores mapeados; stock quase em tempo real</td><td><span class="st warn">Por provar</span></td><td>Feed de stock e curva de produção ainda por entregar</td></tr>
+      <tr><td>Margem</td><td>Captura de 80–90 %; desconto de 10–15 %</td><td><span class="st crit">Não fecha</span></td><td>O desconto custa 1,3 a 5,6 vezes o que se captura (figura)</td></tr>
+      <tr><td>Ciclo financeiro</td><td>Janelas de 18 meses, extensão, refunding</td><td><span class="st warn">A corrigir</span></td><td>Produtor pago em 30/60 dias; 18 meses só nas obrigações</td></tr>
+      <tr><td>Risco</td><td>«Hedge funds/taxas de cobertura»</td><td><span class="st warn">A corrigir</span></td><td>Sem futuros de azeite: back-to-back, indexação, offtake</td></tr>
+      <tr><td>Legal</td><td>Âncora jurídica; jurisdição; regras de promoção</td><td><span class="st crit">Bloqueante</span></td><td>Parecer independente antes do primeiro investidor</td></tr>
+      <tr><td>Go-to-market</td><td>Roadshows a investidores não sofisticados</td><td><span class="st crit">Fora na fase 1</span></td><td>Só profissionais; retalho mais tarde, via ECSP de terceiros</td></tr>
+      <tr><td>Sistema-alvo</td><td>Marketplace fechado na fase 1</td><td><span class="st ok">Confirmado</span></td><td>Mantém-se, com gate de decisão a 31/08/2027</td></tr>
     </tbody>
   </table>
 
@@ -279,7 +280,7 @@
     {
       "ariaLabel": "Calendário de out. 2026 a mar. 2028: fase 0, piloto, gate, fase 2; registo da SPV e 1.ª série; pré-seed",
       "start": "2026-10-01", "end": "2028-03-31", "today": "2026-10-13", "todayLabel": "13/10",
-      "laneHeight": 23, "barHeight": 14,
+      "laneHeight": 21, "barHeight": 13,
       "lanes": [
         { "label": "Operação", "items": [
           { "from": "2026-10-13", "to": "2027-01-31", "label": "Fase 0: preparação", "tone": "soft" },
@@ -352,7 +353,7 @@
   </table>
 
   <h2>Agenda e coordenação</h2>
-  <p class="small">Janela operacional já marcada (14h45–16h, aproximadamente). Foco, segundo o documento-fonte: validar os trilhos legais e de pagamentos e o escopo do piloto. Proposta de ordem de trabalhos:</p>
+  <p class="small">Janela operacional já marcada (14h45–16h, aprox.), com foco em validar os trilhos legais e de pagamentos e o escopo do piloto. Ordem de trabalhos proposta:</p>
   <table class="agenda compact">
     <thead><tr><th>Hora</th><th>Ponto</th><th>Decisão a tomar</th><th>Quem</th></tr></thead>
     <tbody>
@@ -370,7 +371,7 @@
   <p class="dek">Oito conclusões da verificação de 13/10/2026 que mudam decisões. Números da base factual (00), do desenho do modelo (01) e do modelo de referência.</p>
 
   <ol class="findings">
-    <li><span><b>Preços em queda e voláteis.</b> AOVE na origem: 8,99 €/kg em janeiro de 2024 (máximo), 3,34 no início de outubro de 2026 (−63 %), 3,10 a 13/10. Espanha prevê +23 % de colheita em 2026/27; volatilidade anualizada de 23–42 % [E].</span><span class="ref">00 §1.1–1.2, §1.6</span></li>
+    <li><span><b>Preços em queda e voláteis.</b> AOVE na origem: 8,99 €/kg em janeiro de 2024 (máximo), 3,34 no início de outubro de 2026 (−63 %), 3,10 a 13/10. Espanha prevê +23 % de colheita em 2026/27; volatilidade anualizada de 23–42 % [E].</span><span class="ref">00 §1.1, §1.2, §1.6</span></li>
     <li><span><b>A aritmética da tese não fecha.</b> Capturar 80–90 % da margem do embalador dá 0,15–0,45 €/kg; o desconto de 10 % sobre 5,65 €/kg custa 0,57. Margem HoReCa: 0,35 €/kg (6,8 %) com 10 % de desconto, 1,4 % com 15 %; distribuidores ~1,5 %, sem desconto.</span><span class="ref">00 §1.4; 01 §2.2–2.5</span></li>
     <li><span><b>Não há hedge de azeite em bolsa.</b> O MFAO (Jaén) foi extinto em 2016–17; cobre-se com back-to-back, compra indexada (SIMA + Poolred) e offtake. Stock parado 18 meses: carry de ~20 % e VaR 95 % de 37–57 % [E]; perda potencial de 50–70 % do lote.</span><span class="ref">00 §1.6, §7; 01 §2.6</span></li>
     <li><span><b>Os 18 meses só existem do lado do capital.</b> O produtor recebe em 30/60 dias (Dir. 2019/633; DL 118/2010, alterado pelo DL 76/2021) e o lote roda em 2–6 meses. «18 meses» passa a ser o vencimento legal das obrigações: esperado a 12, uma extensão até 18.</span><span class="ref">00 §5; 01 §1.2</span></li>
@@ -393,8 +394,8 @@
         "bands": [ { "y0": 2.81, "y1": 4.61, "label": "custo de produção ES: 2,81–4,61", "labelAt": "2022-11-15", "labelPos": "bottom" } ],
         "series": [ { "name": "AOVE na origem", "color": "series.azeite", "markers": false, "format": { "dec": 2, "suffix": " €/kg" },
           "points": [
-            ["2022-04-07", 3.45, { "label": "3,45", "anchor": "end", "dx": -7, "dy": 3, "marker": true }],
-            ["2024-01-24", 8.988, { "label": "8,99\njan. 2024", "anchor": "start", "dx": 8, "dy": 3, "marker": true }],
+            ["2022-04-07", 3.45, { "label": "3,45", "anchor": "start", "dx": 6, "dy": 11, "marker": true }],
+            ["2024-01-24", 8.988, { "label": "8,99 · jan. 2024", "anchor": "middle", "dy": -8, "marker": true }],
             ["2025-02-15", 4.075],
             ["2025-11-05", 4.62],
             ["2026-04-09", 4.43],
