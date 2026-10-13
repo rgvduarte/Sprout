@@ -250,7 +250,16 @@ export function lineChart(o) {
         const dy = p[2].dy ?? -9;
         const lines = String(lab).split('\n');
         lines.forEach((ln, k) => {
-          g += text(x + dx, y + dy + k * 9.5 - (dy < 0 ? (lines.length - 1) * 9.5 : 0), ln, { size: THEME.fs.value, anchor, weight: k === 0 ? 500 : 400, fill: k === 0 ? THEME.ink : THEME.muted, mono: k === 0 && /^[\d−+]/.test(ln) });
+          const ty = y + dy + k * 9.5 - (dy < 0 ? (lines.length - 1) * 9.5 : 0);
+          const [val, ...rest] = ln.split(' · ');
+          if (k === 0 && rest.length) {
+            // "8,99 · jan. 2024": valor em mono, contexto em texto corrido, cinzento
+            g += `<text x="${r2(x + dx)}" y="${r2(ty)}" text-anchor="${anchor}" style="font-size:${THEME.fs.value}pt" fill="${THEME.ink}">`
+              + `<tspan style="font-family:${THEME.font.mono};font-weight:500;font-variant-numeric:tabular-nums">${esc(val)}</tspan>`
+              + `<tspan dx="3.5" style="font-family:${THEME.font.body}" fill="${THEME.muted}">${esc(rest.join(' · '))}</tspan></text>`;
+          } else {
+            g += text(x + dx, ty, ln, { size: THEME.fs.value, anchor, weight: k === 0 ? 500 : 400, fill: k === 0 ? THEME.ink : THEME.muted, mono: k === 0 && /^[\d−+]/.test(ln) });
+          }
         });
       }
     });

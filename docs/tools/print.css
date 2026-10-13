@@ -409,7 +409,7 @@ dl.defs dd { margin: 0; }
 
 /* ---------- Paginação --------------------------------------------------- */
 
-.sheet { break-before: page; page-break-before: always; }
+.sheet { break-before: page; page-break-before: always; padding-top: 1.4mm; }
 .sheet:first-of-type { break-before: auto; page-break-before: auto; }
 .page-break { break-before: page; page-break-before: always; }
 .keep, figure, table, .note, .callout, .no-split { break-inside: avoid; page-break-inside: avoid; }

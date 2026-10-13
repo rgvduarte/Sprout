@@ -12,8 +12,9 @@
  *   2. Emula media print, espera pela rede, por document.fonts.ready e, se <html> tiver
  *      data-await-ready, até o documento marcar data-ready="1" (gráficos desenhados).
  *   3. Tipografia pt-PT (desligável com --no-typeset): espaço inseparável entre número e
- *      unidade (%, €, kg, t, dias...), separador de milhares U+202F, e após palavras de uma
- *      letra (a, e, o, à, é) para não ficarem no fim da linha.
+ *      unidade (%, €, kg, t, dias...), separador de milhares U+202F, sem quebra dentro de
+ *      intervalos numéricos (23–42 %) nem depois de ≥ ≤ ~ ≈, e espaço inseparável após
+ *      palavras de uma letra (a, e, o, à, é) e abreviaturas (art., n.º, p., §).
  *   4. Verificações antes de imprimir: glifos fora das fontes da marca, elementos que
  *      transbordam a largura útil, folhas (.sheet) mais altas do que a página.
  *   5. Gera o PDF (A4, printBackground, preferCSSPageSize) e imprime o número de páginas.
@@ -98,6 +99,8 @@ function typesetInPage() {
   const reThousands = /\b(\d{1,3})((?:[  ]\d{3})+)(?!\d)/g;
   const reShort = /(?<=^|[\s(\u00A0])([aeoAEOàÀéÉ]|§|n\.º|n\.os|art\.|arts\.|al\.|p\.|pp\.|Dir\.|Reg\.|DL|CSC|CVM|LGT|CC)[ ](?=\S)/g;
   const reEuroLead = /(€)[ ](?=\d)/g;
+  const reRange = /(\d[%]?)([–-])(?=[\d−])/g;          // 23–42, 0,15–0,45: sem quebra depois do traço
+  const reRel = /([≥≤~≈±×])[ ](?=[\d−])/g;            // ≥ 100 000, ~0,68: símbolo colado ao número
   const skip = new Set(['SCRIPT', 'STYLE', 'CODE', 'PRE', 'TEXTAREA', 'svg', 'SVG']);
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(n) {
@@ -114,6 +117,8 @@ function typesetInPage() {
       .replace(reThousands, (m, a, rest) => a + rest.replace(/[  ]/g, NNBSP))
       .replace(reUnit, '$1' + NBSP)
       .replace(reEuroLead, '$1' + NBSP)
+      .replace(reRange, '$1$2\u2060')
+      .replace(reRel, '$1' + NBSP)
       .replace(reShort, (m, w) => w + NBSP);
     if (t !== before) { n.nodeValue = t; changed++; }
   }

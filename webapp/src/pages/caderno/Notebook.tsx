@@ -240,6 +240,8 @@ export function SealsPage({
 
 function SealButton({ s, c, onOpen, fresh, onStamped, questsDone }: { s: SealView; c: CampaignDef; onOpen: (s: SealView) => void; fresh: boolean; onStamped: (id: string) => void; questsDone: number }) {
   const [stamped, setStamped] = useState(!fresh);
+  // fica em modo carimbo durante esta visita, para o selo não saltar depois de assentar
+  const [stampMode] = useState(fresh);
   useEffect(() => {
     if (!fresh) return;
     const t = window.setTimeout(() => setStamped(true), 450);
@@ -254,8 +256,8 @@ function SealButton({ s, c, onOpen, fresh, onStamped, questsDone }: { s: SealVie
       aria-haspopup="dialog"
       className="group flex w-full min-w-0 flex-col items-center gap-2 rounded-md px-1.5 py-3 text-center transition-colors duration-150 hover:bg-surface-2"
     >
-      <span className="transition-transform duration-200 ease-out group-hover:-translate-y-0.5" style={s.earned && !fresh ? { transform: `rotate(${sealTilt(s.def.id)}deg)` } : undefined}>
-        {fresh ? (
+      <span className="transition-transform duration-200 ease-out group-hover:-translate-y-0.5" style={s.earned && !stampMode ? { transform: `rotate(${sealTilt(s.def.id)}deg)` } : undefined}>
+        {stampMode ? (
           <WaxSealStamp seal={s.def} producer={s.producer} region={s.region} stamped={stamped} onStamped={() => onStamped(s.def.id)} size={96} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />
         ) : (
           <OriginSeal seal={s.def} producer={s.producer} region={s.region} state={s.earned ? 'earned' : 'locked'} size={96} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />

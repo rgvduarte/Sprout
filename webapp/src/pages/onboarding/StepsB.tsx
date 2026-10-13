@@ -132,7 +132,7 @@ export function StepBeneficiario(p: StepProps) {
       {col ? (
         <UboEditor {...p} />
       ) : (
-        <div data-field="contaPropria">
+        <div data-field="contaPropria" className="max-w-[68ch]">
           <RadioGroup
             legend={<Lbl ex={isEx('contaPropria')}>Investes por conta própria?</Lbl>}
             hint="Ou seja, o dinheiro é teu e és tu quem decide e beneficia do investimento."
@@ -155,7 +155,7 @@ export function StepBeneficiario(p: StepProps) {
         </div>
       )}
 
-      <div data-field="pep">
+      <div data-field="pep" className="max-w-[68ch]">
         <RadioGroup
           legend={<Lbl ex={isEx('pep')}>Pessoa politicamente exposta</Lbl>}
           hint={
