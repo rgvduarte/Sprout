@@ -10,7 +10,7 @@ import { CampaignTabs, MilestonesBlock, NotesPage, SealsPage, Spread } from './N
 import { OriginCards } from './OriginCards';
 import { OriginsMap, sealRegionLabels } from './OriginsMap';
 import { SealDrawer } from './SealDrawer';
-import { CAMPAIGNS, cardsFor, followOf, getCampaign, knowledgeTimeline, milestonesFor, notesFor, regionReasons, useProfile, type CampaignId } from './model';
+import { CAMPAIGNS, cardsFor, followOf, getCampaign, knowledgeTimeline, milestonesFor, notesFor, regionReasons, useProfile, type CampaignDef, type CampaignId } from './model';
 
 /* =====================================================================
    Caderno de colheita: um caderno por campanha, com os selos de origem
@@ -52,12 +52,9 @@ export default function CadernoPage() {
   );
 
   const c = getCampaign(campaign);
-  const notes = useMemo(() => notesFor(c, data.lots, data.events, follow), [c, data.lots, data.events, follow]);
   const timeline = useMemo(() => knowledgeTimeline(profile), [profile]);
-  const milestones = useMemo(() => milestonesFor(c, timeline), [c, timeline]);
   const allCards = useMemo(() => Object.fromEntries(CAMPAIGNS.map((x) => [x.id, cardsFor(x, data.lots, follow, profile.analysesRead)])) as Record<CampaignId, ReturnType<typeof cardsFor>>, [data.lots, follow, profile.analysesRead]);
   const cards = allCards[campaign];
-  const campaignSeals = data.seals.filter((s) => s.def.campanha === campaign);
 
   const counts = Object.fromEntries(
     CAMPAIGNS.map((x) => {
@@ -108,10 +105,10 @@ export default function CadernoPage() {
   const cardsTotal = Object.values(allCards).flat().length;
   const cardsHere = cards.filter((x) => x.state !== 'bloqueado').length;
 
-  const emptyNotes =
-    c.state === 'concluida' ? (
+  const emptyNotesFor = (cc: CampaignDef) =>
+    cc.state === 'concluida' ? (
       'Não acompanhaste nenhum lote desta campanha.'
-    ) : c.state === 'fase-2' ? (
+    ) : cc.state === 'fase-2' ? (
       <>
         As notas da safra aparecem quando acompanhares uma origem de café: explora <TextLink to="/mercados/cafe">A Plantação</TextLink> e lê as amostras de pré-safra dos lotes{' '}
         <TextLink to="/lote/CF-2027-001#analises">CF-2027-001</TextLink> e <TextLink to="/lote/CF-2027-002#analises">CF-2027-002</TextLink>.
@@ -122,6 +119,28 @@ export default function CadernoPage() {
         <TextLink to="/lote/AZ-2026-021#analises">AZ-2026-021</TextLink> ou no <TextLink to="/lote/AG-2026-007#analises">AG-2026-007</TextLink>.
       </>
     );
+
+  /** Página dupla de uma campanha (também desenhada por baixo durante o virar de página). */
+  const renderSpread = (id: CampaignId) => {
+    const cc = getCampaign(id);
+    return (
+      <div key={id} className="grid xl:grid-cols-2">
+        <SealsPage
+          c={cc}
+          seals={data.seals.filter((s) => s.def.campanha === id)}
+          onOpen={(x) => setOpenSealId(x.def.id)}
+          fresh={fresh}
+          onStamped={onStamped}
+          questsDoneFor={(s) => s.def.questIds.filter((q) => game.isQuestDone(q)).length}
+        >
+          <MilestonesBlock c={cc} milestones={milestonesFor(cc, timeline)} />
+        </SealsPage>
+        <div className="min-w-0 border-t border-border xl:border-l xl:border-t-0 xl:border-dashed">
+          <NotesPage c={cc} notes={notesFor(cc, data.lots, data.events, follow)} emptyNotes={emptyNotesFor(cc)} />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Page>
@@ -146,23 +165,7 @@ export default function CadernoPage() {
 
       <section aria-label="Caderno por campanha">
         <CampaignTabs current={campaign} onSelect={select} counts={counts} />
-        <Spread campaign={campaign} dir={dir}>
-          <div className="grid xl:grid-cols-2">
-            <SealsPage
-              c={c}
-              seals={campaignSeals}
-              onOpen={(x) => setOpenSealId(x.def.id)}
-              fresh={fresh}
-              onStamped={onStamped}
-              questsDoneFor={(s) => s.def.questIds.filter((id) => game.isQuestDone(id)).length}
-            >
-              <MilestonesBlock c={c} milestones={milestones} />
-            </SealsPage>
-            <div className="min-w-0 border-t border-border xl:border-l xl:border-t-0 xl:border-dashed">
-              <NotesPage c={c} notes={notes} emptyNotes={emptyNotes} />
-            </div>
-          </div>
-        </Spread>
+        <Spread campaign={campaign} dir={dir} render={renderSpread} />
         <nav aria-label="Virar de campanha" className="mt-2 flex items-center justify-between gap-3">
           {prev ? (
             <Button variant="ghost" size="sm" onClick={() => select(prev.id)} iconLeft={<ArrowLeft aria-hidden className="size-4" strokeWidth={1.75} />}>

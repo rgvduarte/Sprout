@@ -16,13 +16,13 @@
 ## 0. Sumário executivo
 
 1. **Azeite: o ciclo de preços inverteu-se por completo.** O virgem extra (AOVE) na origem em Espanha passou de **3,45 €/kg (abr. 2022)** para o máximo de **8,99 €/kg (jan. 2024)** e está em **3,34 €/kg (29/09–05/10/2026)**: −63% desde o pico, em 33 meses. A primeira estimativa oficial espanhola para 2026/27 é **1,60 Mt (+23%)**, o que mantém a pressão em baixa.
-2. **A "margem do embalador" é pequena.** Segundo o Observatorio de la Cadena Alimentaria (Espanha), o lucro líquido do embalador de AOVE foi de **0,19–0,50 €/kg** (5–14% do preço ao público sem IVA) nas campanhas 2018/19–2020/21; o custo de embalamento ronda **0,47–0,51 €/kg**. Os grandes embaladores operam com **EBITDA de ~5–6%** das vendas (Deoleo 2025: 5,9%; Sovena 2024: ~5,5%).
+2. **A "margem do embalador" é pequena.** Segundo o Observatorio de la Cadena Alimentaria (Espanha), o lucro líquido do embalador de AOVE foi de **0,19–0,50 €/kg** (5–14% do preço ao público sem IVA) nas campanhas 2018/19–2020/21; o custo de embalamento ronda **0,47–0,51 €/kg**. Os grandes embaladores operam com **EBITDA de ~5–6%** das vendas (Deoleo 2025: ~6,1%; Sovena 2024: ~5,5%).
 3. **A aritmética da tese não fecha tal como está escrita.** Capturar 80–90% de 0,19–0,50 €/kg dá **0,15–0,45 €/kg**; um desconto de 10–15% sobre um preço de referência de 4,6–6,7 €/kg custa **0,46–1,00 €/kg**. O desconto custa 1 a 6,7 vezes o que se captura. Só fecha se o Sprout capturar o **diferencial total granel→prateleira** (1,2–2,2 €/kg, 27–34% do preço ao público sem IVA) e vender contra referências de marca ou de cash & carry português, e não contra marcas brancas espanholas.
 4. **A água é economicamente pouco adequada à tese.** Portugal engarrafou ~**2.000 milhões de litros** em 2025, num mercado de **479 M€** (média ~**0,24 €/L** [I]). A água mineral natural tem de ser embalada na origem (Diretiva 2009/54/CE), pelo que **o produtor é o embalador**: não há um elo de embalamento separado para desintermediar. A logística e o depósito do SDR (**0,10 €/embalagem desde 10/04/2026**) pesam 20–40% do valor ex-fábrica [E].
 5. **Café: o preço caiu mas a margem não está no grão.** O Arabica (ICE KC) bateu o recorde de **~4,41 USD/lb (fev. 2025)** e estava em **2,85 USD/lb a 09/10/2026** (−24% em termos homólogos). O Robusta passou de ~**5.800 USD/t (fev. 2025)** para **3.470 USD/t (12/10/2026)**. O grão verde vale ≤10% do valor de retalho a nível mundial (ICO). Em Portugal, a HoReCa está presa a contratos de exclusividade dos torrefatores com equipamento em comodato. É uma vertical para mais tarde.
 6. **Procura:** há **74.524 empresas** de restauração e similares em Portugal (2024; 91% microempresas). Só **20,2%** das empresas portuguesas pagam a horas, e só **11%** no alojamento e restauração, onde o atraso médio é de **30 dias**.
 7. **Regime legal de prazos:** o DL 118/2010 (alterado pelo DL 76/2021, que transpõe a Diretiva (UE) 2019/633) limita o pagamento de produtos alimentares a **30 dias (perecíveis)** e a **30/60 dias (não perecíveis)**, conforme os escalões de volume de negócios. **Um ciclo de 18 meses não pode aplicar-se ao pagamento ao produtor.**
-8. **Dimensão [E]:** o SAM em Portugal (azeite + água no canal HoReCa) é de **~140–275 M€/ano**, e o da Ibéria é de **~0,7–1,25 mil M€/ano**. O SOM realista a 36 meses é de **1,7–8 M€ de GMV** (1.000–2.000 clientes HoReCa), com uma margem de contribuição de **0,15–1,2 M€**. O fluxo B2B HoReCa sozinho é pequeno face à ambição do documento-fonte.
+8. **Dimensão [E]:** o SAM em Portugal (azeite + água no canal HoReCa) é de **~160–285 M€/ano**, e o da Ibéria é de **~0,7–1,25 mil M€/ano**. O SOM realista a 36 meses é de **1,7–8 M€ de GMV** (1.000–2.000 clientes HoReCa), com uma margem de contribuição de **~0,05–0,65 M€** (3–8% do GMV, com os preços corrigidos em `01-desenho-do-modelo.md`). O fluxo B2B HoReCa sozinho é pequeno face à ambição do documento-fonte.
 
 ---
 
@@ -36,13 +36,13 @@
 | 2022/23 | **2.570** [F,M] | **1.390** [F,M] | **~660** (652–680 conforme a fonte) [F,M] | **~126** [F,A] | Seca; INE: 1,375 M hl (−40%) |
 | 2023/24 | **~2.410** (est. COI) [F,M] | **1.530** [F,M] | **853** [F,M] | **~160** [F/I,M] | INE: >1,75 M hl em 2023 |
 | 2024/25 | **3.572** (provisório) [F,A] | **~2.100–2.130** [F,M] | **1.421** [F,A] | **177** [F,A] | Recuperação ibérica |
-| 2025/26 | **3.440** (previsão COI, dez. 2025) [F,A] | **2.056** (previsão COI) [F,A] | **1.298,5** (fecho AICA) [F,A] | **160–179** [F,M] | PT: Olivum 160; INE ~175 (set. 2026); Governo 179 |
+| 2025/26 | **3.440** (previsão COI, dez. 2025) [F,A] | **2.056** (previsão COI) [F,A] | **1.298,5** (fecho AICA) [F,A] | **160–179** [F,M]; ~175 [E] | PT: Olivum 160; Governo 179; ~175 = ponto médio [E] (o valor "INE ~175" antes citado não tem publicação INE localizada). Mundo e UE: previsão COI de dez. 2025 com a Espanha ainda prevista; com o fecho espanhol, UE ~1.980–2.000 [I] |
 | 2026/27p | n.d. | n.d. | **1.602,6** (1.º aforo do MAPA, 01/10/2026) [F,A] | **~+10%** (Olivum) [F,M] | Andaluzia: 1.261,2 kt (+23,9%) |
 
 Pontos-chave:
 - A Espanha representa ~40% da produção mundial. Em 2025/26 fechou −8,6% (1.298.503 t contra 1.421.097 t), mas ficou 17% acima da média das quatro campanhas anteriores. As existências totais eram de 863.339 t em maio de 2026. [F,A]
 - Em setembro de 2026, um pedido de um Estado-Membro (aparentemente a Itália) ao Conselho estimou as **existências finais da UE em 2025/26 em ~420 kt** e reportou quedas de preço superiores a 50% em zonas produtoras italianas. Pede a ativação da reserva agrícola. [F,M]
-- **Portugal** é o 2.º produtor da UE em alguns anos e o 4.º noutros. O Alentejo representa ~85% da produção, e a expansão (olival intensivo e superintensivo) mantém a produção estruturalmente acima de 150 kt. O grau de autoaprovisionamento era de **247,9%** (INE). [F,M]
+- **Portugal** é o 3.º ou 4.º produtor da UE, consoante a campanha (Itália e Grécia produziram mais em todas as campanhas recentes; em 2024/25, ~250, ~250 e 177 kt [F,M via COI; não reverificado nesta revisão]), e o 2.º ou 3.º exportador. O Alentejo representa ~85% da produção, e a expansão (olival intensivo e superintensivo) mantém a produção estruturalmente acima de 150 kt. O grau de autoaprovisionamento era de **247,9%** (INE). [F,M]
 
 ### 1.2 Comércio externo de Portugal
 
@@ -79,9 +79,9 @@ Pontos-chave:
 | **29 set.–5 out. 2026** | **3,34** | Poolred | M |
 | 13 out. 2026 | 3,05–3,36 (Infaoliva 3,10; Almazaras de Córdoba 3,05; Junta de Andalucía 3,36) | Infobae | M |
 
-- Médias de campanha (agregador secundário de Poolred): **2024/25 = 3,89 €/kg**; **2025/26 = 4,31 €/kg** (até dez. 2025). [F,B]
+- Médias (agregador secundário de Poolred): **2025/26 = 4,31 €/kg** (até dez. 2025) [F,B]. O valor de 3,89 €/kg antes apresentado como média da campanha 2024/25 é incompatível com os pontos mensais desta tabela (dez. 2024 = 5,30; fev. 2025 = 4,075; abr. 2025 = 3,90; jun. 2025 ≈ 3,52; set. 2025 ≈ 4,24): é provavelmente a média do ano civil de 2025 (≈ 3,9, NV). A média da campanha 2024/25 fica em **~4,2–4,5 €/kg [I]** até haver a série Poolred/DG AGRI.
 - O diferencial entre AOVE e lampante comprimiu para **0,24 €/kg** (era 0,75 €/kg um ano antes). O prémio de qualidade está quase anulado. [F,M]
-- **Portugal (SIMA/GPP e CE):** AOVE a granel a **4,43 €/kg** na semana 15/2026 (−31% homólogo); **3,95 €/kg** (395 €/100 kg) em jul. 2026; **3,50 €/kg** na semana 39/2026 (Oleista); intervalo de **3,40–3,80 €/kg** no início de out. 2026. Em Trás-os-Montes, o granel enfrenta a concorrência de azeite tunisino importado. [F,M]
+- **Portugal (SIMA/GPP e CE):** AOVE a granel a **4,43 €/kg** na semana 15/2026 (−31% homólogo); **3,95 €/kg** (395 €/100 kg) em jul. 2026; **3,50 €/kg** na semana 39/2026 (Oleista, não SIMA); intervalo SIMA de **3,40–3,80 €/kg** no início de out. 2026. O índice contratual proposto (média SIMA + Poolred) fica em ~3,42–3,47 €/kg a out. 2026 [I]. Em Trás-os-Montes, o granel enfrenta a concorrência de azeite tunisino importado. [F,M]
 - **Custos de produção (Espanha, AEMO, via imprensa):** 2,81 €/kg em sebe com rega e até **4,61 €/kg** em olival de montanha. A OliveA situa o limiar do olival tradicional em ~5 €/kg. O estudo do Observatorio para 2020/21 dava 1,44–4,33 €/kg. [F,M] [I] Aos preços atuais (3,1–3,6 €/kg), **o olival tradicional opera abaixo do custo**. Isto cria vendedores motivados, mas também risco de abandono de oferta.
 
 ### 1.4 Preços no retalho
@@ -135,7 +135,7 @@ Não existe um estudo português equivalente publicado (o Observatório portugu�
 
 | Grupo | País | Dimensão | Margem | Período | Conf. |
 |---|---|---|---|---|---|
-| **Deoleo** (Carbonell, Bertolli, Koipe) | ES, cotada | Vendas de **~821 M€** (−17,6%); volume +11%; **8,3%** de quota mundial (Euromonitor) | Margem bruta de **15,2%** (2024: 9,9%); **EBITDA de 50 M€ = 5,9%**; dívida líquida de 86 M€ (1,7× EBITDA) | 2025 | A |
+| **Deoleo** (Carbonell, Bertolli, Koipe) | ES, cotada | Vendas de **~821 M€** (−17,6%); volume +11%; **8,3%** de quota mundial (Euromonitor) | Margem bruta de **15,2%** (2024: 9,9%); **EBITDA de ~50 M€ ≈ 6,1%** (5,9% exigiria ~48,4 M€: confirmar o valor exato); dívida líquida de 86 M€ (1,7× EBITDA) | 2025 | A |
 | **Sovena** (Nutrinveste; Andorinha, Oliveira da Serra) | PT/ES | Vendas de **~1,8 mil M€**; Sovena Espanha 1.320 M€; Sovena Portugal Consumer Goods ~550 M€; ~30% de quota no Brasil | **EBITDA > 100 M€ (~5,5%)**, o primeiro acima de 100 M€ | 2024 | M |
 | **Acesur** (La Española, Coosur) | ES | Líder em volume em Espanha: ~60,2 M L | n.d. | 2023 | B |
 | **Gallo** (Victor Guedes) | PT | "1.ª marca portuguesa e 4.ª mundial"; Brasil e Portugal como mercados principais | Contas recentes **não encontradas** | — | B |
@@ -262,8 +262,8 @@ Tese: "capturar 80–90% da margem do embalador + 10–15% de desconto ao client
 
 | Indicador | Valor | Período | Conf. |
 |---|---|---|---|
-| Faturação do setor (torrefação e comercialização) | **695 M€** (+6,9%); 92 empresas | 2024 | A |
-| Série | 530 (2021), 590 (2022), 660 (2023) M€ | 2021–23 | A |
+| Faturação do setor (torrefação e comercialização) | **695 M€** (+6,9% face a 2023 revisto, ≈ 650 M€); 92 empresas | 2024 | A |
+| Valores de edições anteriores do estudo (não homogéneos) | 530 (2021), 590 (2022), 660 (2023) M€, de edições diferentes do Informa D&B, com revisões; 695/660 = +5,3%, não +6,9%. Não usar como série | 2021–23 | B |
 | Exportações (torrado e solúvel) / importações | 134 M€ (+9,8%) / 255 M€ (+12,8%) | 2024 | A |
 | Consumo per capita | ~5,5 kg/ano (AICC/FIPA, sem data) | n.d. | B |
 | Densidade de pontos de venda | 1 por cada 160 habitantes (média europeia: ~400) | n.d. | B |
@@ -332,20 +332,20 @@ Todos os valores desta secção são **estimativas nossas**, com o método indic
 
 | Camada | Componente | Método | Valor anual |
 |---|---|---|---|
-| **TAM PT** | Azeite, consumo aparente | 45–65 kt [E, conf. B: per capita de 3,7 kg na crise de 2022/23 (COI) como piso, mais a recuperação de +30% em 2025 (Casa do Azeite)] × 6,67 €/kg (retalho s/ IVA) | **~300–435 M€** (a preço de retalho); ~160–235 M€ (a preço de origem) |
+| **TAM PT** | Azeite, consumo aparente | **65–71 kt** [I: produção 160–177 kt ÷ grau de autoaprovisionamento de 247,9% (INE, via JN); campanha do dado a confirmar] × 6,67 €/kg (retalho s/ IVA) | **~430–475 M€** (a preço de retalho); ~230–255 M€ (a preço de origem) |
 | | Água | DGEG 2025 | **479 M€** (~2.000 M L) |
 | | Café | Informa D&B 2024 | **695 M€** |
-| | Oferta de azeite PT (lado do produtor) | 175 kt × 3,4–4,4 €/kg | ~0,6–0,77 mil M€ |
-| **SAM PT** (HoReCa + retalho independente; azeite + água) | Azeite | Quota HoReCa de 20–30% [E, não verificado] → 9–19,5 kt × 4,5–5,5 €/kg | ~40–107 M€ |
+| | Oferta de azeite PT (lado do produtor) | ~175 kt [E] × 3,4–4,4 €/kg | ~0,6–0,77 mil M€ |
+| **SAM PT** (HoReCa + retalho independente; azeite + água) | Azeite | Quota HoReCa de 20–30% [E, não verificado] → 13–21 kt × 4,5–5,5 €/kg | ~58–117 M€ |
 | | Água | 17% fora do lar (proxy Espanha, Mercasa) × ~1.960 M L → ~335 M L × 0,30–0,50 €/L [E] | ~100–168 M€ |
-| | **Total** | | **~140–275 M€** |
+| | **Total** | | **~160–285 M€** |
 | **SAM Ibéria** | Espanha: azeite | 496 kt × 20–30% × 4,0–4,5 €/kg | ~0,40–0,67 mil M€ |
 | | Espanha: água | 613 M L fora do lar × 0,30–0,50 €/L | ~0,18–0,31 mil M€ |
 | | **Total Ibéria** (PT + ES) | | **~0,7–1,25 mil M€** |
-| **SOM PT** (36 meses) | Por cliente HoReCa: azeite ~150–300 L/ano e água ~3.000–5.000 L/ano [E, derivado do SAM ÷ n.º de empresas] | GMV de ~1,7–4,1 mil € por cliente por ano | |
+| **SOM PT** (36 meses) | Por cliente HoReCa: azeite ~150–300 L/ano e água ~3.000–5.000 L/ano [E, derivado do SAM ÷ n.º de empresas; com o SAM do azeite revisto, a derivação dá ~190–310 L/ano; mantém-se o intervalo inferior por prudência] | GMV de ~1,7–4,1 mil € por cliente por ano | |
 | | Piloto fechado (12 meses) | 50–100 clientes | **~0,1–0,4 M€ de GMV** |
-| | Ano 3 | 1.000–2.000 clientes (1,3–2,7% das empresas HoReCa) | **~1,7–8 M€ de GMV** (0,6–3% do SAM PT) |
-| | Margem de contribuição | 8–15% do GMV [E] | **~0,15–1,2 M€** |
+| | Ano 3 | 1.000–2.000 clientes (1,3–2,7% das empresas HoReCa) | **~1,7–8 M€ de GMV** (0,6–5,1% do SAM PT revisto; com o SAM anterior de 140–275 M€ seriam 0,6–5,7%) |
+| | Margem de contribuição | ~3–8% do GMV [E; azeite HoReCa 6,8% a 5,65 €/kg, 12% só a 6,00; água como agente ~2%: `01-desenho-do-modelo.md` §2] | **~0,05–0,65 M€** |
 
 **Leitura [I]:** o fluxo B2B HoReCa é **pequeno e fragmentado**. Não sustenta, por si, uma estrutura de capital com investidores, SPV e janelas de 18 meses. Os bolos maiores estão a montante:
 - **Granel PT:** ~0,6–0,77 mil M€ a preço de origem. É um mercado de corretagem e trading entre lagares, embaladores e exportadores.
@@ -365,7 +365,7 @@ Se o objetivo do produto de investimento for financiar stock, o ativo subjacente
 6. **O risco de preço domina tudo; não prometer liquidação a 18 meses sobre stock não coberto.** O azeite variou +157% (abr. 2022 → dez. 2023) e −57% (jan. 2024 → abr. 2025) em janelas de 15–20 meses, e **não tem futuros cotados** desde a extinção do MFAO. A política de cobertura (o entregável da Tesouraria) tem de assentar em **operações *back-to-back*** (comprar só com venda contratada a preço fixo), contratos a prazo com lagares e limites de stock em dias de vendas. Não se deve apostar em "hedge funds". Qualquer retorno ao investidor indexado ao *spread* é, na prática, uma posição longa em azeite.
 7. **Separar o ciclo do produtor do ciclo do capital.** O DL 118/2010 (com o DL 76/2021) e a Diretiva 2019/633 limitam o pagamento ao produtor a 30–60 dias. O contrato padrão Produtor↔Plataforma deve prever **pagamento ≤30 dias** (ou na entrega). As janelas de 18 meses, a extensão e o *refunding* só podem existir no contrato Plataforma↔Investidor, o que reforça a necessidade da nota jurídica sobre SPV, AIFMD e prospeto.
 8. **Planear a tesouraria para devedores lentos.** Com 11% da HoReCa a pagar a horas e 30 dias de atraso médio, o piloto deve exigir **débito direto SEPA ou pré-pagamento**, com limite de crédito por cliente e seguro de crédito. O *fill rate* e o DSO devem ser KPI diários a par da reconciliação. O SLA de "reconciliação diária" do documento-fonte tem de incluir os depósitos do SDR, se houver água.
-9. **Ajustar a ambição à escala real.** O SOM a 36 meses é de 1,7–8 M€ de GMV e 0,15–1,2 M€ de margem. Se a ambição for maior, o modelo deve olhar para **o granel a montante** (lagar → embaladores e exportadores; ~0,6–0,77 mil M€ por ano em Portugal) e para a **exportação embalada para o Brasil**, onde Portugal tem 62% das importações. A tese de "liquidez operacional sobre ativos físicos" encaixa melhor em stock de granel certificado do que em entregas HoReCa.
+9. **Ajustar a ambição à escala real.** O SOM a 36 meses é de 1,7–8 M€ de GMV e ~0,05–0,65 M€ de margem. Se a ambição for maior, o modelo deve olhar para **o granel a montante** (lagar → embaladores e exportadores; ~0,6–0,77 mil M€ por ano em Portugal) e para a **exportação embalada para o Brasil**, onde Portugal tem 62% das importações. A tese de "liquidez operacional sobre ativos físicos" encaixa melhor em stock de granel certificado do que em entregas HoReCa.
 10. **Calendário favorável à compra, desfavorável ao *mark-to-market*.** Com a campanha 2026/27 a começar e uma colheita espanhola prevista de 1,6 Mt, os preços de origem deverão manter-se baixos no inverno de 2026/27 [I]. É bom para fixar contratos de compra com o lagar âncora. É mau para qualquer promessa de valorização do stock a investidores.
 11. **Recolher dados que faltam antes do business plan final:**
     - preço de cash & carry PT (AOVE em 5 L, água por formato);
@@ -380,8 +380,8 @@ Se o objetivo do produto de investimento for financiar stock, o ativo subjacente
 ## 7. Itens não verificados (ou de baixa confiança)
 
 - Produção mundial e da UE em 2021/22–2023/24 com tabelas primárias do COI e da DG AGRI. Os valores usados vêm de citações na imprensa (AFP, The Grocer, OFI).
-- Produção de Portugal em 2025/26: as fontes divergem (160 / 175 / 179 kt).
-- Consumo aparente de azeite em Portugal em 2024/25 e 2025/26: **não encontrado**. O intervalo de 45–65 kt é estimativa nossa.
+- Produção de Portugal em 2025/26: as fontes divergem (160 Olivum / 179 Governo); o "~175 kt INE" não tem publicação localizada.
+- Consumo aparente de azeite em Portugal em 2024/25 e 2025/26: **não encontrado** como dado direto. O intervalo de 65–71 kt é inferência a partir do grau de autoaprovisionamento do INE (247,9%); a estimativa anterior de 45–65 kt não usava esse dado.
 - Exportações de azeite de Portugal em 2025 (ano completo, valor e volume) e importações de Espanha em 2024–2025.
 - Preço de AOVE em cash & carry ou *foodservice* em Portugal (Recheio, Makro, distribuidores).
 - Margens e contas recentes da Gallo, da Acushla e da Sovena (2025).

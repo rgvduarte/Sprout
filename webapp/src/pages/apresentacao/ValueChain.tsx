@@ -229,8 +229,8 @@ type Tip = { row: 'a' | 'b' | 'z'; seg: Seg } | null;
 
 function ChainChart({ progress }: { progress: MotionValue<number> }) {
   const [tip, setTip] = useState<Tip>(null);
-  const hl = useTransform(progress, [0.04, 0.22], [0, 1]);
-  const dimProducer = useTransform(hl, [0, 1], [1, 0.5]);
+  const dimProducer = useTransform(progress, [0.04, 0.22], [1, 0.5]);
+  const ring = useTransform(progress, [0.04, 0.22], [0, 1]);
   const beam = useTransform(progress, [0.12, 0.3], [0, 1]);
   const split = useTransform(progress, [0.3, 0.66], [0, 1]);
   const oneBlockLabel = useTransform(split, [0, 0.3], [1, 0]);
@@ -257,7 +257,7 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
               {i > 0 && <Gap />}
             </motion.div>
           ))}
-          <motion.span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px] rounded-[6px] border-2 border-fg" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)`, opacity: hl }} />
+          <motion.span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px] rounded-[6px] border-2 border-fg" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)`, opacity: ring }} />
         </Track>
 
         {/* linha: com a Sprout */}

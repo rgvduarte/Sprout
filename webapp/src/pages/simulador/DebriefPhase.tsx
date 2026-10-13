@@ -132,7 +132,7 @@ export function DebriefPhase({ run, reviewing, pointsAwarded, streak, onReplay, 
         </h3>
         <DataTable columns={lotColumns} rows={f.lots} getRowId={(l) => l.simLotId} caption="Resultado de cada lote, em € fictícios" />
         <p className="mt-2 text-sm text-muted">
-          Investido + resultado bruto − parte da Sprout ({pct(1 - INVESTOR_SHARE, 0)} da margem, só quando há margem) + reserva = liquidação. Os custos base (análises, armazenagem, seguro, logística) já estão no preço de entrada; aqui estão só os custos extra.
+          Investido + resultado bruto − parte da Sprout ({pct(1 - INVESTOR_SHARE, 0)} da margem, só quando há margem) + reserva = liquidação. Vendas inclui devoluções por força maior. Os custos base (análises, armazenagem, seguro, logística) já estão no preço de entrada; aqui estão só os custos extra.
         </p>
       </section>
 
@@ -229,17 +229,17 @@ const lotColumns: Column<LotFinal>[] = [
     ),
   },
   { key: 'inv', header: 'Investido', align: 'right', mono: true, render: (l) => fe(l.amount) },
-  { key: 'vendas', header: 'Vendas e devoluções', align: 'right', mono: true, render: (l) => fe(l.revenue + l.refunds) },
+  { key: 'vendas', header: 'Vendas', align: 'right', mono: true, render: (l) => fe(l.revenue + l.refunds) },
   { key: 'custos', header: 'Custos extra', align: 'right', mono: true, render: (l) => fe(l.costHedge + l.costEvents + l.costExtension + l.costRefunding) },
   { key: 'bruto', header: 'Resultado bruto', align: 'right', mono: true, render: (l) => fes(l.gross) },
-  { key: 'sprout', header: 'Parte da Sprout', align: 'right', mono: true, render: (l) => (l.gross > 0 ? fe(l.gross * (1 - INVESTOR_SHARE)) : '—') },
+  { key: 'sprout', header: 'Sprout', align: 'right', mono: true, render: (l) => (l.gross > 0 ? fe(l.gross * (1 - INVESTOR_SHARE)) : '—') },
   { key: 'reserva', header: 'Reserva', align: 'right', mono: true, render: (l) => (l.reserveUsed > 0.5 ? fe(l.reserveUsed) : '—') },
   { key: 'liq', header: 'Liquidação', align: 'right', mono: true, render: (l) => <span className="font-semibold">{fe(l.value)}</span> },
   { key: 'res', header: 'Resultado', align: 'right', mono: true, render: (l) => fpct(l.result) },
   {
     key: 'quando',
-    header: 'Liquidou em',
-    minWidth: 150,
+    header: 'Liquidou',
+    minWidth: 120,
     render: (l) => (
       <span className="flex flex-col">
         <span className="font-mono tnum">{monthLabel(l.settledAt)}</span>

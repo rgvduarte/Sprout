@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { getWorld, HEDGE_TRIGGERS, MARKET_TODAY, REFUNDING_PLAYBOOKS, type WorldId } from '../../data';
@@ -34,13 +34,16 @@ function ActionChips({ r }: { r: LotRisk }) {
 export default function RiscoTab() {
   const { lots } = useData();
   const [params, setParams] = useSearchParams();
-  const sc: ScenarioId = isScenario(params.get('cenario')) ? (params.get('cenario') as ScenarioId) : 'base';
-  const water = params.get('agua') === '1';
+  // estado local (resposta imediata) espelhado no URL para poder partilhar o cenário
+  const [sc, setSc] = useState<ScenarioId>(() => (isScenario(params.get('cenario')) ? (params.get('cenario') as ScenarioId) : 'base'));
+  const [water, setWater] = useState(() => params.get('agua') === '1');
   const isPrice = sc === 'preco-15' || sc === 'preco-30';
   const update = (next: { cenario?: ScenarioId; agua?: boolean }) => {
-    const p = new URLSearchParams(params);
     const c = next.cenario ?? sc;
     const a = next.agua ?? water;
+    setSc(c);
+    setWater(a);
+    const p = new URLSearchParams(params);
     if (c === 'base') p.delete('cenario');
     else p.set('cenario', c);
     if (a && (c === 'preco-15' || c === 'preco-30')) p.set('agua', '1');
@@ -48,7 +51,7 @@ export default function RiscoTab() {
     setParams(p, { replace: true });
   };
 
-  const res = useMemo(() => stress(lots, sc, water), [lots, sc, water]);
+  const res = useMemo(() => stress(lots, sc, water && isPrice), [lots, sc, water, isPrice]);
   const rows = [...res.rows].sort((a, b) => (windowOf(a.lot).ext ?? windowOf(a.lot).end).localeCompare(windowOf(b.lot).ext ?? windowOf(b.lot).end));
   const delta = res.totalMargin - res.baseMargin;
   const ids = (list: LotRisk[]) => (list.length ? list.map((r) => r.lot.id).join(', ') : 'nenhum');
