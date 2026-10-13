@@ -137,6 +137,6 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
   );
 }
 
-/** Seals by region for reasons, avoiding repeated lookups. */
+/** Selos ganhos com a respetiva região, para explicar porque uma região está acesa. */
 export const sealRegionLabels = (earnedIds: string[]) =>
   SEALS.filter((s) => earnedIds.includes(s.id)).map((s) => ({ regionId: s.regionId, label: `${getProducersByRegion(s.regionId).find((p) => p.id === s.producerId)?.nome ?? s.producerId} · ${s.campanha}` }));

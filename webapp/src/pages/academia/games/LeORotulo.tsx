@@ -170,7 +170,7 @@ function WaterLabelCard({ w, highlight }: { w: WaterLabel; highlight: Set<WaterF
     ['Magnésio (Mg²⁺)', w.magnesio],
     ['Sílica (SiO₂)', w.silica],
   ];
-  const fmt = (v: number) => new Intl.NumberFormat('pt-PT', { maximumFractionDigits: v < 1 ? 2 : 1, useGrouping: true }).format(v).replace(/\s/g, '\u00a0');
+  const fmt = (v: number) => (Number.isInteger(v) ? num(v) : new Intl.NumberFormat('pt-PT', { maximumFractionDigits: v < 1 ? 2 : 1 }).format(v));
   const row = ([label, v, field]: [string, number, WaterField?]) => (
     <div key={label} className={cn('flex items-baseline justify-between gap-3 px-2 py-1 transition-colors duration-300', field && highlight.has(field) && 'rounded-xs bg-world-soft font-semibold')}>
       <dt className="min-w-0 truncate text-fg">{label}</dt>
