@@ -79,7 +79,7 @@ export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible,
                     {c.sortValue ? (
                       <button
                         type="button"
-                        onClick={() => setSort(active && sort!.dir === 'desc' ? { key: c.key, dir: 'asc' } : { key: c.key, dir: active ? 'desc' : 'desc' })}
+                        onClick={() => setSort(active ? { key: c.key, dir: sort!.dir === 'desc' ? 'asc' : 'desc' } : { key: c.key, dir: 'desc' })}
                         className={cn('inline-flex h-10 items-center gap-1 hover:text-fg', c.align === 'right' && 'flex-row-reverse', active && 'text-fg')}
                       >
                         <span className={c.srHeader ? 'sr-only' : undefined}>{c.header}</span>

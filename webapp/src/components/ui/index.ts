@@ -1,0 +1,24 @@
+/* Componentes de interface partilhados. Importar daqui: '../../components/ui' */
+export { Button, ButtonLink, IconButton, TextLink, buttonClass } from './Button';
+export type { ButtonProps, ButtonVariant, ButtonSize, ButtonLinkProps, IconButtonProps } from './Button';
+export { Card, CardHeader, Divider } from './Card';
+export { Badge, Pill, StatusPill, TONE_SOFT, TONE_DOT } from './Badge';
+export type { BadgeProps, StatusPillProps } from './Badge';
+export { PageHeader, Page, Section } from './PageHeader';
+export { KeyValue, Meter, StatTile, EmptyState, Skeleton, RiskNote, Disclaimer, SimulationLabel } from './Display';
+export type { KeyValueItem, MeterProps } from './Display';
+export { Field, Input, Textarea, Select, Checkbox, RadioGroup, Slider, SegmentedControl } from './Form';
+export type { FieldProps, InputProps, CheckboxProps, RadioOption, SliderProps, SegmentOption } from './Form';
+export { Tabs } from './Tabs';
+export type { TabItem, TabsProps } from './Tabs';
+export { Drawer, Dialog } from './Overlay';
+export type { DrawerProps, DialogProps } from './Overlay';
+export { DataTable } from './DataTable';
+export type { Column, DataTableProps } from './DataTable';
+export { Tooltip, Stepper, Timeline, FilterBar, NoAccess } from './Misc';
+export type { Step, TimelineItem } from './Misc';
+export { ToastViewport } from './Toast';
+export type { ToastInput, ToastItem } from './Toast';
+export { CommodityChip, CommodityGlyph } from './Commodity';
+export { ChartFrame, ChartTooltipContent } from './ChartFrame';
+export type { ChartFrameProps, LegendItem, ChartTooltipContentProps } from './ChartFrame';
