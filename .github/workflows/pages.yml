@@ -24,18 +24,18 @@ jobs:
         with:
           node-version: 22
 
+      # Se a webapp não compilar, o job falha e o Pages mantém a última versão publicada.
       - name: Construir a webapp
-        id: webapp
-        continue-on-error: true
+        if: hashFiles('webapp/package.json') != ''
         working-directory: webapp
         run: |
           npm ci || npm install
           npx vite build --base ./ --outDir ../_site --emptyOutDir
 
-      - name: Página provisória (se a webapp ainda não compila)
-        if: steps.webapp.outcome != 'success'
+      - name: Página provisória (só enquanto não existe webapp)
+        if: hashFiles('webapp/package.json') == ''
         run: |
-          rm -rf _site && mkdir -p _site
+          mkdir -p _site
           cp .github/pages/index.html _site/index.html
 
       - name: Documentos (PDF e Excel)

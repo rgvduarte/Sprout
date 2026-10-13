@@ -95,64 +95,69 @@ export default function InicioPage() {
 
       <SeasonCard />
 
-      <div className="mt-10 grid min-w-0 gap-x-6 gap-y-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        {/* coluna principal: os lotes (ou os primeiros passos) */}
-        {hasLots ? (
-          <Section id="lotes" title="Os teus lotes" description="Cada lote é uma missão física: onde está a mercadoria e o que acontece a seguir." className="!mt-0 min-w-0">
-            <Card padding="md">
-              <MyLots positions={data.positions} />
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-                <RiskNote compact className="max-w-[46ch]" />
-                <ButtonLink to="/carteira" variant="secondary" size="sm" iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
-                  Abrir a carteira
+      <div className="mt-10 flex min-w-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-6">
+        {/* coluna principal: os lotes (ou os primeiros passos) e as missões */}
+        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
+          {hasLots ? (
+            <Section id="lotes" title="Os teus lotes" description="Cada lote é uma missão física: onde está a mercadoria e o que acontece a seguir." className="order-1 !mt-0 min-w-0 lg:order-none">
+              <Card padding="md">
+                <MyLots positions={data.positions} />
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+                  <RiskNote compact className="max-w-[46ch]" />
+                  <ButtonLink to="/carteira" variant="secondary" size="sm" iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
+                    Abrir a carteira
+                  </ButtonLink>
+                </div>
+              </Card>
+            </Section>
+          ) : approved ? (
+            <Section id="lotes" title="Os teus lotes" className="order-1 !mt-0 min-w-0 lg:order-none">
+              <Card padding="lg">
+                <p className="font-medium text-fg">Ainda não financias nenhum lote.</p>
+                <p className="measure mt-1 text-muted">Antes do primeiro compromisso, lê os fatores de risco de um lote aberto e joga uma campanha no simulador. As novas missões estão mais abaixo.</p>
+                <ButtonLink to="/academia/simulador" variant="secondary" className="mt-4">
+                  Abrir o simulador
                 </ButtonLink>
+              </Card>
+            </Section>
+          ) : (
+            <Section id="comecar" title="Começa por aqui" description="Primeiro conhecer, depois decidir. Nada aqui pede dinheiro." className="order-1 !mt-0 min-w-0 lg:order-none">
+              <Card padding="md">
+                <MissionList missions={listMissions} limit={4} />
+              </Card>
+            </Section>
+          )}
+
+          {/* missões de conhecimento (quem já está aprovado) */}
+          {approved && (
+            <Section id="missoes" title="Missões de conhecimento" description="Diligência, campanha e selos. Os pontos vêm do que aprendes, nunca do que investes." className="order-3 !mt-0 min-w-0 lg:order-none">
+              <Card padding="md">
+                <MissionList missions={listMissions} limit={4} />
+              </Card>
+            </Section>
+          )}
+
+        </div>
+        {/* coluna lateral: o Diário e o nível */}
+        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
+          {/* Diário de campanha */}
+          <Section id="diario" title="Diário de campanha" description="Leituras e acontecimentos dos produtores, à medida que chegam." className="order-2 !mt-0 min-w-0 lg:order-none">
+            <Card padding="md">
+              <CampaignFeed events={data.events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={feedLimit} />
+              <div className="mt-2 border-t border-border pt-2">
+                <Button variant="ghost" size="sm" onClick={() => setFeedLimit((n) => (n > 7 ? 7 : 18))} aria-expanded={feedLimit > 7}>
+                  {feedLimit > 7 ? 'Mostrar menos' : 'Mostrar mais acontecimentos'}
+                </Button>
               </div>
             </Card>
           </Section>
-        ) : approved ? (
-          <Section id="lotes" title="Os teus lotes" className="!mt-0 min-w-0">
-            <Card padding="lg">
-              <p className="font-medium text-fg">Ainda não financias nenhum lote.</p>
-              <p className="measure mt-1 text-muted">Antes do primeiro compromisso, lê os fatores de risco de um lote aberto e joga uma campanha no simulador. As novas missões estão mais abaixo.</p>
-              <ButtonLink to="/academia/simulador" variant="secondary" className="mt-4">
-                Abrir o simulador
-              </ButtonLink>
-            </Card>
-          </Section>
-        ) : (
-          <Section id="comecar" title="Começa por aqui" description="Primeiro conhecer, depois decidir. Nada aqui pede dinheiro." className="!mt-0 min-w-0">
+
+          <Section id="nivel" title="Nível de conhecimento" className="order-4 !mt-0 min-w-0 lg:order-none">
             <Card padding="md">
-              <MissionList missions={listMissions} limit={4} />
+              <LevelPanel goal={goal} />
             </Card>
           </Section>
-        )}
-
-        {/* Diário de campanha */}
-        <Section id="diario" title="Diário de campanha" description="Leituras e acontecimentos dos produtores, à medida que chegam." className="!mt-0 min-w-0">
-          <Card padding="md">
-            <CampaignFeed events={data.events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={feedLimit} />
-            <div className="mt-2 border-t border-border pt-2">
-              <Button variant="ghost" size="sm" onClick={() => setFeedLimit((n) => (n > 7 ? 7 : 18))} aria-expanded={feedLimit > 7}>
-                {feedLimit > 7 ? 'Mostrar menos' : 'Mostrar mais acontecimentos'}
-              </Button>
-            </div>
-          </Card>
-        </Section>
-
-        {/* missões de conhecimento (quem já está aprovado) */}
-        {approved && (
-          <Section id="missoes" title="Missões de conhecimento" description="Diligência, campanha e selos. Os pontos vêm do que aprendes, nunca do que investes." className="!mt-0 min-w-0">
-            <Card padding="md">
-              <MissionList missions={listMissions} limit={4} />
-            </Card>
-          </Section>
-        )}
-
-        <Section id="nivel" title="Nível de conhecimento" className={approved ? '!mt-0 min-w-0' : '!mt-0 min-w-0 lg:col-start-2'}>
-          <Card padding="md">
-            <LevelPanel goal={goal} />
-          </Card>
-        </Section>
+        </div>
       </div>
 
       <Section id="novas" title="Novas missões" description="Lotes abertos a financiamento. Abre a jornada, lê a análise e os riscos antes de qualquer decisão.">
