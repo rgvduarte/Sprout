@@ -193,7 +193,11 @@ export function lineChart(o) {
   for (const b of o.bands || []) {
     const y0 = sy(Math.max(b.y0, ymin)), y1 = sy(Math.min(b.y1, ymax));
     g += `<rect x="${r2(m.l)}" y="${r2(y1)}" width="${r2(W - m.r - m.l)}" height="${r2(y0 - y1)}" fill="${b.color || THEME.panel}"><title>${esc(b.label || '')}</title></rect>`;
-    if (b.label) g += text(m.l + 4, y1 + 9, b.label, { size: THEME.fs.tick, fill: THEME.muted });
+    if (b.label) {
+      const lx = b.labelAt != null ? sx(isTime ? toT(b.labelAt) : b.labelAt) : m.l + 4;
+      const ly = b.labelPos === 'bottom' ? y0 - 4 : y1 + 9;
+      g += text(lx, ly, b.label, { size: THEME.fs.tick, fill: THEME.muted, anchor: b.labelAnchor || 'start' });
+    }
   }
   // grelha e eixo y
   for (const t of yTicks) {
@@ -423,6 +427,7 @@ function segmentRow({ x, y, width, th, segments, scaleMax, fv, outside = 'below'
   // rótulos de fora: da direita para a esquerda, em degraus se colidirem
   let lastRight = Infinity;
   let row = 0;
+  let maxRow = 0;
   for (let i = outsideLabels.length - 1; i >= 0; i--) {
     const L = outsideLabels[i];
     const right = L.cx + 2;
@@ -436,8 +441,9 @@ function segmentRow({ x, y, width, th, segments, scaleMax, fv, outside = 'below'
     svg += text(tx + 2, tyA, L.name, { size: THEME.fs.label, anchor, weight: 500 });
     svg += text(tx + 2, tyA + 9.5, L.val, { size: THEME.fs.value, anchor, mono: true, fill: THEME.ink });
     lastRight = tx + 2 - L.w;
+    maxRow = Math.max(maxRow, row);
   }
-  return { svg, spans, outsideRows: outsideLabels.length ? row + 1 : 0 };
+  return { svg, spans, outsideRows: outsideLabels.length ? maxRow + 1 : 0 };
 }
 
 /**
@@ -478,8 +484,10 @@ export function valueChain(o) {
   const th = Math.min(o.thickness ?? 26, 30);
   const fv = makeFmt(o.format, { dec: 2 });
   const labW = o.labelWidth ?? Math.max(textW(o.top.label, THEME.fs.label, 'body', 600), textW(o.bottom.label, THEME.fs.label, 'body', 600)) + 12;
-  const top = segmentRow({ x: labW, y: 26, width: W - labW, th, segments: o.top.segments, fv, outside: 'above' });
-  const topY = 26;
+  // 1.ª passagem só para saber quantas linhas de rótulos exteriores a barra de cima precisa
+  const dry = segmentRow({ x: labW, y: 100, width: W - labW, th, segments: o.top.segments, fv, outside: 'above' });
+  const topY = 26 + 20 * Math.max(0, dry.outsideRows - 1);
+  const top = segmentRow({ x: labW, y: topY, width: W - labW, th, segments: o.top.segments, fv, outside: 'above' });
   const zoomIdx = o.top.segments.findIndex((s) => s.zoom);
   const linkH = o.linkHeight ?? 26;
   const botY = topY + th + linkH;

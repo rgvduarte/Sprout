@@ -181,9 +181,9 @@ export default function PilotoTab() {
             label="Capital financiado vs. comprometido com produtores"
             note={`Compromisso de compra assumido nos ${cyc.length} lotes em ciclo e o que os co-financiadores já financiaram. A diferença é o que falta nos lotes abertos.`}
             value={eur(cap.financed)}
-            sub={`de ${eur(cap.committed)} · ${pct(cap.financed / cap.committed, 1)}`}
+            sub={`de ${eur(cap.committed)} (${pct(cap.financed / cap.committed, 1)}); faltam ${eur(cap.gap)}`}
             tone={cap.gap > 0 ? 'info' : 'ok'}
-            toneLabel={cap.gap > 0 ? `${eur(cap.gap)} por financiar` : 'Tudo financiado'}
+            toneLabel={cap.gap > 0 ? plural(cap.openLots.length, 'lote aberto', 'lotes abertos') : 'Tudo financiado'}
             history={<KpiHistory kind="columns" values={hist.financed} track={hist.committed} labels={HISTORY_LABELS} format={(v) => eur(v, { compact: true })} label="Capital financiado (coluna cheia) e comprometido (contorno)" />}
           />
           <KpiRow
