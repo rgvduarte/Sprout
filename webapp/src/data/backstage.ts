@@ -8,7 +8,7 @@ import type { HedgeTrigger, KycCase, PilotKpi, ReconciliationRun, RefundingPlayb
    ===================================================================== */
 
 export const PILOT_KPIS: PilotKpi[] = tidyDeep([
-  { id: 'fill-rate', label: 'Fill rate dos lotes abertos na campanha', value: 0.78, format: 'pct', target: 0.8, higherIsBetter: true, status: 'warn', note: 'Volume financiado sobre volume oferecido desde 01/10/2026, incluindo lotes fechados no mesmo período.', history: [0.71, 0.84, 0.92, 0.88, 0.81, 0.78] },
+  { id: 'fill-rate', label: 'Financiamento dos lotes da campanha (volume financiado sobre oferecido)', value: 0.78, format: 'pct', target: 0.8, higherIsBetter: true, status: 'warn', note: 'Volume financiado sobre volume oferecido desde 01/10/2026, incluindo lotes fechados no mesmo período.', history: [0.71, 0.84, 0.92, 0.88, 0.81, 0.78] },
   { id: 'base', label: 'Desconto médio ao comprador vs. referência', value: -0.121, format: 'pct', target: -0.12, higherIsBetter: false, status: 'ok', note: 'Média ponderada por volume das vendas dos últimos 90 dias.', history: [-0.118, -0.12, -0.122, -0.119, -0.121, -0.121] },
   { id: 'sla-produtor', label: 'Pagamentos a produtores em ≤ 2 dias úteis', value: 0.96, format: 'pct', target: 0.95, higherIsBetter: true, status: 'ok', note: '24 de 25 pagamentos no prazo; 1 atrasou por IBAN mal validado.', history: [0.9, 0.93, 1, 0.95, 0.96, 0.96] },
   { id: 'sla-investidor', label: 'Liquidações a investidores no prazo', value: 1, format: 'pct', target: 1, higherIsBetter: true, status: 'ok', note: '3 lotes liquidados desde junho de 2026, todos dentro da janela.', history: [1, 1, 1, 1, 1, 1] },
