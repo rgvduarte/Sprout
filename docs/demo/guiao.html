@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>Sprout · Guião da demonstração</title>
+<link rel="stylesheet" href="../tools/print.css">
+<style>
+  @page {
+    @top-right { content: "Guião da demonstração · 13-10-2026"; }
+    @bottom-left { content: "Documento interno · demonstração com dados fictícios · não constitui oferta nem recomendação de investimento"; }
+  }
+  :root { --fs-body: 9pt; --lh-body: 1.42; }
+  h1 { font-size: 22pt; margin: 0 0 1mm; }
+  .lead { font-size: 10.5pt; color: var(--muted); margin: 0 0 4mm; max-width: 150mm; }
+  .meta { display: flex; gap: 8mm; font-size: 8.4pt; margin: 0 0 5mm; padding: 2.5mm 0; border-top: 0.6pt solid var(--rule-strong); border-bottom: 0.6pt solid var(--rule-strong); }
+  .meta b { font-family: var(--f-display); font-stretch: 87.5%; }
+  h2 { font-size: 13pt; margin: 6mm 0 2mm; break-after: avoid; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  ul.check { list-style: none; padding: 0; margin: 0; }
+  ul.check li { padding: 1.1mm 0 1.1mm 6mm; position: relative; border-bottom: 0.4pt solid var(--rule); }
+  ul.check li::before { content: ""; position: absolute; left: 0; top: 2.2mm; width: 2.6mm; height: 2.6mm; border: 0.7pt solid var(--ink); border-radius: 0.5mm; }
+  .key { background: var(--panel, #F4F5EF); padding: 3mm 4mm; margin: 2mm 0 4mm; border-radius: 1mm; }
+  .key p { margin: 0 0 1.5mm; }
+  .key p:last-child { margin: 0; }
+  table.run { width: 100%; border-collapse: collapse; font-size: 8.4pt; }
+  table.run th { text-align: left; font-family: var(--f-display); font-stretch: 87.5%; font-weight: 650; font-size: 8pt; padding: 1.6mm 2mm; border-bottom: 0.9pt solid var(--ink); }
+  table.run td { vertical-align: top; padding: 2mm 2mm; border-bottom: 0.4pt solid var(--rule); }
+  table.run tr { break-inside: avoid; }
+  td.t { white-space: nowrap; font-family: var(--f-mono); font-size: 7.8pt; color: var(--muted); width: 13mm; }
+  td.n { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 700; width: 6mm; }
+  td.s { width: 50mm; }
+  td.s b { display: block; font-family: var(--f-display); font-stretch: 87.5%; font-weight: 650; font-size: 8.8pt; margin-bottom: 0.8mm; }
+  td.s code, .mono { font-family: var(--f-mono); font-size: 7.6pt; }
+  td.say p { margin: 0 0 1.2mm; }
+  td.say p.q { font-style: italic; }
+  .warn { color: var(--crit, #B42318); font-weight: 600; }
+  dl.qa { margin: 0; }
+  dl.qa dt { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 650; font-size: 9.2pt; margin: 3mm 0 0.8mm; break-after: avoid; }
+  dl.qa dd { margin: 0; padding-left: 0; break-inside: avoid; }
+  table.nums { width: 100%; border-collapse: collapse; font-size: 8.4pt; }
+  table.nums td, table.nums th { padding: 1.4mm 2mm; border-bottom: 0.4pt solid var(--rule); text-align: right; }
+  table.nums td:first-child, table.nums th:first-child { text-align: left; }
+  table.nums th { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 650; border-bottom: 0.9pt solid var(--ink); }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<h1>Guião da demonstração</h1>
+<p class="lead">Como apresentar a Sprout em 20 minutos: o que abrir, o que clicar e o que dizer em cada ecrã, mais respostas às perguntas difíceis.</p>
+<div class="meta">
+  <div><b>Link</b><br><span class="mono">rgvduarte.github.io/Sprout</span></div>
+  <div><b>Duração</b><br>20 min + 10 min de perguntas</div>
+  <div><b>Ecrã</b><br>Portátil ligado ao projetor, browser em ecrã inteiro</div>
+  <div><b>Dados</b><br>Todos fictícios, data simulada 13-10-2026</div>
+</div>
+
+<div class="cols">
+<div>
+<h2>Antes de começar (5 min antes)</h2>
+<ul class="check">
+  <li>Abrir <span class="mono">rgvduarte.github.io/Sprout</span> em Chrome, numa janela nova, e recarregar uma vez para apanhar a versão publicada.</li>
+  <li>Tema <b>Claro</b> (ícone do sol, canto superior direito): lê-se melhor no projetor.</li>
+  <li>Zoom do browser a 100 % (Ctrl/Cmd + 0). Em ecrãs pequenos, 90 %.</li>
+  <li>“Ver como” → <b>Visitante</b> para começar pela Apresentação.</li>
+  <li>Ter abertos noutros separadores: o resumo executivo em PDF e o business plan (para perguntas sobre números).</li>
+  <li>Desligar notificações do computador.</li>
+  <li>Plano B sem internet: usar a apresentação em PDF com as capturas.</li>
+</ul>
+</div>
+<div>
+<h2>A mensagem em três frases</h2>
+<div class="key">
+  <p><b>1.</b> A Sprout liga produtores de azeite (e depois água e café) a compradores profissionais, e deixa investidores qualificados financiar lotes reais, que se veem, se provam e se rastreiam.</p>
+  <p><b>2.</b> A app torna isso envolvente sem o tornar num casino: o jogo está na colheita, no conhecimento e num simulador com dinheiro fictício; o dinheiro real é tratado com seriedade.</p>
+  <p><b>3.</b> Os números foram verificados e dizem que o modelo, tal como foi desenhado, não fecha até 2031. Por isso o pedido é pequeno: um piloto que mede os dois preços de que tudo depende.</p>
+</div>
+<p style="font-size:8.2pt;color:var(--muted)">Se só tiveres 5 minutos: passos 0, 3, 6 e 9 do roteiro.</p>
+</div>
+</div>
+
+<h2>Roteiro, passo a passo</h2>
+<table class="run">
+<thead><tr><th></th><th>Tempo</th><th>Onde e o que clicar</th><th>O que dizer</th></tr></thead>
+<tbody>
+<tr><td class="n">0</td><td class="t">0:00–2:00</td>
+<td class="s"><b>Apresentação · capítulo 1</b>Menu → Apresentação (perfil Visitante). Ficar no primeiro ecrã.</td>
+<td class="say"><p class="q">“Hoje um lagar português vende azeite a granel a um embalador, que o vende a um distribuidor, que o vende ao restaurante. Cada passo leva a sua margem. A Sprout encurta esse caminho.”</p><p>Apontar para o olival desenhado e para os três números do subtítulo: 80–90 % (a tese dos fundadores), 10–15 % de desconto ao comprador, janelas de 18 meses.</p></td></tr>
+
+<tr><td class="n">1</td><td class="t">2:00–3:30</td>
+<td class="s"><b>Apresentação · “A cadeia hoje”</b>Fazer scroll devagar: a barra da cadeia de valor divide-se.</td>
+<td class="say"><p class="q">“O bloco entre o preço ao produtor e o preço ao comprador é o diferencial granel → comprador. Dentro dele está a margem líquida do embalador, que verificámos: 0,19 a 0,50 €/kg. A Sprout redistribui esse diferencial: um prémio ao produtor, um desconto ao comprador e um spread que financia o ciclo.”</p><p><span class="warn">Cuidado:</span> não dizer que a Sprout “captura 80–90 % da margem do embalador” como facto. É a tese de partida e a verificação mostrou que, sozinha, não paga um desconto de 10–15 %.</p></td></tr>
+
+<tr><td class="n">2</td><td class="t">3:30–5:00</td>
+<td class="s"><b>Início</b>“Ver como” → <b>Investidor qualificado</b>. Menu → Início.</td>
+<td class="say"><p class="q">“Isto é o que um investidor vê. Não abre com dinheiro, abre com a estação: dia 13 da campanha 2026/27. À direita, o Diário dos produtores em direto: depósitos de azeite a encher, paletes de água no armazém.”</p><p>Mostrar: o nível de conhecimento (Provador, 190 pontos), as missões de diligência e as “Novas missões” (lotes por financiar).</p></td></tr>
+
+<tr><td class="n">3</td><td class="t">5:00–6:30</td>
+<td class="s"><b>Mercados → O Olival</b>Menu → Mercados → clicar em O Olival. Clicar numa região do mapa de origens.</td>
+<td class="say"><p class="q">“Cada mercado é um mundo: O Olival, A Nascente, A Plantação. Café é fase 2. O mapa de origens acende à medida que o investidor estuda e participa.”</p><p>Mostrar a cena isométrica do lagar, o calendário da campanha e as missões abertas.</p></td></tr>
+
+<tr><td class="n">4</td><td class="t">6:30–9:00</td>
+<td class="s"><b>Jornada do lote AZ-2026-021</b>Clicar “Abrir missão” no lote AZ-2026-021. Usar a barra de capítulos (ou teclas J/K) para Origem → Colheita → Preço → Ciclo.</td>
+<td class="say"><p class="q">“Este é o momento do investimento. Um lote real: 24 toneladas de azeite virgem extra de Trás-os-Montes, em 24 IBC. A missão é encher o depósito: está a 60 %, com 7 co-financiadores.”</p><p>Colheita: o boletim de análises ao lado dos limites legais. Preço: referência vs preço do lote. Ciclo: os 18 meses, com a bifurcação entre liquidação, extensão condicionada e refunding.</p></td></tr>
+
+<tr><td class="n">5</td><td class="t">9:00–10:30</td>
+<td class="s"><b>Jornada · Riscos</b>Capítulo 05 Riscos. Abrir 2 ou 3 fatores e clicar “Li e compreendi”.</td>
+<td class="say"><p class="q">“Antes de investir, o investidor tem de abrir e confirmar cada fator de risco: preço, qualidade, contraparte, liquidez, logística, regulatório. O botão de compromisso só desbloqueia com os seis lidos. Aqui a gamificação está ao serviço da proteção.”</p></td></tr>
+
+<tr><td class="n">6</td><td class="t">10:30–12:30</td>
+<td class="s"><b>Jornada · Compromisso</b>Ler os restantes riscos. Escolher 5 000 €. Marcar a declaração. <b>Manter premido</b> o botão até o anel encher.</td>
+<td class="say"><p class="q">“O montante traduz-se em mercadoria: 5 000 € são cerca de 1 400 kg de azeite, umas 2 000 garrafas. Confirmar é um gesto deliberado: segurar, não clicar. O resultado é um selo de lacre e uma carta de origem para o caderno do investidor. Não há confetes nem promessas de retorno.”</p><p>Mostrar a faixa “Pode cancelar sem custos até 17/10/2026”: quatro dias de reflexão, à imagem da regra europeia de crowdfunding.</p></td></tr>
+
+<tr><td class="n">7</td><td class="t">12:30–13:30</td>
+<td class="s"><b>Carteira</b>Menu → Carteira. Abrir uma posição (gaveta lateral).</td>
+<td class="say"><p class="q">“A carteira mostra o que se financiou em quilos e garrafas, onde está a mercadoria e quando se prevê liquidar. Há uma vista de diversificação que só serve para avisar quando há concentração.”</p></td></tr>
+
+<tr><td class="n">8</td><td class="t">13:30–15:00</td>
+<td class="s"><b>Academia → Painel de prova</b>Menu → Academia. Abrir o mini-jogo do azeite e responder a uma amostra.</td>
+<td class="say"><p class="q">“A progressão vem do conhecimento: módulos e mini-jogos com conteúdo real. Neste aprende-se a classificar azeite como Virgem Extra, Virgem ou Lampante, com os limites legais. Os níveis dão acesso a conhecimento, nunca a melhores preços.”</p></td></tr>
+
+<tr><td class="n">9</td><td class="t">15:00–17:00</td>
+<td class="s"><b>Simulador de campanha</b>Menu → Simulador. Escolher 2–3 lotes, ligar a cobertura num deles, “Avançar 6 meses” três vezes, ver o balanço.</td>
+<td class="say"><p class="q">“É aqui que os retornos e as perdas entram no jogo, com 50 000 € fictícios. Joga-se uma campanha de 18 meses com choques de preço, colheitas fracas e atrasos nas vendas, e vê-se o que a cobertura, a reserva e a extensão fazem. O regulamento europeu exige uma simulação de perdas a investidores não sofisticados; aqui ela é a parte mais interessante da app.”</p></td></tr>
+
+<tr><td class="n">10</td><td class="t">17:00–18:00</td>
+<td class="s"><b>Caderno de colheita</b>Menu → Caderno de colheita. Virar a página da campanha.</td>
+<td class="say"><p class="q">“A coleção: selos de origem e cartas com os dados reais de cada lote. Ganham-se por diligência ou por participação, e não valem dinheiro nem se trocam.”</p></td></tr>
+
+<tr><td class="n">11</td><td class="t">18:00–19:00</td>
+<td class="s"><b>Bastidores</b>“Ver como” → <b>Equipa Sprout</b>. Menu → Bastidores: Tesouraria e Compliance.</td>
+<td class="say"><p class="q">“Do lado da equipa está a seriedade: contas segregadas num PSP licenciado na UE, reconciliação diária, fila de KYC, e uma revisão da gamificação que prova que nenhuma mecânica proibida está em uso.”</p></td></tr>
+
+<tr><td class="n">12</td><td class="t">19:00–20:00</td>
+<td class="s"><b>Fecho</b>Menu → Plano de execução (ou voltar à Apresentação, capítulo final).</td>
+<td class="say"><p class="q">“O que viram é um protótipo com dados fictícios. A investigação verificou os números: tal como foi desenhado, o modelo não chega ao break-even até 2031. O desenho recomendado aproxima-se, mas também não fecha. Por isso pedimos 1,1 M€ de pré-seed em três tranches para um piloto que mede os dois preços de que tudo depende, com um gate a 31-08-2027 e regras de paragem escritas antes de começar.”</p></td></tr>
+</tbody>
+</table>
+
+<h2 class="page-break">Perguntas difíceis</h2>
+<dl class="qa">
+  <dt>“Isto é um produto financeiro? Está regulado?”</dt>
+  <dd>O desenho recomendado separa duas empresas: a OpCo faz o comércio B2B e uma SPV portuguesa emite obrigações só a investidores profissionais ou com ticket mínimo de 100 000 €, o que evita o prospeto. O retalho fica para mais tarde, através de uma plataforma de crowdfunding licenciada (ECSP). Os pagamentos passam por um PSP licenciado na UE, com contas segregadas e sem numerário. A estrutura final depende do parecer jurídico do Gonçalo Almeida.</dd>
+  <dt>“Isto não é gamificar o investimento? Os reguladores não gostam disso.”</dt>
+  <dd>Exatamente por isso a linha está traçada: nada de pontos, rankings, streaks, confetes ou contagens decrescentes ligados a dinheiro real. O jogo está no produto físico (colheita, lotes, selos), no conhecimento (níveis e mini-jogos) e num simulador com dinheiro fictício. A ESMA e outros reguladores criticam a gamificação que empurra a transacionar mais; aqui ela empurra a ler os riscos.</dd>
+  <dt>“Porque é que não há break-even?”</dt>
+  <dd>Porque a margem por quilo é pequena e a estrutura de uma empresa financeira é cara. Num lote HoReCa de 20 t ganha-se cerca de 0,35 €/kg; a distribuidores, 0,06 €/kg. A tese de capturar 80–90 % da margem do embalador não paga um desconto de 10–15 %. O plano mostra isto com honestidade e propõe testar no piloto, antes de escalar, se o azeite de origem identificada consegue uma referência de 6,00 €/kg.</dd>
+  <dt>“E se o preço do azeite cair 30 %?”</dt>
+  <dd>Não há futuros de azeite em bolsa desde que o mercado de Jaén fechou. Por isso a regra é back-to-back: só comprar com a venda contratada a preço fixo. Guardar stock 18 meses sem venda arriscaria perder metade do lote, e o plano não o faz. O simulador mostra este cenário.</dd>
+  <dt>“Os dados e os produtores são reais?”</dt>
+  <dd>Não. Produtores, lotes, preços, investidores e o histórico são fictícios e servem para mostrar o fluxo; a faixa “Ambiente de demonstração” está sempre visível. Os números do negócio vêm do business plan, que tem as fontes.</dd>
+  <dt>“Porque azeite e água? E o café?”</dt>
+  <dd>O azeite é o centro do piloto: tem origem identificável, valor por quilo e o lagar âncora. A água entra só como produto complementar, porque é engarrafada na origem e pesa muito em logística. O café fica para a fase 2, como compra de café verde com cobertura na ICE e conformidade com o regulamento europeu de desflorestação.</dd>
+  <dt>“Quanto pode um investidor ganhar?”</dt>
+  <dd>Não se responde com um número prometido. Cada lote mostra um intervalo estimado, com a indicação “não garantido”, e a nota de capital em risco. O desenho do plano usa obrigações com cupão fixo; o detalhe está no business plan, capítulo 7.</dd>
+</dl>
+
+<h2>O que não dizer</h2>
+<ul class="check">
+  <li>“Retorno garantido”, “sem risco”, “lucro certo”, ou qualquer percentagem de retorno como promessa.</li>
+  <li>Que a app já está aberta a investidores, ou que os lotes mostrados existem.</li>
+  <li>Que a Sprout “captura 80–90 % da margem do embalador” como facto verificado.</li>
+  <li>Que o histórico de lotes liquidados é real: é ilustrativo.</li>
+  <li>Não partilhar o link com investidores antes de pôr o site atrás de acesso privado.</li>
+</ul>
+
+<h2>Números de bolso (business plan, cenários até 2031)</h2>
+<table class="nums">
+<thead><tr><th>Cenário</th><th>EBITDA 2031</th><th>Capital próprio necessário</th></tr></thead>
+<tbody>
+<tr><td>Base (tese da fonte, corrigida)</td><td>−1,22 M€</td><td>5,51 M€</td></tr>
+<tr><td>Recomendado (desenho reestruturado)</td><td>−0,60 M€</td><td>4,22 M€</td></tr>
+<tr><td>Recomendado a preços verificados</td><td>−0,97 M€</td><td>5,01 M€</td></tr>
+<tr><td>Pedido</td><td colspan="2">1,1 M€ de pré-seed em três tranches · gate a 31-08-2027</td></tr>
+</tbody>
+</table>
+<p style="font-size:8pt;color:var(--muted);margin-top:2mm">Nenhum cenário chega ao break-even até 2031. Fontes: Sprout-Business-Plan.pdf (sumário executivo e capítulo 13) e Sprout-Modelo-Financeiro.xlsx.</p>
+
+</body>
+</html>
