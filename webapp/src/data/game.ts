@@ -328,7 +328,7 @@ export const MODULES: KnowledgeModule[] = tidyDeep([
 /* ------------------------------------------------------------ missões */
 
 export const QUESTS: Quest[] = tidyDeep([
-  { id: 'q-painel-3', title: 'Identifica 3 atributos no painel de prova', description: 'Associa três descrições sensoriais ao atributo certo no mini-jogo Painel de prova.', world: 'azeite', points: 20, criteria: { type: 'minigame', gameId: 'painel-prova', minScore: 3 }, href: '/academia#painel-prova' },
+  { id: 'q-painel-3', title: 'Identifica 3 atributos no painel de prova', description: 'No mini-jogo Painel de prova, associa à primeira três descrições sensoriais ao atributo ou defeito certo.', world: 'azeite', points: 20, criteria: { type: 'manual' }, href: '/academia#painel-prova' },
   { id: 'q-extensao', title: 'Percebe o que acontece numa extensão', description: 'Completa o módulo sobre o ciclo de 18 meses.', world: 'geral', points: 15, criteria: { type: 'module', moduleId: 'm-ciclo-18m' }, href: '/academia#m-ciclo-18m' },
   { id: 'q-comparar-preco', title: 'Compara o preço de entrada com a referência', description: 'No mundo do azeite, vê quanto abaixo da referência é vendido um lote aberto.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/mercados/azeite' },
   { id: 'q-cobertura', title: 'Encontra a cobertura de preço de um lote de azeite', description: 'Abre um lote de azeite e lê a secção de cobertura.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/lote/AZ-2026-021#cobertura' },
@@ -339,8 +339,9 @@ export const QUESTS: Quest[] = tidyDeep([
   { id: 'q-rotulo-3', title: 'Classifica 3 águas no Lê o rótulo', description: 'Acerta a classificação de três rótulos de água.', world: 'agua', points: 20, sealId: 'seal-serraverde-2627', criteria: { type: 'minigame', gameId: 'le-o-rotulo', minScore: 3 }, href: '/academia#le-o-rotulo' },
   { id: 'q-serra-verde', title: 'Visita a Nascente da Serra Verde no mapa', description: 'No mundo da água, abre a região do Minho e a ficha do produtor.', world: 'agua', points: 10, sealId: 'seal-serraverde-2627', criteria: { type: 'region-visit', regionId: 'minho' }, href: '/mercados/agua' },
   { id: 'q-simulador', title: 'Joga uma campanha completa no simulador', description: 'Distribui o orçamento fictício, joga os 18 meses e lê o balanço final.', world: 'geral', points: 25, criteria: { type: 'sim-complete' }, href: '/academia/simulador' },
-  { id: 'q-origens-cafe', title: 'Explora as origens de café', description: 'Entra no mundo do café e percorre o mapa das origens.', world: 'cafe', points: 10, sealId: 'seal-altomogiana-2728', criteria: { type: 'world-visit', worldId: 'cafe' }, href: '/mercados/cafe' },
+  { id: 'q-origens-cafe', title: 'Explora as origens de café', description: 'Entra em A Plantação: o mapa mostra as origens em avaliação para a Fase 2.', world: 'cafe', points: 10, sealId: 'seal-altomogiana-2728', criteria: { type: 'world-visit', worldId: 'cafe' }, href: '/mercados/cafe' },
   { id: 'q-cereja', title: 'Ordena as etapas da cereja à chávena', description: 'No mini-jogo Da cereja à chávena, acerta pelo menos 4 respostas.', world: 'cafe', points: 20, sealId: 'seal-altomogiana-2728', criteria: { type: 'minigame', gameId: 'cereja-chavena', minScore: 4 }, href: '/academia#cereja-chavena' },
+  { id: 'q-primeira-extracao', title: 'Acompanha a primeira extração da campanha', description: 'Segue no Diário de campanha três leituras de telemetria dos depósitos dos lagares, em direto.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/#diario' },
   { id: 'q-contas', title: 'Percebe para onde vai o dinheiro', description: 'Completa o módulo sobre PSP, contas segregadas e reconciliação.', world: 'geral', points: 10, criteria: { type: 'module', moduleId: 'm-rails' }, href: '/academia#m-rails' },
 ]);
 

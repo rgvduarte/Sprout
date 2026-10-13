@@ -1,8 +1,9 @@
-import { Info } from 'lucide-react';
-import { Button } from '../../components/ui';
-import type { PositionView } from '../../state';
+import { useState } from 'react';
+import { Button, Dialog } from '../../components/ui';
+import { transferReference, useGame, useToast, type PositionView } from '../../state';
 import { toDate, useNow } from '../../lib/clock';
 import { date as fmtDate, eur } from '../../lib/format';
+import { physicalForAmount } from '../../lib/physical';
 import { REFLECTION_DAYS, reflectionUntil } from './positions';
 
 /**
@@ -12,6 +13,9 @@ import { REFLECTION_DAYS, reflectionUntil } from './positions';
 export function ReflectionBand({ p }: { p: PositionView }) {
   const until = reflectionUntil(p);
   const current = useNow(60_000);
+  const game = useGame();
+  const { toast } = useToast();
+  const [confirm, setConfirm] = useState(false);
   if (!until) return null;
   const start = toDate(p.committedAt).getTime();
   const end = toDate(until).getTime();
@@ -39,17 +43,43 @@ export function ReflectionBand({ p }: { p: PositionView }) {
         </div>
       </div>
       <p className="mt-2 text-sm text-muted">
-        Transfere por SEPA para a conta segregada no PSP, com a referência <span className="font-mono text-fg tnum">{p.id.toUpperCase()}</span>. Depois de {fmtDate(until)} a transferência é aplicada no lote.
+        Transfere por SEPA para a conta segregada no PSP, com a referência <span className="font-mono text-fg tnum">{transferReference(p)}</span>. Depois de {fmtDate(until)} a transferência é aplicada no lote.
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <Button variant="quiet-danger" size="sm" disabled aria-describedby={`cancel-${p.id}`}>
-          Cancelar compromisso
-        </Button>
-        <p id={`cancel-${p.id}`} className="flex items-start gap-1.5 text-sm text-muted">
-          <Info aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
-          Indisponível nesta demonstração: o cancelamento é feito pela equipa de operações e não está simulado.
+      {open && p.session && (
+        <div className="mt-3">
+          <Button variant="quiet-danger" size="sm" onClick={() => setConfirm(true)}>
+            Cancelar compromisso
+          </Button>
+        </div>
+      )}
+      <Dialog
+        open={confirm}
+        onClose={() => setConfirm(false)}
+        role="alertdialog"
+        title={`Cancelar o compromisso de ${eur(p.amount)}?`}
+        description={`Estás dentro do período de reflexão (até ${fmtDate(until)}): o cancelamento não tem custos e nenhuma transferência foi aplicada.`}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirm(false)} data-autofocus>
+              Manter compromisso
+            </Button>
+            <Button
+              variant="quiet-danger"
+              onClick={() => {
+                const r = game.cancelCommitment(p.id);
+                setConfirm(false);
+                toast(r.ok ? { tone: 'neutral', title: `Compromisso cancelado · ${p.lot.id}`, description: 'Sem custos. Nenhuma transferência tinha sido aplicada.' } : { tone: 'warn', title: 'Não foi possível cancelar', description: r.message });
+              }}
+            >
+              Cancelar compromisso
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-muted">
+          A fatia de {physicalForAmount(p.lot, p.amount).primary} sai do lote {p.lot.id}. O teu nível de conhecimento e as missões cumpridas não mudam: nunca dependeram do montante.
         </p>
-      </div>
+      </Dialog>
     </div>
   );
 }

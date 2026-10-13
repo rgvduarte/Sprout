@@ -1,4 +1,4 @@
-import { useMemo, useState, type DragEvent } from 'react';
+import { useEffect, useMemo, useState, type DragEvent } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Check, GripVertical, X } from 'lucide-react';
 import { Button } from '../../../components/ui';
@@ -7,6 +7,7 @@ import type { OliveCategory, OliveSample, SensoryAttribute } from '../../../data
 import { createRng } from '../../../lib/prng';
 import { cn } from '../../../lib/cn';
 import { num } from '../../../lib/format';
+import { useGame } from '../../../state';
 import { OLIVE_EXPLAIN, OLIVE_PARAMS } from '../content';
 import { PainelArt } from './art';
 import { Choice, EASE, Pips, ResultPanel, shuffle, Verdict, useFinishGame, type FinishResult } from './kit';
@@ -93,6 +94,12 @@ function LearnPhase({ cards, onDone }: { cards: SensoryAttribute[]; onDone: () =
   const card = cards[idx];
   const solved = Boolean(matched[card.id]);
   const last = idx === cards.length - 1;
+  // Missão «Identifica 3 atributos no painel de prova»: três descrições associadas à primeira.
+  const { completeQuest, isQuestDone } = useGame();
+  const questDone = isQuestDone('q-painel-3');
+  useEffect(() => {
+    if (firstTry >= 3 && !questDone) completeQuest('q-painel-3');
+  }, [firstTry, questDone, completeQuest]);
 
   const pick = (attrId: string) => {
     if (solved || matched[attrId] || wrong.includes(attrId)) return;

@@ -440,7 +440,7 @@
    ],
    "necessidade_capital_proprio": 4572081,
    "ano_minimo_cash_flow_acumulado": 2031,
-   "necessidade_ainda_a_crescer_2031": "sim: necessidade ainda a crescer",
+   "necessidade_ainda_a_crescer_2031": "sim",
    "aplicacao_fundos": {
     "pre_arranque_e_capital_spv": 145000,
     "perdas_operacionais": 4057527,
@@ -2105,7 +2105,7 @@
     "k_vale": 4277081,
     "k_need": 4572081,
     "k_min_ano": 2031,
-    "k_ainda": "sim: necessidade ainda a crescer",
+    "k_ainda": "sim",
     "k_rondas": 4572081,
     "u_pre": 145000,
     "u_ebitda": 4057527,
@@ -2685,7 +2685,7 @@
    ],
    "necessidade_capital_proprio": 5508754,
    "ano_minimo_cash_flow_acumulado": 2031,
-   "necessidade_ainda_a_crescer_2031": "sim: necessidade ainda a crescer",
+   "necessidade_ainda_a_crescer_2031": "sim",
    "aplicacao_fundos": {
     "pre_arranque_e_capital_spv": 145000,
     "perdas_operacionais": 4796893,
@@ -4350,7 +4350,7 @@
     "k_vale": 5213754,
     "k_need": 5508754,
     "k_min_ano": 2031,
-    "k_ainda": "sim: necessidade ainda a crescer",
+    "k_ainda": "sim",
     "k_rondas": 5508754,
     "u_pre": 145000,
     "u_ebitda": 4796893,
@@ -4930,7 +4930,7 @@
    ],
    "necessidade_capital_proprio": 5131438,
    "ano_minimo_cash_flow_acumulado": 2031,
-   "necessidade_ainda_a_crescer_2031": "sim: necessidade ainda a crescer",
+   "necessidade_ainda_a_crescer_2031": "sim",
    "aplicacao_fundos": {
     "pre_arranque_e_capital_spv": 145000,
     "perdas_operacionais": 4274699,
@@ -6595,7 +6595,7 @@
     "k_vale": 4836438,
     "k_need": 5131438,
     "k_min_ano": 2031,
-    "k_ainda": "sim: necessidade ainda a crescer",
+    "k_ainda": "sim",
     "k_rondas": 5131438,
     "u_pre": 145000,
     "u_ebitda": 4274699,
@@ -7175,7 +7175,7 @@
    ],
    "necessidade_capital_proprio": 4021708,
    "ano_minimo_cash_flow_acumulado": 2031,
-   "necessidade_ainda_a_crescer_2031": "sim: necessidade ainda a crescer",
+   "necessidade_ainda_a_crescer_2031": "sim",
    "aplicacao_fundos": {
     "pre_arranque_e_capital_spv": 145000,
     "perdas_operacionais": 3142265,
@@ -8840,7 +8840,7 @@
     "k_vale": 3726708,
     "k_need": 4021708,
     "k_min_ano": 2031,
-    "k_ainda": "sim: necessidade ainda a crescer",
+    "k_ainda": "sim",
     "k_rondas": 4021708,
     "u_pre": 145000,
     "u_ebitda": 3142265,
@@ -9061,8 +9061,10 @@
     "cup": 0.09,
     "cupliq": 0.0648,
     "cupciclo": 4904,
+    "retciclo": 0.0481,
     "res": 0,
     "livre": -3959,
+    "kyc": 1268,
     "noc": 539
    },
    "base": {
@@ -9115,8 +9117,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 959,
+    "retciclo": 0.0103,
     "res": 2083,
     "livre": 4860,
+    "kyc": 1268,
     "noc": 91
    },
    "otimista": {
@@ -9169,8 +9173,10 @@
     "cup": 0.07,
     "cupliq": 0.0504,
     "cupciclo": 749,
+    "retciclo": 0.0086,
     "res": 4341,
     "livre": 10587,
+    "kyc": 1268,
     "noc": 81
    },
    "recomendado": {
@@ -9223,8 +9229,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 971,
+    "retciclo": 0.0103,
     "res": 3656,
     "livre": 8532,
+    "kyc": 1268,
     "noc": 92
    }
   },
@@ -9279,8 +9287,10 @@
     "cup": 0.09,
     "cupliq": 0.0648,
     "cupciclo": 2210,
+    "retciclo": 0.0148,
     "res": 0,
     "livre": -5903,
+    "kyc": 13,
     "noc": 243
    },
    "base": {
@@ -9333,8 +9343,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 1264,
+    "retciclo": 0.0092,
     "res": 578,
     "livre": 1349,
+    "kyc": 13,
     "noc": 120
    },
    "otimista": {
@@ -9387,8 +9399,10 @@
     "cup": 0.07,
     "cupliq": 0.0504,
     "cupciclo": 853,
+    "retciclo": 0.0067,
     "res": 2601,
     "livre": 6069,
+    "kyc": 13,
     "noc": 92
    },
    "recomendado": {
@@ -9441,8 +9455,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 1545,
+    "retciclo": 0.0113,
     "res": 1391,
     "livre": 3246,
+    "kyc": 13,
     "noc": 146
    }
   },
@@ -9497,8 +9513,10 @@
     "cup": 0.09,
     "cupliq": 0.0648,
     "cupciclo": 3144,
+    "retciclo": 0.0074,
     "res": 820,
     "livre": 1913,
+    "kyc": 13,
     "noc": 345
    },
    "base": {
@@ -9551,8 +9569,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 2427,
+    "retciclo": 0.0062,
     "res": 1035,
     "livre": 2414,
+    "kyc": 13,
     "noc": 230
    },
    "otimista": {
@@ -9605,8 +9625,10 @@
     "cup": 0.07,
     "cupliq": 0.0504,
     "cupciclo": 2132,
+    "retciclo": 0.0058,
     "res": 1123,
     "livre": 2621,
+    "kyc": 13,
     "noc": 230
    },
    "recomendado": {
@@ -9659,8 +9681,10 @@
     "cup": 0.075,
     "cupliq": 0.054,
     "cupciclo": 2427,
+    "retciclo": 0.0062,
     "res": 1035,
     "livre": 2414,
+    "kyc": 13,
     "noc": 230
    }
   },
@@ -10270,7 +10294,7 @@
  },
  "verificacao": {
   "estado_verificacoes_internas": "OK",
-  "formulas": 26447,
+  "formulas": 26475,
   "erros_de_formula": 0,
   "tolerancia_relativa": 0.005,
   "contra_calculo_referencia": {

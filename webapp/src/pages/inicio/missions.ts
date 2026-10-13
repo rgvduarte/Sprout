@@ -1,4 +1,4 @@
-import { getProducer, getQuestsByLot, getSeal, isInvestable, LEVELS, MODULES, QUESTS } from '../../data';
+import { getProducer, getQuest, getQuestsByLot, getSeal, isInvestable, LEVEL_PERKS, LEVELS, MODULES, QUESTS } from '../../data';
 import type { CampaignEvent, LevelId, Lot, WorldId } from '../../data';
 import type { GameView, PositionView } from '../../state';
 import { num } from '../../lib/format';
@@ -50,13 +50,14 @@ export interface Mission {
   live?: boolean;
 }
 
-/** Vantagens de nível: conhecimento e acesso, nunca vantagens financeiras. */
-export const LEVEL_PERKS: Record<LevelId, string> = {
-  aprendiz: 'Academia, mini-jogos e Simulador de campanha.',
-  provador: 'Relatório técnico completo de cada lote: reanálises, inventários mensais e fotografias dos contentores selados.',
-  lagareiro: 'Prova guiada online com o mestre lagareiro, com amostras da campanha em curso.',
-  mestre: 'Visita ao lagar durante a campanha, com a equipa de operações.',
+/** Regalias de nível (partilhadas com a Academia): conhecimento e acesso, nunca vantagens financeiras. */
+export const levelPerk = (id: LevelId) => {
+  const t = LEVEL_PERKS[id].short;
+  return `${t.charAt(0).toUpperCase()}${t.slice(1)}.`;
 };
+
+/** Missão sazonal da campanha (em QUESTS): acompanhar a primeira extração no Diário. */
+export const SEASON_QUEST_ID = 'q-primeira-extracao';
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
@@ -149,6 +150,8 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
 
   /* missão de campanha: acompanhar a extração em direto */
   const readings = liveEvents.filter((e) => e.kind === 'telemetria' && e.world === 'azeite').length;
+  const seasonQuest = getQuest(SEASON_QUEST_ID);
+  const seasonDone = game.isQuestDone(SEASON_QUEST_ID);
   out.push(
     finish({
       id: 'campanha-extracao',
@@ -160,9 +163,9 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
           : 'Leituras dos depósitos dos lagares, no Diário de campanha',
       world: 'azeite',
       live: true,
-      steps: [{ id: 'leituras', label: `${CAMPAIGN_READINGS} leituras de telemetria em direto`, done: readings >= CAMPAIGN_READINGS, count: [readings, CAMPAIGN_READINGS], href: '/#diario' }],
-      reward: 'As missões de campanha não dão pontos: registam o que acompanhaste nesta sessão.',
-      rewardLabel: 'Nota',
+      steps: [{ id: 'leituras', label: `${CAMPAIGN_READINGS} leituras de telemetria em direto`, done: seasonDone || readings >= CAMPAIGN_READINGS, count: [seasonDone ? CAMPAIGN_READINGS : readings, CAMPAIGN_READINGS], href: '/#diario' }],
+      reward: `+${seasonQuest?.points ?? 0} pontos de conhecimento. Conta o que acompanhaste no Diário, nunca o que investiste.`,
+      rewardLabel: 'Ganhas',
     }),
   );
 
@@ -204,7 +207,7 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
         context: next.description,
         steps: pending.map((m) => ({ id: m.id, label: `${m.title} · +${m.points} pts`, done: false, href: `/academia#${m.id}` })),
         valueText: `${num(game.points)} de ${num(next.minPoints)} pts`,
-        reward: LEVEL_PERKS[next.id],
+        reward: levelPerk(next.id),
       }),
     );
     // a barra deste objetivo mede pontos, não passos

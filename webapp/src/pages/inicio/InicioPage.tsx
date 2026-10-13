@@ -1,15 +1,14 @@
-import { useContext, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ServerCog } from 'lucide-react';
 import { PRODUCERS } from '../../data';
 import { CampaignFeed, HarvestBand, KnowledgeLevelBadge, OriginSeal } from '../../components/game';
 import { Button, ButtonLink, Card, Page, PageHeader, RiskNote, Section, SimulationLabel, TextLink } from '../../components/ui';
 import { useData, useFeed, useGame, useRole } from '../../state';
-import { GameContext } from '../../state/AppProvider';
 import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, num, pct } from '../../lib/format';
 import { plannedSettlement, positionState, windowOf } from '../carteira/positions';
 import { LevelPanel } from './LevelPanel';
-import { buildMissions } from './missions';
+import { buildMissions, CAMPAIGN_READINGS, SEASON_QUEST_ID } from './missions';
 import { MissionList } from './MissionList';
 import { MyLots } from './MyLots';
 import { NovasMissoes } from './NovasMissoes';
@@ -27,8 +26,7 @@ export default function InicioPage() {
   const game = useGame();
   const data = useData();
   const feed = useFeed();
-  const gameCtx = useContext(GameContext);
-  const worldsVisited = useMemo(() => gameCtx?.profile.worldsVisited ?? [], [gameCtx?.profile.worldsVisited]);
+  const worldsVisited = game.worldsVisited;
   const [feedLimit, setFeedLimit] = useState(7);
 
   const approved = game.onboarding.status === 'aprovado';
@@ -39,6 +37,13 @@ export default function InicioPage() {
     () => buildMissions({ game, lots: data.lots, positions: data.positions, liveEvents: feed.events, isVisitor, worldsVisited, feedPaused: feed.pauseReason }),
     [game, data.lots, data.positions, feed.events, isVisitor, worldsVisited, feed.pauseReason],
   );
+  // Missão de campanha: fecha quando o Diário mostrou as leituras em direto (dá pontos de conhecimento).
+  const campaignReadings = feed.events.filter((e) => e.kind === 'telemetria' && e.world === 'azeite').length;
+  const { completeQuest } = game;
+  const extractionDone = game.isQuestDone(SEASON_QUEST_ID);
+  useEffect(() => {
+    if (campaignReadings >= CAMPAIGN_READINGS && !extractionDone) completeQuest(SEASON_QUEST_ID);
+  }, [campaignReadings, extractionDone, completeQuest]);
   const goal = missions.find((m) => m.kind === 'aprendizagem');
   const listMissions = missions.filter((m) => m.kind !== 'aprendizagem');
   const nextStep = listMissions.find((m) => m.done < m.total && m.kind !== 'campanha');

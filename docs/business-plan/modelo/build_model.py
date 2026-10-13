@@ -945,7 +945,7 @@ def define_lines():
     ln("k_min_ano", KF, s, "Ano do mínimo do cash flow acumulado", "ano", FMT_YEAR,
        lambda c, y: f"INDEX({rng(c, 'ano')},1,MATCH(MIN({rng(c, 'cf_acum')}),{rng(c, 'cf_acum')},0))", scalar=True)
     ln("k_ainda", KF, s, "O acumulado ainda desce em 2031?", "", None,
-       lambda c, y: f"IF({c.l('cf_acion', 4)}<0,\"sim: necessidade ainda a crescer\",\"não\")", scalar=True)
+       lambda c, y: f"IF({c.l('cf_acion', 4)}<0,\"sim\",\"não\")", scalar=True)
     ln("k_rondas", KF, s, "Capital próprio levantado no plano (pré-seed + rondas adicionais)", "€", FMT_EUR,
        lambda c, y: c.l("cx_rondas_acum", 4), scalar=True)
     s = "Aplicação de fundos até ao ano do mínimo (€)"
@@ -1041,7 +1041,7 @@ DETAIL_TITLES = {
     "Cash flow": ("Cash flow", "Capital de giro por prazos médios, obrigações e float das séries, cash flow para o acionista, caixa e rondas (cenário ativo)."),
     "Capital & financiamento": ("Capital & financiamento", "Necessidade de capital, aplicação de fundos, runway, break-even, investidores e o que tem de ser verdade (cenário ativo)."),
 }
-DETAIL_START = {"Pessoal": 20}
+DETAIL_START = {}
 
 
 class Layout:
@@ -1129,7 +1129,7 @@ def write_line_cells(ws, ctx, ln_, row):
             c = put(ws, f"{col}{row}", "=" + str(v), fmt=ln_.fmt, bold=ln_.style == "key")
         if ln_.style == "check":
             c.font = font(MUTED, italic=True)
-        c.alignment = Alignment(horizontal="right")
+        c.alignment = Alignment(horizontal="left" if ln_.scalar else "right")
     if ln_.style == "key":
         for col in ["A", "B"] + cols:
             ws[f"{col}{row}"].border = B_TOP
@@ -1142,7 +1142,7 @@ def setup_detail_sheet(ws, sheet):
     title(ws, t, sub)
     put(ws, "A3", '="Cenário ativo: "&Pressupostos!$C$4&"  ·  euros correntes, sem IVA"', color=ACCENT, bold=True)
     header_row(ws, 4, ["Rubrica", "Unidade"] + [str(y) for y in YEARS] + ["Notas"])
-    for k, v in {"A": 70, "B": 10, "C": 14, "D": 14, "E": 14, "F": 14, "G": 14, "H": 70}.items():
+    for k, v in {"A": 88, "B": 10, "C": 14, "D": 14, "E": 14, "F": 14, "G": 14, "H": 70}.items():
         ws.column_dimensions[k].width = v
     ws.freeze_panes = "C5"
 
@@ -1164,9 +1164,10 @@ def write_detail(wb, lines, preg, lay):
 
 
 def write_pessoal_table(ws, preg, P):
-    put(ws, "A6", "Tabela salarial (inputs na folha Pressupostos)", bold=True, color=ACCENT)
-    header_row(ws, 7, ["Função", "Fundador?", "Salário anual (14 meses)", "Salário mensal (÷ 14)", "Variável", "Custo anual c/ encargos (1 FTE, 2027)"])
-    r = 8
+    r0 = ws.max_row + 2
+    section_row(ws, r0, "Tabela salarial (inputs em Pressupostos; valores de 2027)")
+    header_row(ws, r0 + 1, ["Função", "Fundador?", "Salário anual (14 meses)", "Salário mensal (÷ 14)", "Variável", "Custo anual c/ encargos (1 FTE)"])
+    r = r0 + 2
     for fn, lab in ROLE_LABEL.items():
         put(ws, f"A{r}", lab)
         put(ws, f"B{r}", "sim (60% até ao gate)" if fn in FOUNDERS else "não", color=MUTED)
@@ -1175,7 +1176,6 @@ def write_pessoal_table(ws, preg, P):
         put(ws, f"E{r}", "=" + preg.ref("var_" + fn, 0), fmt=FMT_PCT)
         put(ws, f"F{r}", f"=C{r}*(1+E{r})*(1+{preg.ref('tsu', 0)}+{preg.ref('outros_enc', 0)})+{preg.ref('subs', 0)}", fmt=FMT_EUR)
         r += 1
-    assert r <= 20
 
 
 # ----------------------------------------------------------------------------- casos do Motor
@@ -1208,7 +1208,7 @@ def write_motor(wb, lines, preg):
     ws = wb.create_sheet("Motor")
     title(ws, "Motor de cálculo", "As mesmas linhas das folhas de detalhe, em blocos fixos por cenário e por caso de sensibilidade. "
                                   "Não editar: os inputs estão em Pressupostos. Cenários, Unit economics e Sensibilidade leem daqui.")
-    for k, v in {"A": 70, "B": 10, "C": 14, "D": 14, "E": 14, "F": 14, "G": 14, "H": 18}.items():
+    for k, v in {"A": 88, "B": 10, "C": 14, "D": 14, "E": 14, "F": 14, "G": 14, "H": 18}.items():
         ws.column_dimensions[k].width = v
     header_row(ws, 4, ["Rubrica", "Unidade"] + [str(y) for y in YEARS] + ["id da linha"])
     ws.freeze_panes = "C5"
@@ -1253,7 +1253,7 @@ def write_unit_economics(wb, preg, blocks):
     ws = wb.create_sheet("Unit economics", 2)
     title(ws, "Unit economics", "Lotes-tipo de ponta a ponta, por cenário (independente do seletor). Valores por kg lidos do Motor no ano de regime; "
                                 "lote = €/kg × dimensão do lote.")
-    for k, v in {"A": 62, "B": 9}.items():
+    for k, v in {"A": 80, "B": 9}.items():
         ws.column_dimensions[k].width = v
     for col in "CDEFGHIJ":
         ws.column_dimensions[col].width = 13
@@ -1346,11 +1346,17 @@ def write_unit_economics(wb, preg, blocks):
             ("cupliq", "Retorno líquido anual de um particular residente (retenção de 28%)", "%",
              lambda s, si: f"{ser_at('fin_cupao', si)}*(1-{preg.ref('fin_ret_sing', 0)})", FMT_PCT2),
             ("cupciclo", "Cupão pago no ciclo do lote", "€", lambda s, si: f"{at(s, f'{k}_cupao')}*{kg_cells[s]}", FMT_EUR),
+            ("retciclo", "Retorno bruto do investidor no ciclo (% das obrigações afetas ao lote)", "%",
+             lambda s, si: (f"IF({ser_at('fin_pct', si)}>0,{at(s, f'{k}_cupao')}*{kg_cells[s]}/({ser_at('fin_pct', si)}*({at(s, f'{k}_gr')}+{at(s, f'{k}_emb')})"
+                            f"*{kg_cells[s]}/{preg.ref('fin_util', si)}),0)"), FMT_PCT2),
             ("res", "Retida na reserva de primeira perda (30% da margem; teto 5% das obrigações do lote)", "€",
              lambda s, si: (f"MAX(0,MIN({preg.ref('fin_res_pct_margem', 0)}*{at(s, f'{k}_margem')}*{kg_cells[s]},"
                             f"{preg.ref('fin_res_pct_notes', 0)}*{ser_at('fin_pct', si)}*({at(s, f'{k}_gr')}+{at(s, f'{k}_emb')})*{kg_cells[s]}/{preg.ref('fin_util', si)}))"), FMT_EUR),
             ("livre", "Margem livre para a OpCo depois da reserva", "€",
              lambda s, si: f"{at(s, f'{k}_margem')}*{kg_cells[s]}-RES", FMT_EUR),
+            ("kyc", "Memo: KYC/KYB e screening das contrapartes do lote (no custo fixo de tecnologia)", "€",
+             (lambda s, si: f"{kg_cells[s]}/({preg.ref('az_cons_cliente', 0)}*1000)*({preg.ref('kyc_kyb', 0)}+12*{preg.ref('kyc_screen', 0)})") if k == "h"
+             else (lambda s, si: f"{preg.ref('kyc_kyb', 0)}+12*{preg.ref('kyc_screen', 0)}"), FMT_EUR),
             ("noc", "Memo: custo nocional do capital próprio (8%/ano; fora do EBITDA)", "€",
              lambda s, si: (f"{preg.ref('fin_nocional', 0)}*(1-{ser_at('fin_pct', si)})*({at(s, f'{k}_gr')}+{at(s, f'{k}_emb')})"
                             f"*({at(s, f'{k}_ds')}+{at(s, f'{k}_dr')}-{preg.ref('az_dp', 0)})/365*{kg_cells[s]}"), FMT_EUR),
@@ -1582,7 +1588,7 @@ def write_cenarios(wb, blocks, P, detail_lay):
     ws = wb.create_sheet("Cenários")
     title(ws, "Cenários", "Os três cenários do documento-fonte (com as correções verificadas, sem ajustes) e o cenário Recomendado (reestruturado), lado a lado. "
                           "Ligações ao Motor: não dependem do seletor.")
-    for k, v in {"A": 58, "B": 26, "C": 14, "D": 14, "E": 14, "F": 14, "G": 14, "H": 60}.items():
+    for k, v in {"A": 62, "B": 26, "C": 20, "D": 20, "E": 20, "F": 20, "G": 20, "H": 100}.items():
         ws.column_dimensions[k].width = v
     r = 4
     section_row(ws, r, "1. Indicadores por ano")
@@ -1642,15 +1648,14 @@ def write_cenarios(wb, blocks, P, detail_lay):
         put(ws, f"C{r}", fmt_val(a["recomendado"]), color=ACCENT, align=WRAP)
         ws.merge_cells(f"C{r}:G{r}")
         put(ws, f"H{r}", a["justificacao"] + " Fonte: " + a["fonte"], color=MUTED, align=WRAP)
-        ws.row_dimensions[r].height = 15 * max(2, min(8, len(a["justificacao"]) // 75 + 1))
+        ws.row_dimensions[r].height = 13 * max(2, (len(a["justificacao"]) + len(a["fonte"]) + 8) // 95 + 1)
         r += 1
-    put(ws, f"A{r}", "Não alterado", bold=True)
-    put(ws, f"H{r}", P["cenario_recomendado"]["nao_alterado"], color=MUTED, align=WRAP)
-    ws.row_dimensions[r].height = 45
-    r += 1
-    put(ws, f"A{r}", "Produto para investidores", bold=True)
-    put(ws, f"H{r}", P["cenario_recomendado"]["produto_investidor"], color=MUTED, align=WRAP)
-    ws.row_dimensions[r].height = 60
+    for lab, txt in (("Não alterado", P["cenario_recomendado"]["nao_alterado"]), ("Produto para investidores", P["cenario_recomendado"]["produto_investidor"])):
+        put(ws, f"A{r}", lab, bold=True, align=Alignment(vertical="top"))
+        put(ws, f"H{r}", txt, color=MUTED, align=WRAP)
+        ws.row_dimensions[r].height = 13 * max(2, len(txt) // 95 + 1)
+        r += 1
+    r -= 1
     r += 2
     section_row(ws, r, "5. Verificações (devem ser 0)")
     r += 1
@@ -1712,7 +1717,7 @@ def write_sensibilidade(wb, preg, blocks):
     ws = wb.create_sheet("Sensibilidade")
     title(ws, "Sensibilidade", "Base e Recomendado: desconto HoReCa, volumes e preço do AOVE (motor completo, recalculado por caso); "
                                "tese literal do documento-fonte: captura da margem do embalador × desconto.")
-    for k, v in {"A": 50, "B": 15, "C": 15, "D": 15, "E": 15, "F": 15, "G": 15, "H": 15, "I": 50}.items():
+    for k, v in {"A": 80, "B": 14, "C": 15, "D": 15, "E": 15, "F": 15, "G": 15, "H": 15, "I": 20}.items():
         ws.column_dimensions[k].width = v
     r = 4
     section_row(ws, r, "Casos (inputs em Pressupostos)", ncols=9)
@@ -1812,11 +1817,9 @@ def write_leiame(wb, P):
     ws.title = "Leia-me"
     title(ws, "Sprout — Modelo financeiro 2027–2031",
           "Gerado por docs/business-plan/modelo/build_model.py a partir de pressupostos.json · data de referência 13-10-2026 · euros correntes, sem IVA")
-    ws.column_dimensions["A"].width = 30
-    ws.column_dimensions["B"].width = 120
-    for col in "CDEF":
-        ws.column_dimensions[col].width = 16
-    r = 4
+    for k, v in {"A": 50, "B": 12, "C": 20, "D": 20, "E": 20, "F": 20, "G": 40}.items():
+        ws.column_dimensions[k].width = v
+    r = 16   # linhas 4–14: tabela de resultados (escrita depois de Cenários)
     blocks = [
         ("Para que serve", [
             "Testar, com números rastreáveis, se a tese do documento-fonte (marketplace B2B de azeite, água e café com desconto de 10–15%, captura de 80–90% "
@@ -1825,18 +1828,18 @@ def write_leiame(wb, P):
         ]),
         ("Resposta curta", [
             "Os três cenários do documento-fonte, com as 53 correções verificadas e sem ajustes, não chegam ao break-even até 2031: a margem por kg não paga a estrutura.",
-            "O cenário Recomendado (reestruturado) muda o produto, os canais e os custos como a investigação recomenda. O resultado está na folha Cenários e na tabela abaixo; "
-            "não foi ajustado para dar break-even.",
+            "O cenário Recomendado (reestruturado) muda o produto, os canais e os custos como a investigação recomenda. O resultado está na tabela acima e na folha "
+            "Cenários; não foi ajustado para dar break-even. A folha Sensibilidade mostra o caso com todas as alavancas no topo dos intervalos da investigação.",
         ]),
         ("Estrutura", [
             "Pressupostos — todos os inputs, por cenário, com fonte; seletor do cenário ativo em C4.",
             "Unit economics — lotes-tipo de ponta a ponta (HoReCa 20 t, distribuidores 30 t, granel 100 t, água 20 paletes) nos quatro cenários; bolo de intermediação; "
-            "teste da tese literal; risco de preço.",
+            "teste da tese literal; risco de preço; piloto de 2027.",
             "Volumes, Receitas, Pessoal, Custos, DR, Cash flow, Capital & financiamento — o cenário ativo, ano a ano.",
             "Cenários — os quatro cenários lado a lado; o que tem de ser verdade; o que muda no Recomendado; verificações.",
-            "Sensibilidade — desconto 10/12,5/15%, volumes ±30% e preço do AOVE −30% (motor completo por caso) para o Base e o Recomendado; "
-            "grelha captura × desconto da tese literal.",
-            "Fontes — origem de cada pressuposto e registo de verificação. Motor — o cálculo em blocos fixos (não editar).",
+            "Sensibilidade — desconto 10/12,5/15%, volumes ±30%, preço do AOVE −30% e topo dos intervalos (motor completo por caso), para o Base e o Recomendado; "
+            "grelha captura × desconto da tese literal; perda no stock com choque de preço.",
+            "Fontes — origem de cada pressuposto e registo de verificação. Motor — o cálculo em blocos fixos por cenário e caso (não editar).",
         ]),
         ("Como mudar de cenário", [
             "Pressupostos!C4: escolher Pessimista, Base, Otimista ou Recomendado. Mudam as folhas de detalhe. Cenários, Unit economics e Sensibilidade "
@@ -1864,39 +1867,39 @@ def write_leiame(wb, P):
         ]),
     ]
     for head, paras in blocks:
-        put(ws, f"A{r}", head, bold=True, color=ACCENT)
+        put(ws, f"A{r}", head, bold=True, color=ACCENT, align=Alignment(vertical="top"))
         for ptxt in paras:
             put(ws, f"B{r}", ptxt, align=WRAP)
-            ws.row_dimensions[r].height = 15 * max(1, len(ptxt) // 115 + 1)
+            ws.merge_cells(f"B{r}:G{r}")
+            ws.row_dimensions[r].height = 13.5 * max(1, len(ptxt) // 125 + 1)
             r += 1
         r += 1
-    return ws, r
+    return ws, 4
 
 
 def write_leiame_summary(ws, r):
-    put(ws, f"A{r}", "Resultados (ligados a Cenários)", bold=True, color=ACCENT)
+    section_row(ws, r, "Resultados-chave (ligados à folha Cenários)", ncols=7)
     r += 1
-    header_row(ws, r, ["Indicador", ""] + SCEN_LABEL, start_col=1)
-    ws.cell(row=r, column=2).value = "Unidade"
+    header_row(ws, r, ["Indicador", "Unidade"] + SCEN_LABEL)
     r += 1
     items = [("EBITDA 2031", "dr_ebitda", 4, "€", FMT_EUR), ("Resultado líquido 2031", "dr_rl", 4, "€", FMT_EUR),
-             ("GMV 2031", "gmv_total", 4, "€", FMT_EUR), ("Cash flow acumulado 2031", "cf_acum", 4, "€", FMT_EUR)]
+             ("GMV 2031", "gmv_total", 4, "€", FMT_EUR), ("Cash flow acumulado para o acionista, 2027–2031", "cf_acum", 4, "€", FMT_EUR)]
     for lab, lid, y, unit, fmt in items:
         put(ws, f"A{r}", lab)
         put(ws, f"B{r}", unit, color=MUTED)
         for i, s in enumerate(SCEN):
             put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{YC[y]}{CEN_POS[lid][s]}", fmt=fmt)
         r += 1
-    for lab, lid, unit, fmt in (("Necessidade de capital próprio (pico)", "k_need", "€", FMT_EUR), ("Break-even do EBITDA", "be_data", "mês", FMT_DATE),
-                                ("Verificações do modelo", "estado", "", None)):
-        put(ws, f"A{r}", lab)
+    for lab, lid, unit, fmt in (("Necessidade de capital próprio (pico no horizonte)", "k_need", "€", FMT_EUR),
+                                ("Break-even do EBITDA", "be_data", "mês", FMT_DATE),
+                                ("1.º ano com cash flow para o acionista ≥ 0", "be_ano_cf", "ano", FMT_YEAR)):
+        put(ws, f"A{r}", lab, bold=lid == "k_need")
         put(ws, f"B{r}", unit, color=MUTED)
-        if lid == "estado":
-            put(ws, f"C{r}", f"=Cenários!C{CEN_POS['estado']}", bold=True)
-        else:
-            for i in range(4):
-                put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{'CDEF'[i]}{CEN_POS[lid]}", fmt=fmt, align=Alignment(horizontal="right"))
+        for i in range(4):
+            put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{'CDEF'[i]}{CEN_POS[lid]}", fmt=fmt, align=Alignment(horizontal="right"), bold=lid == "k_need")
         r += 1
+    put(ws, f"A{r}", "Verificações do modelo (Cenários, secção 5)")
+    put(ws, f"C{r}", f"=Cenários!C{CEN_POS['estado']}", bold=True, align=Alignment(horizontal="right"))
 
 
 def write_fontes(wb, P):
@@ -2227,9 +2230,9 @@ def read_results(path, blocks, lines, P, preg):
                 dd["eur_kg"][key] = rd(ue[f"{ck}{rows[key]}"].value, 4)
                 dd["eur_lote"][key] = rd(ue[f"{ce}{rows[key]}"].value)
             dd["margem_pct"] = rd(ue[f"{ck}{rows['margem_pct']}"].value, 4)
-            for key in ("cap", "ciclo", "pct", "notes", "sub", "cup", "cupliq", "cupciclo", "res", "livre", "noc"):
+            for key in ("cap", "ciclo", "pct", "notes", "sub", "cup", "cupliq", "cupciclo", "retciclo", "res", "livre", "kyc", "noc"):
                 v = ue[f"{ce}{rows[key]}"].value
-                dd[key] = rd(v, 4) if key in ("pct", "cup", "cupliq") else rd(v)
+                dd[key] = rd(v, 4) if key in ("pct", "cup", "cupliq", "retciclo") else rd(v)
             d[s] = dd
         uej[nm] = d
     for s_i, s in enumerate(SCEN):

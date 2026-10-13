@@ -3,7 +3,7 @@ import { Download } from 'lucide-react';
 import { Button, DataTable } from '../../components/ui';
 import type { Column } from '../../components/ui';
 import type { Investor } from '../../data';
-import { useToast, type PositionView } from '../../state';
+import { transferReference, useToast, type PositionView } from '../../state';
 import { date as fmtDate } from '../../lib/format';
 import { contractSummary, downloadText, monthLabel, monthlyStatement, statementIssueDate, statementMonths } from './docs';
 
@@ -38,7 +38,7 @@ export function Documents({ investor, positions }: { investor: Investor; positio
       id: `cond-${p.id}`,
       kind: 'Condições do lote' as const,
       title: `Resumo das condições · ${p.lot.id}`,
-      ref: p.id.toUpperCase(),
+      ref: transferReference(p),
       date: p.committedAt.slice(0, 10),
       file: `Sprout_condicoes_${p.lot.id}.txt`,
       build: () => contractSummary(investor, p),

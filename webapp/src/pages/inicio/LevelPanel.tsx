@@ -6,7 +6,7 @@ import { Meter } from '../../components/ui';
 import { useGame } from '../../state';
 import { cn } from '../../lib/cn';
 import { num } from '../../lib/format';
-import { LEVEL_PERKS, type Mission } from './missions';
+import { levelPerk, type Mission } from './missions';
 
 /**
  * Escada dos níveis de conhecimento com o que cada um abre (conhecimento e
@@ -52,7 +52,7 @@ export function LevelPanel({ goal }: { goal?: Mission }) {
                 </p>
                 <p className={cn('mt-0.5 text-sm', reached || isNext ? 'text-fg' : 'text-muted')}>
                   <span className="text-muted">{reached ? 'Já tens: ' : 'Abre: '}</span>
-                  {LEVEL_PERKS[l.id]}
+                  {levelPerk(l.id)}
                 </p>
                 {isNext && (
                   <Meter

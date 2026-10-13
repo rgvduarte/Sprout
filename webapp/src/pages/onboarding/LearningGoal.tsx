@@ -6,7 +6,6 @@ import type { LearningFocus, LevelId, WorldId } from '../../data/types';
 import { Button, CommodityGlyph, Meter, RadioGroup, SegmentedControl } from '../../components/ui';
 import { KnowledgeLevelBadge } from '../../components/game';
 import { useGame, useToast, type ProfileId } from '../../state';
-import { now } from '../../lib/clock';
 import { date as fmtDate, num } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { useLearningGoal } from './learningGoal';

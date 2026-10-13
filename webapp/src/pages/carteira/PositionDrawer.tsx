@@ -18,9 +18,6 @@ import { decimalsOf, physicalShare, plannedSettlement, playbookFor, positionStat
 
 type TabId = 'rastreabilidade' | 'analises' | 'documentos' | 'prazos' | 'diario';
 
-/** Amostras pedidas nesta sessão (em memória, como a loja do jogo). */
-const samplesRequested = new Set<string>();
-
 function AnalysisBlock({ a }: { a: QualityAnalysis }) {
   return (
     <section className="min-w-0 border-b border-border pb-5 last:border-b-0 last:pb-0" aria-label={`Boletim ${a.reportId}`}>
@@ -105,7 +102,6 @@ function DrawerBody({ p }: { p: PositionView }) {
   const { investor, events } = useData();
   const { toast } = useToast();
   const [tab, setTab] = useState<TabId>('rastreabilidade');
-  const [, force] = useState(0);
   const st = positionState(p);
   const share = physicalShare(p);
   const region = getRegion(lot.regionId);
@@ -113,7 +109,7 @@ function DrawerBody({ p }: { p: PositionView }) {
   const settle = plannedSettlement(lot);
   const pb = playbookFor(lot);
   const lotEvents = events.filter((e) => e.lotId === lot.id);
-  const requested = samplesRequested.has(lot.id);
+  const requested = game.sampleRequest(lot.id);
   const noStock = lot.stock <= 0;
 
   const onTab = (v: TabId) => {
@@ -127,9 +123,9 @@ function DrawerBody({ p }: { p: PositionView }) {
   };
 
   const requestSample = () => {
-    samplesRequested.add(lot.id);
-    force((n) => n + 1);
-    toast({ tone: 'accent', title: `Amostra do ${lot.id} pedida`, description: lot.world === 'agua' ? 'Uma garrafa de 1,5 L do lote segue com o próximo inventário mensal.' : 'Um frasco de 250 mL do lote segue com o próximo inventário mensal.' });
+    const what = lot.world === 'agua' ? 'Garrafa de 1,5 L' : lot.world === 'cafe' ? 'Amostra de 350 g de café verde' : 'Frasco de 250 ml';
+    game.requestReward({ rewardId: 'amostra', lotId: lot.id, option: 'morada', detail: `${what} do ${lot.id} · morada registada`, status: 'Pedido registado · envio em até 10 dias úteis' });
+    toast({ tone: 'accent', title: `Amostra do ${lot.id} pedida`, description: `${what} do lote, com o boletim de análises impresso. Envio para a morada registada em até 10 dias úteis.` });
   };
 
   return (
@@ -173,7 +169,7 @@ function DrawerBody({ p }: { p: PositionView }) {
                   <p className="mt-1 text-sm text-muted">Todos os co-financiadores podem pedir uma amostra, qualquer que seja o montante. É participação, não tamanho.</p>
                   {requested ? (
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-ok-ink">
-                      <Check aria-hidden className="size-4" strokeWidth={2} /> Pedido registado: segue com o próximo inventário mensal.
+                      <Check aria-hidden className="size-4" strokeWidth={2} /> Pedida a {fmtDate(requested.at)} · {requested.status}.
                     </p>
                   ) : (
                     <div className="mt-2 flex flex-wrap items-center gap-3">
