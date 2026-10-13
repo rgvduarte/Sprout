@@ -7,6 +7,16 @@ import type { WorldId } from '../../data/types';
 export function CommodityGlyph({ world, className, ...rest }: { world: WorldId; className?: string } & SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cn('size-4 shrink-0', className)} {...rest}>
+      <CommodityGlyphPaths world={world} />
+    </svg>
+  );
+}
+
+
+/** Só os traços do glifo (para usar dentro de outro SVG, viewBox 24 × 24). */
+export function CommodityGlyphPaths({ world }: { world: WorldId }) {
+  return (
+    <>
       {world === 'azeite' && (
         <>
           <ellipse cx="10" cy="14.5" rx="5" ry="6.4" transform="rotate(-28 10 14.5)" />
@@ -28,7 +38,7 @@ export function CommodityGlyph({ world, className, ...rest }: { world: WorldId; 
           <path d="M8.3 17.4c2.4-2.4 3.2-5.4 3.7-7.3.5-1.8 1.6-3.4 3.7-4.6" />
         </>
       )}
-    </svg>
+    </>
   );
 }
 

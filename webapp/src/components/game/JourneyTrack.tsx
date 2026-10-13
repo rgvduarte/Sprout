@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, useMotionValueEvent, useReducedMotion, type MotionValue } from 'motion/react';
+import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, type MotionValue } from 'motion/react';
 import { Sprout, FlaskConical, Container, Store, Truck, Landmark } from 'lucide-react';
 import { getWorld } from '../../data';
 import type { JourneyStage, Lot, Milestone, WorldId } from '../../data/types';
@@ -41,7 +41,8 @@ export function JourneyTrack({ lot, world: worldProp, milestones: msProp, orient
   const reduce = useReducedMotion();
   const doneCount = milestones.filter((m) => m.done).length;
   const [lit, setLit] = useState(progress ? 0 : doneCount);
-  useMotionValueEvent(progress ?? ({ on: () => () => {} } as unknown as MotionValue<number>), 'change', (v) => {
+  const fallback = useMotionValue(1);
+  useMotionValueEvent(progress ?? fallback, 'change', (v) => {
     const n = Math.round(Math.max(0, Math.min(1, v)) * doneCount);
     setLit((prev) => (prev === n ? prev : n));
   });

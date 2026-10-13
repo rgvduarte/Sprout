@@ -1,6 +1,6 @@
 import { CAMPAIGN_EVENTS } from './events';
-import { DEMO_PROGRESS, LEVELS, MODULES, QUESTS, SEALS, SIM_COMPLETE_POINTS } from './game';
-import { DEMO_INVESTOR_ID, INVESTORS, SEED_POSITIONS, SEED_SEALS } from './investors';
+import { LEVELS, MODULES, QUESTS, SEALS, SIM_COMPLETE_POINTS } from './game';
+import { DEMO_INVESTOR_ID, INVESTORS, SEED_POSITIONS } from './investors';
 import { LOTS } from './lots';
 import { MARKET, MARKET_TODAY } from './market';
 import { MINI_GAMES } from './minigames';

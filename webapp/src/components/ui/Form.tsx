@@ -50,7 +50,7 @@ export function Field({ label, id, hint, error, required, children, className }:
 
 /* ------------------------------------------------------------ Input */
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
   /** sufixo visual (p.ex. "€", "kg") */
   suffix?: ReactNode;
   prefix?: ReactNode;

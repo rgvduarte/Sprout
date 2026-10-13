@@ -36,6 +36,8 @@
   --crit-ink: #9a1d13;
   --info-ink: #1f5470;
   --seal-ink: #7a2419;
+  --seal-on: #f8e6e2;
+  --seal-deep: #5e1a12;
   --neutral-ink: #3d4436;
 
   /* Séries de gráfico (validadas: dataviz validate_palette, todos os pares) */
@@ -92,12 +94,16 @@
   --crit-ink: #f59a91;
   --info-ink: #9fcde3;
   --seal-ink: #e08a7b;
+  --seal-on: #2b0d08;
+  --seal-deep: #8f3426;
   --neutral-ink: #c4cab9;
     --ok-ink: #7fd3a5;
     --warn-ink: #ebbd72;
     --crit-ink: #f59a91;
     --info-ink: #9fcde3;
     --seal-ink: #e08a7b;
+    --seal-on: #2b0d08;
+    --seal-deep: #8f3426;
     --neutral-ink: #c4cab9;
     --series-azeite: #9e9a1e;
     --series-agua: #4192c8;
@@ -211,6 +217,11 @@
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
+/* Ponto de quebra do rail de navegação (900 px): variante rail: */
+@theme {
+  --breakpoint-rail: 56.25rem;
+}
+
 /* ------------------------------------------------------------------
    Base
    ------------------------------------------------------------------ */
@@ -299,6 +310,31 @@
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
+
+/* Slider (input range) com trilho do mesmo tom */
+.sprout-range { --track: color-mix(in oklab, var(--accent) 18%, var(--surface-2)); }
+.sprout-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--track) var(--pct, 0%));
+}
+.sprout-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+}
+.sprout-range::-moz-range-track { height: 6px; border-radius: 999px; background: var(--track); }
+.sprout-range::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--accent); }
+.sprout-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+.sprout-range:focus-visible { outline: none; }
+.sprout-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sprout-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sprout-range:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* Esqueleto de carregamento: pulsação de opacidade, sem brilho */
 @keyframes sprout-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
