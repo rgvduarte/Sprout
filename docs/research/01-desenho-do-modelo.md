@@ -503,65 +503,69 @@ Pré-arranque (Q4 2026) **€95k** + **capital social da SPV €50k** (realizado
 
 | Fonte | Mecânica | Valor (base) | Justificação | Início |
 |---|---|---|---|---|
-| **Margem de principal — azeite HoReCa/gourmet** | Venda a 90% da referência; custos diretos e cupão deduzidos | **12,2% das vendas (0,66 €/kg)** | Lote-tipo, secção 2.2 | 2027 |
-| **Margem de principal — azeite distribuidores/exportação** | Venda a 95% da referência (5,00 €/kg); paletes de 5 L ou IBC; stock 60 dias | **8,4% (0,40 €/kg)** | Compradores profissionais negoceiam sobre o índice | 2027 |
-| **Comissão de agente — água** | 4% do GMV, faturada ao engarrafador (IVA 23%) | **€10,8 por palete**; €19k em 2031 | Banda de agente 0,5–3% + serviço [E] | 2027 (sujeita ao gate) |
-| **Margem de principal — café verde** | Compra a importador UE a 7,00 €/kg; venda a microtorrefatores a 7,85 €/kg | **~6,9% (0,54 €/kg)** | Modelo Algrano [C]; EUDR | 2029 (otimista 2028) |
-| **Originação e verificação de financiamento de terceiros** | Banco empresta ao lagar; Sprout verifica, custodia e monitoriza | **0,75% por utilização × 2 + 0,5%/ano = 2,0%/ano** da carteira média; €100k em 2031 | Fosso "lote financiável"; evita a reserva de crédito | 2028 |
+| **Margem de principal — azeite HoReCa/gourmet** | Venda a 90% da referência (5,65 €/kg); custos diretos e cupão deduzidos | **6,8% das vendas (0,35 €/kg)** em regime; ~0,15 €/kg em 2028 (< 300 clientes, stock médio 180 dias, com obrigações) | Lote-tipo, secção 2.2 | 2027 |
+| **Margem de principal — azeite distribuidores/exportação** | Venda ao preço de saída do embalador (4,35 €/kg; intervalo 4,16–4,51), sem desconto; paletes de 5 L; stock médio 30 dias; IBC fora | **~1,5% (0,06 €/kg)**; *break-even* a 4,29 €/kg; cada 0,10 €/kg = ~€178k de EBITDA em 2031 | Decomposição do Observatorio: granel + embalamento + margem do embalador | 2027 |
+| **Comissão de agente — água** | ~2% do GMV (banda 0,5–3%), faturada ao engarrafador (IVA 23%) | **€5,4 por palete**; €9,7k em 2031 | Banda de agente 0,5–3% [E, NV]; 4–5% só com cotação real de um engarrafador | 2027 (sujeita ao gate) |
+| **Margem de principal — café verde** | Compra a importador UE a 7,00 €/kg; venda a microtorrefatores a 7,85 €/kg | **~6,9% (0,54 €/kg)** | [E] NV, sem comparável verificado (as margens da Algrano estão como NV); EUDR | 2029 (otimista 2028) |
+| **Originação e verificação de financiamento de terceiros** | Banco empresta ao lagar; Sprout verifica, custodia e monitoriza | **0,75% por utilização × 2 + 0,5%/ano = 2,0%/ano** da carteira média, menos custos de verificação (0,018 €/kg verificado: *collateral manager* €1.200 + análises €600 por lote de 100 t; ~4.570 t verificadas em 2031 a LTV 62,5%): **€100k bruto, ~€18k líquido em 2031** | Fosso "lote financiável"; evita a reserva de crédito. Alternativa: o banco ou o mutuário paga diretamente o *collateral manager* e o laboratório | 2028 |
 | **Dados e índice** | Subscrição de preços de lotes verificados | €10k (2030), €30k (2031) | Conservador: Poolred e Mintec já existem | 2030 |
 
 **O que não cobramos:** comissões de gestão ou de desempenho aos investidores. Cobrar "*spread* retido" a investidores é cobrar como gestor de ativos e reforça a leitura de OIC [F/I].
 
 ### 6.2 Estrutura de custos
 
-**Variáveis (por kg de azeite, base 2027):**
+**Variáveis (por kg de azeite, base, regime 2029):**
 
 | Custo | HoReCa/gourmet | Distribuidores/exportação |
 |---|---|---|
 | Granel (índice + prémio) | 3,600 | 3,600 |
 | Embalamento | 0,550 | 0,450 |
-| Logística | 0,300 | 0,100 |
-| Armazenagem + seguro + análises + perdas + desclassificação | 0,071 | 0,053 |
-| Custódia | 0,060 | 0,040 |
-| Pagamentos/KYC/faturação | 0,020 | 0,010 |
-| Provisão de crédito | 0,032 | 0,014 |
-| Cupão (capital parado incluído) | 0,108 | 0,083 |
-| **Total** | **4,741** | **4,351** |
-| Preço de venda | 5,400 | 4,750 |
-| **Margem de contribuição** | **0,659 (12,2%)** | **0,399 (8,4%)** |
+| Logística | 0,280 | 0,090 |
+| Armazém logístico (3PL) e *picking* | 0,060 | 0 |
+| Armazenagem + seguro + análises + perdas + desclassificação | 0,059 | 0,046 |
+| Custódia (*collateral manager*) | 0,100 | 0,040 |
+| Pagamentos bancários (KYC e faturação no fixo) | 0,010 | 0,005 |
+| Provisão de crédito | 0,031 | 0,013 |
+| Cupão das obrigações | 0,048 | 0,042 |
+| **Total** | **4,738** | **4,286** |
+| Preço de venda | 5,085 | 4,350 |
+| **Margem de contribuição** | **0,347 (6,8%)** | **0,064 (1,5%)** |
 
-**Fixos (base; as linhas estão em € de 2027 antes de contingência de 5% e inflação de 2%; pessoal e total em valores nominais):**
+Em 2027 (piloto, sem obrigações): HoReCa 0,341 €/kg (6,7%) com stock médio de 180 dias; distribuidores 0,096 €/kg (2,2%). Os valores estão em `pressupostos.json` → `commodities.azeite.check_margem_contribuicao_base_eur_kg`.
+
+**Fixos (base; as linhas estão em € de 2027 antes de contingência de 5% e inflação de 2%; pessoal, SPV, seguro de crédito e total em valores nominais):**
 
 | Linha | 2027 | 2028 | 2029 | 2030 | 2031 |
 |---|---|---|---|---|---|
-| Pessoal (com TSU 23,75% + 2%; salários +3%/ano) | 366k | 492k | 644k | 825k | 907k |
+| Pessoal (TSU 23,75% + 2%; subsídio de refeição ~€2k/FTE; salários +3%/ano; fundadores a 60% até ao gate) | 401k | 508k | 668k | 856k | 1.042k |
 | Jurídico e *compliance* externo | 90k | 50k | 45k | 45k | 45k |
-| Tecnologia (*cloud*, SaaS, KYC, faturação) | 30k | 40k | 55k | 70k | 85k |
+| Tecnologia (*cloud*, SaaS, KYC, faturação certificada: só aqui, não no custo por kg) | 30k | 40k | 55k | 70k | 85k |
 | Segurança (*pentest*; ISO 27001 em 2029) | 15k | 15k | 35k | 20k | 20k |
 | Marketing B2B (*roadshow* privado, feiras, amostras) | 40k | 50k | 70k | 90k | 110k |
 | Escritório, viagens, formação | 35k | 45k | 66k | 83k | 96k |
 | Auditoria, contabilidade, seguros empresariais | 32k | 34k | 37k | 28k | 30k |
-| SPV (anual + por série + *setup* em 2027) | 55k | 35k | 40k | 45k | 50k |
-| **Opex não salarial (com contingência e inflação)** | **309k** | **286k** | **376k** | **419k** | **489k** |
+| SPV (anual + por série + *setup* em 2027 + funções independentes) | 65k | 65k | 70k | 75k | 80k |
+| Seguro de crédito (0,4% das vendas de azeite; mínimo €4–8k; desde 2028) | 0 | 7k | 15k | 26k | 39k |
+| **Opex não salarial (com contingência e inflação)** | **319k** | **323k** | **422k** | **475k** | **558k** |
 
 **Plano de pessoal (FTE, base):**
 
 | Função | Salário bruto anual | 2027 | 2028 | 2029 | 2030 | 2031 |
 |---|---|---|---|---|---|---|
-| CEO / comercial (fundador) | €60.000 (60% em 2027) | 1 | 1 | 1 | 1 | 1 |
-| CTO (fundador) | €65.000 (60% em 2027) | 1 | 1 | 1 | 1 | 1 |
+| CEO / comercial (fundador) | €60.000 (60% até ao gate) | 1 | 1 | 1 | 1 | 1 |
+| CTO (fundador) | €65.000 (60% até ao gate) | 1 | 1 | 1 | 1 | 1 |
 | Engenheiro(a) de software | €45.000 | 1 | 1 | 2 | 2 | 2 |
 | Responsável Risco e Tesouraria | €60.000 | 1 | 1 | 1 | 1 | 1 |
 | *Compliance*/AML | €45.000 | 0,5 | 1 | 1 | 1 | 1 |
 | Operações e *supply* | €38.000 | 1 | 1 | 1 | 2 | 2 |
 | Técnico(a) de qualidade do azeite | €32.000 | 0,5 | 1 | 1 | 1 | 1 |
-| Gestor(a) de conta B2B | €30.000 + 15% variável | 1 | 1 | 2 | 3 | 3 |
+| Gestor(a) de conta B2B (~400 contas ativas cada) | €30.000 + 15% variável | 1 | 1 | 2 | 3 | 5 |
 | *Controller* financeiro | €45.000 | 0 | 0 | 0 | 1 | 1 |
 | Analista de dados/produto | €40.000 | 0 | 0 | 0 | 0 | 1 |
 | Assistente de operações | €24.000 | 0 | 0 | 1 | 1 | 1 |
-| **Total** | | **7** | **8** | **11** | **14** | **15** |
+| **Total** | | **7** | **8** | **11** | **14** | **17** |
 
-Salários são estimativa de mercado (Lisboa/Porto), **não verificada** contra guias salariais.
+Salários são estimativa de mercado (Lisboa/Porto), **não verificada** contra guias salariais. Fundadores a 60% até ao gate (31-08-2027) e a 100% depois: fator efetivo de 0,73 em 2027. Os gestores de conta estão dimensionados para ~400 contas HoReCa ativas cada, com encomenda *self-service* e SDD recorrente [I, NV]; num modelo assistido (250–300 contas por pessoa [I, NV]) seriam 7–8 em 2031 (−€102k de EBITDA).
 
 ---
 
@@ -571,21 +575,25 @@ Salários são estimativa de mercado (Lisboa/Porto), **não verificada** contra 
 
 | Parâmetro | Pessimista | Base | Otimista |
 |---|---|---|---|
-| Azeite (t): 2027 → 2031 | 60 / 150 / 300 / 450 / 600 | 120 / 400 / 850 / 1.450 / 2.200 | 200 / 650 / 1.300 / 2.200 / 3.300 |
-| Peso HoReCa/gourmet (2027 → 2031) | 70% → 50% | 60% → 40% | 55% → 35% |
+| Azeite (t): 2027 → 2031 | 40 / 150 / 300 / 450 / 600 | 60 / 400 / 850 / 1.450 / 2.200 | 80 / 650 / 1.300 / 2.200 / 3.300 |
+| Clientes HoReCa/*gourmet* ativos (média anual) | 30 / 100 / 250 / 400 / 500 | 40 / 180 / 650 / 1.300 / 2.000 | 50 / 300 / 1.000 / 2.000 / 3.000 |
+| Azeite HoReCa/*gourmet* (t), a 0,205 t por cliente | 6 / 21 / 51 / 82 / 103 | 8 / 37 / 133 / 267 / 410 | 10 / 62 / 205 / 410 / 615 |
+| Peso HoReCa/*gourmet* (2027 → 2031) | 15% → 17% | 13% → 19% | 13% → 19% |
 | Índice do granel; prémio ao lagar | 3,50; 0,15 €/kg | 3,50; 0,10 €/kg | 3,50; 0,05 €/kg |
-| Referência HoReCa / distribuidores | 5,70 / 4,85 €/kg | 6,00 / 5,00 €/kg | 6,30 / 5,20 €/kg |
-| Desconto HoReCa / distribuidores | 10% / 6% | 10% / 5% | 10% / 5% |
-| Margem de contribuição do azeite (2027) | **4,0%** | **10,8%** | **16,0%** |
+| Referência HoReCa / distribuidores | 5,40 / 4,20 €/kg | 5,65 / 4,35 €/kg | 6,00 / 4,50 €/kg |
+| Desconto HoReCa / distribuidores | 10% / 0% | 10% / 0% | 10% / 0% |
+| Margem de contribuição do azeite (2027 → 2031) | **−2,3% → −3,8%** | **2,9% → 2,7%** | **7,6% → 8,1%** |
+| Stock médio HoReCa (dias) | 180 até 2029; 90; 60 | 180 / 180 / 45 / 45 / 45 | 180 / 90 / 45 / 45 / 45 |
 | Cupão | 9% | 8% → 7% | 8% → 6,5% |
+| Obrigações (% do capital de giro) | 0% em 2027; 85% | 0% em 2027; 90% | 0% em 2027; 90% |
 | Utilização do capital | 70% | 80% | 85% |
 | Prazo de recebimento HoReCa / distribuidores | 45 / 55 dias | 35 / 45 dias | 30 / 40 dias |
-| Água (paletes) | 120 e sai no gate | 240 → 1.800 | 300 → 3.000 |
+| Água (paletes); comissão | 60 e sai no gate; 1% | 150 → 1.800; 2% | 180 → 3.000; 3% |
 | Café (t) | 2029: 10 → 30 | 2029: 30 → 100 | 2028: 20 → 160 |
-| Financiamento de terceiros (carteira média) | 2030: €0,5M; 2031: €1M | 2028: €0,5M → 2031: €5M | 2028: €1M → 2031: €10M |
-| FTE em 2031 | 7,5 | 15 | 25 |
+| Financiamento de terceiros (carteira média; margem líquida em 2031) | 2030: €0,5M; 2031: €1M; €4k | 2028: €0,5M → 2031: €5M; €18k | 2028: €1M → 2031: €10M; €35k |
+| FTE em 2031 | 7,5 | 17 | 28 |
 
-Preços das mercadorias constantes ao nível de out. 2026: o modelo compra *back-to-back* e é neutro ao nível de preço; os choques tratam-se na secção 4.4.
+Preços das mercadorias constantes ao nível de out. 2026: o modelo compra *back-to-back* e é neutro ao nível de preço; os choques tratam-se na secção 4.4. A HoReCa está limitada ao SOM (`10-mercado.md` §5: 1.000–2.000 clientes no ano 3); o resto do volume vai para distribuidores/exportadores com *offtake*, ao preço de saída do embalador.
 
 ### 7.2 Resultados (k€)
 
@@ -593,74 +601,82 @@ Preços das mercadorias constantes ao nível de out. 2026: o modelo compra *back
 
 | | 2027 | 2028 | 2029 | 2030 | 2031 |
 |---|---|---|---|---|---|
-| GMV total | 682 | 2.205 | 4.819 | 8.161 | 12.293 |
-| Margem de contribuição total | 69 | 231 | 522 | 908 | 1.373 |
-| — azeite (% do GMV de azeite) | 67 (10,8%) | 217 (10,6%) | 468 (10,8%) | 793 (10,8%) | 1.172 (10,6%) |
-| — água + café + terceiros + dados | 3 | 16 | 57 | 118 | 204 |
-| Pessoal | 366 | 492 | 644 | 825 | 907 |
-| Opex não salarial | 309 | 286 | 376 | 419 | 489 |
-| **EBITDA** | **−606** | **−546** | **−499** | **−336** | **−23** |
-| Capex | 92 | 44 | 48 | 38 | 34 |
-| Capital de giro (stock + recebíveis − fornecedores) | 131 | 430 | 929 | 1.573 | 2.363 |
-| Obrigações em circulação (fim de ano) | 78 | 387 | 836 | 1.415 | 2.127 |
-| Reserva de primeira perda (caixa restrita) | 0 | 19 | 42 | 71 | 106 |
-| *Cash flow* para o acionista | −750 | −600 | −619 | −468 | −171 |
-| Acumulado | −750 | −1.350 | −1.969 | −2.437 | −2.608 |
+| GMV total | 307 | 1.929 | 4.301 | 7.353 | 11.142 |
+| Margem de contribuição total | 9 | 29 | 119 | 237 | 381 |
+| — azeite HoReCa/*gourmet* | 3 | 6 | 46 | 96 | 148 |
+| — azeite distribuidores/exportação | 5 | 19 | 46 | 79 | 120 |
+| — azeite (% do GMV de azeite) | 2,9% | 1,4% | 2,4% | 2,7% | 2,7% |
+| — água + café + terceiros (líquido) + dados | 1 | 5 | 27 | 61 | 113 |
+| Pessoal | 401 | 508 | 668 | 856 | 1.042 |
+| Opex não salarial | 319 | 323 | 422 | 475 | 558 |
+| **EBITDA** | **−711** | **−801** | **−970** | **−1.094** | **−1.220** |
+| Capex | 92 | 44 | 48 | 38 | 38 |
+| Capital de giro (stock + recebíveis − fornecedores) | 45 | 276 | 500 | 867 | 1.324 |
+| Obrigações em circulação (fim de ano; = 90% × capital de giro ÷ 0,8) | 0 | 311 | 563 | 975 | 1.489 |
+| Reserva de primeira perda (caixa restrita) | 0 | 16 | 28 | 49 | 74 |
+| *Cash flow* para o acionista | −803 | −861 | −1.031 | −1.189 | −1.329 |
+| Acumulado | −803 | −1.664 | −2.695 | −3.884 | −5.214 |
 
-**Otimista:** GMV 1.149 → 19.211; margem 175 → 3.116; EBITDA −516 / −447 / −118 / **+427** / **+1.053**; acumulado mínimo −1.484 (2029).
+**Otimista:** GMV 418 → 17.470; margem 29 → 1.458; EBITDA −706 / −884 / −904 / −875 / −906; acumulado −4.836 em 2031 e ainda a descer.
 
-**Pessimista:** GMV 330 → 3.142; margem 13 → 137; EBITDA ≈ −650 todos os anos; acumulado −3.563 em 2031. **Nunca chega ao *break-even*.**
+**Pessimista:** GMV 188 → 2.823; margem −4 → −79 (distribuidores abaixo do custo a 4,20 €/kg); EBITDA −709 → −931; acumulado −4.277 em 2031. **Nunca chega ao *break-even*.**
 
 ### 7.3 Necessidade de financiamento
 
 | | Pessimista | Base | Otimista |
 |---|---|---|---|
 | Pré-arranque 2026 | 95k | 95k | 95k |
-| Vale máximo do *cash flow* acumulado | 3.563k | 2.608k | 1.484k |
-| Caixa mínima operacional | 150k | 150k | 150k |
-| **Capital próprio necessário** | **3,8M (não investir: parar no gate após ~0,7M)** | **≈ 2,9M** | **≈ 1,7M** |
+| Capital social da SPV | 50k | 50k | 50k |
+| Mínimo do *cash flow* acumulado no horizonte (2031, ainda a descer) | 4.277k | 5.214k | 4.836k |
+| Caixa mínima operacional (~2,5 meses de opex de 2027) | 150k | 150k | 150k |
+| **Capital próprio necessário** | **≥ 4,6M (não investir: parar no gate após ~0,74M)** | **≥ 5,5M (o acumulado ainda desce em 2031)** | **≥ 5,1M (idem)** |
 
-**Plano de rondas (base):** pré-*seed* **€0,7M** até 31-01-2027 (fase 0 + piloto até ao gate); *seed* **€1,5M** após o gate (Q4 2027; cobre o resto de 2027, 2028 e 2029); ponte ou série A **€0,7M** em 2030. O capital de giro é financiado a 90% pelas obrigações da SPV (€2,1M em circulação em 2031, ~40–45 investidores com ticket médio de €50k), não pelo capital próprio.
+Nenhum cenário tem vale dentro do horizonte: o *cash flow* anual de 2031 é −€0,97M (pessimista), −€1,33M (base) e −€1,06M (otimista), e o capital de giro (10% em capital próprio) e a reserva continuam a crescer depois de 2031. Os valores são mínimos, não picos. Prolongar o modelo até o *cash flow* anual ser ≥ 0 exige pressupostos novos para 2032+; com os atuais, isso não acontece.
+
+**Plano de rondas (base):** pré-*seed* **€1,1M** até 31-01-2027 (pré-arranque, capital da SPV, fase 0, piloto e gate, mais set.–dez. 2027 para fechar a *seed* ou encerrar, e €150k de caixa mínima; alternativa: €0,8M + compromisso firme de *bridge* de €0,3M). **Seed: não dimensionada.** Com os pressupostos corrigidos, o caso base não é financiável como plano de capital de risco; a *seed* só faz sentido se o piloto mudar os pressupostos (secção 7.4). O capital de giro é financiado a 90% pelas obrigações da SPV a partir de 2028 (€1,49M em circulação em 2031, ~30 investidores com ticket médio de €50k), não pelo capital próprio.
 
 ### 7.4 Leitura
 
-- **O Sprout é, economicamente, um distribuidor especializado com verificação de lotes.** Margem de contribuição de ~10–11% do GMV; precisa de **~€12M de GMV** para pagar uma estrutura de 15 pessoas.
-- **A alavanca não é o desconto, é o volume a montante e a verificação.** O otimista ganha porque a referência é mais alta, o cupão desce com historial e o financiamento de terceiros escala sem balanço.
-- **O pessimista é o mundo em que o Sprout vende azeite *standard*.** Se o gate mostrar margens de 4%, não há modelo: parar.
+- **O Sprout é, economicamente, um distribuidor especializado com verificação de lotes, e de margem baixa:** 0,35 €/kg na HoReCa e 0,06 €/kg nos distribuidores em regime; margem média do azeite de 0,12 €/kg (2,7% do GMV) em 2031.
+- **O que teria de ser verdade.** Para pagar a estrutura de 2031 (€1,60M de pessoal e opex), a margem média do azeite teria de ser **~0,68 €/kg**, 5,5 vezes a atual. Alavancas (Δ EBITDA 2031, base): prémio de origem pago pelos distribuidores +0,10 €/kg = +€178k; referência HoReCa documentada a 6,00 €/kg = +€128k; as duas juntas (com +0,20 €/kg nos distribuidores) deixam o EBITDA em −€0,74M. Do lado dos custos: 3PL/custódia +0,05 €/kg = −€20k; gestores a 250–300 contas = −€102k.
+- **Nenhuma alavanca de preço plausível fecha o fosso.** Fecha-o uma estrutura ~€0,7–1,2M/ano mais leve (perto de metade da atual) ou uma receita de serviços (verificação e financiamento de terceiros) muito maior do que a modelada, que hoje deixa ~€18k líquidos em 2031.
+- **O otimista também não chega ao *break-even*:** a referência mais alta e o cupão mais baixo são comidos por uma estrutura de 28 pessoas.
+- **O pessimista é o mundo em que o Sprout vende azeite *standard*.** Margens negativas: parar no gate.
 
 ---
 
 ## 8. Alertas do conselheiro
 
-1. **"Jogadores" e retalho: parem já.** O documento-fonte fala em "investidores não sofisticados (jogadores)". Prometer 10–15% com "refunding" a retalho é captação de fundos reembolsáveis (RGICSF art. 200.º, crime), OIC não autorizado (Asset Land, Capital Alternatives) e o padrão exato do alerta Cimovelpark e de Afinsa/Fórum Filatélico, que acabou com penas de prisão. Nenhum material, conversa ou lista de espera para retalho até haver estrutura ECSP de terceiros.
-2. **A aritmética original não fecha.** Capturar 80–90% de uma margem de 0,19–0,50 €/kg não paga um desconto de 0,60–1,00 €/kg. Se o deck mantiver a frase, é uma afirmação enganosa perante investidores. Usem "redistribuição de 88% do bolo de intermediação, dos quais ~40% ficam no Sprout".
-3. **"Monetizar em 12 horas" só existe do lado B2B.** Do lado do investidor, o caminho mínimo é constituição + parecer + contas + documentação: 2–3 meses. Pressa aqui é o que gera "dinheiro preso" e bloqueios bancários.
+1. **"Jogadores" e retalho: parem já.** O documento-fonte fala em "investidores não sofisticados (jogadores)". Qualquer promessa de retorno fixo a retalho com "refunding" é captação de fundos reembolsáveis (RGICSF art. 200.º, crime), OIC não autorizado (Asset Land, Capital Alternatives) e o padrão exato do alerta Cimovelpark e de Afinsa/Fórum Filatélico, que acabou com penas de prisão. Nenhum material, conversa ou lista de espera para retalho até haver estrutura ECSP de terceiros. (Os 10–15% do documento-fonte são desconto ao cliente; não os apresentar como retorno.)
+2. **A aritmética original não fecha.** Capturar 80–90% de uma margem de 0,19–0,50 €/kg não paga um desconto de 0,57–0,85 €/kg (10–15% sobre 5,65). Se o deck mantiver a frase, é uma afirmação enganosa perante investidores (Reg. 2017/1129, art. 22.º; CVM, art. 7.º). Também não usem "88% do bolo redistribuído; o Sprout fica com ~40%": é margem antes de €1,6M de custos fixos. Usem "no lote-tipo HoReCa, o bolo de intermediação (1,22 €/kg) reparte-se em 46% desconto ao comprador, 4% custo de capital, 21% custos diretos e 28% margem de contribuição do Sprout; à escala do plano, essa margem ainda não paga a estrutura".
+3. **"Monetizar em 12 horas" só existe do lado B2B.** Do lado do investidor, o caminho mínimo é constituição e registo da SPV + **12 meses** (CSC art. 348.º/2, salvo garantia bancária) + parecer + contas + documentação. Pressa aqui é o que gera "dinheiro preso" e bloqueios bancários.
 4. **O *backoffice* "reverse engineered" é o maior risco técnico-jurídico imediato.** Pode violar direitos de autor (DL 252/94), termos de uso, a Lei do Cibercrime ou a DSP2 (*screen scraping* de bancos sem licença AISP). Quarentena até à auditoria; *ledger*, pagamentos e KYC reescritos em *clean room*; nada de dinheiro real nem dados de investidores lá dentro.
 5. **Não existe "hedge" de azeite em bolsa.** O MFAO fechou (2016–17). "Hedge funds" e "taxas de cobertura" têm de sair do deck. A cobertura é comercial: *back-to-back*, indexação, *offtake*, limites. Com o AOVE −63% desde o pico e uma colheita espanhola +23% prevista, ninguém racional pré-compra azeite a 18 meses sem juro.
-6. **A água tem baixa densidade de valor e não tem embalador a desintermediar.** ~0,24 €/L, logística de 20–40%, depósito SDR de €0,10 por garrafa, embalamento obrigatório na origem e engarrafadores com incentivo para retaliar. €216 de comissão por 20 paletes. Fica como agente, com critério de saída no gate.
+6. **A água tem baixa densidade de valor e não tem embalador a desintermediar.** ~0,24 €/L, logística de 20–40%, depósito SDR de €0,10 por garrafa, embalamento obrigatório na origem e engarrafadores com incentivo para retaliar. €108 de comissão por 20 paletes (2%). Fica como agente, com critério de saída no gate.
 7. **Conflito de interesses com o lagar âncora.** Pedro Marques é responsável de Operações e, ao mesmo tempo, a âncora de oferta (Lagar do Val). Isto exige: preço sempre ao índice + prémio aprovado por terceiros; ninguém ligado ao lagar aprova qualidade, preço ou libertação dos seus lotes; *collateral manager* independente (o depositário não pode ser o único a certificar o próprio stock); concentração ≤ 50% no piloto e ≤ 35% depois; divulgação aos investidores. Se o lagar for parte relacionada de um sócio, os investidores têm de o saber por escrito.
 8. **O parecer jurídico não pode vir só de um sócio.** Gonçalo Almeida é sócio e advogado do projeto. Para investidores e bancos, o parecer sobre a SPV tem de ser de um escritório independente. É também um seguro para o próprio Gonçalo.
 9. **Pessoa-chave e governação:** o "owner" de Risco e Tesouraria ainda não existe. Sem ele, sem política aprovada e sem membro independente no Comité, não há primeira emissão. O Speaker 2 concentra tecnologia, segurança e pagamentos: exigir quatro olhos e acessos separados desde o dia 1.
 10. **Gamificação:** a webapp tem componentes de interface com nome "game" (`webapp/src/components/game/`). Podem servir painéis de colheita e lotes; não podem tocar em retornos, rankings, *streaks*, contagens decrescentes de "oportunidade" ou confetes. Revisão de *compliance* em cada *release*.
-11. **Escala e capital:** o base só chega a EBITDA ≈ 0 em 2031 e consome ~€2,9M de capital próprio. Não levantem capital de risco com a narrativa "marketplace agro com desconto"; levantem com a narrativa "infraestrutura de verificação e financiamento de lotes físicos" e só depois de provar o gate.
-12. **Pequenos riscos que matam:** IVA se investidores particulares forem donos de lotes (fuga de 6–23%); "HNWI" tratado como "qualificado" sem teste; usar Stripe ou carteiras de *marketplace* para dinheiro de investidores; comprar a produtores espanhóis abaixo do custo de produção (Ley 12/2013); a analogia dos combustíveis (oligopólio integrado e carga fiscal, não "comissões absurdas").
+11. **Escala e capital:** com os pressupostos corrigidos, o base não chega ao *break-even* até 2031 (EBITDA −€1,22M) e consome ≥ €5,5M de capital próprio, ainda a crescer. Não levantem capital de risco com a narrativa "marketplace agro com desconto"; levantem com a narrativa "infraestrutura de verificação e financiamento de lotes físicos" e só depois de provar o gate.
+12. **Pequenos riscos que matam:** IVA se investidores particulares forem donos de lotes (fuga de 6–23%); "HNWI" tratado como "qualificado" sem classificação de profissional feita por banco ou empresa de investimento; subscritor ≥ €100k tratado como não-retalho (é retalho para os PRIIPs); emitir obrigações antes de 12 meses de registo da SPV; usar Stripe ou carteiras de *marketplace* para dinheiro de investidores; comprar a produtores espanhóis abaixo do custo de produção (Ley 12/2013); a analogia dos combustíveis (oligopólio integrado e carga fiscal, não "comissões absurdas").
 
 ---
 
 ## 9. Implicações para o Sprout
 
-1. **Reescrever a tese no deck e na webapp:** "o único sítio onde um lote de azeite português é verificado, custodiado, precificado e financiável". Métrica: redistribuição do bolo de intermediação (88% no lote-tipo), não "80–90% da margem do embalador".
-2. **Produto inicial = AOVE de origem identificada** em 5 L/BIB para HoReCa média/alta e *gourmet*, mais paletes para 2–3 distribuidores/exportadores com *offtake*. Fora: AOVE *standard* contra cash & carry e qualquer comparação com marca branca espanhola.
-3. **Política de preço em €/kg sobre referência documentada:** 10% (HoReCa), 5% (profissionais). Recolher 20–30 cotações antes de 31-01-2027; sem elas, não há preço de lançamento.
-4. **Modelo principal no azeite, agente com faturação direta na água.** Nenhum fundo de terceiros nas contas do Sprout; nenhum PSP *marketplace* na fase 1.
-5. **Sprout Capital, SA** com obrigações a qualificados ou ≥ €100k; série piloto de €150k (20% subordinado); cupão de 8%; vencimento 12 + 6 meses; reserva de primeira perda; representante comum; uma conta por série.
-6. **Pagar ao produtor em ≤ 30 dias por SCT Inst** e usar isso como o argumento comercial n.º 1 junto dos lagares.
-7. **Custódia independente desde o primeiro lote:** tanque selado, depósito tripartido, *collateral manager*, análise na entrada e a cada 4 meses, telemetria horária.
-8. **Ledger antes da UI:** dupla entrada em € e kg, contas-espelho por banco e série, camt.053 diário, referência RF em todas as faturas, faturação por API de software certificado com selo qualificado a 01-01-2027.
-9. **Contratar já:** Responsável de Risco e Tesouraria; advogado independente para o parecer; *collateral manager*; 2 lagares alternativos.
-10. **Café em 2029** como *sourcing* de verde em EUR para microtorrefatores; nunca HoReCa.
-11. **Fase 2 = banco parceiro**: o Sprout origina e verifica, o banco empresta aos lagares. É aí que nasce o fosso e a receita sem balanço.
-12. **Financiar com disciplina:** pré-*seed* de €0,7M até ao gate; *seed* só com os critérios de 5.4 cumpridos; parar se o gate mostrar margens de 4%.
+1. **Reescrever a tese no deck e na webapp:** "o único sítio onde um lote de azeite português é verificado, custodiado, precificado e financiável". Métricas: margem de contribuição em €/kg por canal e EBITDA; para explicar, a repartição do bolo do lote-tipo (46% desconto / 4% cupão / 21% custos diretos / 28% Sprout). Nunca "80–90% da margem do embalador" nem "88% redistribuído".
+2. **Produto inicial = AOVE de origem identificada** em 5 L/BIB para HoReCa média/alta e *gourmet*, mais paletes para 2–3 distribuidores/exportadores com *offtake* ao preço de saída do embalador (canal de volume e historial, não de margem). Fora: AOVE *standard* contra cash & carry, granel em IBC "com margem" e qualquer comparação com marca branca espanhola.
+3. **Política de preço em €/kg sobre referência documentada:** 10% (HoReCa); 0% a profissionais. Recolher 20–30 cotações antes de 31-01-2027: com mediana < 5,65 €/kg a margem HoReCa cai abaixo de 7%; com < 5,40 €/kg não há modelo.
+4. **Modelo principal no azeite, agente com faturação direta na água** (~2%). Nenhum fundo de terceiros nas contas do Sprout; nenhum PSP *marketplace* na fase 1.
+5. **Sprout Capital, SA registada até nov. 2026**, com capital social de €50k. **Sem obrigações antes de 12 meses de registo** (CSC art. 348.º/2), salvo garantia bancária orçamentada. 1.ª série de €150k (€100k sénior + €50k de capital) em nov. 2027–jan. 2028, **só a profissionais** (*per se* ou classificados por banco/empresa de investimento); subscritores ≥ €100k não profissionais só se o parecer afastar o KID PRIIPs; sem retalho abaixo de €100k. Cupão de 8%; vencimento 12 + 6 meses; reserva de primeira perda em conta empenhada; representante comum; uma conta por série.
+6. **Piloto do tamanho da procura:** 1 lote misto de 20 t (≥ 80% com *offtake*; 4 t para 33 clientes HoReCa/*gourmet*) e 60 paletes de água, financiado por capital próprio. Gate com KPIs por canal.
+7. **Pagar ao produtor em ≤ 30 dias por SCT Inst** e usar isso como o argumento comercial n.º 1 junto dos lagares.
+8. **Custódia independente desde o primeiro lote:** tanque selado, depósito tripartido, *collateral manager* com inspeção por tranche, 3PL com conta de custódia, análise na entrada e a cada 4 meses, telemetria horária.
+9. **Ledger antes da UI:** dupla entrada em € e kg, contas-espelho por banco e série, camt.053 diário, referência RF em todas as faturas, faturação por API de software certificado com selo qualificado a 01-01-2027.
+10. **Contratar já:** Responsável de Risco e Tesouraria; advogado independente para o parecer (perguntas 2 e 10 primeiro); *collateral manager*; 3PL; 2 lagares alternativos.
+11. **Café em 2029** como *sourcing* de verde em EUR para microtorrefatores; nunca HoReCa. Margem por validar.
+12. **Fase 2 = banco parceiro**: o Sprout origina e verifica, o banco empresta aos lagares. Só é fosso se os custos de verificação forem pagos pelo banco ou pelo mutuário; senão, a margem líquida é residual.
+13. **Financiar com disciplina:** pré-*seed* de €1,1M (ou €0,8M + *bridge* firme de €0,3M) até ao gate e mais 4 meses; ***seed* só se o piloto mudar os pressupostos** (referência ≥ 6,00 documentada, prémio de origem pago pelos distribuidores, estrutura mais leve); parar se as margens por canal ficarem abaixo dos mínimos de 5.4.
 
 ---
 
@@ -689,6 +705,13 @@ As URL completas e a etiqueta de cada facto estão em `00-base-factual.md`. As p
 - Diretiva (UE) 2019/633 — https://eur-lex.europa.eu/eli/dir/2019/633/oj
 - DL 76/2021 — https://sima.gpp.pt/images/Producao_e_Mercados/OrgProducao_CadeiaAlimentar/PARCA/DL_76_2021.pdf
 - Reg. (UE) 2017/1129 — https://eur-lex.europa.eu/eli/reg/2017/1129/oj/eng
+- Código das Sociedades Comerciais, consolidado (arts. 276.º, 277.º, 348.º) — https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975
+- Reg. (UE) 1286/2014 (PRIIPs) — https://eur-lex.europa.eu/eli/reg/2014/1286/oj/eng
+- DL 105/2004 (contratos de garantia financeira) — https://diariodarepublica.pt/dr/detalhe/decreto-lei/105-2004-523145
+- Diretiva 2002/47/CE (garantia financeira) — https://eur-lex.europa.eu/eli/dir/2002/47/oj/eng
+- TNews/AHRESP (74.524 empresas de restauração) — https://tnews.pt/ahresp-setor-da-restauracao-revela-se-instavel-em-2024-devido-a-localizacao-dos-negocios/
+- Observador (Olivum, produção PT) — https://observador.pt/2026/09/23/producao-de-azeite-em-portugal-pode-crescer-10-em-2026-2027-e-aproximar-se-das-177-mil-toneladas-da-campanha-anterior/
+- Veja Portugal (Governo, 179 kt) — https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/
 - MiFID II, Anexo II — https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/mifid-ii/annex-ii
 - ESMA/2013/611 (AIFMD) — https://prod.finanssivalvonta.fi/contentassets/0a617ea0f9c74761a1aafdc551050be2/2013-611_guidelines_on_key_concepts_of_the_aifmd_-_en.pdf
 - ESMA C6/C7 — https://www.esma.europa.eu/sites/default/files/library/esma-70-156-869_guidelines_on_c6_c7_application_of_mifid_ii_annex_1_ro.pdf

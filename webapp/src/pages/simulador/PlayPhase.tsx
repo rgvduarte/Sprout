@@ -77,7 +77,6 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
           </p>
         )}
         <SeasonStrip month={month} extended={anyExtended} className="mt-3" />
-        <SimBand compact className="mt-2 md:hidden" />
         <p className="sr-only" aria-live="polite">
           {`Mês ${month}, ${monthLabel(month)}. ${spanEvents.map((e) => e.event.title).join('. ')}${pendingNow ? '. Há uma decisão por tomar.' : ''}${finished ? '. Campanha terminada.' : ''}`}
         </p>
@@ -87,7 +86,9 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 text-sm">
             <span className="block font-semibold text-fg">Mês {month} de {WINDOW}</span>
-            <span className="block truncate font-mono text-muted tnum">{month === 0 ? 'out. 2026' : monthLabel(month)}</span>
+            <span className="block truncate text-muted">
+              <span className="font-mono tnum">{month === 0 ? 'out. 2026' : monthLabel(month)}</span> · dinheiro fictício
+            </span>
           </p>
           <Controls finished={finished} atStop={atStop} blockedReason={blockedReason} onAdvance={advance} onOpenDebrief={onOpenDebrief} compact />
         </div>
@@ -139,11 +140,6 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
         <CardHeader
           title={<span id="cal-title">Calendário da campanha</span>}
           description={`Mês ${month} de ${WINDOW}${anyExtended ? ' (com extensão até ao mês 24)' : ''}. Bandas da estação, janela de 18 meses e o que cada lote já vendeu.`}
-          actions={
-            <Button variant="ghost" size="sm" onClick={onAbandon} iconLeft={<Undo2 aria-hidden className="size-4" strokeWidth={1.75} />}>
-              Voltar à preparação
-            </Button>
-          }
         />
         <SimCalendar run={run} month={month} />
       </Card>
@@ -154,6 +150,13 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
           <ValueChart run={run} counterfactual={noHedge} month={month} />
         </Card>
         <Journal run={run} month={month} />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4">
+        <Button variant="ghost" size="sm" onClick={onAbandon} iconLeft={<Undo2 aria-hidden className="size-4" strokeWidth={1.75} />}>
+          Voltar à preparação
+        </Button>
+        <p className="text-sm text-muted">Abandona esta campanha sem a guardar no histórico. A distribuição fica como estava.</p>
       </div>
     </div>
   );
@@ -271,10 +274,10 @@ function LotRow({ snap }: { snap: LotSnap }) {
           <h3 className="min-w-0 text-[1rem] leading-snug">{shortName(snap.simLotId)}</h3>
           <StatusPill label={st.label} tone={st.tone} />
         </div>
-        <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-2 text-sm min-[480px]:grid-cols-3">
+        <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm min-[560px]:grid-cols-3">
           <div className="min-w-0">
             <dt className="text-muted">Por vender</dt>
-            <dd className="font-mono text-fg tnum">{unitsText(lot, snap.units)}</dd>
+            <dd className="font-mono text-fg tnum">{snap.units < 0.05 ? 'tudo vendido' : unitsText(lot, snap.units)}</dd>
             <dd className="font-mono text-muted tnum">de {unitsText(lot, snap.totalUnits)}</dd>
           </div>
           <div className="min-w-0">
@@ -283,7 +286,7 @@ function LotRow({ snap }: { snap: LotSnap }) {
             <dd className="font-mono text-muted tnum">{price(snap.price, lot.priceUnit)}</dd>
           </div>
           <div className="min-w-0">
-            <dt className="text-muted">Liquidação estimada</dt>
+            <dt className="text-muted">{snap.status === 'liquidado' ? 'Liquidação' : 'Liquidação estimada'}</dt>
             <dd className="font-mono text-fg tnum">{fe(snap.value)}</dd>
             <dd className="font-mono text-muted tnum">{fpct(snap.result)}</dd>
           </div>

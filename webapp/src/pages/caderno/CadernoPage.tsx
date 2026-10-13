@@ -6,7 +6,7 @@ import type { WorldId } from '../../data/types';
 import { Badge, Button, Page, PageHeader, Section, TextLink } from '../../components/ui';
 import { KnowledgeLevelBadge, EASE_OUT } from '../../components/game';
 import { useData, useGame, useRole, type ProfileId, type SealView } from '../../state';
-import { CampaignTabs, NotesPage, SealsPage, Spread } from './Notebook';
+import { CampaignTabs, MilestonesBlock, NotesPage, SealsPage, Spread } from './Notebook';
 import { OriginCards } from './OriginCards';
 import { OriginsMap, sealRegionLabels } from './OriginsMap';
 import { SealDrawer } from './SealDrawer';
@@ -155,9 +155,11 @@ export default function CadernoPage() {
               fresh={fresh}
               onStamped={onStamped}
               questsDoneFor={(s) => s.def.questIds.filter((id) => game.isQuestDone(id)).length}
-            />
+            >
+              <MilestonesBlock c={c} milestones={milestones} />
+            </SealsPage>
             <div className="min-w-0 border-t border-border xl:border-l xl:border-t-0 xl:border-dashed">
-              <NotesPage c={c} notes={notes} milestones={milestones} emptyNotes={emptyNotes} />
+              <NotesPage c={c} notes={notes} emptyNotes={emptyNotes} />
             </div>
           </div>
         </Spread>

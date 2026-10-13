@@ -107,7 +107,9 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
                 <ul className="mt-2 flex flex-wrap gap-3">
                   {regionSeals.map((s) => (
                     <li key={s.def.id} className="flex items-center gap-2">
-                      <OriginSeal seal={s.def} producer={s.producer} region={s.region} state={s.earned ? 'earned' : 'locked'} size={56} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />
+                      <span className="shrink-0">
+                        <OriginSeal seal={s.def} producer={s.producer} region={s.region} state={s.earned ? 'earned' : 'locked'} size={56} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />
+                      </span>
                       <span className="text-sm">
                         <span className="block text-fg">{s.producer.nome}</span>
                         <span className={cn('block text-xs', s.earned ? 'text-seal-ink' : 'text-muted')}>

@@ -155,7 +155,7 @@ function DrawerBody({ p }: { p: PositionView }) {
                   items={[
                     { label: 'Produtor', value: p.producer.nome, hint: `${p.producer.localidade} · ${region?.nome ?? ''}` },
                     { label: 'Mercadoria', value: lot.product },
-                    { label: 'Armazenagem', value: lot.storage.local, hint: `${num(lot.storage.containers)} × ${lot.storage.container.toLowerCase()}` },
+                    { label: 'Armazenagem', value: lot.storage.local, hint: `${num(lot.storage.containers)} × ${/^[A-Z]{2,}/.test(lot.storage.container) ? lot.storage.container : lot.storage.container.charAt(0).toLowerCase() + lot.storage.container.slice(1)}` },
                     { label: 'Comprador', value: lot.buyer ? `${lot.buyer.segment} · ${lot.buyer.descricao}` : 'Por contratar' },
                     { label: 'Certificações do produtor', value: p.producer.certifications.join(', ') || '—' },
                     { label: 'A tua parte', value: `${share.primary} · ${pct(share.shareOfLot, 1)} do lote`, mono: true },

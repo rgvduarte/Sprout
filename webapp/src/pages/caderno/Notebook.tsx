@@ -176,8 +176,10 @@ export function SealsPage({
   fresh,
   onStamped,
   questsDoneFor,
+  children,
 }: {
   c: CampaignDef;
+  children?: ReactNode;
   seals: SealView[];
   onOpen: (s: SealView) => void;
   fresh: Set<string>;
@@ -206,7 +208,8 @@ export function SealsPage({
           </li>
         ))}
       </ul>
-      <p className="measure mt-auto border-t border-border pt-4 text-sm text-muted">
+      {children}
+      <p className="measure mt-auto pt-8 text-sm text-muted">
         {c.state === 'concluida'
           ? 'Campanha encerrada a 30/09/2026. Os selos desta página já não se podem ganhar.'
           : c.state === 'fase-2'
@@ -248,6 +251,74 @@ function SealButton({ s, c, onOpen, fresh, onStamped, questsDone }: { s: SealVie
   );
 }
 
+/* ------------------------------------------------------------ marcos de conhecimento */
+
+export function MilestonesBlock({ c, milestones }: { c: CampaignDef; milestones: KMilestone[] }) {
+  const game = useGame();
+  const [all, setAll] = useState(false);
+  const cafeQuests = QUESTS_BY_WORLD('cafe');
+  const list = all ? milestones : milestones.slice(0, 6);
+  return (
+    <div className="mt-8 min-w-0 border-t border-border pt-6">
+        <h3 className="text-[1.0625rem]">{c.state === 'fase-2' ? 'Preparação para a Fase 2' : 'Marcos de conhecimento'}</h3>
+        {c.state === 'fase-2' ? (
+          <>
+            <p className="mt-1 text-sm text-muted">O café ainda não é investível. O que se aprende agora conta para o nível e acende as origens no mapa.</p>
+            <QuestList quests={cafeQuests} isDone={game.isQuestDone} completedAt={game.questCompletedAt} compact className="mt-2" />
+          </>
+        ) : milestones.length === 0 ? (
+          <p className="mt-2 text-[0.9375rem] text-muted">
+            {c.state === 'em-curso' ? (
+              <>
+                Ainda sem marcos nesta campanha.{' '}
+                {game.nextLevel ? (
+                  <>
+                    O próximo é {game.nextLevel.nome}: faltam <span className="font-mono text-fg tnum">{num(game.pointsToNext)}</span> pontos de conhecimento.{' '}
+                  </>
+                ) : null}
+                <TextLink to="/academia">Ver a Academia</TextLink>
+              </>
+            ) : (
+              'Sem marcos de conhecimento nesta campanha.'
+            )}
+          </p>
+        ) : (
+          <ol className="mt-3 flex flex-col gap-2.5">
+            {list.map((m) => {
+              const Icon = m.kind === 'nivel' ? null : KIND_ICON[m.kind];
+              return (
+                <li key={m.id} className="flex min-w-0 items-start gap-3">
+                  <span aria-hidden className={cn('mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full', m.kind === 'nivel' ? 'bg-accent text-accent-fg' : 'bg-accent-soft text-accent')}>
+                    {Icon ? <Icon className="size-3.5" strokeWidth={1.75} /> : <LevelGlyph level={m.level!} className="size-3.5" />}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className={cn('text-[0.9375rem] leading-snug', m.kind === 'nivel' ? 'font-semibold text-fg' : 'text-fg')}>{m.title}</p>
+                    <p className="text-xs text-muted">
+                      <time dateTime={m.at} className="font-mono tnum">
+                        {fmtDate(m.at)}
+                      </time>
+                      {m.points ? (
+                        <>
+                          {' · '}
+                          <span className="font-mono tnum">+{m.points} pts</span>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      {c.state !== 'fase-2' && milestones.length > 6 && (
+        <Button variant="ghost" size="sm" className="mt-2" onClick={() => setAll((v) => !v)} aria-expanded={all}>
+          {all ? 'Mostrar só os 6 mais recentes' : `Mostrar os ${milestones.length} marcos`}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------ página das notas */
 
 const KIND_ICON = {
@@ -263,12 +334,10 @@ function noteDate(at: string, nowD: Date) {
   return `${dateShort(at)} ${lisbonParts(at).year}`;
 }
 
-export function NotesPage({ c, notes, milestones, emptyNotes }: { c: CampaignDef; notes: Note[]; milestones: KMilestone[]; emptyNotes: ReactNode }) {
+export function NotesPage({ c, notes, emptyNotes }: { c: CampaignDef; notes: Note[]; emptyNotes: ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   const nowD = useNow(30_000);
-  const game = useGame();
   const shown = expanded ? notes : notes.slice(0, 5);
-  const cafeQuests = QUESTS_BY_WORLD('cafe');
   return (
     <section aria-labelledby={`notas-${c.short}`} className="flex min-w-0 flex-col p-5 sm:p-7">
       <h2 id={`notas-${c.short}`} className="text-[1.375rem] leading-tight">
@@ -320,56 +389,6 @@ export function NotesPage({ c, notes, milestones, emptyNotes }: { c: CampaignDef
         </>
       )}
 
-      <h3 className="mt-9 text-[1.0625rem]">{c.state === 'fase-2' ? 'Preparação para a Fase 2' : 'Marcos de conhecimento'}</h3>
-      {c.state === 'fase-2' ? (
-        <>
-          <p className="mt-1 text-sm text-muted">O café ainda não é investível. O que se aprende agora conta para o nível e acende as origens no mapa.</p>
-          <QuestList quests={cafeQuests} isDone={game.isQuestDone} completedAt={game.questCompletedAt} compact className="mt-2" />
-        </>
-      ) : milestones.length === 0 ? (
-        <p className="mt-2 text-[0.9375rem] text-muted">
-          {c.state === 'em-curso' ? (
-            <>
-              Ainda sem marcos nesta campanha.{' '}
-              {game.nextLevel ? (
-                <>
-                  O próximo é {game.nextLevel.nome}: faltam <span className="font-mono text-fg tnum">{num(game.pointsToNext)}</span> pontos de conhecimento.{' '}
-                </>
-              ) : null}
-              <TextLink to="/academia">Ver a Academia</TextLink>
-            </>
-          ) : (
-            'Sem marcos de conhecimento nesta campanha.'
-          )}
-        </p>
-      ) : (
-        <ol className="mt-3 flex flex-col gap-2.5">
-          {milestones.map((m) => {
-            const Icon = m.kind === 'nivel' ? null : KIND_ICON[m.kind];
-            return (
-              <li key={m.id} className="flex min-w-0 items-start gap-3">
-                <span aria-hidden className={cn('mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full', m.kind === 'nivel' ? 'bg-accent text-accent-fg' : 'bg-accent-soft text-accent')}>
-                  {Icon ? <Icon className="size-3.5" strokeWidth={1.75} /> : <LevelGlyph level={m.level!} className="size-3.5" />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className={cn('text-[0.9375rem] leading-snug', m.kind === 'nivel' ? 'font-semibold text-fg' : 'text-fg')}>{m.title}</p>
-                  <p className="text-xs text-muted">
-                    <time dateTime={m.at} className="font-mono tnum">
-                      {fmtDate(m.at)}
-                    </time>
-                    {m.points ? (
-                      <>
-                        {' · '}
-                        <span className="font-mono tnum">+{m.points} pts</span>
-                      </>
-                    ) : null}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      )}
       <p className="mt-auto pt-6 text-right font-mono text-xs text-muted tnum" aria-hidden>
         p. {c.folio[1]}
       </p>

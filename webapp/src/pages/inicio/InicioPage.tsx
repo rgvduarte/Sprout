@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from 'react';
 import { ArrowRight, ServerCog } from 'lucide-react';
+import { PRODUCERS } from '../../data';
 import { CampaignFeed, HarvestBand, KnowledgeLevelBadge, OriginSeal } from '../../components/game';
 import { Button, ButtonLink, Card, Page, PageHeader, RiskNote, Section, SimulationLabel, TextLink } from '../../components/ui';
 import { useData, useFeed, useGame, useRole } from '../../state';
@@ -53,7 +54,7 @@ export default function InicioPage() {
   const lockedSeal = data.seals.find((s) => !s.earned && s.def.earnable !== 'compromisso');
   const lastRun = game.simRuns[0];
 
-  const oliveProducers = 4;
+  const oliveProducers = PRODUCERS.filter((p) => p.world === 'azeite' && p.fase === 1).length;
   const description = isVisitor
     ? `A colheita começou: ${oliveProducers} lagares a moer e duas nascentes a encher stock para o verão. Explora os mundos e joga uma campanha com dinheiro fictício antes de pensares em investir.`
     : `Os lagares moem a primeira azeitona e as nascentes enchem stock para o verão. Aqui segues ${hasLots ? `os teus ${num(active.length)} lotes` : 'os lotes'}, o Diário dos produtores e as missões da campanha.`;

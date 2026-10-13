@@ -32,11 +32,11 @@ function LotRow({ lot }: { lot: Lot }) {
       <div className="min-w-0 flex-1">
         <p className="font-mono text-sm text-fg tnum">{lot.id}</p>
         <p className="truncate text-[0.9375rem] text-fg">{lot.title}</p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
           <StatusPill status={lot.status} />
           <span className="font-mono tnum">{lotQuantityLabel(lot)}</span>
-          <span>· {g.caption}</span>
         </p>
+        <p className="mt-1 text-sm text-muted">{g.caption}</p>
       </div>
       <Link to={`/lote/${lot.id}`} className="inline-flex min-h-11 shrink-0 items-center gap-1 px-1 text-sm font-medium text-accent hover:underline" aria-label={`Abrir o lote ${lot.id}`}>
         Abrir
@@ -70,7 +70,9 @@ export function SealDrawer({ seal, campaign, onClose }: { seal: SealView | null;
       {s && campaign && (
         <div className="flex flex-col gap-7">
           <div className="flex items-center gap-4">
-            <OriginSeal seal={s.def} producer={s.producer} region={s.region} state={s.earned ? 'earned' : 'locked'} size={120} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />
+            <div className="shrink-0">
+              <OriginSeal seal={s.def} producer={s.producer} region={s.region} state={s.earned ? 'earned' : 'locked'} size={120} earnedBy={s.earned?.by} earnedAt={s.earned?.at} />
+            </div>
             <div className="min-w-0">
               {s.earned ? (
                 <>

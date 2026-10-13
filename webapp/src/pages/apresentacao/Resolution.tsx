@@ -60,7 +60,7 @@ export function Resolution() {
           </div>
         </div>
         <div role="note" className="mt-14 border-t border-rail-border pt-6">
-          <p className="max-w-[90ch] text-sm leading-relaxed text-rail-muted">
+          <p className="max-w-[68ch] text-sm leading-relaxed text-rail-muted">
             <strong className="font-semibold text-rail-fg">Comunicação informativa.</strong> Não constitui oferta pública, recomendação de investimento nem promessa de rentabilidade. Acesso restrito a investidores qualificados.{' '}
             <strong className="font-semibold text-rail-fg">Capital em risco:</strong> pode perder parte ou a totalidade do montante financiado e não há mercado secundário antes da liquidação. Ambiente de demonstração: produtores, lotes e números são fictícios.
           </p>

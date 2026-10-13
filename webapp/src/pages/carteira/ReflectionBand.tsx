@@ -1,7 +1,7 @@
 import { Info } from 'lucide-react';
 import { Button } from '../../components/ui';
 import type { PositionView } from '../../state';
-import { now, toDate, useNow } from '../../lib/clock';
+import { toDate, useNow } from '../../lib/clock';
 import { date as fmtDate, eur } from '../../lib/format';
 import { REFLECTION_DAYS, reflectionUntil } from './positions';
 
@@ -15,7 +15,7 @@ export function ReflectionBand({ p }: { p: PositionView }) {
   if (!until) return null;
   const start = toDate(p.committedAt).getTime();
   const end = toDate(until).getTime();
-  const t = Math.max(0, Math.min(1, ((current ?? now()).getTime() - start) / (end - start)));
+  const t = Math.max(0, Math.min(1, (current.getTime() - start) / (end - start)));
   const open = t < 1;
   return (
     <div className="min-w-0 rounded-sm bg-[color-mix(in_oklab,var(--info)_9%,var(--surface))] px-4 py-3" role="group" aria-label={`Período de reflexão do compromisso no lote ${p.lot.id}`}>

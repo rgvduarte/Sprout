@@ -41,7 +41,7 @@ export function SimCalendar({ run, month, className }: { run: SimRun; month: num
               return (
                 <div key={m} className="min-w-0 text-center font-mono text-[11px] leading-4 text-muted">
                   <span className={cn('block', m % 3 !== 1 && 'max-md:invisible', m === month && 'font-semibold text-fg')}>{monthShort(m)}</span>
-                  <span className={cn('block text-fg', !jan && m !== 1 && 'invisible')}>{calendarYear(m)}</span>
+                  <span className={cn('block text-fg', !jan && m !== 1 && 'invisible', m === 1 && 'max-md:invisible')}>{calendarYear(m)}</span>
                 </div>
               );
             })}
