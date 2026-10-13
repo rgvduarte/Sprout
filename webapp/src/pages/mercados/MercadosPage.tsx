@@ -246,7 +246,7 @@ export default function MercadosPage() {
           </aside>
           <Card as="section" aria-labelledby="diario-t">
             <CardHeader id="diario-t" title="Diário de campanha" description="Telemetria e eventos dos produtores dos três mundos." />
-            <CampaignFeed events={events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={7} compact />
+            <CampaignFeed events={events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={12} compact />
           </Card>
         </div>
 

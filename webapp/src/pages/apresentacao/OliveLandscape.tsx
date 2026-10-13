@@ -92,8 +92,8 @@ export interface OliveLandscapeProps {
 
 export function OliveLandscape({ deposits, leaders = true, crop = false, children, className }: OliveLandscapeProps) {
   const { mid, near } = useTrees();
-  const viewBox = crop ? '520 130 920 390' : `0 0 ${LS_W} ${LS_H}`;
-  const aspect = crop ? '920 / 390' : `${LS_W} / ${LS_H}`;
+  const viewBox = crop ? '520 190 920 330' : `0 0 ${LS_W} ${LS_H}`;
+  const aspect = crop ? '920 / 330' : `${LS_W} / ${LS_H}`;
   const layer = 'absolute inset-0 h-full w-full';
   const contours = [16, 32, 48, 66];
 

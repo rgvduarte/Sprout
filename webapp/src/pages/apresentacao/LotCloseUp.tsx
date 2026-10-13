@@ -6,7 +6,7 @@ import { fundedFraction } from '../../data';
 import type { TelemetryUnit } from '../../data/types';
 import { useData, useFeed } from '../../state';
 import { useNow } from '../../lib/clock';
-import { eur, kg, num, pct, relative } from '../../lib/format';
+import { eur, kg, num, pct, relative, tidyText } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { cn } from '../../lib/cn';
 import { FOCUS_LOT_ID, FOCUS_PRODUCER_ID, LAGAR } from './model';
@@ -21,12 +21,12 @@ import { ChapterHead, Frame } from './parts';
 export function LotChapter({ tall }: { tall: boolean }) {
   return (
     <Chapter id="lote" label="Um lote" heightVh={250} static={!tall} stickyClassName="pt-14 pb-4" className="bg-[color-mix(in_oklab,var(--c-azeite)_5%,var(--bg))]">
-      {(progress) => <LotScene progress={progress} />}
+      {(progress, rich) => <LotScene progress={progress} rich={rich} />}
     </Chapter>
   );
 }
 
-function LotScene({ progress }: { progress: MotionValue<number> }) {
+function LotScene({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
   const { getLot, telemetry } = useData();
   const lot = getLot(FOCUS_LOT_ID)!;
   const units = telemetry[FOCUS_PRODUCER_ID] ?? [];
@@ -58,7 +58,8 @@ function LotScene({ progress }: { progress: MotionValue<number> }) {
         </div>
         <div className="mt-10 min-w-0">
           <h3 className="sr-only">Jornada do lote</h3>
-          <JourneyTrack lot={lot} progress={journey} compact />
+          {/* sem scroll, a jornada mostra o estado real (o componente só acende marcos quando o progresso muda) */}
+          <JourneyTrack lot={lot} progress={rich ? journey : undefined} compact />
         </div>
       </div>
     </Frame>
@@ -166,15 +167,13 @@ function FundingFacts() {
           </dd>
         </div>
         <div>
-          <dt className="text-muted">Co-financiadores · bilhete mínimo</dt>
-          <dd className="font-medium text-fg tnum">
-            {num(f.coFinancers)} · {eur(f.minTicket)}
-          </dd>
+          <dt className="text-muted">Co-financiadores</dt>
+          <dd className="font-medium text-fg tnum">{num(f.coFinancers)}</dd>
         </div>
         <div>
-          <dt className="text-muted">{eur(f.minTicket)} financiam</dt>
+          <dt className="text-muted">Bilhete mínimo</dt>
           <dd className="font-medium text-fg tnum">
-            {ticket.primary}, {ticket.secondary}
+            {eur(f.minTicket)} <span className="font-normal text-muted">= {tidyText(`${ticket.primary}, ${ticket.secondary}`)}</span>
           </dd>
         </div>
       </dl>

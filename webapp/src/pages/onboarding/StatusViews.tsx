@@ -209,7 +209,7 @@ export function ApprovedView({ c, profileId, onRestart }: { c: CaseView; profile
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
       <div className="flex min-w-0 flex-col gap-6">
         <Card padding="lg">
-          <CardHeader title={c.nome} description={`Aprovado a ${fmtDate(decided)} · processo ${caseLabel(c.id)}`} actions={<StatusPill tone="ok" label="Verificação concluída" />} />
+          <CardHeader title={c.nome} description={`Aprovado a ${fmtDate(decided)} · processo ${caseLabel(c.id)}`} actions={<StatusPill tone="ok" label="Conta ativa" />} />
           <KeyValue
             columns={2}
             items={[

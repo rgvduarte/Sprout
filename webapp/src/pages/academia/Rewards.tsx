@@ -84,8 +84,16 @@ export function Rewards() {
                 )}
               </div>
               <div className="col-start-2 mt-3 sm:col-start-3 sm:row-start-1 sm:mt-0">
-                <Button variant="secondary" size="sm" disabled={!st.unlocked || exhausted} onClick={() => openReward(r.id)}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={!st.unlocked || exhausted}
+                  onClick={() => openReward(r.id)}
+                  className="disabled:border-transparent disabled:bg-surface-2"
+                  iconLeft={!st.unlocked ? <Lock aria-hidden className="size-3.5" strokeWidth={1.75} /> : undefined}
+                >
                   {issued ? 'Ver certificado' : exhausted ? 'Amostras pedidas' : r.action}
+                  {!st.unlocked && <span className="sr-only"> · bloqueado</span>}
                 </Button>
               </div>
             </li>

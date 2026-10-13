@@ -58,35 +58,17 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
   const blockedReason = pendingNow ? 'Decide primeiro a proposta deste mês.' : finished ? 'A campanha terminou.' : undefined;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* ---------------- painel fixo do mês ---------------- */}
-      <div className="sticky top-[57px] z-10 -mx-4 border-b border-border bg-[color-mix(in_oklab,var(--bg)_96%,transparent)] px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+    <div className="flex flex-col gap-6 max-md:pb-16">
+      {/* ---------------- painel do mês (fixo a partir de 768 px; no telemóvel os controlos vão para baixo) ---------------- */}
+      <div className="-mx-4 border-b border-border bg-[color-mix(in_oklab,var(--bg)_96%,transparent)] px-4 py-3 md:sticky md:top-[57px] md:z-10 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <MonthLeaf month={month} reduce={Boolean(reduce)} />
           <div className="hidden min-w-0 flex-1 md:block">
             <p className="truncate text-[0.9375rem] text-fg">{month === 0 ? 'Lotes financiados. A campanha começa em novembro.' : SEASON_NOTE[calendarMonth(month)]}</p>
             <SimBand compact className="mt-1" />
           </div>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            {finished ? (
-              <Button size="lg" onClick={onOpenDebrief}>
-                Abrir o balanço
-              </Button>
-            ) : (
-              <>
-                <Button size="lg" onClick={() => advance(1)} disabled={atStop} title={blockedReason} iconRight={<ChevronRight aria-hidden className="size-4" strokeWidth={2} />} className="motion-safe:active:scale-[0.98]">
-                  Avançar mês
-                </Button>
-                <Button variant="secondary" size="lg" onClick={() => advance(6)} disabled={atStop} title={blockedReason} iconRight={<ChevronsRight aria-hidden className="size-4" strokeWidth={1.75} />} className="max-sm:px-3">
-                  <span>
-                    <span className="max-sm:hidden">Avançar </span>6 meses
-                  </span>
-                </Button>
-                <Button variant="ghost" size="lg" onClick={() => advance(MAX_MONTH)} disabled={atStop} title={blockedReason} iconLeft={<FastForward aria-hidden className="size-4" strokeWidth={1.75} />} className="max-md:hidden">
-                  Até ao fim
-                </Button>
-              </>
-            )}
+          <div className="ml-auto max-md:hidden">
+            <Controls finished={finished} atStop={atStop} blockedReason={blockedReason} onAdvance={advance} onOpenDebrief={onOpenDebrief} />
           </div>
         </div>
         {pendingNow && (
@@ -99,6 +81,16 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
         <p className="sr-only" aria-live="polite">
           {`Mês ${month}, ${monthLabel(month)}. ${spanEvents.map((e) => e.event.title).join('. ')}${pendingNow ? '. Há uma decisão por tomar.' : ''}${finished ? '. Campanha terminada.' : ''}`}
         </p>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-bg px-4 py-2.5 md:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <p className="min-w-0 text-sm">
+            <span className="block font-semibold text-fg">Mês {month} de {WINDOW}</span>
+            <span className="block truncate font-mono text-muted tnum">{month === 0 ? 'out. 2026' : monthLabel(month)}</span>
+          </p>
+          <Controls finished={finished} atStop={atStop} blockedReason={blockedReason} onAdvance={advance} onOpenDebrief={onOpenDebrief} compact />
+        </div>
       </div>
 
       {/* ---------------- este mês + lotes ---------------- */}
@@ -163,6 +155,33 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
         </Card>
         <Journal run={run} month={month} />
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------ controlos */
+
+function Controls({ finished, atStop, blockedReason, onAdvance, onOpenDebrief, compact }: { finished: boolean; atStop: boolean; blockedReason?: string; onAdvance: (n: number) => void; onOpenDebrief: () => void; compact?: boolean }) {
+  if (finished) {
+    return (
+      <Button size={compact ? 'md' : 'lg'} onClick={onOpenDebrief}>
+        Abrir o balanço
+      </Button>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <Button size={compact ? 'md' : 'lg'} onClick={() => onAdvance(1)} disabled={atStop} title={blockedReason} iconRight={<ChevronRight aria-hidden className="size-4" strokeWidth={2} />} className="motion-safe:active:scale-[0.98]">
+        Avançar mês
+      </Button>
+      <Button variant="secondary" size={compact ? 'md' : 'lg'} onClick={() => onAdvance(6)} disabled={atStop} title={blockedReason} aria-label="Avançar 6 meses" iconRight={<ChevronsRight aria-hidden className="size-4" strokeWidth={1.75} />} className={compact ? 'px-3' : undefined}>
+        {compact ? '6' : 'Avançar 6 meses'}
+      </Button>
+      {!compact && (
+        <Button variant="ghost" size="lg" onClick={() => onAdvance(MAX_MONTH)} disabled={atStop} title={blockedReason} iconLeft={<FastForward aria-hidden className="size-4" strokeWidth={1.75} />} className="max-lg:hidden">
+          Até ao fim
+        </Button>
+      )}
     </div>
   );
 }

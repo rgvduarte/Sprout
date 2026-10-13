@@ -17,7 +17,7 @@ export function SimuladorBand() {
         <p className="measure text-[1.0625rem] text-fg">
           Distribui um orçamento fictício por lotes e joga 18 meses, mês a mês ou de uma vez: choques de preço, colheitas fracas, atrasos nas vendas, quebras de qualidade. Vês o que mudam a cobertura, a reserva de primeira perda, a extensão e o refunding. O balanço final pode ser uma perda.
         </p>
-        <p className="measure mt-3 text-[0.9375rem] text-muted">
+        <p className="mt-3 max-w-[62ch] text-[0.9375rem] text-muted">
           O Regulamento (UE) 2020/1503, das plataformas europeias de crowdfunding, obriga a fazer a investidores não sofisticados um teste de conhecimentos e a pedir-lhes uma simulação da capacidade de suportar perdas, calculada como 10 % do património líquido. O piloto só aceita investidores qualificados; usamos o simulador no mesmo espírito, antes do primeiro compromisso.
         </p>
         <SimulationLabel className="mt-4" />

@@ -91,7 +91,7 @@ export default function CadernoPage() {
 
   const earnedSealIds = data.earnedSeals.map((s) => s.def.id);
   const sealLabels = useMemo(() => sealRegionLabels(earnedSealIds), [earnedSealIds.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
-  const reasonsFor = (regionId: string) => regionReasons(regionId, profile, follow, data.lots, sealLabels);
+  const reasonsFor = (regionId: string, world: WorldId) => regionReasons(regionId, profile, follow, data.lots.filter((l) => l.world === world), sealLabels.filter((x) => x.world === world));
   const initialRegion = useMemo(() => {
     const pick = (w: WorldId) => {
       const regions = REGIONS.filter((r) => r.worlds.includes(w));
@@ -132,22 +132,13 @@ export default function CadernoPage() {
           <>
             <KnowledgeLevelBadge level={game.level} size="sm" />
             <Badge tone="seal">
-              <span className="font-mono tnum">
-                {data.earnedSeals.length} de {data.seals.length}
-              </span>{' '}
-              selos
+              <span className="font-mono tnum">{data.earnedSeals.length}</span> de <span className="font-mono tnum">{data.seals.length}</span> selos
             </Badge>
             <Badge tone="neutral">
-              <span className="font-mono tnum">
-                {cardsEarned} de {cardsTotal}
-              </span>{' '}
-              cartas
+              <span className="font-mono tnum">{cardsEarned}</span> de <span className="font-mono tnum">{cardsTotal}</span> cartas
             </Badge>
             <Badge tone="neutral">
-              <span className="font-mono tnum">
-                {lit} de {REGIONS.filter((r) => r.worlds.length > 0).length}
-              </span>{' '}
-              regiões acesas
+              <span className="font-mono tnum">{lit}</span> de <span className="font-mono tnum">{REGIONS.filter((r) => r.worlds.length > 0).length}</span> regiões acesas
             </Badge>
           </>
         }
@@ -194,10 +185,7 @@ export default function CadernoPage() {
         description="Uma por lote: ganha-se ao co-financiar o lote ou ao ler o seu boletim de análises. São pessoais e intransmissíveis: não se vendem, não se trocam e não valem dinheiro."
         actions={
           <Badge tone="neutral">
-            <span className="font-mono tnum">
-              {cardsHere} de {cards.length}
-            </span>{' '}
-            nesta página
+            <span className="font-mono tnum">{cardsHere}</span> de <span className="font-mono tnum">{cards.length}</span> nesta página
           </Badge>
         }
       >

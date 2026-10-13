@@ -25,9 +25,9 @@ export function priceNumber(world: WorldId, v: number): string {
 /* ------------------------------------------------------------ missões */
 
 export const MISSION_TITLE: Record<WorldId, (lot: Lot) => string> = {
-  azeite: (lot) => `Encher o depósito: ${Math.round(lot.quantity / 1000)} IBC de 1 000 kg`,
-  agua: (lot) => `Encher o armazém: ${lot.quantity} paletes de 504 garrafas`,
-  cafe: (lot) => `Encher a tulha: ${lot.quantity} sacas de 60 kg`,
+  azeite: (lot) => `encher o depósito com ${Math.round(lot.quantity / 1000)} IBC de 1 000 kg`,
+  agua: (lot) => `encher o armazém com ${lot.quantity} paletes de 504 garrafas`,
+  cafe: (lot) => `encher a tulha com ${lot.quantity} sacas de 60 kg`,
 };
 
 /** Pílula de cobertura de preço por mundo (o que protege o lote). */

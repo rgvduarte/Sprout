@@ -66,7 +66,7 @@ function contours(seed: string, cx: number, cy: number, rings: number, rx0: numb
 
 function Layer({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax meet" className={cn('absolute inset-0 h-full w-full overflow-visible', className)} aria-hidden>
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className={cn('absolute inset-0 h-full w-full overflow-visible', className)} aria-hidden>
       {children}
     </svg>
   );
@@ -295,9 +295,9 @@ function Terreiro() {
 
 /* ------------------------------------------------------------ cena */
 
-export function Terrain({ world, seed, tanks, className, label }: { world: WorldId; seed: string; tanks?: TelemetryUnit[]; className?: string; label: string }) {
+export function Terrain({ world, seed, tanks, className, label, crop }: { world: WorldId; seed: string; tanks?: TelemetryUnit[]; className?: string; label: string; crop?: boolean }) {
   return (
-    <div className={cn('relative w-full', className)} style={{ aspectRatio: `${W} / ${H}` }} role="img" aria-label={label} data-world={world}>
+    <div className={cn('relative w-full overflow-hidden', crop ? 'aspect-[520/190] sm:aspect-[520/300]' : 'aspect-[520/300]', className)} role="img" aria-label={label} data-world={world}>
       {world === 'azeite' && (
         <>
           <ParallaxLayer distance={26} className="absolute inset-0">

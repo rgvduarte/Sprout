@@ -128,7 +128,7 @@ export default function InicioPage() {
           ) : (
             <Section id="comecar" title="Começa por aqui" description="Primeiro conhecer, depois decidir. Nada aqui pede dinheiro." className="order-1 !mt-0 min-w-0 lg:order-none">
               <Card padding="md">
-                <MissionList missions={listMissions} limit={3} />
+                <MissionList missions={listMissions} limit={5} />
               </Card>
             </Section>
           )}

@@ -140,7 +140,7 @@ function ModuleBody({ module: m, done, onClose }: { module: KnowledgeModule; don
 
   return (
     <div className="grid gap-x-8 gap-y-6">
-      <div className="measure min-w-0">
+      <div className="min-w-0 max-w-[62ch]">
         {m.sections.map((s) => (
           <div key={s.heading} className="mt-5 first:mt-0">
             <h4 className="text-[1.0625rem]">{s.heading}</h4>

@@ -124,7 +124,7 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
         kind: 'acesso',
         title: 'Explora os três mundos',
         context: 'Mapa de origens, vocabulário e estação de cada mercado',
-        steps: worlds.map((w) => ({ id: w.id, label: w.nome, done: worldsVisited.includes(w.id), href: `/mercados/${w.id}` })),
+        steps: worlds.map((w) => ({ id: w.id, label: `Visita ${w.nome}`, done: worldsVisited.includes(w.id), href: `/mercados/${w.id}` })),
         reward: 'As regiões de cada mundo acendem no teu mapa à medida que as exploras.',
       }),
     );

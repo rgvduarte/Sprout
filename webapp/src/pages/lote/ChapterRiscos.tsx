@@ -46,9 +46,9 @@ function RiskItem({ r, idx, open, read, onToggle, onRead, btnRef }: { r: RiskFac
             {r.title}
             <span className="sr-only">{read ? ' · lido' : ' · por ler'}</span>
           </span>
-          <Badge tone={sev.tone} className="hidden sm:inline-flex">
-            {sev.label}
-          </Badge>
+          <span className="hidden shrink-0 sm:inline-flex">
+            <Badge tone={sev.tone}>{sev.label}</Badge>
+          </span>
           <ChevronDown aria-hidden className={cn('size-5 shrink-0 text-muted transition-transform duration-200', open && 'rotate-180')} strokeWidth={1.75} />
         </button>
       </h3>

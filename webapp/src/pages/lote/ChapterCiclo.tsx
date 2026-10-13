@@ -154,13 +154,13 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
           </g>
           {/* marcos */}
           {[
-            { iso: win.start, label: win.startKnown ? 'Compra' : 'Compra (prev.)', anchor: 'start' as const },
-            ...(venda ? [{ iso: venda, label: 'Em venda', anchor: 'middle' as const }] : []),
-            ...(expedido ? [{ iso: expedido, label: 'Expedido', anchor: 'middle' as const }] : []),
+            { iso: win.start, label: win.startKnown ? 'Compra' : 'Compra (prev.)', anchor: 'start' as const, above: false },
+            ...(venda ? [{ iso: venda, label: 'Em venda', anchor: 'middle' as const, above: !wide }] : []),
+            ...(expedido ? [{ iso: expedido, label: 'Expedido', anchor: 'middle' as const, above: false }] : []),
           ].map((mk) => (
             <g key={mk.label}>
               <circle cx={X(mk.iso)} cy={base} r={5} fill={tokens.surface} stroke={tokens.fg} strokeWidth={2} />
-              <text x={X(mk.iso)} y={base + 22} textAnchor={mk.anchor} fontSize="12" fill={tokens.fg}>
+              <text x={X(mk.iso)} y={mk.above ? base - 12 : base + 22} textAnchor={mk.anchor} fontSize="12" fill={tokens.fg} paintOrder="stroke" stroke={tokens.bg} strokeWidth={3}>
                 {mk.label}
               </text>
             </g>
@@ -260,7 +260,7 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
           </p>
           <p className="mt-1 text-sm text-muted">
             {playbook ? `Gatilho: ${playbook.trigger.charAt(0).toLowerCase()}${playbook.trigger.slice(1)} ` : ''}Uma nova ronda refinancia a armazenagem à espera de melhor preço. Tem custo e não elimina a perda.
-            {playbook && ` Playbook "${playbook.title}": ${playbook.steps.length} passos escritos antes de o lote abrir.`}
+            {playbook && ` Playbook «${playbook.title}»: ${playbook.steps.length} passos escritos antes de o lote abrir.`}
           </p>
         </li>
       </ol>

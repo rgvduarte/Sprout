@@ -269,7 +269,7 @@ function ProducerSheet({ producer, world }: { producer: Producer; world: WorldId
             </span>{' '}
             de {num(cap)} {unitLbl} de capacidade.
           </p>
-          <ul className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+          <ul className={cn('mt-3 grid gap-x-6 gap-y-3', units.length > 1 && 'sm:grid-cols-2')}>
             {units.map((u) => (
               <li key={u.id}>
                 <Meter value={u.capacity ? u.level / u.capacity : 0} label={u.label} valueLabel={`${num(u.level)} / ${num(u.capacity)} ${unitLbl}`} tone={world} size="sm" />

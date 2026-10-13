@@ -250,7 +250,6 @@ function MissionRow({ quest: q, game }: { quest: Quest; game: GameView }) {
               Selo {sealProducer.nome} · {seal.campanha}
             </span>
           )}
-          {!multi && !p.done && <span>{p.text}</span>}
           {p.done && at && (justNow ? <span className="font-medium text-accent">cumprida agora</span> : <span>cumprida a {fmtDate(at)}</span>)}
         </p>
       </div>

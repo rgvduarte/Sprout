@@ -105,7 +105,7 @@ export function MiniGames({ active, onSelect }: { active: MiniGameId; onSelect: 
               <Art className="hidden size-20 shrink-0 sm:block" />
               <div className="min-w-0 flex-1">
                 <h3 className="text-[1.375rem] text-fg">{meta.title}</h3>
-                <p className="measure mt-1 text-[0.9375rem] text-fg">{RULES[id]}</p>
+                <p className="mt-1 max-w-[60ch] text-[0.9375rem] text-fg">{RULES[id]}</p>
                 {quest && (
                   <p className="mt-2 text-sm text-world-ink">
                     Missão: {quest.title} · <span className="font-mono tnum">+{quest.points} pts</span> · {questDone ? 'cumprida' : `precisa de ${quest.criteria.type === 'minigame' ? quest.criteria.minScore : ''} certas`}

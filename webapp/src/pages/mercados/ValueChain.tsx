@@ -35,7 +35,7 @@ function inkOn(fillHex: string, light: string, dark: string): string {
   return contrast(L, luminance(light)) >= contrast(L, luminance(dark)) ? light : dark;
 }
 
-const SHORT: Record<ChainSegment['id'], string> = { produtor: 'Produtor', premio: 'Prémio', custos: 'Custos', spread: 'Spread do lote', desconto: 'Desconto ao comprador' };
+const SHORT: Record<ChainSegment['id'], string> = { produtor: 'Produtor', premio: 'Prémio', custos: 'Custos', spread: 'Spread do lote', desconto: 'Desconto' };
 
 const MIDDLE_SPROUT: Record<WorldId, string> = {
   azeite: 'Sprout · lote em IBC',

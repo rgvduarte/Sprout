@@ -8,7 +8,7 @@ import { date as fmtDate, eur, num, pct, price } from '../../lib/format';
 import { lotQuantityLabel } from '../../lib/physical';
 import { useData, useGame, useRole } from '../../state';
 import { lotPhysicalDetail, priceDecimals } from './model';
-import { CheckMark, useJourney, Wrap } from './shared';
+import { CheckMark, NoBreakIds, useJourney, Wrap } from './shared';
 import { Terrain } from './Terrain';
 
 /* =====================================================================
@@ -131,7 +131,7 @@ function DiligenceList({ items }: { items: DiligenceItem[] }) {
             <CheckMark done={it.done} />
             <div className="min-w-0 flex-1">
               <p className={cn('text-[0.9375rem] font-medium leading-snug', it.done ? 'text-muted' : 'text-fg')}>
-                {it.title}
+                <NoBreakIds text={it.title} />
                 <span className="sr-only">{it.done ? ' · cumprida' : ' · por fazer'}</span>
               </p>
               <p className="text-sm text-muted">
@@ -218,7 +218,7 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
         </dl>
 
         {/* ação */}
-        <div className="order-3 min-w-0 lg:order-none">
+        <div className="order-2 min-w-0 lg:order-none">
           <div className="flex flex-wrap gap-2">
             {lot.status === 'aberto' && !isVisitor && (
               <Button variant="primary" size="lg" iconRight={<ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => goTo('compromisso')}>
@@ -255,10 +255,12 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
         </div>
         <div className="contents lg:col-span-5 lg:flex lg:flex-col lg:gap-8">
         {/* medidor da missão sobre a paisagem */}
-        <div className="order-2 min-w-0 lg:order-none">
-          <Terrain world={lot.world} seed={lot.id} tanks={data.telemetry[lot.producerId]} label={`${ctx.copy.terrainLabel}: ${ctx.producer.nome}, ${ctx.region.nome}`} />
-          <div className="relative -mt-14 flex items-end justify-between gap-4 sm:-mt-24">
-            <MissionCaption />
+        <div className="order-3 min-w-0 lg:order-none">
+          <Terrain world={lot.world} seed={lot.id} tanks={data.telemetry[lot.producerId]} crop label={`${ctx.copy.terrainLabel}: ${ctx.producer.nome}, ${ctx.region.nome}`} />
+          <div className="relative">
+            <div className="pr-[156px] pt-3 sm:pr-[216px] xl:pr-[256px]">
+              <MissionCaption />
+            </div>
             <LotGauge
               kind={lot.world}
               value={fundedFraction(lot)}
@@ -266,7 +268,7 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
               animateOnMount
               label={`Financiamento do lote ${lot.id}`}
               valueText={`${pct(fundedFraction(lot), 1)} financiado`}
-              className="w-[148px] shrink-0 sm:w-[200px] xl:w-[240px] [&_svg]:h-auto [&_svg]:w-full"
+              className="absolute bottom-0 right-0 w-[148px] sm:w-[200px] xl:w-[240px] [&_svg]:h-auto [&_svg]:w-full"
             />
           </div>
         </div>

@@ -220,10 +220,10 @@ export default function CarteiraPage() {
 function CarteiraLocked({ status, visitor }: { status: string; visitor: boolean }) {
   const blocked = status === 'bloqueado';
   const statusText: Record<string, string> = {
-    'nao-iniciado': 'Registo por iniciar',
-    'em-curso': 'Registo a meio',
-    'em-analise': 'Documentação em análise',
-    bloqueado: 'Fora do piloto: investidor não qualificado',
+    'nao-iniciado': 'por iniciar',
+    'em-curso': 'a meio',
+    'em-analise': 'documentação em análise',
+    bloqueado: 'fora do piloto (investidor não qualificado)',
   };
   return (
     <Page>
@@ -234,14 +234,15 @@ function CarteiraLocked({ status, visitor }: { status: string; visitor: boolean 
           <LotGauge kind="pallet" size="md" value={0} label="Palete vazia" className="w-[104px]" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm text-muted">
-            {visitor ? 'Estás a ver como Visitante' : 'Estado'} · <span className="font-medium text-fg">{statusText[status] ?? 'Registo por concluir'}</span>
-          </p>
-          <h2 className="mt-2 text-[1.5rem] leading-tight">{blocked ? 'O piloto está fechado a investidores qualificados' : 'A tua carteira começa depois da verificação'}</h2>
+          <h2 className="text-[1.5rem] leading-tight">{blocked ? 'O piloto está fechado a investidores qualificados' : 'A tua carteira começa depois da verificação'}</h2>
           <p className="measure mt-2 text-muted">
             {blocked
               ? 'A tua classificação não permite comprometer capital nesta fase. Podes continuar a explorar os mundos, as jornadas dos lotes e jogar campanhas no simulador com dinheiro fictício.'
               : 'Antes de qualquer compromisso: registo, KYC/KYB e avaliação de adequação. Enquanto isso podes explorar todos os lotes e jogar campanhas com dinheiro fictício, incluindo as que acabam em perda.'}
+          </p>
+          <p className="mt-3 text-sm text-muted">
+            Estado do registo: <span className="font-medium text-fg">{statusText[status] ?? 'por concluir'}</span>
+            {visitor ? ' · estás a ver como Visitante' : ''}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             {!blocked && (

@@ -194,10 +194,7 @@ export function SealsPage({
             Selos de origem
           </h2>
           <p className="mt-1 text-sm text-muted">
-            <span className="font-mono text-fg tnum">
-              {earned} de {seals.length}
-            </span>{' '}
-            {seals.length === 1 ? 'selo' : 'selos'} · {c.label}
+            <span className="font-mono text-fg tnum">{earned}</span> de <span className="font-mono text-fg tnum">{seals.length}</span> {seals.length === 1 ? 'selo' : 'selos'} · {c.label}
           </p>
         </div>
         {complete && <PageComplete earned={earned} total={seals.length} />}

@@ -3,11 +3,11 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getLot, getProducersByWorld, getWorld, isWorldId } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
-import { Badge, ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
+import { ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
 import { CampaignFeed, SeasonTrack } from '../../components/game';
 import { useData, useFeed, useGame } from '../../state';
 import { ReferenceChart } from './MarketChart';
-import { MissionList, RunningLotsTable } from './MissionBoard';
+import { HedgePill, MissionList, RunningLotsTable } from './MissionBoard';
 import { LearnWorld } from './Learn';
 import { OriginsExplorer, regionsFor } from './Origins';
 import { useSceneLevels, WorldScene } from './scenes';
@@ -88,7 +88,7 @@ function World({ world }: { world: WorldId }) {
                   <>
                     <CommodityChip world={world} size="md" />
                     {preview ? <StatusPill label={w.faseLabel!} tone="cafe" /> : <StatusPill label="Piloto fechado · Fase 1" tone="accent" />}
-                    <Badge tone={world}>{w.hedge.label}</Badge>
+                    <HedgePill world={world} />
                   </>
                 }
               />
@@ -129,7 +129,7 @@ function World({ world }: { world: WorldId }) {
           description={
             preview
               ? 'Lotes em due diligence para a Fase 2. Podes abrir a jornada e jogá-los no simulador; ainda não se financiam.'
-              : 'Cada lote é uma missão: encher o depósito com o financiamento dos co-financiadores. Nos lotes em preparação, o medidor mostra o stock que o produtor já tem.'
+              : `Cada lote é uma missão: ${world === 'agua' ? 'encher o armazém de paletes' : 'encher o depósito'} com o financiamento dos co-financiadores. Nos lotes em preparação, o medidor mostra o stock que o produtor já tem.`
           }
           className="mt-12"
         >

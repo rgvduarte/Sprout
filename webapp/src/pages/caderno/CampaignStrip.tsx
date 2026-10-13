@@ -44,9 +44,9 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
     return { key: String(ym), label: MONTHS_SHORT[m - 1], long: `${MONTHS_LONG[m - 1]} de ${y}`, kind: 'mes', month: m };
   });
   const cells: Cell[] = [
-    ...(buckets.has('antes') ? [{ key: 'antes', label: 'antes', long: 'antes da campanha', kind: 'antes' as const }] : []),
+    ...(buckets.has('antes') ? [{ key: 'antes', label: 'ant.', long: 'antes da campanha', kind: 'antes' as const }] : []),
     ...months,
-    ...(buckets.has('depois') ? [{ key: 'depois', label: 'depois', long: 'depois da campanha', kind: 'depois' as const }] : []),
+    ...(buckets.has('depois') ? [{ key: 'depois', label: 'dep.', long: 'depois da campanha', kind: 'depois' as const }] : []),
   ];
   const lead = buckets.has('antes') ? 1 : 0;
 
@@ -116,9 +116,11 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
           ))}
         </div>
         {showToday && (
-          <div className="pointer-events-none absolute -top-1 h-9 w-0" style={{ left: `${todayLeft}%` }} aria-hidden>
-            <div className="absolute inset-y-0 -left-px w-0.5 bg-fg" />
-            <span className="absolute -top-4 left-1 whitespace-nowrap text-[11px] font-medium text-fg">hoje</span>
+          <div className="pointer-events-none absolute top-0 h-0 w-0" style={{ left: `${todayLeft}%` }} aria-hidden>
+            {/* marca de hoje: entalhe sobre a faixa e fio pelas notas, sem tapar o nome da fase */}
+            <span className="absolute -left-[5px] -top-[7px] size-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-fg" />
+            <span className="absolute -left-px top-7 h-[46px] w-0.5 bg-fg" />
+            <span className="absolute -top-[22px] left-1.5 whitespace-nowrap text-[11px] font-medium text-fg">hoje</span>
           </div>
         )}
       </div>

@@ -249,7 +249,7 @@ function LockedCard({ card }: { card: CardView }) {
         <div className="flex items-center justify-between gap-2 text-xs text-muted">
           <span className="inline-flex items-center gap-1">
             <CommodityGlyph world={lot.world} className="size-3.5" />
-            Por desbloquear
+            Por ganhar
           </span>
           <span className="font-mono tnum">
             {String(card.n).padStart(2, '0')}/{String(card.of).padStart(2, '0')}

@@ -14,7 +14,7 @@ import { cn } from '../../lib/cn';
 
 const STATE_LABEL: Record<RegionState, string> = { unexplored: 'Por explorar', learned: 'Aprendido', participated: 'Participado' };
 
-export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionId: string) => string[]; initialRegion: Partial<Record<WorldId, string>> }) {
+export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionId: string, world: WorldId) => string[]; initialRegion: Partial<Record<WorldId, string>> }) {
   const { regionStates, seals } = useData();
   const [world, setWorld] = useState<WorldId>('azeite');
   const [selected, setSelected] = useState<Partial<Record<WorldId, string>>>(initialRegion);
@@ -24,7 +24,7 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
   const state = (regionId && regionStates[regionId]) || 'unexplored';
   const producers = regionId ? getProducersByRegion(regionId).filter((p) => p.world === world) : [];
   const regionSeals = seals.filter((s) => s.def.regionId === regionId && s.def.world === world);
-  const reasons = regionId ? reasonsFor(regionId) : [];
+  const reasons = regionId ? reasonsFor(regionId, world) : [];
   const lit = regions.filter((r) => regionStates[r.id] && regionStates[r.id] !== 'unexplored').length;
 
   return (
@@ -38,10 +38,7 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
             options={(['azeite', 'agua', 'cafe'] as WorldId[]).map((w) => ({ value: w, label: getWorld(w).commodity, icon: <CommodityGlyph world={w} className="size-4" /> }))}
           />
           <p className="text-sm text-muted">
-            <span className="font-mono text-fg tnum">
-              {lit} de {regions.length}
-            </span>{' '}
-            regiões acesas em {getWorld(world).nome}
+            <span className="font-mono text-fg tnum">{lit}</span> de <span className="font-mono text-fg tnum">{regions.length}</span> regiões acesas em {getWorld(world).nome}
           </p>
         </div>
         <TileMap
@@ -139,4 +136,4 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
 
 /** Selos ganhos com a respetiva região, para explicar porque uma região está acesa. */
 export const sealRegionLabels = (earnedIds: string[]) =>
-  SEALS.filter((s) => earnedIds.includes(s.id)).map((s) => ({ regionId: s.regionId, label: `${getProducersByRegion(s.regionId).find((p) => p.id === s.producerId)?.nome ?? s.producerId} · ${s.campanha}` }));
+  SEALS.filter((s) => earnedIds.includes(s.id)).map((s) => ({ regionId: s.regionId, world: s.world, label: `${getProducersByRegion(s.regionId).find((p) => p.id === s.producerId)?.nome ?? s.producerId} · ${s.campanha}` }));

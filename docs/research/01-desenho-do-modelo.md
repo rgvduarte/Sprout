@@ -1,7 +1,8 @@
 # 01 — Desenho do modelo de negócio (recomendação)
 
 > **Data:** 13-10-2026. **Para:** fundadores do Sprout (Gonçalo Almeida, Pedro Marques, Speaker 1, Speaker 2) e quem escrever o business plan, o resumo em PDF e a webapp.
-> **Base numérica:** `00-base-factual.md` (factos e fontes) e `docs/business-plan/modelo/pressupostos.json` (pressupostos). Todos os números deste documento saem desses dois ficheiros; os cálculos foram feitos com os mesmos parâmetros do JSON.
+> **Base numérica:** `00-base-factual.md` (factos e fontes) e `docs/business-plan/modelo/pressupostos.json` (pressupostos). Todos os números deste documento saem desses dois ficheiros; os cálculos foram feitos com os mesmos parâmetros do JSON e reproduzem-se com `docs/business-plan/modelo/calculo_referencia.py`.
+> **Revisão de 13-10-2026:** números refeitos depois da verificação registada em `00-base-factual.md` (secção "Registo de verificação"): referência HoReCa 5,65 €/kg, distribuidores ao preço de saída do embalador, piloto de 1 lote de 20 t, sem obrigações antes de 12 meses de registo da SPV (CSC art. 348.º/2), PRIIPs e classificação de investidores.
 > **Etiquetas:** [F] facto com fonte; [L] referência legal/técnica não relida online; [E] estimativa nossa; [I] inferência/opinião nossa; NV não verificado.
 > **Tom:** isto é a opinião de um conselheiro, não um parecer jurídico. Onde a tese do documento-fonte não fecha, dizemo-lo e propomos o que muda.
 
@@ -9,13 +10,13 @@
 
 ## Sumário para os fundadores
 
-1. **A tese só fecha numa leitura.** "80–90% da margem do embalador" não pode ser o que o Sprout guarda: essa margem vale 0,19–0,50 €/kg [F] e um desconto de 10% sobre ~6 €/kg custa 0,60 €/kg. A leitura coerente é: **do bolo dos intermediários (embalador + distribuidor), 80–90% é redistribuído entre comprador (desconto), Sprout (margem) e investidores (cupão); 10–20% é consumido por custódia, qualidade, pagamentos e crédito.** No lote-tipo, esse número dá **88%**.
-2. **O desconto de 10% cabe; o de 15% quase não.** Num lote de 20 t de AOVE de origem identificada, vendido contra uma referência de 6,00 €/kg, a margem de contribuição do Sprout é de **12,2% (0,66 €/kg)** com 10% de desconto e **7,1%** com 15%. Contra azeite *standard* (referência 5,40 €/kg), 15% de desconto dá margem negativa. Contra marca branca espanhola, nunca fecha.
-3. **"Liquidação a 18 meses" é o vencimento legal das obrigações, não o tempo de detenção do azeite.** O lote roda em 2–4 meses; o produtor recebe em ≤ 30 dias; o comprador paga em ≤ 35 dias; o investidor tem vencimento esperado a 12 meses e final a 18. Segurar azeite 18 meses custa ~20% em carry e arrisca 37–57% em preço [E].
-4. **Estrutura da fase 1:** Sprout Marketplace (OpCo PT, **principal** no azeite, **agente com faturação direta** na água) + Sprout Capital, SA (SPV PT que emite obrigações **só a investidores qualificados ou com subscrição ≥ €100.000**). Sem retalho, sem "jogadores", sem gamificação, sem "reembolso garantido".
-5. **Piloto (01-02 a 31-07-2027):** 3 lagares + 2 engarrafadores, ~36 compradores, 3–6 investidores, 40 t de azeite + 120 paletes de água, ~€240k de GMV, série de **€150k** (€120k sénior + €30k subordinado dos fundadores). Gate a 31-08-2027.
-6. **Economia a 5 anos (base):** 2.200 t de azeite e €12,3M de GMV em 2031, margem de contribuição de ~10,6%, EBITDA ≈ 0 em 2031. **Necessidade de capital próprio ≈ €2,9M.** No otimista, EBITDA positivo em 2030 e necessidade de €1,7M. No pessimista, nunca chega ao *break-even*: **parar no gate**.
-7. **Os maiores riscos não são de mercado:** promoção a retalho, *backoffice* "reverse engineered", conflito de interesses com o lagar âncora e um parecer jurídico que não é independente.
+1. **A tese não se mede em "% redistribuído".** "80–90% da margem do embalador" não pode ser o que o Sprout guarda: essa margem vale 0,19–0,50 €/kg [F] e um desconto de 10% sobre a referência-base de 5,65 €/kg custa 0,57 €/kg. A "taxa de redistribuição do bolo" também não serve: é quase tautológica (1 − atrito ÷ bolo) e dá 70–90% mesmo em lotes que perdem dinheiro. **Medir por margem de contribuição em €/kg e por EBITDA.** No lote-tipo HoReCa em regime, o bolo de intermediação (1,22 €/kg) reparte-se em **46% desconto ao comprador, 4% cupão, 21% custos diretos e 28% margem do Sprout (0,35 €/kg)**.
+2. **O desconto de 10% cabe à justa; o de 15% não.** Contra a referência-base de **5,65 €/kg** (equivalente de retalho *standard* a out. 2026, NV), a margem HoReCa em regime é **6,8% (0,35 €/kg)** com 10% de desconto e **1,4%** com 15%. Só contra **6,00 €/kg documentados** (origem identificada; cenário otimista) chega a 12,2%. Aos distribuidores não há desconto possível: a referência deles é o preço de saída do embalador (4,16–4,51 €/kg) e o canal fica perto do *break-even* (~1,5%).
+3. **"Liquidação a 18 meses" é o vencimento legal das obrigações, não o tempo de detenção do azeite.** O lote roda em 2–6 meses (a parte HoReCa até ~6 meses enquanto houver < 300 clientes); o produtor recebe em ≤ 30 dias; o comprador paga em ≤ 35–45 dias; o investidor tem vencimento esperado a 12 meses e final a 18. Segurar azeite 18 meses custa ~20% em carry e arrisca 37–57% em preço [E].
+4. **Estrutura da fase 1:** Sprout Marketplace (OpCo PT, **principal** no azeite, **agente com faturação direta** na água) + Sprout Capital, SA (SPV PT, capital social de €50k, que emite obrigações **só a investidores qualificados ou com subscrição ≥ €100.000**). Pelo CSC (art. 348.º/2 [L]), a SPV **só pode emitir 12 meses depois do registo definitivo**, salvo garantia bancária. Quem subscreve ≥ €100k sem ser profissional é retalho para os PRIIPs: **a 1.ª série vai só a profissionais**. Sem retalho abaixo de €100k, sem "jogadores", sem gamificação, sem "reembolso garantido".
+5. **Piloto (01-02 a 31-07-2027):** 3 lagares + 2 engarrafadores, ~36 compradores, **1 lote misto de 20 t** (4 t HoReCa/*gourmet* + 16 t para distribuidores com *offtake*) + 60 paletes de água, **~€106k de GMV**, **financiado por capital próprio** (incl. os €50k de capital da SPV). Sem investidores no piloto: a 1.ª série (€150k = €100k sénior + €50k de capital da SPV) sai em nov. 2027–jan. 2028, depois do gate (31-08-2027).
+6. **Economia a 5 anos: nenhum cenário chega ao *break-even* até 2031.** Base: 2.200 t de azeite e €11,1M de GMV em 2031, margem do azeite de 2,7% do GMV (0,12 €/kg), **EBITDA de −€1,22M em 2031** e necessidade de capital próprio **≥ €5,5M, ainda a crescer**. Otimista: EBITDA de −€0,91M em 2031. Pessimista: **parar no gate**. Para pagar a estrutura de 2031, a margem média do azeite teria de ser ~0,68 €/kg. **O plano não é financiável tal como está**: o piloto tem de provar outro preço ou permitir outra estrutura (secção 7.4).
+7. **Os maiores riscos não são de mercado:** promoção a retalho, *backoffice* "reverse engineered", conflito de interesses com o lagar âncora, um parecer jurídico que não é independente e uma emissão antes do prazo do CSC.
 
 ---
 
@@ -36,9 +37,9 @@
 **Definições que propomos adotar em todos os documentos:**
 
 - **Bolo de intermediação (Π)** = preço de referência que o comprador paga hoje pelo produto equivalente − preço do granel ao lagar − custo físico de embalamento − custo físico de logística. É o que hoje fica com embalador, distribuidor e retalhista (margens e despesas gerais).
-- **Taxa de redistribuição** = (desconto ao comprador + margem do Sprout + cupão do investidor) ÷ Π. **É esta a métrica "80–90%"**: mede quanto do bolo dos intermediários deixa de lhes pertencer. O resto (10–20%) é o custo de fazer o trabalho deles com controlo: custódia, análises, armazenagem, pagamentos, KYC, crédito.
-- **Desconto** = diferença, em €/kg, entre a referência **observada e documentada** (cotação de cash & carry, *foodservice* ou lista do concorrente para o produto equivalente) e o preço Sprout. Meta: **10%** a HoReCa e lojas *gourmet*; **5%** a distribuidores e exportadores.
-- **Ciclo de 18 meses** = vencimento legal das obrigações da Sprout Capital. Vencimento esperado em **M12** (uma campanha); **uma** extensão condicionada até **M18**. O ciclo físico de cada lote é de **2–4 meses**.
+- **Repartição do bolo** = desconto ao comprador, cupão, custos diretos (custódia, 3PL, análises, armazenagem, perdas, crédito, pagamentos) e margem do Sprout, em €/kg e em % de Π. **Serve para explicar, não para medir.** A antiga "taxa de redistribuição" ((desconto + margem + cupão) ÷ Π) é ≈ 1 − atrito ÷ Π: dá 70–90% tanto em lotes viáveis como em lotes com margem negativa (secção 2.5) e conta o cupão, que é custo de financiar stock (os incumbentes também o suportam dentro de Π), como "redistribuição". **A tese mede-se por margem de contribuição em €/kg, por canal, e por EBITDA.**
+- **Desconto** = diferença, em €/kg, entre a referência **observada e documentada** (cotação de cash & carry, *foodservice* ou lista do concorrente para o produto equivalente) e o preço Sprout. Meta: **10%** a HoReCa e lojas *gourmet*; **0%** a distribuidores e exportadores, cuja referência é o preço de saída do embalador (o argumento para eles é origem verificada, lote e prazo, não preço).
+- **Ciclo de 18 meses** = vencimento legal das obrigações da Sprout Capital. Vencimento esperado em **M12** (uma campanha); **uma** extensão condicionada até **M18**. O ciclo físico de cada lote é de **2–6 meses**.
 - **"Refunding"** = palavra só de uso interno, no sentido técnico de **refinanciamento** de uma série por outra. Em materiais externos: "mecanismos de liquidez e extensão".
 
 ### 1.3 Os três lados e a plataforma
@@ -46,8 +47,8 @@
 | Lado | Quem | O que dá | O que recebe | Contrato |
 |---|---|---|---|---|
 | **Produtores** | Lagares do Alentejo e Trás-os-Montes (âncora: Lagar do Val + 2); engarrafadores com captação reconhecida pela DGEG; na fase 2, importadores de café verde da UE | Lote individualizado, ficha analítica, embalamento no lagar, telemetria do tanque | Preço = índice (média 2 semanas SIMA + Poolred) + prémio de origem; **pagamento ≤ 30 dias por SCT Inst** | Produtor↔Sprout: compra, depósito tripartido, força maior com lista fechada |
-| **Compradores B2B** | HoReCa média/alta, lojas *gourmet*, distribuidores *foodservice*, exportadores | Encomenda firme ou *offtake*; mandato SDD B2B | Azeite de origem rastreável com ~10% de desconto sobre a referência documentada; entrega e crédito a 30–45 dias | Condições gerais de venda; *offtake* acima de 10 t |
-| **Financiadores** | Fase 1: investidores qualificados ou com ≥ €100k; fase 2: banco parceiro (financiamento de stock de terceiros) | Capital para stock e recebíveis | **Cupão fixo de 8%/ano** (base 2027), garantido por penhor/propriedade dos lotes e cessão de recebíveis; sem participação no preço do azeite | Termos e condições das obrigações; representante comum |
+| **Compradores B2B** | HoReCa média/alta, lojas *gourmet*, distribuidores *foodservice*, exportadores | Encomenda firme ou *offtake*; mandato SDD B2B | HoReCa/*gourmet*: azeite de origem rastreável com ~10% de desconto sobre a referência documentada. Distribuidores: preço de saída do embalador, lote verificado e prazo. Entrega e crédito a 30–45 dias | Condições gerais de venda; *offtake* acima de 10 t |
+| **Financiadores** | Fase 1 (desde a 1.ª série, nov. 2027–jan. 2028): clientes profissionais; subscritores ≥ €100k não profissionais só se o parecer afastar o KID PRIIPs. Fase 2: banco parceiro (financiamento de stock de terceiros) | Capital para stock e recebíveis | **Cupão fixo de 8%/ano** (base 2028, 1.º ano com obrigações), garantido por penhor/propriedade dos lotes e cessão de recebíveis; sem participação no preço do azeite | Termos e condições das obrigações; representante comum |
 | **Plataforma** | **Sprout Marketplace** (OpCo), **Sprout Capital, SA** (SPV), *collateral manager* independente | Curadoria, verificação, custódia, logística, crédito, *ledger* e reconciliação diária | Margem de principal; comissão de agente na água; comissões de verificação (fase 2) | — |
 
 ### 1.4 Fluxos
@@ -57,23 +58,26 @@
 ```mermaid
 flowchart LR
   L["Lagar (produtor)"] -->|"granel AOVE individualizado"| T[("Tanque selado no lagar<br/>depósito tripartido + telemetria")]
-  T -->|"embalamento no lagar a pedido<br/>(5 L PET / BIB / vidro)"| E["Lote embalado"]
-  E -->|"expedição FCA/DAP<br/>documento de transporte AT + lot_id"| C["Comprador B2B"]
-  CM["Collateral manager<br/>(SGS / Bureau Veritas / Control Union)"] -.->|"inspeção na entrada e na libertação<br/>análise acreditada a cada 4 meses"| T
+  T -->|"embalamento no lagar<br/>paletes de 5 L, FCA/DAP"| D["Distribuidor / exportador<br/>(offtake)"]
+  T -->|"embalamento por tranche<br/>(5 L PET / BIB / vidro)"| W[("Armazém logístico 3PL<br/>conta de custódia da SPV")]
+  W -->|"picking e entrega<br/>documento de transporte AT + lot_id"| C["HoReCa / gourmet"]
+  CM["Collateral manager<br/>(SGS / Bureau Veritas / Control Union)"] -.->|"inspeção na entrada, em cada tranche e no fecho<br/>análise acreditada a cada 4 meses"| T
 ```
+
+Libertar o lote encomenda a encomenda sob custódia de terceiro (120–270 libertações por lote de 20 t com tickets de €400–900) não cabe em €1.200 por lote. Por isso a parte HoReCa é embalada por tranches e passa para um 3PL com conta de custódia: €2.000 de *collateral manager* por lote (entrada, ~3 tranches, fecho) e 0,06 €/kg de armazenagem e *picking* no 3PL [E, NV]. Cada +0,05 €/kg nestes custos = −€20,5k de EBITDA em 2031 (base, 410 t).
 
 **Dinheiro**
 
 ```mermaid
 flowchart LR
-  I["Investidores qualificados<br/>(ou ≥ €100k)"] -->|"subscrição por SCT<br/>de conta em nome próprio"| S["Sprout Capital SA<br/>conta da Série N"]
+  I["Clientes profissionais<br/>(≥ €100k só com parecer sobre PRIIPs)"] -->|"subscrição por SCT<br/>de conta em nome próprio"| S["Sprout Capital SA<br/>conta da Série N"]
   S -->|"preço do lote ≤ 30 dias<br/>SCT Inst + VoP"| L["Lagar"]
   C["Comprador B2B"] -->|"SDD B2B / SCT com ref. RF<br/>≤ 35–45 dias"| K["Conta de cobranças da SPV<br/>(recebíveis cedidos)"]
   K -->|"cascata diária após reconciliação"| S
-  S -->|"30% da margem do lote<br/>até 5% do saldo"| R[("Reserva de primeira perda<br/>penhor financeiro")]
+  S -->|"30% da margem do lote<br/>até 5% do saldo"| R[("Reserva de primeira perda<br/>conta empenhada (penhor de créditos)")]
   S -->|"margem do lote (comissão/preço de transferência)"| O["Sprout Marketplace (OpCo)"]
   S -->|"cupão trimestral + cash sweep"| I
-  F["Fundadores"] -->|"capital subordinado 20% piloto / 10% regime"| S
+  F["Fundadores"] -->|"capital social da SPV €50k (33% da 1.ª série) / 10% em regime"| S
 ```
 
 **Título e colateral**
@@ -94,23 +98,26 @@ flowchart LR
 flowchart LR
   E["Engarrafador"] -->|"paletes + fatura com depósito SDR"| C["Comprador B2B"]
   C -->|"paga diretamente ao engarrafador"| E
-  E -->|"fatura de comissão 4% (IVA 23%)"| O["Sprout Marketplace"]
+  E -->|"fatura de comissão ~2% (IVA 23%)"| O["Sprout Marketplace"]
   O -.->|"encomenda, KYB, catálogo, SLA de entrega"| C
 ```
 
 Sem fundos de terceiros na Sprout, sem stock, sem depósitos SDR no balanço e sem necessidade de PSP *marketplace* [I].
 
-### 1.5 Calendário de um lote (HoReCa, base)
+### 1.5 Calendário de um lote misto (base, regime)
 
 | Dia | Evento | Dinheiro | Título |
 |---|---|---|---|
-| D−30 | Encomendas e *offtake* cobrem ≥ 85% do lote; análise de pré-compra | — | Lagar |
+| D−30 | *Offtake* de distribuidores e encomendas HoReCa cobrem ≥ 85% do lote; análise de pré-compra | — | Lagar |
 | D0 | Tanque selado, inspeção de entrada, ficha do lote; utilização da série | Compromisso de pagamento ao lagar | **SPV** |
-| D0–D90 | Embalamento a pedido; expedições; faturas com ref. RF | — | SPV → OpCo → comprador em cada expedição |
+| D0–D60 | Distribuidores levantam as paletes do *offtake* | — | SPV → OpCo → distribuidor em cada expedição |
+| D0–D90 | Parte HoReCa: embalamento por tranche, inspeção e libertação para o 3PL; entregas; faturas com ref. RF | — | SPV (no 3PL) → OpCo → comprador em cada entrega |
 | D30 | Pagamento ao lagar | SCT Inst (SPV → lagar) | — |
-| D35–D125 | Cobranças SDD B2B | Comprador → conta de cobranças → cascata diária | — |
-| D125 | Lote fechado; capital reutilizado no lote seguinte ou amortizado (*cash sweep*) | — | — |
+| D35–D125 | Cobranças SDD B2B / SCT | Comprador → conta de cobranças → cascata diária | — |
+| D125 | Lote fechado; capital reutilizado no lote seguinte ou amortizado (*cash sweep*). Com < 300 clientes HoReCa, a parte HoReCa pode levar ~6 meses (fecho em ~D215) | — | — |
 | M12 / M18 | Reembolso esperado da série / vencimento legal | SPV → investidores | — |
+
+No piloto (fev.–jul. 2027) o calendário é o mesmo, mas sem série: o lote é pago com capital próprio, porque a SPV só pode emitir obrigações 12 meses depois do registo (secção 3.2).
 
 ---
 

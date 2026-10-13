@@ -211,7 +211,17 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
           </div>
         </div>
 
-        <div className="mt-2 rounded-sm bg-world-soft px-4 py-3" aria-live="polite">
+        <div className="mt-2 flex items-center gap-4 rounded-sm bg-world-soft px-4 py-3" aria-live="polite">
+          <LotGauge
+            kind={lot.world}
+            value={funded}
+            highlight={valid ? [funded, after] : undefined}
+            size="sm"
+            label={`Pré-visualização do lote ${lot.id} com o teu compromisso`}
+            valueText={`${pct(funded, 1)} financiado; com o teu compromisso ${pct(after, 1)}`}
+            className="shrink-0 lg:hidden"
+          />
+          <div className="min-w-0">
           <p className="text-[1.0625rem] text-fg">
             Financia{' '}
             <strong className="font-mono font-semibold tnum">
@@ -222,6 +232,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
           <p className="mt-0.5 text-sm text-world-ink">
             {containersFor(lot, phys.base)} · {pct(phys.shareOfLot, 1)} do lote · liquidado com o lote inteiro
           </p>
+          </div>
         </div>
 
         <div className="mt-8">
@@ -308,7 +319,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
       </div>
 
       {/* pré-visualização da fatia no depósito */}
-      <div className="min-w-0 lg:col-span-5">
+      <div className="hidden min-w-0 lg:col-span-5 lg:block">
         <div className="lg:sticky" style={{ top: CHROME_H + 24 }}>
           <div className="flex items-end gap-5 lg:flex-col lg:items-start">
             <LotGauge

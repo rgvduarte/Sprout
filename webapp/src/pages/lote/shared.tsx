@@ -170,3 +170,21 @@ export function CheckMark({ done, size = 20, className, label }: { done: boolean
     </span>
   );
 }
+
+/** Não deixa partir números de lote (AZ-2026-021) a meio numa quebra de linha. */
+export function NoBreakIds({ text }: { text: string }) {
+  const parts = text.split(/([A-Z]{2}-\d{4}-\d{3})/);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^[A-Z]{2}-\d{4}-\d{3}$/.test(part) ? (
+          <span key={i} className="whitespace-nowrap">
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}

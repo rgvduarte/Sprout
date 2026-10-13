@@ -31,14 +31,18 @@ function ParamRow({ p, t }: { p: QualityParam; t: MotionValue<number> }) {
   const bar = useTransform(t, (v) => Math.min(1, v) * ratio);
   const unit = p.unit && p.unit !== '%' ? p.unit : '';
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 py-2 sm:grid-cols-[minmax(0,1fr)_5.5rem_7.5rem_6rem_1.25rem]">
-      <span className="min-w-0 text-[0.9375rem] text-fg">
+    <li className="grid grid-cols-[minmax(0,1fr)_auto_1.25rem] items-center gap-x-3 gap-y-0.5 py-2 sm:grid-cols-[minmax(0,1fr)_5.5rem_7.5rem_6rem_1.25rem] sm:gap-x-4">
+      <span className="col-start-1 row-start-1 min-w-0 text-[0.9375rem] text-fg" aria-hidden>
         {p.label}
         {unit && <span className="text-sm text-muted"> · {unit}</span>}
       </span>
-      <motion.span className="text-right font-mono text-[0.9375rem] font-medium text-fg tnum">{display}</motion.span>
-      <span className="font-mono text-sm text-muted tnum sm:text-right">{p.limitLabel}</span>
-      <span aria-hidden className="relative hidden h-1.5 rounded-full bg-[color-mix(in_oklab,var(--world)_14%,var(--surface-2))] sm:block">
+      <motion.span aria-hidden className="col-start-2 row-start-1 text-right font-mono text-[0.9375rem] font-medium text-fg tnum">
+        {display}
+      </motion.span>
+      <span aria-hidden className="col-start-1 row-start-2 font-mono text-sm text-muted tnum sm:col-start-3 sm:row-start-1 sm:text-right">
+        {p.limitLabel}
+      </span>
+      <span aria-hidden className="relative hidden h-1.5 rounded-full bg-[color-mix(in_oklab,var(--world)_14%,var(--surface-2))] sm:col-start-4 sm:row-start-1 sm:block">
         {bounded && (
           <>
             <motion.span className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-world" style={{ scaleX: bar }} />
@@ -46,8 +50,8 @@ function ParamRow({ p, t }: { p: QualityParam; t: MotionValue<number> }) {
           </>
         )}
       </span>
-      <span className="hidden justify-end sm:flex">
-        {p.pass ? <Check aria-hidden className="size-4 text-ok-ink" strokeWidth={2.25} /> : <Minus aria-hidden className="size-4 text-crit-ink" strokeWidth={2.25} />}
+      <span aria-hidden className="col-start-3 row-start-1 flex justify-end sm:col-start-5">
+        {p.pass ? <Check className="size-4 text-ok-ink" strokeWidth={2.25} /> : <Minus className="size-4 text-crit-ink" strokeWidth={2.25} />}
       </span>
       <span className="sr-only">
         {p.label}: {fmtParam(p, p.value)} {unit}. Limite {p.limitLabel}. {p.pass ? 'Cumpre.' : 'Não cumpre.'}

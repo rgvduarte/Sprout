@@ -260,9 +260,9 @@ function WaterPallet({ P, x, y, filled }: { P: Proj; x: number; y: number; fille
 
 /** Saca de juta de 60 kg deitada (tracejada = ainda por encher). */
 function Sack({ P, x, y, z = 0, filled }: { P: Proj; x: number; y: number; z?: number; filled: boolean }) {
-  const w = 1.5;
-  const d = 0.95;
-  const h = 0.62;
+  const w = 1.9;
+  const d = 1.2;
+  const h = 0.78;
   if (!filled) return <IsoBox P={P} x={x} y={y} z={z} w={w} d={d} h={h} top="transparent" left="transparent" right="transparent" stroke={INK.line} sw={0.8} dash="2.5 2" />;
   return (
     <g>
@@ -453,14 +453,14 @@ function PlantacaoScene({ variant = 'hero', levels, className, label }: ScenePro
   const level = levels[0] ?? 0;
   // tulha: 3 × 2 sacas sobre palete, mais 2 por cima
   const sacks: [number, number, number][] = [
-    [32.2, 15.6, 0.3],
-    [33.8, 15.6, 0.3],
-    [35.4, 15.6, 0.3],
-    [32.2, 16.65, 0.3],
-    [33.8, 16.65, 0.3],
-    [35.4, 16.65, 0.3],
-    [33, 16.1, 0.92],
-    [34.6, 16.1, 0.92],
+    [31.4, 15.5, 0.3],
+    [33.4, 15.5, 0.3],
+    [35.4, 15.5, 0.3],
+    [31.4, 16.8, 0.3],
+    [33.4, 16.8, 0.3],
+    [35.4, 16.8, 0.3],
+    [32.4, 16.1, 1.08],
+    [34.4, 16.1, 1.08],
   ];
   const vb = variant === 'band' ? '96 22 512 306' : '96 20 512 310';
   return (
@@ -496,9 +496,9 @@ function PlantacaoScene({ variant = 'hero', levels, className, label }: ScenePro
           <polyline key={`b${k}`} fill="none" points={pts([P(26.5, 4 + k * 2.25, 0.25), P(36.5, 4 + k * 2.25, 0.25)])} />
         ))}
       </g>
-      <GableHouse P={P} x={26.4} y={15} w={4.6} d={4.2} h={2.8} rise={1.3} windows={1} />
+      <GableHouse P={P} x={25.4} y={15} w={4.6} d={4.2} h={2.8} rise={1.3} windows={1} />
       {/* sacas: tracejadas até haver café na tulha */}
-      <IsoBox P={P} x={32} y={15.4} w={5} d={2.4} h={0.3} top={INK.wood} left={INK.wood} right={INK.wallRight} stroke={INK.steelLine} sw={0.7} />
+      <IsoBox P={P} x={31.2} y={15.3} w={6.3} d={2.8} h={0.3} top={INK.wood} left={INK.wood} right={INK.wallRight} stroke={INK.steelLine} sw={0.7} />
       {sacks.map(([x, y, z], i) => (
         <Sack key={i} P={P} x={x} y={y} z={z} filled={level > (i + 0.5) / sacks.length} />
       ))}
@@ -520,9 +520,10 @@ function CoffeeRow({ P, from, to, z, spacing, flowers }: { P: Proj; from: Pt; to
             <ellipse cx={cx + 2} cy={cy + 4.4} rx={4.6} ry={1.8} fill={INK.shadow} />
             <circle cx={cx} cy={cy} r={4.3} fill="color-mix(in oklab, var(--accent) 62%, var(--surface))" stroke="color-mix(in oklab, var(--accent) 70%, var(--fg))" strokeWidth={0.7} />
             {flowers && (
-              <g fill="var(--surface)">
-                <circle cx={cx - 1.5} cy={cy - 1.3} r={0.8} />
-                <circle cx={cx + 1.6} cy={cy - 0.2} r={0.8} />
+              <g fill="var(--surface)" stroke="color-mix(in oklab, var(--accent) 50%, var(--surface))" strokeWidth={0.4}>
+                <circle cx={cx - 3.1} cy={cy - 2.4} r={0.9} />
+                <circle cx={cx - 0.9} cy={cy - 4} r={0.9} />
+                <circle cx={cx + 1.7} cy={cy - 3.6} r={0.9} />
               </g>
             )}
           </g>
