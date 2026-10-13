@@ -1,9 +1,7 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { getLot as getStaticLot } from '../../data';
 import type { Lot } from '../../data/types';
 import { cn } from '../../lib/cn';
-import { mergeLot, useData, useRole, type PositionView } from '../../state';
-import { positionKey, useLedger } from './ledger';
+import { useData, type PositionView } from '../../state';
 import { lotContext, lotWindow, type ChapterId, type LotContext, type LotWindow } from './model';
 
 /* =====================================================================
@@ -16,7 +14,7 @@ export const NAV_H = 45;
 export const CHROME_H = TOPBAR_H + NAV_H;
 
 export interface Journey {
-  /** lote com compromissos da sessão (e cancelamentos locais) */
+  /** lote com compromissos e cancelamentos da sessão */
   lot: Lot;
   ctx: LotContext;
   win: LotWindow;
@@ -41,27 +39,10 @@ export function useJourney(): Journey {
   return j;
 }
 
-/**
- * Lote efetivo: o da loja (com compromissos da sessão) menos os compromissos
- * cancelados no período de reflexão (registo local).
- */
+/** Lote efetivo (com compromissos e cancelamentos da sessão) e as posições ativas do perfil nele. */
 export function useEffectiveLot(lotId: string): { lot?: Lot; positions: PositionView[] } {
   const data = useData();
-  const { profileId } = useRole();
-  const ledger = useLedger();
-  const storeLot = data.getLot(lotId);
-  const base = getStaticLot(lotId);
-  const allMine = data.positions.filter((p) => p.lotId === lotId);
-  const positions = allMine.filter((p) => !ledger.cancelled[positionKey(p)]);
-  if (!storeLot || !base) return { lot: storeLot, positions };
-  const cancelled = Object.values(ledger.cancelled).filter((c) => c.lotId === lotId);
-  if (!cancelled.length) return { lot: storeLot, positions };
-  const cancelledAmount = cancelled.reduce((s, c) => s + c.amount, 0);
-  const mineAllCancelled = allMine.length > 0 && positions.length === 0 && cancelled.some((c) => c.profileId === profileId);
-  const deltaRaised = storeLot.funding.raised - base.funding.raised - cancelledAmount;
-  const deltaCo = storeLot.funding.coFinancers - base.funding.coFinancers - (mineAllCancelled ? 1 : 0);
-  const lot = mergeLot(base, { [lotId]: { raised: Math.max(0, deltaRaised), coFinancers: Math.max(0, deltaCo) } });
-  return { lot, positions };
+  return { lot: data.getLot(lotId), positions: data.positions.filter((p) => p.lotId === lotId) };
 }
 
 export function journeyBase(lot: Lot) {

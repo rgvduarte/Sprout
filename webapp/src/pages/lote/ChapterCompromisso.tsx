@@ -10,7 +10,6 @@ import { date as fmtDate, eur, num, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { useData, useGame, useRole, useToast } from '../../state';
 import { CommitDone, type CommitMoment } from './CommitDone';
-import { positionKey, useLedger } from './ledger';
 import { concentrationAfter, containersFor, priceDecimals, reflectionEnd } from './model';
 import { ChapterHeading, CheckMark, CHROME_H, useJourney, Wrap } from './shared';
 
@@ -25,9 +24,7 @@ const WORLD_FILL: Record<WorldId, string> = { azeite: 'var(--c-azeite)', agua: '
 function Diversification({ amount }: { amount: number }) {
   const { lot, ctx } = useJourney();
   const data = useData();
-  const ledger = useLedger();
-  const active = data.positions.filter((p) => !ledger.cancelled[positionKey(p)]);
-  const c = concentrationAfter(active, lot, amount, ctx.producer.nome);
+  const c = concentrationAfter(data.positions, lot, amount, ctx.producer.nome);
   return (
     <div>
       <h3 className="text-[1.0625rem]">Efeito na tua diversificação</h3>
@@ -358,7 +355,7 @@ export function ChapterCompromisso({ label }: { label: string }) {
   const [moment, setMoment] = useState<CommitMoment | null>(null);
   const session = positions.filter((p) => p.session);
   const latest = session[session.length - 1];
-  const live = moment && positions.some((p) => positionKey(p) === positionKey(moment.position)) ? moment : null;
+  const live = moment && positions.some((p) => p.id === moment.position.id) ? moment : null;
   const shown: CommitMoment | null = live ?? (latest ? { position: latest, prevFunded: fundedFraction(lot), firstSeal: false, fresh: false } : null);
 
   return (

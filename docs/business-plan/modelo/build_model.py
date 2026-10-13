@@ -385,6 +385,8 @@ def build_params(P):
     p("sens_desc_3", C17, "Sensibilidade: desconto HoReCa — caso 3", "%", "const", sens["desconto_horeca"][2], FMT_PCT, "")
     p("sens_vol_neg", C17, "Sensibilidade: volumes físicos — caso baixo", "%", "const", sens["volume"][0], FMT_PCT, "Estrutura fixa inalterada")
     p("sens_vol_pos", C17, "Sensibilidade: volumes físicos — caso alto", "%", "const", sens["volume"][1], FMT_PCT, "")
+    p("sens_premio_topo", C17, "Caso combinado: prémio de origem pago por distribuidores/exportadores (topo)", "€/kg", "const",
+      sens["premio_origem_distribuidores_topo"], FMT_EKG2, "Topo da condição 0,10–0,20 do 01 §5.4; com carteira de terceiros do otimista e volumes +30%")
     p("sens_preco", C17, "Sensibilidade: preço do AOVE (índice e referências de venda)", "%", "const", sens["preco_aove"], FMT_PCT,
       "Repasse proporcional; embalamento, logística e fixos inalterados")
     p("tese_m_min", C17, "Margem líquida do embalador — mínimo (2018/19)", "€/kg", "const", tese["margem_liquida_embalador_eur_kg"]["min"], FMT_EKG,
@@ -1096,7 +1098,7 @@ class Ctx:
     def p(self, pid, y=0):
         ref = self.preg.ref(pid, self.scen, y)
         if pid in self.ov:
-            return "(" + self.ov[pid](ref) + ")"
+            return "(" + self.ov[pid](ref, y) + ")"
         return ref
 
     def l(self, lid, y):
@@ -1189,12 +1191,16 @@ def motor_cases():
         lab = SCEN_LONG[i - 1]
         for j in (1, 2, 3):
             cases.append((f"{s}__desc_{j}", f"{lab} · desconto HoReCa caso {j}", i,
-                          {"h_desc": (lambda ref, j=j: f"Pressupostos!$C${PREG.by['sens_desc_' + str(j)].row}")}))
+                          {"h_desc": (lambda ref, y, j=j: f"Pressupostos!$C${PREG.by['sens_desc_' + str(j)].row}")}))
         for tag, pid in (("vol_neg", "sens_vol_neg"), ("vol_pos", "sens_vol_pos")):
-            ov = {v: (lambda ref, pid=pid: f"{ref}*(1+Pressupostos!$C${PREG.by[pid].row})") for v in vol_ids}
+            ov = {v: (lambda ref, y, pid=pid: f"{ref}*(1+Pressupostos!$C${PREG.by[pid].row})") for v in vol_ids}
             cases.append((f"{s}__{tag}", f"{lab} · volumes {'−' if tag == 'vol_neg' else '+'}", i, ov))
-        ov = {v: (lambda ref: f"{ref}*(1+Pressupostos!$C${PREG.by['sens_preco'].row})") for v in price_ids}
+        ov = {v: (lambda ref, y: f"{ref}*(1+Pressupostos!$C${PREG.by['sens_preco'].row})") for v in price_ids}
         cases.append((f"{s}__preco", f"{lab} · preço do AOVE", i, ov))
+        ov = {v: (lambda ref, y: f"{ref}*(1+Pressupostos!$C${PREG.by['sens_vol_pos'].row})") for v in vol_ids}
+        ov["d_premio_venda"] = lambda ref, y: f"Pressupostos!$C${PREG.by['sens_premio_topo'].row}"
+        ov["tp_cart"] = lambda ref, y: PREG.ref("tp_cart", 3, y)
+        cases.append((f"{s}__topo", f"{lab} · topo dos intervalos (prémio 0,20; carteira do otimista; volumes +30%)", i, ov))
     return cases
 
 
@@ -1711,9 +1717,9 @@ def write_sensibilidade(wb, preg, blocks):
     r = 4
     section_row(ws, r, "Casos (inputs em Pressupostos)", ncols=9)
     r += 1
-    for pid in ("sens_desc_1", "sens_desc_2", "sens_desc_3", "sens_vol_neg", "sens_vol_pos", "sens_preco", "exp_aberta"):
+    for pid in ("sens_desc_1", "sens_desc_2", "sens_desc_3", "sens_vol_neg", "sens_vol_pos", "sens_preco", "sens_premio_topo", "exp_aberta"):
         put(ws, f"A{r}", PREG.by[pid].label)
-        put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=FMT_PCT)
+        put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=(FMT_EKG2 if pid == "sens_premio_topo" else FMT_PCT))
         r += 1
     r += 1
     cols = [("mh", "Margem HoReCa 2029 (€/kg)", FMT_EKG), ("e29", "EBITDA 2029 (€)", FMT_EUR), ("e31", "EBITDA 2031 (€)", FMT_EUR),
@@ -1729,12 +1735,13 @@ def write_sensibilidade(wb, preg, blocks):
         cases = [(s, "Cenário (referência)", None), (f"{s}__desc_1", "Desconto HoReCa", "sens_desc_1"),
                  (f"{s}__desc_2", "Desconto HoReCa", "sens_desc_2"), (f"{s}__desc_3", "Desconto HoReCa", "sens_desc_3"),
                  (f"{s}__vol_neg", "Volumes físicos (estrutura fixa)", "sens_vol_neg"), (f"{s}__vol_pos", "Volumes físicos (estrutura fixa)", "sens_vol_pos"),
-                 (f"{s}__preco", "Preço do AOVE (índice e referências; repasse proporcional)", "sens_preco")]
+                 (f"{s}__preco", "Preço do AOVE (índice e referências; repasse proporcional)", "sens_preco"),
+                 (f"{s}__topo", "Topo dos intervalos: prémio de origem dos distribuidores, carteira de terceiros do otimista, volumes +30%", "sens_premio_topo")]
         ref_row = r
         for key, clab, pid in cases:
             put(ws, f"A{r}", clab, bold=key == s)
             if pid:
-                put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=FMT_PCT, align=Alignment(horizontal="right"))
+                put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=(FMT_EKG2 if pid == "sens_premio_topo" else FMT_PCT), align=Alignment(horizontal="right"))
             vals = {
                 "mh": "=" + mref(blocks, key, "h_margem", 2),
                 "e29": "=" + mref(blocks, key, "dr_ebitda", 2),
@@ -1782,7 +1789,7 @@ def write_sensibilidade(wb, preg, blocks):
     # choque de preço no stock
     section_row(ws, r, "Choque de −30% no preço: perda pontual no stock de azeite (2031)", ncols=9)
     r += 1
-    header_row(ws, r, ["Cenário", "Stock médio de azeite (€)", "Perda: 100% em aberto (€)", "Perda: 15% em aberto (€)", "Perda 100% ÷ EBITDA 2031"])
+    header_row(ws, r, ["Cenário", "Stock médio de azeite (€)", "Perda: 100% em aberto (€)", "Perda: 15% em aberto (€)", "Perda 100% ÷ margem anual do azeite"])
     r += 1
     SENS_POS["stock"] = {}
     for s in SCEN:
@@ -1790,7 +1797,7 @@ def write_sensibilidade(wb, preg, blocks):
         put(ws, f"B{r}", "=" + mref(blocks, s, "cg_stock_az", 4), fmt=FMT_EUR)
         put(ws, f"C{r}", f"={preg.ref('sens_preco', 0)}*B{r}", fmt=FMT_EUR)
         put(ws, f"D{r}", f"={preg.ref('exp_aberta', 0)}*C{r}", fmt=FMT_EUR)
-        put(ws, f"E{r}", f"=IF({mref(blocks, s, 'dr_ebitda', 4)}<>0,C{r}/ABS({mref(blocks, s, 'dr_ebitda', 4)}),0)", fmt=FMT_PCT)
+        put(ws, f"E{r}", f"=IF({mref(blocks, s, 'mc_az', 4)}>0,-C{r}/{mref(blocks, s, 'mc_az', 4)},\"n/a\")", fmt=FMT_PCT, align=Alignment(horizontal="right"))
         SENS_POS["stock"][s] = r
         r += 1
     r += 1
@@ -1994,7 +2001,7 @@ def scan_errors(path):
 
 
 # ----------------------------------------------------------------------------- espelho em Python (verificação)
-def mirror(P, s, desc=None, vol=0.0, price=0.0):
+def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
     """Mesmo motor em Python, para verificar o livro (independente das fórmulas)."""
     az = P["commodities"]["azeite"]
     chs = {"h": az["canais"]["horeca_gourmet"], "d": az["canais"]["distribuidores_export"], "g": az["canais"]["granel_certificado"]}
@@ -2024,7 +2031,7 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0):
                 ref = ch["preco_referencia_eur_kg"][s] * (1 + price)
                 dsc = desc if desc is not None else ch["desconto_efetivo"][s]
             elif k == "d":
-                ref = ch["preco_referencia_eur_kg"][s] * (1 + price) + ch["premio_origem_venda_eur_kg"][s]
+                ref = ch["preco_referencia_eur_kg"][s] * (1 + price) + (ch["premio_origem_venda_eur_kg"][s] if premio_d is None else premio_d)
                 dsc = ch["desconto_efetivo"][s]
             else:
                 ref = idx + ch["premio_venda_sobre_indice_eur_kg"]
@@ -2054,7 +2061,7 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0):
         m_cf = cv * (cf["preco_venda_eur_kg"] - cf["preco_compra_eur_kg"] - cf["logistica_eur_kg"] - cfin - cf["provisao_credito_pct_vendas"] * cf["preco_venda_eur_kg"]
                      - cf["pagamentos_ops_eur_kg"] - cf["custo_cobertura_pct_compras"][s] * cf["preco_compra_eur_kg"])
         cg_cf = cv * (cf["preco_compra_eur_kg"] * cf["dias_stock"] + cf["preco_venda_eur_kg"] * cf["dias_recebimento"] - cf["preco_compra_eur_kg"] * cf["dias_pagamento"]) / 365
-        cart = ft["carteira_media_eur"][s][y]
+        cart = ft["carteira_media_eur"][tp_scen or s][y]
         bruto = cart * (ft["taxa_verificacao_por_utilizacao_pct"] * ft["rotacoes_por_ano"] + ft["taxa_monitorizacao_anual_pct"])
         kgv = cart / (ft["valor_colateral_eur_kg"] * ft["ltv"]) * ft["rotacoes_por_ano"]
         m_tp = bruto - kgv * ft["custo_verificacao_eur_kg_verificado"] * ft["pct_custo_verificacao_suportado_sprout"][s]
@@ -2134,14 +2141,20 @@ def read_results(path, blocks, lines, P, preg):
             return mo[f"C{row}"].value
         return [mo[f"{c}{row}"].value for c in YC]
 
+    def nd_for(unit):
+        return {"€": 0, "ano": 0, "data": 0, "t": 1, "FTE": 1, "n.º": 1, "dias": 1, "mês": 1, "meses": 1}.get(unit, 4)
+
+    def rr(x, nd):
+        if not isinstance(x, (int, float)):
+            return x
+        return int(round(x)) if nd == 0 else round(x, nd)
+
     def all_lines(key):
         out = {}
         for ln_ in lines:
             v = series(key, ln_.lid)
-            if isinstance(v, list):
-                out[ln_.lid] = [rd(x, 4) if isinstance(x, float) and abs(x) < 50 else rd(x) for x in v]
-            else:
-                out[ln_.lid] = rd(v, 4) if isinstance(v, float) and abs(v) < 50 else rd(v)
+            nd = nd_for(ln_.unit)
+            out[ln_.lid] = [rr(x, nd) for x in v] if isinstance(v, list) else rr(v, nd)
         return out
 
     res = {
@@ -2235,9 +2248,10 @@ def read_results(path, blocks, lines, P, preg):
     res["unit_economics"] = uej
     # sensibilidade
     se = wb["Sensibilidade"]
-    sens = {"casos": {"desconto_horeca": P["sensibilidades"]["desconto_horeca"], "volume": P["sensibilidades"]["volume"], "preco_aove": P["sensibilidades"]["preco_aove"]}}
+    sens = {"casos": {"desconto_horeca": P["sensibilidades"]["desconto_horeca"], "volume": P["sensibilidades"]["volume"], "preco_aove": P["sensibilidades"]["preco_aove"],
+                      "topo_dos_intervalos": P["sensibilidades"]["nota_topo"]}}
     names = {"": "cenario", "__desc_1": "desconto_10", "__desc_2": "desconto_12_5", "__desc_3": "desconto_15",
-             "__vol_neg": "volume_menos_30", "__vol_pos": "volume_mais_30", "__preco": "preco_aove_menos_30"}
+             "__vol_neg": "volume_menos_30", "__vol_pos": "volume_mais_30", "__preco": "preco_aove_menos_30", "__topo": "topo_dos_intervalos"}
     for s in ("base", "recomendado"):
         d = {}
         for suf, nm in names.items():
@@ -2264,7 +2278,7 @@ def read_results(path, blocks, lines, P, preg):
         }
     sens["tese_literal_horeca_base_2029"] = tese
     sens["choque_preco_stock_2031"] = {s: {"stock_azeite": rd(se[f"B{r}"].value), "perda_100_aberto": rd(se[f"C{r}"].value),
-                                           "perda_15_aberto": rd(se[f"D{r}"].value), "perda_100_sobre_ebitda": rd(se[f"E{r}"].value, 4)}
+                                           "perda_15_aberto": rd(se[f"D{r}"].value), "perda_100_sobre_margem_azeite": rd(se[f"E{r}"].value, 4)}
                                        for s, r in SENS_POS["stock"].items()}
     res["sensibilidade"] = sens
     cen = wb["Cenários"]
@@ -2349,15 +2363,16 @@ def main():
         ver["contra_calculo_referencia"][s] = d
     ver["contra_calculo_referencia"]["maior_desvio_relativo"] = round(worst, 6)
     worst2 = 0.0
-    cases = [(s, None, 0.0, 0.0, s) for s in SCEN]
+    cases = [(s, {}, s) for s in SCEN]
     for s in ("base", "recomendado"):
         sens = P["sensibilidades"]
-        cases += [(s, sens["desconto_horeca"][j], 0.0, 0.0, f"{s}__desc_{j + 1}") for j in range(3)]
-        cases += [(s, None, sens["volume"][0], 0.0, f"{s}__vol_neg"), (s, None, sens["volume"][1], 0.0, f"{s}__vol_pos"),
-                  (s, None, 0.0, sens["preco_aove"], f"{s}__preco")]
+        cases += [(s, {"desc": sens["desconto_horeca"][j]}, f"{s}__desc_{j + 1}") for j in range(3)]
+        cases += [(s, {"vol": sens["volume"][0]}, f"{s}__vol_neg"), (s, {"vol": sens["volume"][1]}, f"{s}__vol_pos"),
+                  (s, {"price": sens["preco_aove"]}, f"{s}__preco"),
+                  (s, {"vol": sens["volume"][1], "premio_d": sens["premio_origem_distribuidores_topo"], "tp_scen": "otimista"}, f"{s}__topo")]
     wbv = load_workbook(OUT_XLSX, data_only=True)["Motor"]
-    for s, dsc, vl, pr, key in cases:
-        m = mirror(P, s, dsc, vl, pr)
+    for s, kw, key in cases:
+        m = mirror(P, s, **kw)
         got = {lid: [wbv[f"{c}{blocks[key].pos[lid][1]}"].value for c in YC] for lid in ("dr_ebitda", "cf_acum", "dr_rl", "gmv_total", "mc_total")}
         e = max(max(cmp(a, b) for a, b in zip(got["dr_ebitda"], m["ebitda"])), max(cmp(a, b) for a, b in zip(got["cf_acum"], m["acum"])),
                 max(cmp(a, b) for a, b in zip(got["dr_rl"], m["rl"])), max(cmp(a, b) for a, b in zip(got["gmv_total"], m["gmv"])),

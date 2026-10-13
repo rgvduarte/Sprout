@@ -2406,7 +2406,9 @@
   ],
   "preco_aove": -0.3,
   "exposicao_aberta_back_to_back": 0.15,
-  "nota": "aplicadas aos cenários base e recomendado no modelo financeiro (folha Motor); volume = todos os volumes físicos (azeite por canal, água, café), estrutura fixa inalterada; preço do AOVE = índice do granel e referências de venda HoReCa e distribuidores x (1 - 30%), com embalamento, logística e custos fixos inalterados (repasse proporcional, o caso conservador); a perda pontual no stock em aberto é mostrada à parte"
+  "nota": "aplicadas aos cenários base e recomendado no modelo financeiro (folha Motor); volume = todos os volumes físicos (azeite por canal, água, café), estrutura fixa inalterada; preço do AOVE = índice do granel e referências de venda HoReCa e distribuidores x (1 - 30%), com embalamento, logística e custos fixos inalterados (repasse proporcional, o caso conservador); a perda pontual no stock em aberto é mostrada à parte",
+  "premio_origem_distribuidores_topo": 0.2,
+  "nota_topo": "caso combinado 'topo dos intervalos': prémio de origem pago por distribuidores/exportadores 0,20 €/kg (topo da condição 0,10-0,20 do 01 sec. 5.4), carteira de verificação para terceiros do otimista (10 M€ em 2031) e volumes físicos +30%; mostra se o caminho recomendado chega ao break-even mesmo com tudo no topo do que a investigação suporta"
  },
  "cenario_recomendado": {
   "nome": "Recomendado (reestruturado)",

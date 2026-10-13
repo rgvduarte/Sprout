@@ -1,35 +1,29 @@
-import { useCallback, useSyncExternalStore } from 'react';
-import type { LevelId, WorldId } from '../../data/types';
-import type { ProfileId } from '../../state';
+import { useCallback } from 'react';
+import { LEVELS } from '../../data';
+import type { LearningFocus, LevelId } from '../../data/types';
+import { useGame, type ProfileId } from '../../state';
 
 /* =====================================================================
-   Objetivo de aprendizagem (última missão do registo). Em memória, por
-   perfil. Mede-se só em pontos de conhecimento, nunca em dinheiro.
+   Objetivo de aprendizagem (última missão do registo). Vive na loja
+   partilhada (useGame().learningGoal), a mesma que a Academia e o Início
+   leem. Mede-se só em pontos de conhecimento, nunca em dinheiro.
    ===================================================================== */
 
 export interface LearningGoal {
-  world: WorldId;
+  /** mundo por onde começa, ou 'risco' (escolhido na Academia) */
+  focus: LearningFocus;
+  /** nível a alcançar; sem escolha explícita, o próximo nível */
   level: LevelId;
   setAt: string;
 }
 
-const goals: Partial<Record<ProfileId, LearningGoal>> = {};
-const listeners = new Set<() => void>();
-
-export function setLearningGoal(profile: ProfileId, goal: LearningGoal | undefined) {
-  goals[profile] = goal;
-  listeners.forEach((l) => l());
-}
-
-export function useLearningGoal(profile: ProfileId): [LearningGoal | undefined, (g: LearningGoal | undefined) => void] {
-  const goal = useSyncExternalStore(
-    (cb) => {
-      listeners.add(cb);
-      return () => listeners.delete(cb);
-    },
-    () => goals[profile],
-    () => goals[profile],
-  );
-  const set = useCallback((g: LearningGoal | undefined) => setLearningGoal(profile, g), [profile]);
+/** O perfil é sempre o ativo; o argumento fica por compatibilidade com as chamadas existentes. */
+export function useLearningGoal(_profile?: ProfileId): [LearningGoal | undefined, (g: { focus: LearningFocus; level: LevelId } | undefined) => void] {
+  const game = useGame();
+  const g = game.learningGoal;
+  const fallbackLevel = (game.nextLevel ?? LEVELS[LEVELS.length - 1]).id;
+  const goal: LearningGoal | undefined = g ? { focus: g.focus, level: g.level ?? fallbackLevel, setAt: g.setAt } : undefined;
+  const { setLearningGoal } = game;
+  const set = useCallback((next: { focus: LearningFocus; level: LevelId } | undefined) => setLearningGoal(next ?? null), [setLearningGoal]);
   return [goal, set];
 }

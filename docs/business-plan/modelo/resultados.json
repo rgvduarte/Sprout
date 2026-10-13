@@ -125,10 +125,10 @@
     ],
     "investidores_estimados": [
      0,
-     3.3445,
-     7.2732,
-     9.1793,
-     11.3587
+     3.3,
+     7.3,
+     9.2,
+     11.4
     ],
     "cupao_pago": [
      0,
@@ -453,7 +453,7 @@
    "pre_seed": 1100000,
    "gasto_ate_gate_2027_08": 725622,
    "gasto_ate_2027_12": 946086,
-   "runway_pre_seed_meses": 14.4259,
+   "runway_pre_seed_meses": 14.4,
    "break_even_ebitda_mes": null,
    "break_even_ebitda_mes_indice": null,
    "primeiro_ano_ebitda_positivo": "não atinge até 2031",
@@ -463,7 +463,7 @@
     "defice_ebitda": 931281,
     "premio_adicional_distribuidores_eur_kg": 1.8908,
     "referencia_horeca_eur_kg": 15.5682,
-    "volume_granel_t": 46508,
+    "volume_granel_t": 46508.3,
     "corte_custos_fixos_pct": 1.1062,
     "carteira_terceiros_eur": 263861712
    },
@@ -525,11 +525,11 @@
      0.0034
     ],
     "v_lotes": [
-     1.4333,
-     5.35,
-     10.85,
-     16.3667,
-     21.7167
+     1.4,
+     5.3,
+     10.8,
+     16.4,
+     21.7
     ],
     "v_ag_pal": [
      60,
@@ -563,8 +563,8 @@
      0,
      0,
      0,
-     457,
-     914
+     457.1,
+     914.3
     ],
     "h_gr": [
      3.65,
@@ -1947,10 +1947,10 @@
     ],
     "inv_n": [
      0,
-     3.3445,
-     7.2732,
-     9.1793,
-     11.3587
+     3.3,
+     7.3,
+     9.2,
+     11.4
     ],
     "cf_ebitda": [
      -709086,
@@ -2126,12 +2126,12 @@
     ],
     "rw_cross": [
      null,
-     14.4259,
+     14.4,
      null,
      null,
      null
     ],
-    "b_runway": 14.4259,
+    "b_runway": 14.4,
     "be_cross": [
      null,
      null,
@@ -2202,10 +2202,10 @@
     ],
     "i_n": [
      0,
-     3.3445,
-     7.2732,
-     9.1793,
-     11.3587
+     3.3,
+     7.3,
+     9.2,
+     11.4
     ],
     "wt_gap": [
      709086,
@@ -2229,7 +2229,7 @@
      1.8908
     ],
     "wt_h": [
-     138,
+     137.7712,
      44.9211,
      22.9735,
      17.4995,
@@ -2243,11 +2243,11 @@
      0.02
     ],
     "wt_g": [
-     12067,
-     36855,
-     39800,
-     44059,
-     46508
+     12067.0,
+     36855.1,
+     39799.5,
+     44058.7,
+     46508.3
     ],
     "wt_fix": [
      1.0054,
@@ -2370,10 +2370,10 @@
     ],
     "investidores_estimados": [
      0,
-     6.212,
-     11.2611,
-     19.5022,
-     29.7879
+     6.2,
+     11.3,
+     19.5,
+     29.8
     ],
     "cupao_pago": [
      0,
@@ -2698,7 +2698,7 @@
    "pre_seed": 1100000,
    "gasto_ate_gate_2027_08": 734422,
    "gasto_ate_2027_12": 948437,
-   "runway_pre_seed_meses": 14.1125,
+   "runway_pre_seed_meses": 14.1,
    "break_even_ebitda_mes": null,
    "break_even_ebitda_mes_indice": null,
    "primeiro_ano_ebitda_positivo": "não atinge até 2031",
@@ -2708,7 +2708,7 @@
     "defice_ebitda": 1219976,
     "premio_adicional_distribuidores_eur_kg": 0.6864,
     "referencia_horeca_eur_kg": 8.9896,
-    "volume_granel_t": 42348,
+    "volume_granel_t": 42348.2,
     "corte_custos_fixos_pct": 0.7815,
     "carteira_terceiros_eur": 349348035
    },
@@ -2770,11 +2770,11 @@
      0.0126
     ],
     "v_lotes": [
-     2.1333,
-     13.95,
-     30.55,
-     53,
-     80
+     2.1,
+     13.9,
+     30.6,
+     52.8,
+     80.2
     ],
     "v_ag_pal": [
      150,
@@ -2806,10 +2806,10 @@
     ],
     "v_tp_t": [
      0,
-     457,
-     1371,
-     2743,
-     4571
+     457.1,
+     1371.4,
+     2742.9,
+     4571.4
     ],
     "h_gr": [
      3.6,
@@ -4192,10 +4192,10 @@
     ],
     "inv_n": [
      0,
-     6.212,
-     11.2611,
-     19.5022,
-     29.7879
+     6.2,
+     11.3,
+     19.5,
+     29.8
     ],
     "cf_ebitda": [
      -711437,
@@ -4371,12 +4371,12 @@
     ],
     "rw_cross": [
      null,
-     14.1125,
+     14.1,
      null,
      null,
      null
     ],
-    "b_runway": 14.1125,
+    "b_runway": 14.1,
     "be_cross": [
      null,
      null,
@@ -4447,10 +4447,10 @@
     ],
     "i_n": [
      0,
-     6.212,
-     11.2611,
-     19.5022,
-     29.7879
+     6.2,
+     11.3,
+     19.5,
+     29.8
     ],
     "wt_gap": [
      711437,
@@ -4474,7 +4474,7 @@
      0.6864
     ],
     "wt_h": [
-     105,
+     105.0572,
      29.9596,
      13.8347,
      10.2493,
@@ -4488,11 +4488,11 @@
      0.0288
     ],
     "wt_g": [
-     12107,
-     31340,
-     35671,
-     37981,
-     42348
+     12107.0,
+     31339.6,
+     35671.5,
+     37980.7,
+     42348.2
     ],
     "wt_fix": [
      0.9881,
@@ -4615,10 +4615,10 @@
     ],
     "investidores_estimados": [
      0,
-     7.3323,
-     13.8318,
-     23.9393,
-     36.1022
+     7.3,
+     13.8,
+     23.9,
+     36.1
     ],
     "cupao_pago": [
      0,
@@ -4943,7 +4943,7 @@
    "pre_seed": 1100000,
    "gasto_ate_gate_2027_08": 743922,
    "gasto_ate_2027_12": 945452,
-   "runway_pre_seed_meses": 13.9065,
+   "runway_pre_seed_meses": 13.9,
    "break_even_ebitda_mes": null,
    "break_even_ebitda_mes_indice": null,
    "primeiro_ano_ebitda_positivo": "não atinge até 2031",
@@ -4953,7 +4953,7 @@
     "defice_ebitda": 906160,
     "premio_adicional_distribuidores_eur_kg": 0.3399,
     "referencia_horeca_eur_kg": 7.652,
-    "volume_granel_t": 28618,
+    "volume_granel_t": 28618.2,
     "corte_custos_fixos_pct": 0.3935,
     "carteira_terceiros_eur": 265770864
    },
@@ -5015,11 +5015,11 @@
      0.0189
     ],
     "v_lotes": [
-     2.8333,
+     2.8,
      22.7,
-     46.75,
-     80,
-     120
+     46.8,
+     80.2,
+     120.2
     ],
     "v_ag_pal": [
      180,
@@ -5051,10 +5051,10 @@
     ],
     "v_tp_t": [
      0,
-     914,
-     2743,
-     5486,
-     9143
+     914.3,
+     2742.9,
+     5485.7,
+     9142.9
     ],
     "h_gr": [
      3.55,
@@ -6437,10 +6437,10 @@
     ],
     "inv_n": [
      0,
-     7.3323,
-     13.8318,
-     23.9393,
-     36.1022
+     7.3,
+     13.8,
+     23.9,
+     36.1
     ],
     "cf_ebitda": [
      -706360,
@@ -6616,12 +6616,12 @@
     ],
     "rw_cross": [
      null,
-     13.9065,
+     13.9,
      null,
      null,
      null
     ],
-    "b_runway": 13.9065,
+    "b_runway": 13.9,
     "be_cross": [
      null,
      null,
@@ -6692,10 +6692,10 @@
     ],
     "i_n": [
      0,
-     7.3323,
-     13.8318,
-     23.9393,
-     36.1022
+     7.3,
+     13.8,
+     23.9,
+     36.1
     ],
     "wt_gap": [
      706360,
@@ -6719,7 +6719,7 @@
      0.3399
     ],
     "wt_h": [
-     85,
+     84.8788,
      21.9778,
      10.9449,
      8.3915,
@@ -6733,11 +6733,11 @@
      0.0317
     ],
     "wt_g": [
-     12021,
-     30874,
-     29997,
-     27619,
-     28618
+     12020.6,
+     30873.6,
+     29996.5,
+     27619.1,
+     28618.2
     ],
     "wt_fix": [
      0.9601,
@@ -6767,9 +6767,9 @@
    "volumes_t": {
     "azeite_horeca_gourmet": [
      8.2,
-     30.75,
+     30.8,
      82,
-     144,
+     143.5,
      205
     ],
     "azeite_distribuidores_exportacao": [
@@ -6787,10 +6787,10 @@
      3500
     ],
     "azeite_total": [
-     60,
-     894,
+     60.2,
+     893.8,
      2299,
-     3826,
+     3826.5,
      5495
     ],
     "clientes_horeca_gourmet": [
@@ -6860,10 +6860,10 @@
     ],
     "investidores_estimados": [
      0,
-     10.4749,
-     22.4281,
-     37.7253,
-     55
+     10.5,
+     22.4,
+     37.7,
+     55.4
     ],
     "cupao_pago": [
      0,
@@ -7188,7 +7188,7 @@
    "pre_seed": 1100000,
    "gasto_ate_gate_2027_08": 652747,
    "gasto_ate_2027_12": 823617,
-   "runway_pre_seed_meses": 16.4288,
+   "runway_pre_seed_meses": 16.4,
    "break_even_ebitda_mes": null,
    "break_even_ebitda_mes_indice": null,
    "primeiro_ano_ebitda_positivo": "não atinge até 2031",
@@ -7198,7 +7198,7 @@
     "defice_ebitda": 529540,
     "premio_adicional_distribuidores_eur_kg": 0.2979,
     "referencia_horeca_eur_kg": 8.8991,
-    "volume_granel_t": 21882,
+    "volume_granel_t": 21881.6,
     "corte_custos_fixos_pct": 0.4541,
     "carteira_terceiros_eur": 31477019
    },
@@ -7219,9 +7219,9 @@
     ],
     "v_h_t": [
      8.2,
-     30.75,
+     30.8,
      82,
-     144,
+     143.5,
      205
     ],
     "v_d_t": [
@@ -7239,10 +7239,10 @@
      3500
     ],
     "v_az_t": [
-     60,
-     894,
+     60.2,
+     893.8,
      2299,
-     3826,
+     3826.5,
      5495
     ],
     "v_h_mix": [
@@ -7260,11 +7260,11 @@
      0.0314
     ],
     "v_lotes": [
-     2.1433,
-     18.6375,
+     2.1,
+     18.6,
      43,
-     72,
-     105
+     71.6,
+     104.9
     ],
     "v_ag_pal": [
      36,
@@ -7296,10 +7296,10 @@
     ],
     "v_tp_t": [
      0,
-     457,
-     1371,
-     2743,
-     4571
+     457.1,
+     1371.4,
+     2742.9,
+     4571.4
     ],
     "h_gr": [
      3.65,
@@ -8682,10 +8682,10 @@
     ],
     "inv_n": [
      0,
-     10.4749,
-     22.4281,
-     37.7253,
-     55
+     10.5,
+     22.4,
+     37.7,
+     55.4
     ],
     "cf_ebitda": [
      -586333,
@@ -8861,12 +8861,12 @@
     ],
     "rw_cross": [
      null,
-     16.4288,
+     16.4,
      null,
      null,
      null
     ],
-    "b_runway": 16.4288,
+    "b_runway": 16.4,
     "be_cross": [
      null,
      null,
@@ -8937,10 +8937,10 @@
     ],
     "i_n": [
      0,
-     10.4749,
-     22.4281,
-     37.7253,
-     55
+     10.5,
+     22.4,
+     37.7,
+     55.4
     ],
     "wt_gap": [
      586333,
@@ -8964,7 +8964,7 @@
      0.2979
     ],
     "wt_h": [
-     86,
+     85.9285,
      30.8178,
      15.484,
      11.1112,
@@ -8978,11 +8978,11 @@
      0.0288
     ],
     "wt_g": [
-     9978,
-     27090,
-     26984,
-     25185,
-     21882
+     9978.0,
+     27090.2,
+     26984.2,
+     25184.9,
+     21881.6
     ],
     "wt_fix": [
      0.9745,
@@ -9916,7 +9916,8 @@
     -0.3,
     0.3
    ],
-   "preco_aove": -0.3
+   "preco_aove": -0.3,
+   "topo_dos_intervalos": "caso combinado 'topo dos intervalos': prémio de origem pago por distribuidores/exportadores 0,20 €/kg (topo da condição 0,10-0,20 do 01 sec. 5.4), carteira de verificação para terceiros do otimista (10 M€ em 2031) e volumes físicos +30%; mostra se o caminho recomendado chega ao break-even mesmo com tudo no topo do que a investigação suporta"
   },
   "base": {
    "cenario": {
@@ -10030,6 +10031,22 @@
     "necessidade_capital_proprio": 6774297,
     "break_even_ebitda_mes": null,
     "margem_media_azeite_2031_eur_kg": -0.1537
+   },
+   "topo_dos_intervalos": {
+    "margem_horeca_2029_eur_kg": 0.3471,
+    "ebitda_2029": -749798,
+    "ebitda_2031": -652081,
+    "ebitda": [
+     -695394,
+     -699789,
+     -749798,
+     -720994,
+     -652081
+    ],
+    "cash_flow_acumulado_2031": -4005939,
+    "necessidade_capital_proprio": 4300939,
+    "break_even_ebitda_mes": null,
+    "margem_media_azeite_2031_eur_kg": 0.2839
    }
   },
   "recomendado": {
@@ -10144,6 +10161,22 @@
     "necessidade_capital_proprio": 4959388,
     "break_even_ebitda_mes": null,
     "margem_media_azeite_2031_eur_kg": 0.0112
+   },
+   "topo_dos_intervalos": {
+    "margem_horeca_2029_eur_kg": 0.6094,
+    "ebitda_2029": -513663,
+    "ebitda_2031": -46503,
+    "ebitda": [
+     -574991,
+     -602015,
+     -513663,
+     -339336,
+     -46503
+    ],
+    "cash_flow_acumulado_2031": -2781762,
+    "necessidade_capital_proprio": 3076762,
+    "break_even_ebitda_mes": null,
+    "margem_media_azeite_2031_eur_kg": 0.1302
    }
   },
   "tese_literal_horeca_base_2029": {
@@ -10213,31 +10246,31 @@
     "stock_azeite": 266508,
     "perda_100_aberto": -79952,
     "perda_15_aberto": -11993,
-    "perda_100_sobre_ebitda": -0.0859
+    "perda_100_sobre_margem_azeite": "n/a"
    },
    "base": {
     "stock_azeite": 805623,
     "perda_100_aberto": -241687,
     "perda_15_aberto": -36253,
-    "perda_100_sobre_ebitda": -0.1981
+    "perda_100_sobre_margem_azeite": 0.9027
    },
    "otimista": {
     "stock_azeite": 1046486,
     "perda_100_aberto": -313946,
     "perda_15_aberto": -47092,
-    "perda_100_sobre_ebitda": -0.3465
+    "perda_100_sobre_margem_azeite": 0.2515
    },
    "recomendado": {
     "stock_azeite": 1205425,
     "perda_100_aberto": -361627,
     "perda_15_aberto": -54244,
-    "perda_100_sobre_ebitda": -0.6829
+    "perda_100_sobre_margem_azeite": 0.6736
    }
   }
  },
  "verificacao": {
   "estado_verificacoes_internas": "OK",
-  "formulas": 23851,
+  "formulas": 26447,
   "erros_de_formula": 0,
   "tolerancia_relativa": 0.005,
   "contra_calculo_referencia": {
@@ -10296,12 +10329,14 @@
    "base__vol_neg": 0.0,
    "base__vol_pos": 0.0,
    "base__preco": 0.0,
+   "base__topo": 0.0,
    "recomendado__desc_1": 0.0,
    "recomendado__desc_2": 0.0,
    "recomendado__desc_3": 0.0,
    "recomendado__vol_neg": 0.0,
    "recomendado__vol_pos": 0.0,
    "recomendado__preco": 0.0,
+   "recomendado__topo": 0.0,
    "maior_desvio_relativo": 0.0
   }
  }

@@ -8,8 +8,7 @@ import { daysBetween, TODAY_DATE } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
-import { useData, useRole, useToast } from '../../state';
-import { cancelCommitment, requestSample, sampleKey, useLedger } from './ledger';
+import { transferReference, useData, useGame, useToast } from '../../state';
 import { addDays, containersFor, firstStatement, REFLECTION_DAYS, reflectionEnd, transferDue } from './model';
 import { OriginCard } from './OriginCard';
 import { useJourney } from './shared';
@@ -58,11 +57,10 @@ function ReflectionBand({ committedAt }: { committedAt: string }) {
 
 export function SampleRequest() {
   const { lot, ctx } = useJourney();
-  const { profileId } = useRole();
+  const game = useGame();
   const { toast } = useToast();
-  const ledger = useLedger();
   const [option, setOption] = useState<'sede' | 'visita'>('sede');
-  const req = ledger.samples[sampleKey(profileId, lot.id)];
+  const req = game.sampleRequest(lot.id);
   const ship = addDays(TODAY_DATE, 14);
   return (
     <div>
@@ -73,8 +71,7 @@ export function SampleRequest() {
       <p className="mt-1 text-sm text-muted">Cada co-financiador pode pedir uma amostra, seja qual for o montante: {ctx.copy.sample}.</p>
       {req ? (
         <p className="mt-3 text-[0.9375rem] text-fg" role="status">
-          Amostra pedida a <span className="font-mono tnum">{fmtDate(req.at)}</span> ·{' '}
-          {req.option === 'sede' ? `envio para a sede registada até ${fmtDate(ship)}` : `levantamento numa visita a ${ctx.producer.nome}, a combinar`}.
+          Pedida a <span className="font-mono tnum">{fmtDate(req.at)}</span> · {req.detail}. Uma amostra por lote; o pedido fica também na Academia, em Recompensas da colheita.
         </p>
       ) : (
         <div className="mt-3">
@@ -92,7 +89,13 @@ export function SampleRequest() {
             variant="secondary"
             className="mt-2"
             onClick={() => {
-              requestSample(profileId, lot.id, option);
+              game.requestReward({
+                rewardId: 'amostra',
+                lotId: lot.id,
+                option: option === 'sede' ? 'morada' : 'produtor',
+                detail: option === 'sede' ? `Amostra do ${lot.id} · envio para a sede registada até ${fmtDate(ship)}` : `Amostra do ${lot.id} · levantamento numa visita a ${ctx.producer.nome}, a combinar`,
+                status: 'Pedido registado',
+              });
               toast({ tone: 'neutral', title: 'Amostra pedida', description: `${lot.id} · ${option === 'sede' ? 'envio para a sede' : 'levantamento numa visita'}` });
             }}
           >
@@ -107,7 +110,7 @@ export function SampleRequest() {
 export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCancelled: () => void }) {
   const { lot, ctx } = useJourney();
   const data = useData();
-  const { profileId } = useRole();
+  const game = useGame();
   const { toast } = useToast();
   const [stampNow, setStampNow] = useState(!moment.fresh);
   const [revealed, setRevealed] = useState(!moment.fresh);
@@ -130,8 +133,7 @@ export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCa
   const sealView = seal ? data.seals.find((s) => s.def.id === seal.id) : undefined;
   const reflEnd = reflectionEnd(p.committedAt);
   const inReflection = daysBetween(TODAY_DATE, reflEnd) >= 0;
-  const ref = `SPR-${lot.id.replace(/-/g, '')}-${(p.id.match(/s(\d+)/)?.[1] ?? '1').padStart(3, '0')}`;
-
+  const ref = transferReference(p);
 
   return (
     <div className="grid min-w-0 gap-x-12 gap-y-10 lg:grid-cols-12">
@@ -270,8 +272,12 @@ export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCa
             <Button
               variant="quiet-danger"
               onClick={() => {
-                cancelCommitment(p, profileId);
+                const r = game.cancelCommitment(p.id);
                 setConfirm(false);
+                if (!r.ok) {
+                  toast({ tone: 'warn', title: 'Não foi possível cancelar', description: r.message });
+                  return;
+                }
                 toast({ tone: 'neutral', title: `Compromisso cancelado · ${lot.id}`, description: 'Sem custos. Nenhuma transferência tinha sido pedida.' });
                 onCancelled();
               }}

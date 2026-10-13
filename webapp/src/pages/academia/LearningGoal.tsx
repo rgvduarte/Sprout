@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom';
 import { Check, Target } from 'lucide-react';
 import { Button, Meter } from '../../components/ui';
 import { getModule, getQuest } from '../../data';
-import { useGame, useRole, useToast, type GameView } from '../../state';
+import { useGame, useToast, type GameView } from '../../state';
 import { now } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate } from '../../lib/format';
 import { GOALS, type GoalItem, type LearningGoal as Goal } from './content';
-import { setGoal, useAcademiaLocal } from './localStore';
 
 function itemInfo(item: GoalItem, game: GameView): { label: string; done: boolean; href: string } {
   if (item.kind === 'module') {
@@ -27,15 +26,14 @@ function goalProgress(goal: Goal, game: GameView) {
 /** Objetivo de aprendizagem com progresso (escolhido pelo utilizador). */
 export function LearningGoalPanel() {
   const game = useGame();
-  const { profileId } = useRole();
-  const local = useAcademiaLocal(profileId);
   const { toast } = useToast();
   const [choosing, setChoosing] = useState(false);
-  const current = GOALS.find((g) => g.id === local.goal);
+  const goal = game.learningGoal;
+  const current = GOALS.find((g) => g.id === goal?.focus);
   const showChooser = choosing || !current;
 
   const choose = (g: Goal) => {
-    setGoal(profileId, g.id, now().toISOString());
+    game.setLearningGoal({ focus: g.id, level: goal?.focus === g.id ? goal.level : undefined });
     setChoosing(false);
     toast({ tone: 'accent', title: 'Objetivo definido', description: g.title });
   };
@@ -48,7 +46,7 @@ export function LearningGoalPanel() {
           <h3 id="objetivo-title" className="text-[1.0625rem] leading-tight">
             Objetivo de aprendizagem
           </h3>
-          <p className="mt-0.5 text-sm text-muted">{current && !choosing ? `Definido a ${fmtDate(local.goalSetAt ?? now())}` : 'Escolhe o que queres dominar primeiro. Podes mudar quando quiseres.'}</p>
+          <p className="mt-0.5 text-sm text-muted">{current && !choosing ? `Definido a ${fmtDate(goal?.setAt ?? now())}` : 'Escolhe o que queres dominar primeiro. Podes mudar quando quiseres.'}</p>
         </div>
       </div>
 
@@ -58,7 +56,7 @@ export function LearningGoalPanel() {
           <ul className="flex flex-col gap-2">
             {GOALS.map((g) => {
               const p = goalProgress(g, game);
-              const selected = g.id === local.goal;
+              const selected = g.id === goal?.focus;
               return (
                 <li key={g.id}>
                   <button

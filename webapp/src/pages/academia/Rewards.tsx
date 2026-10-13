@@ -2,13 +2,12 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { ClipboardList, Coffee, Droplets, Factory, Lock, Package, ScrollText, Video } from 'lucide-react';
 import { Button, Drawer, RadioGroup, Select, Field, SegmentedControl } from '../../components/ui';
 import { LEVELS, getQuest } from '../../data';
-import type { LevelId } from '../../data/types';
-import { useData, useGame, useRole, useToast, type GameView, type PositionView } from '../../state';
+import type { LevelId, RewardRequest } from '../../data/types';
+import { useData, useGame, useToast, type GameView, type PositionView } from '../../state';
 import { now } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, num } from '../../lib/format';
 import { LEVEL_PERKS, REWARDS, type RewardDef, type RewardId } from './content';
-import { addRequest, useAcademiaLocal, type RewardRequest } from './localStore';
 import { certificateSvg } from './certificate';
 
 /* =====================================================================
@@ -45,13 +44,11 @@ function unlockState(r: RewardDef, game: GameView, sampleLots: PositionView[]) {
 export function Rewards() {
   const game = useGame();
   const data = useData();
-  const { profileId } = useRole();
-  const local = useAcademiaLocal(profileId);
   const [drawer, setDrawer] = useState<{ id: RewardId; n: number; open: boolean } | null>(null);
   const openReward = (id: RewardId) => setDrawer((d) => ({ id, n: (d?.n ?? 0) + 1, open: true }));
 
   const participating = useMemo(() => data.positions.filter((p) => p.status !== 'liquidado' && p.lot.world !== 'cafe'), [data.positions]);
-  const requestsFor = (id: RewardId) => local.requests.filter((r) => r.rewardId === id);
+  const requestsFor = (id: RewardId) => game.rewardRequests.filter((r) => r.rewardId === id);
   const openDef = drawer ? REWARDS.find((r) => r.id === drawer.id) : undefined;
 
   return (
@@ -106,11 +103,11 @@ export function Rewards() {
           <h3 id="pedidos-title" className="text-[1.0625rem]">
             Os teus pedidos
           </h3>
-          {local.requests.length === 0 ? (
+          {game.rewardRequests.length === 0 ? (
             <p className="mt-2 text-sm text-muted">Ainda não pediste nada. As recompensas desbloqueadas têm o botão ativo.</p>
           ) : (
             <ul className="mt-2 divide-y divide-border">
-              {local.requests.map((q) => (
+              {game.rewardRequests.map((q) => (
                 <RequestRow key={q.id} q={q} />
               ))}
             </ul>
@@ -178,10 +175,8 @@ function RequestRow({ q }: { q: RewardRequest }) {
 function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; open: boolean; onClose: () => void; participating: PositionView[] }) {
   const game = useGame();
   const data = useData();
-  const { profileId } = useRole();
-  const local = useAcademiaLocal(profileId);
   const { toast } = useToast();
-  const reqs = local.requests.filter((r) => r.rewardId === def.id);
+  const reqs = game.rewardRequests.filter((r) => r.rewardId === def.id);
 
   const sampleLots = participating.filter((p) => !reqs.some((q) => q.lotId === p.lotId));
   const reportLots = data.lots.filter((l) => ['aberto', 'financiado', 'em-extensao'].includes(l.status) && l.world !== 'cafe');
@@ -216,7 +211,7 @@ function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; 
       detail = `${placeLabel} · ${slotLabel} · ${people === '1' ? '1 pessoa' : '2 pessoas'}`;
       status = 'Pedido registado · a equipa confirma por email';
     }
-    addRequest(profileId, { rewardId: def.id, at: today, detail, status, lotId: lot });
+    game.requestReward({ rewardId: def.id, at: today, detail, status, lotId: lot, option: def.kind === 'amostra' ? place : def.kind === 'sessao' ? slot : undefined });
     toast({ tone: 'accent', title: def.kind === 'certificado' ? 'Certificado emitido' : 'Pedido registado', description: `${def.title}: ${detail}.` });
     if (def.kind !== 'certificado') onClose();
   };

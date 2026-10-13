@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { LEVELS, MINI_GAMES, MODULES, QUESTS, getWorld } from '../../data';
-import type { LevelId, WorldId } from '../../data/types';
+import type { LearningFocus, LevelId, WorldId } from '../../data/types';
 import { Button, CommodityGlyph, Meter, RadioGroup, SegmentedControl } from '../../components/ui';
 import { KnowledgeLevelBadge } from '../../components/game';
 import { useGame, useToast, type ProfileId } from '../../state';
@@ -24,7 +24,8 @@ interface NextStep {
   href: string;
 }
 
-function useNextSteps(world: WorldId, limit = 4): NextStep[] {
+function useNextSteps(focus: LearningFocus, limit = 4): NextStep[] {
+  const world: WorldId | 'geral' = focus === 'risco' ? 'geral' : focus;
   const game = useGame();
   const own = MODULES.filter((m) => m.world === world && !game.isModuleDone(m.id)).map<NextStep>((m) => ({ id: m.id, kind: 'Módulo', title: m.title, points: m.points, href: `/academia#${m.id}` }));
   const games = MINI_GAMES.filter((g) => g.world === world)
@@ -35,14 +36,14 @@ function useNextSteps(world: WorldId, limit = 4): NextStep[] {
     })
     .filter((x): x is NextStep => x !== null);
   const quests = QUESTS.filter((q) => q.world === world && !game.isQuestDone(q.id)).map<NextStep>((q) => ({ id: q.id, kind: 'Missão', title: q.title, points: q.points, href: q.href }));
-  const general = MODULES.filter((m) => m.world === 'geral' && !game.isModuleDone(m.id)).map<NextStep>((m) => ({ id: m.id, kind: 'Módulo', title: m.title, points: m.points, href: `/academia#${m.id}` }));
+  const general = world === 'geral' ? [] : MODULES.filter((m) => m.world === 'geral' && !game.isModuleDone(m.id)).map<NextStep>((m) => ({ id: m.id, kind: 'Módulo', title: m.title, points: m.points, href: `/academia#${m.id}` }));
   return [...own, ...games, ...quests, ...general].slice(0, limit);
 }
 
 /** «pelo Olival», «pela Nascente», «pela Plantação». */
-const POR: Record<WorldId, string> = { azeite: 'pelo Olival', agua: 'pela Nascente', cafe: 'pela Plantação' };
+const POR: Record<LearningFocus, string> = { azeite: 'pelo Olival', agua: 'pela Nascente', cafe: 'pela Plantação', risco: 'pelo risco' };
 /** «no Olival», «na Nascente», «na Plantação». */
-const EM: Record<WorldId, string> = { azeite: 'no Olival', agua: 'na Nascente', cafe: 'na Plantação' };
+const EM: Record<LearningFocus, string> = { azeite: 'no Olival', agua: 'na Nascente', cafe: 'na Plantação', risco: 'para perceber o risco' };
 
 const WORLD_HINT: Record<WorldId, string> = {
   azeite: 'Lagares, depósitos, painel de prova e cobertura por venda a prazo.',
@@ -55,10 +56,10 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
   const { toast } = useToast();
   const [goal, setGoal] = useLearningGoal(profileId);
   const options = LEVELS.filter((l) => l.minPoints > game.points);
-  const [world, setWorld] = useState<WorldId>(goal?.world ?? 'azeite');
+  const [world, setWorld] = useState<WorldId>(goal && goal.focus !== 'risco' ? goal.focus : 'azeite');
   const [level, setLevel] = useState<LevelId | undefined>(goal?.level ?? options[0]?.id);
   const [editing, setEditing] = useState(false);
-  const steps = useNextSteps(goal?.world ?? world);
+  const steps = useNextSteps(goal?.focus ?? world);
   const H = headingLevel === 2 ? 'h2' : 'h3';
   const hid = useId().replace(/:/g, '');
 
@@ -69,7 +70,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
   const save = () => {
     if (!chosenLevel) return;
     const lv = LEVELS.find((l) => l.id === chosenLevel)!;
-    setGoal({ world, level: chosenLevel, setAt: now().toISOString() });
+    setGoal({ focus: world, level: chosenLevel });
     setEditing(false);
     toast({
       tone: 'accent',
@@ -83,7 +84,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
       <div>
         <div className="min-w-0">
           <H id={`lg-${hid}`} className="text-[1.1875rem] leading-tight">
-            {showForm ? 'Define o teu objetivo de aprendizagem' : `Objetivo: ${target!.nome}, a começar ${POR[goal!.world]}`}
+            {showForm ? 'Define o teu objetivo de aprendizagem' : `Objetivo: ${target!.nome}, a começar ${POR[goal!.focus]}`}
           </H>
           <p className="max-w-[60ch] mt-1 text-sm text-muted">
             {showForm
@@ -161,7 +162,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
           )}
           {steps.length > 0 && (
             <>
-              <p className="mt-5 text-sm font-medium text-fg">Próximos passos {EM[goal!.world]}</p>
+              <p className="mt-5 text-sm font-medium text-fg">Próximos passos {EM[goal!.focus]}</p>
               <ul className="mt-1 divide-y divide-border">
                 {steps.map((s) => (
                   <li key={s.id} className="flex min-w-0 items-center gap-3 py-2">
@@ -185,7 +186,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
               variant="ghost"
               size="sm"
               onClick={() => {
-                setWorld(goal!.world);
+                setWorld(goal!.focus === 'risco' ? 'azeite' : goal!.focus);
                 setLevel(options[0]?.id);
                 setEditing(true);
               }}
