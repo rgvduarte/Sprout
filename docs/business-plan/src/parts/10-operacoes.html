@@ -1,31 +1,31 @@
 
 <!-- ================================ 10 OPERAÇÕES ================================ -->
-<section class="chapter" id="c10">
+<section class="chapter cont" id="c10">
   <header class="ch-head">
     <span class="ch-num">10</span>
     <h1>Operações e tecnologia</h1>
-    <p class="standfirst">O produto do Sprout é a verificação: um lote só é financiável se alguém independente puder provar que existe, que tem a categoria declarada, que não está empenhado a outro e que vai ser vendido. A tecnologia serve isso, e começa pelo ledger, não pela interface.</p>
+    <p class="standfirst">O produto do Sprout é a verificação: um lote só é financiável se alguém independente puder provar que existe, que tem a categoria declarada, que não está empenhado a outro e que vai ser vendido. A tecnologia serve isso e começa pelo ledger.</p>
   </header>
 
   <figure>
     <p class="fig-title">Arquitetura de referência do piloto</p>
     {{svg_arquitetura}}
-    <figcaption>Três camadas: canais, serviços núcleo e integrações externas. O ledger (€ e kg) é a fonte de verdade: a reconciliação D+1 compara-o com extratos, faturas e stock medido, e o risco lê dele. O portal de investimento fica desligado até ao parecer jurídico. <span class="ref">30 §9</span></figcaption>
+    <figcaption>Três camadas: canais, serviços núcleo e integrações externas. O ledger (€ e kg) é a fonte de verdade: a reconciliação D+1 compara-o com extratos, faturas e stock medido, e o risco lê dele. A área de investidor (tracejada) fica desligada até ao parecer jurídico e só começa depois do gate. <span class="ref">30 §9</span></figcaption>
   </figure>
 
   <div class="cols">
     <h3>Telemetria de stock e reconciliação física</h3>
     <p>Três fases: CSV diário por SFTP do ERP do lagar (semana 1); API de eventos de produção, reserva e expedição (meses 1–2); sensores radar nos tanques, leitura a cada 15 min (meses 2–4; 3–9 k€ [E]). A massa (kg) é a unidade contabilística. Sensor contra ERP todos os dias (±0,5 %), ERP contra ledger todas as semanas; acima de 1 %, o lote deixa de vender. Variação de nível sem ordem de saída chama o collateral manager. O sensor monitoriza a garantia; não substitui a inspeção física <span class="ref">30 §7</span>.</p>
     <h3>Logística e qualidade</h3>
-    <p>O lagar embala; distribuidores levantam paletes de 5 L (FCA ou DAP); a parte HoReCa vai em tranches para um 3PL com conta de custódia (0,06 €/kg [E, NV]). O collateral manager inspeciona à entrada, em cada tranche e no fecho (2 000 € por lote [E, NV]); cada +0,05 €/kg nestes custos tira ~20 k€ ao EBITDA de 2031 no base <span class="ref">01 §1.4</span>. Laboratório ISO 17025 à entrada e a cada 4 meses, com critérios mais exigentes do que a lei (cap. 8).</p>
+    <p>O lagar embala; distribuidores levantam paletes de 5 L (FCA ou DAP); a parte HoReCa vai em tranches para um 3PL com conta de custódia (0,06 €/kg [E · NV]). O collateral manager inspeciona à entrada, em cada tranche e no fecho (2 000 € por lote [E · NV]); cada +0,05 €/kg nestes custos tira ~20 k€ ao EBITDA de 2031 no Base <span class="ref">01 §1.4</span>. Laboratório ISO 17025 à entrada e a cada 4 meses, com critérios mais exigentes do que a lei (cap. 8).</p>
     <h3>Faturação, pagamentos e reconciliação</h3>
-    <p>Faturas por API de um programa certificado pela AT (Moloni, InvoiceXpress ou similar), com ATCUD, QR, referência RF e selo qualificado desde 01-01-2027; nada de motor de faturação próprio. Contas da OpCo e da SPV (uma por série) em bancos portugueses. SLA diário: 07h00 extratos de D−1, 09h00 <i>matching</i>, 10h00 relatório assinado por Tesouraria e Compliance. Metas: ≥ 95 % de correspondência automática, 0 breaks por explicar em D+1 e diferença zero entre saldo e passivo de cada série; qualquer diferença bloqueia pagamentos.</p>
+    <p>Faturas por API de um programa certificado pela AT (Moloni, InvoiceXpress ou similar), com ATCUD, QR, referência RF e selo qualificado desde 01-01-2027; nada de motor de faturação próprio. Contas da OpCo e da SPV (uma por série e uma de cobranças) em bancos portugueses. Prazos diários: 07h00 extratos de D−1, 09h00 correspondência, 10h00 relatório assinado por Tesouraria e Compliance. Metas: ≥ 95 % de correspondência automática, 0 divergências por explicar em D+1 e diferença zero entre saldo e passivo de cada série; qualquer diferença bloqueia pagamentos.</p>
     <h3>Segurança e conformidade</h3>
-    <p>RGPD com avaliação de impacto (o KYC usa biometria); OWASP ASVS 5.0 nível 2 como critério de aceitação de cada <i>release</i>; SSO com MFA, RBAC com separação de funções, audit log encadeado por <i>hash</i> em WORM. DORA e NIS2 não se aplicam ao piloto, mas os bancos vão impor cláusulas; ISO 27001 em 2029 (38 k€ de segurança nesse ano no modelo). Setup técnico do piloto: 16–47 k€ e 0,7–2,6 k€/mês [E] <span class="ref">30 §8, §10</span>.</p>
+    <p>RGPD com avaliação de impacto (o KYC usa biometria); OWASP ASVS 5.0 nível 2 como critério de aceitação de cada versão; SSO com MFA, RBAC com separação de funções, registo de auditoria encadeado por <i>hash</i> em armazenamento WORM. DORA e NIS2 não se aplicam ao piloto, mas os bancos vão impor cláusulas; ISO 27001 em 2029 (38 k€ de segurança nesse ano no modelo). Setup técnico do piloto: 16–47 k€ e 0,7–2,6 k€/mês [E] <span class="ref">30 §8, §10</span>.</p>
   </div>
 
   <div class="note">
-    <h3>O backoffice «reverse engineered» é o maior risco técnico-jurídico imediato</h3>
-    <p>O documento-fonte assume um backoffice obtido por engenharia inversa que se monetizaria, «plug and play», em 12 horas. Pode violar direitos de autor (DL 252/94), segredos comerciais (Dir. 2016/943), a DSP2 (<i>screen scraping</i> de bancos) e a Lei do Cibercrime [L]; sem contratos de cessão, o código pode nem ser do Sprout, e um banco ou investidor que o descubra em <i>due diligence</i> sai. <b>O que fazer:</b> quarentena já; auditoria jurídica e técnica (SBOM, ScanCode, OSV-Scanner, Gitleaks, Semgrep) e <i>pentest</i> externo de 5–15 k€ [E]; módulo a módulo, manter, reescrever em <i>clean room</i> ou trocar por SaaS. Ledger, pagamentos e KYC sempre de proveniência limpa: critério obrigatório do gate.</p>
+    <h3>O backoffice obtido por engenharia inversa é o maior risco técnico-jurídico imediato</h3>
+    <p>O documento-fonte assume um backoffice «reverse engineered» que se monetizaria, «plug and play», em 12 horas. Pode violar direitos de autor (DL 252/94), segredos comerciais (Dir. 2016/943), a DSP2 (<i>screen scraping</i> de bancos) e a Lei do Cibercrime [L]; sem contratos de cessão, o código pode nem ser do Sprout, e um banco ou investidor que o descubra em <i>due diligence</i> sai. <b>O que fazer:</b> quarentena já; auditoria jurídica e técnica (SBOM, ScanCode, OSV-Scanner, Gitleaks, Semgrep) e <i>pentest</i> externo de 5–15 k€ [E]; módulo a módulo, manter, reescrever em <i>clean room</i> ou trocar por SaaS. Ledger, pagamentos e KYC sempre de proveniência limpa: critério obrigatório do gate.</p>
   </div>
 </section>

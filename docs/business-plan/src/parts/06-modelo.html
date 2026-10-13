@@ -1,47 +1,46 @@
-
 <!-- ================================ 6 MODELO DE NEGÓCIO ================================ -->
 <section class="chapter" id="c6">
   <header class="ch-head">
     <span class="ch-num">06</span>
     <h1>Modelo de negócio e unit economics</h1>
-    <p class="standfirst">Economicamente, o Sprout é um distribuidor especializado com verificação de lotes, de margem baixa. Ganha por kg, por canal, e só ganha bem num canal: azeite de origem identificada vendido à HoReCa média e alta contra uma referência documentada. A tese mede-se em €/kg e em EBITDA, não em «% da margem do embalador».</p>
+    <p class="standfirst">Economicamente, o Sprout é um distribuidor especializado com verificação de lotes, de margem baixa. Ganha por kg, por canal, e só ganha bem num canal: azeite de origem identificada vendido à HoReCa média e alta contra uma referência documentada. A tese mede-se em €/kg, depois do seguro de crédito, e em EBITDA.</p>
   </header>
 
   <h2><span class="sn">6.1</span>Fontes de receita</h2>
   {{tbl_receitas}}
-  <p class="tblnote">O que não cobramos: comissões de gestão ou de desempenho aos investidores. Cobrar «spread retido» a quem financia é cobrar como gestor de ativos e reforça a leitura de organismo de investimento coletivo <span class="ref">01 §6.1</span>. No recomendado, a margem média do azeite em 2031 é de 0,098 €/kg, abaixo dos 0,122 €/kg do base, porque o granel certificado dilui a média; o EBITDA melhora pela estrutura mais leve e pelos serviços.</p>
+  <p class="tblnote">O que não cobramos: comissões de gestão ou de desempenho aos investidores. Cobrar «spread retido» a quem financia é cobrar como gestor de ativos e reforça a leitura de organismo de investimento coletivo <span class="ref">01 §6.1</span>. No Recomendado, a margem média do azeite em 2031 é de {{= nf(RC['margem_contribuicao']['azeite_eur_kg'][4],3) }} €/kg, abaixo dos {{= nf(B['margem_contribuicao']['azeite_eur_kg'][4],3) }} €/kg do Base, porque o granel em corretagem dilui a média; o EBITDA melhora pela estrutura mais leve e pelos preços ainda por provar.</p>
 
   <h2><span class="sn">6.2</span>O lote-tipo: 20 t de AOVE para HoReCa e gourmet</h2>
   {{tbl_lote_horeca}}
-  <p class="tblnote">Regime de 2029: stock médio de 45 dias, ciclo líquido de 50 dias, obrigações a 90 % do capital empregue com utilização de 80 %, cupão de 7,5 %/ano. Recomendado: referência de 6,00 €/kg de origem identificada (por verificar) e prémio de 0,15 €/kg ao lagar. <span class="ref">Modelo · Unit economics · 01 §2.2</span></p>
+  <p class="tblnote">Regime de 2029: stock médio de 45 dias, ciclo líquido de 50 dias, cupão de 7,5 %/ano; obrigações a 90 % do capital empregue no Base e a 75 % no Recomendado, com utilização de 80 %. O seguro de crédito (0,4 % das vendas) está no opex do modelo; aqui é imputado ao lote. Recomendado: referência de 6,00 €/kg de origem identificada (por verificar) e prémio de 0,15 €/kg ao lagar. <span class="ref">Modelo · Unit economics · 01 §2.2</span></p>
   <figure>
-    <p class="fig-title">Para onde vão os 5,65 €/kg da referência no lote base</p>
+    <p class="fig-title">Para onde vão os 5,65 €/kg da referência no lote do Base</p>
     <p class="fig-sub">€/kg sem IVA, desconto de 10 %. A barra de baixo amplia o bolo de intermediação: o que hoje fica com embalador, distribuidor e retalhista.</p>
     {{fig_lote_valuechain}}
-    <figcaption>No recomendado, o bolo é de 1,52 €/kg e reparte-se em 39 % desconto, 3 % cupão, 17 % custos diretos e 40 % margem. A repartição explica; não mede: a antiga «taxa de redistribuição» dava 70–90 % até em lotes com margem negativa. <span class="ref">01 §2.3 · Modelo</span></figcaption>
+    <figcaption>Margem depois do seguro de crédito. No Recomendado, o bolo é de {{= nf(bolo('recomendado')[0],2) }} €/kg e reparte-se em {{= pct(bolo('recomendado')[2]['desc'],0) }} desconto, {{= pct(bolo('recomendado')[2]['cup'],0) }} cupão, {{= pct(bolo('recomendado')[2]['cd'],0) }} custos diretos e seguro e {{= pct(bolo('recomendado')[2]['sp'],0) }} margem. A repartição explica; não mede: a antiga «taxa de redistribuição» dava 70–90 % até em lotes com margem negativa. <span class="ref">01 §2.3 · Modelo</span></figcaption>
   </figure>
   <div class="cols">
-    <p><b>Do lado do investidor.</b> No lote base, 83 000 € ficam imobilizados durante ~50 dias. Estão-lhe afetos 93 375 € de obrigações (o excedente fica em caixa na série) e o cupão do ciclo é de 959 €: 7,5 %/ano bruto, ~5,4 % líquido para um particular residente, com retenção de 28 % [L]. Os 10 % de capital subordinado (8 300 €) são do patrocinador.</p>
-    <p>O investidor não ganha nem perde com o preço do azeite enquanto a almofada (margem do lote, reserva de 1.ª perda, subordinado) absorver as perdas: é um credor colateralizado, não um dono de stock. É isso que mantém o produto fora das leituras de derivado e de organismo de investimento coletivo (cap. 7).</p>
+    <p class="keep-p"><b>Do lado do investidor.</b> No lote do Base, {{= nf(ue('h','base')['cap']) }} € ficam imobilizados durante ~{{= nf(ue('h','base')['ciclo']) }} dias. Estão-lhe afetos {{= nf(ue('h','base')['notes']) }} € de obrigações (o excedente fica em caixa na série) e o cupão do ciclo é de {{= nf(ue('h','base')['cupciclo']) }} €: {{= pct(ue('h','base')['cup']) }}/ano bruto. A retenção na fonte é de 28 % para particulares residentes (liberatória) e de 25 % por conta para pessoas coletivas residentes; para não residentes, depende da convenção aplicável [L] (7.7). O capital subordinado ({{= nf(ue('h','base')['sub']) }} € no Base, {{= nf(ue('h','recomendado')['sub']) }} € no Recomendado) é do patrocinador.</p>
+    <p class="keep-p">O investidor recebe cupão fixo. O risco de preço que lhe chega é residual e limitado por política: absorvido primeiro pela margem do lote, pela reserva de 1.ª perda e pelo subordinado (10 % no Base, 25 % no Recomendado); num cenário combinado (S5, cap. 8) pode atingir o sénior. É um credor colateralizado; os lotes são colateral da série e não mercadoria sua, e é essa leitura que mantém o produto fora do derivado e do organismo de investimento coletivo (cap. 7).</p>
   </div>
 
-  <h2><span class="sn">6.3</span>Os outros canais: volume, não margem</h2>
+  <h2><span class="sn">6.3</span>Os outros canais: volume, com pouca margem</h2>
   {{tbl_lotes_canais}}
   <div class="cols">
-    <p><b>Distribuidores e exportadores</b> compram ao embalador a 4,16–4,51 €/kg; o Sprout não lhes pode dar desconto. No base, a 4,35 €/kg, o canal ganha 0,064 €/kg (1,5 %) e só não perde dinheiro acima de 4,29 €/kg. O recomendado assume um prémio de origem de 0,10 €/kg (4,45 €/kg) e 55 dias de recebimento: 0,155 €/kg. Cada 0,10 €/kg vale ~178 k€ de EBITDA em 2031 no base <span class="ref">01 §2.5</span>.</p>
-    <p><b>Granel certificado</b>, em lotes de 100 t comprados ao índice e vendidos a índice + 0,15 €/kg, deixa 0,035 €/kg (0,9 %). Dá escala, historial de verificação e colateral para o banco parceiro; não dá margem. No piloto, sem cupão, a HoReCa faz 0,341 €/kg e os distribuidores 0,096 €/kg (base).</p>
+    <p><b>Distribuidores e exportadores</b> compram ao embalador a 4,16–4,51 €/kg; o Sprout não lhes pode dar desconto. No Base, a 4,35 €/kg, o canal ganha {{= nf(ekg('d','base','margem_seg'),3) }} €/kg depois do seguro de crédito ({{= pct(ue('d','base')['margem_seg_pct']) }}) e só não perde dinheiro acima de ~{{= nf(breakeven_price('d','base'),2) }} €/kg. O Recomendado assume um prémio de origem de 0,10 €/kg (4,45 €/kg), por provar, e 55 dias de recebimento: {{= nf(ekg('d','recomendado','margem_seg'),3) }} €/kg. Cada 0,10 €/kg vale ~{{= k(per_010('base')) }} k€ de EBITDA em 2031 no Base <span class="ref">Modelo · 01 §2.5</span>.</p>
+    <p><b>Granel certificado.</b> Comprado ao índice e vendido a índice + 0,15 €/kg, como principal, deixaria {{= nf(ekg('g','recomendado','margem_seg'),3) }} €/kg depois do seguro de crédito ({{= pct(ue('g','recomendado')['margem_seg_pct']) }}). Até haver carta de intenções a ≥ índice + 0,10 €/kg, o Recomendado modela-o como corretagem com verificação: o Sprout cobra {{= nf(UE['granel_corretagem_100t']['recomendado']['com'],3) }} €/kg (0,75 % de 3,50) e paga {{= nf(-UE['granel_corretagem_100t']['recomendado']['custo'],3) }} €/kg de custódia, análises e pagamentos, ficando com {{= nf(UE['granel_corretagem_100t']['recomendado']['margem'],3) }} €/kg, {{= nf(UE['granel_corretagem_100t']['recomendado']['lote']) }} € por lote de 100 t. Dá escala, historial de verificação e colateral para o banco parceiro, com muito pouca margem. No piloto, sem cupão, a HoReCa faz {{= nf(UE['piloto_2027_eur_kg']['base']['h_margem'],3) }} €/kg e os distribuidores {{= nf(UE['piloto_2027_eur_kg']['base']['d_margem'],3) }} €/kg (Base).</p>
   </div>
 
-  <h2 class="page-start"><span class="sn">6.4</span>O veredicto sobre «80–90 % da margem do embalador» e «10–15 % de desconto»</h2>
+  <h2><span class="sn">6.4</span>O veredicto sobre «80–90 % da margem do embalador» e «10–15 % de desconto»</h2>
   <figure>
-    <p class="fig-title">A tese literal num lote HoReCa base, €/kg</p>
-    <p class="fig-sub">Captura de 85 % da margem média do embalador nas três campanhas do Observatorio (0,297 €/kg), contra o que o lote tem de pagar</p>
+    <p class="fig-title">A tese literal num lote HoReCa do Base, €/kg</p>
+    <p class="fig-sub">Captura de 85 % da margem média do embalador nas três campanhas do Observatorio ({{= nf(UE['tese_literal_horeca']['base']['m'],3) }} €/kg), contra o que o lote tem de pagar</p>
     {{fig_tese_waterfall}}
-    <figcaption>O desconto de 10 % custa 2,24 vezes o que a captura rende; depois dos custos diretos e do cupão, sobram −0,62 €/kg. <span class="ref">Modelo · unit economics</span></figcaption>
+    <figcaption>O desconto de 10 % custa {{= nf(UE['tese_literal_horeca']['base']['ratio'],2) }} vezes o que a captura rende; depois dos custos diretos e do cupão, sobram {{= nf(UE['tese_literal_horeca']['base']['spread'],2) }} €/kg. <span class="ref">Modelo · Unit economics</span></figcaption>
   </figure>
   {{tbl_tese_literal}}
   <p class="tblnote">As 18 combinações de captura (80, 85, 90 %), desconto (10, 12,5, 15 %) e margem do embalador (média ou a mais alta das três campanhas) dão saldo negativo. <span class="ref">Modelo · sensibilidade</span></p>
   <div class="note">
-    <p><span class="lbl crit">O que tem de ceder.</span> «80–90 %» sai do deck e da app: usá-lo perante investidores seria uma afirmação enganosa (Reg. 2017/1129, art. 22.º; CVM, art. 7.º [L]). O desconto é de até 10 %, só para HoReCa e gourmet, e só contra uma referência documentada em €/kg; distribuidores e exportadores têm 0 %. O cupão (~0,05 €/kg) é custo pago pela margem do lote, não «redistribuição». No base, qualquer destas alavancas sozinha fecharia o buraco de 2031: +0,69 €/kg pagos pelos distribuidores, uma referência HoReCa de 8,99 €/kg ou −78 % de custos fixos. Nenhuma é realista (cap. 13).</p>
+    <p><span class="lbl crit">O que tem de ceder.</span> «80–90 %» sai da apresentação e da app: usá-lo perante investidores seria uma afirmação enganosa (Reg. 2017/1129, art. 22.º; CVM, art. 7.º [L]). O desconto é de até 10 %, só para HoReCa e gourmet, e só contra uma referência documentada em €/kg; distribuidores e exportadores têm 0 %. O cupão (~0,05 €/kg) é custo pago pela margem do lote. No Base, qualquer destas alavancas sozinha fecharia o défice de 2031: +{{= nf(B['o_que_tem_de_ser_verdade_2031']['premio_adicional_distribuidores_eur_kg'],2) }} €/kg pagos pelos distribuidores, uma referência HoReCa de {{= nf(B['o_que_tem_de_ser_verdade_2031']['referencia_horeca_eur_kg'],2) }} €/kg ou {{= nf(-B['o_que_tem_de_ser_verdade_2031']['corte_custos_fixos_pct']*100,0) }} % de custos fixos. Nenhuma é realista (cap. 13).</p>
   </div>
 </section>

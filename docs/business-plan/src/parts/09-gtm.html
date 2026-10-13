@@ -1,10 +1,9 @@
-
 <!-- ================================ 9 GO-TO-MARKET ================================ -->
-<section class="chapter" id="c9">
+<section class="chapter cont" id="c9">
   <header class="ch-head">
     <span class="ch-num">09</span>
     <h1>Go-to-market</h1>
-    <p class="standfirst">Primeiro mede-se o preço, depois vende-se, e só no fim se levanta capital de investidores. O piloto é do tamanho da procura real, é pago com capital próprio e não tem investidores; a 1.ª série de obrigações só sai depois do gate e do prazo legal da SPV.</p>
+    <p class="standfirst">Primeiro mede-se o preço, depois vende-se, e só no fim se levanta capital de investidores. O piloto é do tamanho da procura real, é pago com capital próprio e não tem investidores; a 1.ª série de obrigações só sai depois do gate.</p>
   </header>
 
   <h2><span class="sn">9.1</span>O piloto fechado: fevereiro a julho de 2027</h2>
@@ -12,44 +11,46 @@
     <table class="compact wrap">
       <thead><tr><th style="width:26mm">Dimensão</th><th>Valor</th></tr></thead>
       <tbody>
-        <tr><td class="lbl">Produtores</td><td>3 lagares (Lagar do Val + 2, com Lagar do Val ≤ 50 % do volume) e 2 engarrafadores</td></tr>
+        <tr><td class="lbl">Produtores</td><td>2 lagares no piloto, um lote de 10 t de cada (Lagar do Val ≤ 50 % do volume) e um 3.º antes da 1.ª série; 2 engarrafadores. Preço do Lagar do Val aprovado por terceiro e declarado aos investidores</td></tr>
         <tr><td class="lbl">Compradores</td><td>~36: 25 HoReCa média e alta, 8 lojas gourmet, 3 distribuidores ou exportadores com offtake</td></tr>
-        <tr><td class="lbl">Volume</td><td>1 lote misto de 20 t de AOVE (4 t HoReCa e gourmet, 16 t com offtake, ≥ 80 % do lote) e 60 paletes de água</td></tr>
-        <tr><td class="lbl">GMV alvo</td><td>~106 k€: azeite HoReCa 20,3 k€, azeite distribuidores 69,6 k€, água 16,2 k€</td></tr>
-        <tr><td class="lbl">Financiamento</td><td>Capital próprio (capital social da SPV + OpCo); pico de ~82 k€ quando o lote é pago a D30; 0 investidores</td></tr>
-        <tr><td class="lbl">Resultado esperado</td><td>Margem do azeite de ~2,9 k€ (3,2 %): o piloto prova operação e preço, não lucro</td></tr>
+        <tr><td class="lbl">Volume</td><td>20 t de AOVE: {{= nf(KP['volume']['azeite_distribuidores_offtake_t']) }} t com offtake de distribuidores ({{= pct(KP['metas']['offtake_cobertura_min_lote'],0) }}) e {{= nf(KP['volume']['azeite_horeca_gourmet_t']) }} t para HoReCa e gourmet, stock aberto autorizado de 15 % com perda orçada (−30 % de preço: {{= nf(PIL_OPEN_LOSS/1000,1) }} k€); 60 paletes de água</td></tr>
+        <tr><td class="lbl">GMV alvo</td><td>~{{= k(KP['gmv_alvo_eur']) }} k€: azeite HoReCa {{= nf(KP['gmv_alvo_detalhe']['azeite_horeca_gourmet']/1000,1) }} k€, distribuidores {{= nf(KP['gmv_alvo_detalhe']['azeite_distribuidores']/1000,1) }} k€, água {{= nf(KP['gmv_alvo_detalhe']['agua']/1000,1) }} k€, a preços do Base</td></tr>
+        <tr><td class="lbl">Financiamento</td><td>Capital próprio (capital social da SPV + OpCo); pico de ~{{= k(PIL_COST) }} k€ quando os lotes são pagos a D30; 0 investidores. O capital da SPV tem de estar intacto (≥ 50 k€) na data da 1.ª emissão</td></tr>
+        <tr><td class="lbl">Resultado esperado</td><td>Margem do azeite de ~{{= nf(PIL_MARG/1000,1) }} k€ ({{= pct(PIL_MARG/PIL_AZ) }}): o piloto prova operação e preço, e não lucro</td></tr>
       </tbody>
     </table>
     <div class="small">
-      <p>33 clientes HoReCa a 150–300 L/ano absorvem 2,3–4,5 t em seis meses, não 20 t; o resto do lote só escoa com offtake de distribuidores <span class="ref">00 §10 · 01 §5.2</span>. O ticket médio HoReCa de 150–300 €/mês (azeite + água) só vale no piloto (~211 €/mês); com o consumo assumido para 2031 cai para ~107 €/mês, porque a água por cliente desce de ~4,8 para 0,9 paletes/ano. O deck deve dizê-lo assim.</p>
+      <p>33 clientes HoReCa a 150–300 L/ano absorvem 2,3–4,5 t em seis meses. As {{= nf(KP['volume']['azeite_horeca_gourmet_t']) }} t do piloto ficam no meio desse intervalo e são o único stock em aberto (15 %, o limite da política); o resto só escoa com offtake de distribuidores <span class="ref">00 §10 · 01 §5.2</span>. O ticket médio HoReCa de 150–300 €/mês (azeite + água) só vale no piloto (~211 €/mês); com o consumo assumido para 2031 cai para ~107 €/mês, porque a água por cliente desce de ~4,8 para 0,9 paletes/ano. A apresentação deve dizê-lo assim.</p>
     </div>
   </div>
   <figure>
-    <p class="fig-title">Calendário: o piloto corre em capital próprio enquanto a SPV cumpre os 12 meses</p>
+    <p class="fig-title">Calendário: o piloto corre em capital próprio; a 1.ª série só depois do gate</p>
     {{fig_timeline_piloto}}
-    <figcaption>1.ª série: 150 k€ (100 k€ sénior + 50 k€ de capital da SPV), 2–4 profissionais com ticket mínimo de 25 k€; emitir antes exige garantia de instituição de crédito (CSC art. 348.º/2, al. c) [L]), de custo NV. <span class="ref">01 §5.1–5.2</span></figcaption>
+    <figcaption>1.ª série: 150 k€ (100 k€ sénior + 50 k€ de capital da SPV), 2–4 profissionais com ticket mínimo de 25 k€. CSC art. 348.º/2 [L]: 12 meses de registo, salvo exceções, incluindo informação financeira auditada com ≤ 3 meses (redação do DL 26/2015), a confirmar no parecer; se a via se confirmar, a 1.ª série pode sair logo depois do gate. <span class="ref">01 §5.1–5.2</span></figcaption>
   </figure>
 
   <h2><span class="sn">9.2</span>Compradores, produtores e investidores</h2>
   <div class="cols">
     <h3>Compradores</h3>
-    <p>O primeiro entregável comercial não é um cliente, é uma referência: 20–30 cotações de AOVE 5 L e de azeite de origem identificada em cash &amp; carry e <i>foodservice</i> (Recheio, Makro, Bidfood, Garcias, distribuidores regionais) até 31-01-2027. Com mediana abaixo de 5,65 €/kg sem IVA a margem HoReCa fica abaixo de 7 %; abaixo de 5,40 €/kg, abaixo de 3 % <span class="ref">00 §11</span>. Depois: 25 contas HoReCa média e alta e 8 lojas gourmet, com prova de lote, ficha analítica e amostra; mandato SDD B2B e pré-pagamento nas três primeiras encomendas. Com distribuidores, parceria antes de concorrência: vender através deles o que o cabaz não tem. Três distribuidores ou exportadores com offtake de ≥ 10 t, e uma pergunta escrita: pagam prémio por origem verificada?</p>
+    <p>O primeiro entregável comercial é uma referência de preço, antes de qualquer cliente. São duas, com medianas separadas, até 31-01-2027: 20–30 cotações de AOVE <i>standard</i> em 5 L em cash &amp; carry e <i>foodservice</i> (Recheio, Makro, Bidfood, Garcias, distribuidores regionais), que valem para o Base; e 20–30 preços de tabela HoReCa de azeite DOP ou monovarietal de marcas premium portuguesas e de cooperativas DOP, que valem para o Recomendado e são as que contam no gate. Com a mediana de origem abaixo de 6,00 €/kg o Recomendado não se aguenta; abaixo de 5,40 €/kg, não há modelo <span class="ref">00 §11</span>. Depois: 25 contas HoReCa média e alta e 8 lojas gourmet, com prova de lote, ficha analítica e amostra; mandato SDD B2B e pré-pagamento nas três primeiras encomendas. Com distribuidores, parceria antes de concorrência: vender através deles o que o cabaz não tem. Três distribuidores ou exportadores com offtake de ≥ 10 t, e uma pergunta escrita a cada um: pagam prémio por origem verificada, e quanto?</p>
     <h3>Produtores: começar pelo âncora, sem depender dele</h3>
-    <p>O Lagar do Val entra primeiro, com regras de parte relacionada (cap. 12): preço ao índice + prémio aprovado por terceiros, depósito tripartido, collateral manager, ≤ 50 % do volume. O <i>feed</i> de stock começa na semana 1 como CSV diário e passa a sensores radar até ao mês 4. Mais dois lagares do Alentejo ou de Trás-os-Montes antes da 1.ª série. O argumento junto dos lagares é o pagamento em ≤ 30 dias por SCT Inst num ano em que o granel está abaixo do custo do olival tradicional. Na água, dois engarrafadores em modelo agente; a água sai no gate se o GMV for &lt; 12 k€ ou a comissão &lt; 1,5 %.</p>
-    <h3>Investidores: roadshow privado a profissionais</h3>
-    <p>Sem investidores no piloto. Para a 1.ª série, uma lista fechada de bancos privados, <i>family offices</i> e profissionais <i>per se</i>, com o deck rotulado como comunicação publicitária e aprovado no parecer. A pergunta a fazer já: que cupão pede o mercado para notas colateralizadas de <i>trade finance</i> a profissionais em Portugal? <span class="ref">00 §11, ponto 8</span></p>
+    <p>O Lagar do Val entra primeiro, com regras de parte relacionada (cap. 12): preço ao índice + prémio aprovado por terceiros, depósito tripartido, collateral manager, ≤ 50 % do volume. O registo de stock começa na semana 1 como CSV diário e passa a sensores radar até ao mês 4. O argumento junto dos lagares é o prémio de origem (0,10–0,15 €/kg) e, na fase 2, o acesso a crédito bancário sobre lotes verificados. O prazo vale pouco: pagar a 30 dias é o que a lei já impõe aos compradores maiores, e 30 dias a 8 % sobre 3,60 €/kg valem ≈ 0,024 €/kg. Pagar a D5 em vez de D30 custaria {{= k(RC['ebitda'][4]-s_rec('pagamento_lagar_d5')) }} k€ de EBITDA em 2031 e {{= k(s_rec('pagamento_lagar_d5','necessidade_capital_proprio')-RC['necessidade_capital_proprio']) }} k€ de capital no Recomendado <span class="ref">Modelo · sensibilidade</span>. O piloto compara, no mesmo lagar, a oferta do Sprout com a de um embalador, incluindo adiantamentos de campanha. Na água, dois engarrafadores em modelo agente; a água sai no gate se o GMV for &lt; 12 k€ ou a comissão &lt; 1,5 %.</p>
+    <h3>Granel: corretagem até haver prova</h3>
+    <p>Um lagar só vende por intermédio do Sprout ao índice, sem prémio, se a verificação lhe der alguma coisa: crédito bancário sobre o lote ou um comprador que pague a certificação. A prova pedida no gate: ≥ 1 embalador ou exportador assina uma carta de intenções a ≥ índice + 0,10 €/kg por lote certificado. Sem ela, o granel fica em corretagem com verificação, como no modelo.</p>
+    <h3>Investidores: colocação direta a profissionais</h3>
+    <p>Sem investidores no piloto. Para a 1.ª série, colocação direta pela SPV a uma lista fechada de <i>family offices</i> e profissionais <i>per se</i>, com a apresentação rotulada como comunicação publicitária e aprovada no parecer. Bancos privados entram como subscritores ou, se distribuírem, como intermediários autorizados, com comissão de colocação (1–2 % [E · NV], fora do modelo) e mercado-alvo MiFID. A pergunta a fazer já: que cupão pede o mercado para notas colateralizadas de <i>trade finance</i> a profissionais em Portugal? Com 10 %, o EBITDA de 2031 do Recomendado desce {{= k(RC['ebitda'][4]-s_rec('cupao_10')) }} k€ <span class="ref">00 §11, ponto 8 · Modelo</span>.</p>
   </div>
   <div class="note">
-    <p><span class="lbl">Minuta de aviso (sujeita ao parecer).</span> «Comunicação publicitária destinada exclusivamente a clientes profissionais. Não constitui oferta pública nem recomendação de investimento. As obrigações da Sprout Capital, SA não são depósitos nem estão cobertas por um sistema de garantia. O capital está em risco e pode perder-se total ou parcialmente. O cupão é fixo; o reembolso depende da venda dos lotes e das garantias. O vencimento esperado é a 12 meses e pode ser prorrogado uma vez até 18 meses, nos termos e condições.»</p>
+    <p><span class="lbl">Minuta de aviso (sujeita ao parecer).</span> «Comunicação publicitária destinada exclusivamente a clientes profissionais. Não constitui oferta pública nem recomendação de investimento. As obrigações da Sprout Capital, SA não são depósitos nem estão cobertas por um sistema de garantia, e só podem ser transmitidas a clientes profissionais. O capital está em risco e pode perder-se total ou parcialmente. O cupão é fixo; o reembolso depende da venda dos lotes e das garantias. O vencimento esperado é a 12 meses e pode ser prorrogado uma vez até 18 meses, nos termos e condições.»</p>
   </div>
 
   <h2><span class="sn">9.3</span>Fases 2 e 3</h2>
   <table class="compact wrap">
-    <colgroup><col style="width:28mm"><col><col style="width:62mm"></colgroup>
+    <colgroup><col style="width:28mm"><col><col style="width:64mm"></colgroup>
     <thead><tr><th>Fase</th><th>O que acontece</th><th>Condição de entrada</th></tr></thead>
     <tbody>
-      <tr><td class="lbl">Fase 2<span class="sub">set. 2027 – 2028</span></td><td>Campanha 2027/28 (compras nov.–fev.); 1.ª série; RFP a banco parceiro (o Sprout origina e verifica, o banco empresta aos lagares); granel certificado back-to-back (500 t em 2028 no recomendado); RFP a PSP marketplace (Lemonway, Mangopay) se houver fundos de terceiros</td><td>Gate de 31-08-2027 cumprido (cap. 14); parecer favorável; SPV com 12 meses de registo</td></tr>
-      <tr><td class="lbl">Fase 3<span class="sub">2029 em diante</span></td><td>Trader de granel e exportação (2029); exportação embalada para o Brasil através de importadores; café verde para microtorrefatores (2030); dados e índice; retalho só como promotor numa ECSP de terceiros (Raize tem autorização; Goparity e Miimosa a verificar), para recebíveis curtos ou lotes diferenciados, fora do horizonte do modelo</td><td>Margem por canal acima dos mínimos; ≥ 2 fontes de <i>funding</i> e de seguro desde a série 2; Espanha só depois de Portugal; Luxemburgo acima de 5–10 M€ de obrigações</td></tr>
+      <tr><td class="lbl">Fase 2<span class="sub">set. 2027 – 2028</span></td><td>Campanha 2027/28 (compras nov.–fev.); 1.ª série; RFP a banco parceiro (o Sprout origina e verifica, o banco empresta aos lagares) e cotação de linha de <i>borrowing base</i> ou <i>factoring</i> com seguro de crédito (13.3); granel em corretagem ({{= nf(RC['volumes_t']['azeite_granel_certificado'][1]) }} t em 2028 no Recomendado); RFP a PSP marketplace (Lemonway, Mangopay) se houver fundos de terceiros</td><td>Gate de 31-08-2027 cumprido (cap. 14); parecer favorável às perguntas 2, 4 e 10; seed fechada ou autonomia comprometida de ≥ 18 meses; <i>servicer</i> de reserva contratado; capital da SPV intacto</td></tr>
+      <tr><td class="lbl">Fase 3<span class="sub">2029 em diante</span></td><td>Trader de granel e exportação (2029); exportação embalada para o Brasil através de importadores; café verde para microtorrefatores (2030); dados e índice; retalho só como promotor numa ECSP de terceiros (Raize tem autorização ECSP; GoParity declara-se autorizada, a confirmar no registo da ESMA; Miimosa NV), para recebíveis curtos ou lotes diferenciados, fora do horizonte do modelo</td><td>Margem por canal acima dos mínimos; ≥ 2 fontes de financiamento e de seguro desde a série 2; promotor ECSP diferente da SPV ou com autonomia financeira ≥ 35 %; Espanha só depois de Portugal; Luxemburgo acima de 5–10 M€ de obrigações</td></tr>
     </tbody>
   </table>
 </section>

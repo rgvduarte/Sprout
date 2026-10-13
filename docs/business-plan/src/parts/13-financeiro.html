@@ -1,16 +1,15 @@
-
 <!-- ================================ 13 FINANCEIRO ================================ -->
 <section class="chapter" id="c13">
   <header class="ch-head">
     <span class="ch-num">13</span>
     <h1>Plano financeiro</h1>
-    <p class="standfirst">Projeções de um modelo, não previsões. Nenhum cenário chega ao break-even até 2031: nem o negócio do documento-fonte, nem o desenho recomendado, que reduz o prejuízo e o capital necessário, nem este com todas as alavancas no topo do que a investigação suporta.</p>
+    <p class="standfirst">Nenhum cenário chega ao break-even até 2031: nem o negócio do documento-fonte, nem o desenho recomendado, que reduz o prejuízo e o capital necessário, nem este com todas as alavancas no topo do que a investigação suporta. Os números são projeções de um modelo cujos preços-chave ainda não foram medidos.</p>
   </header>
 
   <h2><span class="sn">13.1</span>O modelo e os pressupostos</h2>
   <div class="cols">
-    <p>Sprout-Modelo-Financeiro.xlsx tem só fórmulas vivas (26 475, 0 erros), um seletor de cenário e uma folha-motor com os quatro cenários e 14 sensibilidades lado a lado. Reproduz o cálculo de referência da fonte com desvio máximo de 0,009 % e o lote-tipo de 01 §2.2 ao euro. Os preços das mercadorias ficam constantes ao nível de out. 2026: o modelo compra back-to-back; os choques estão em 13.6 e no cap. 8.</p>
-    <p>O EBITDA inclui o cupão das obrigações (o custo de financiar stock). Em 2027 não há obrigações: a SPV só emite 12 meses depois do registo. A necessidade de capital próprio soma o pré-arranque, o capital da SPV, a caixa mínima de 150 k€ e o vale do cash flow acumulado; como o vale ainda não chegou em 2031, os valores são mínimos, não picos.</p>
+    <p>O modelo em Excel tem só fórmulas vivas ({{= nf(R['verificacao']['formulas']) }}, 0 erros), um seletor de cenário e uma folha-motor com os quatro cenários e {{= N_CASES }} casos de sensibilidade lado a lado. Reproduz o cálculo de referência da fonte com desvio máximo de {{= nf(R['verificacao']['contra_calculo_referencia']['maior_desvio_relativo']*100,3) }} % e o lote-tipo de 01 §2.2 ao euro. Os preços das mercadorias ficam constantes ao nível de out. 2026, porque o modelo compra <i class="nowrap">back-to-back</i>; os choques estão em 13.6 e no cap. 8.</p>
+    <p>O EBITDA do modelo é depois do cupão das obrigações (o custo de financiar stock); a conta de resultados mostra também o EBITDA antes do cupão, comparável com múltiplos de mercado. O fundo de maneio e as obrigações são níveis médios do ano, e não saldos de fim de ano; o modelo assume 0 obrigações em 2027 (simplificação; a 1.ª série está prevista para dez. 2027–jan. 2028). A necessidade de capital próprio soma o pré-arranque, o capital da SPV, a caixa mínima de 150 k€ e o vale do fluxo de caixa acumulado; como o vale ainda não chegou em 2031, os valores são mínimos e não picos.</p>
   </div>
   {{tbl_pressupostos}}
 
@@ -21,48 +20,63 @@
       <p class="fig-sub">k€ por ano</p>
       <div class="legend"><span class="key"><span class="sw" style="--sw: var(--accent)"></span>Margem de contribuição</span><span class="key"><span class="sw" style="--sw: var(--neutral-2)"></span>Pessoal + opex não salarial</span></div>
       {{fig_mc_fixos}}
-      <figcaption>EBITDA = diferença: −586 k€ em 2027, −530 k€ em 2031, com 5,5 → 12 FTE. Sem o cupão, o EBITDA de 2031 seria −352 k€.</figcaption>
+      <figcaption>EBITDA = diferença: {{= k(RC['ebitda'][0]) }} k€ em 2027, {{= k(RC['ebitda'][4]) }} k€ em 2031, com 5,5 → 12 FTE. Antes do cupão, o EBITDA de 2031 seria {{= k(RC['ebitda_sem_cupao'][4]) }} k€.</figcaption>
     </figure>
     <figure>
-      <p class="fig-title">De onde vem a margem de 2031 no recomendado</p>
-      <p class="fig-sub">698 k€ de margem de contribuição, k€; a verde, serviços</p>
+      <p class="fig-title">De onde vem a margem de 2031 no Recomendado</p>
+      <p class="fig-sub">{{= k(RC['margem_contribuicao']['total'][4]) }} k€ de margem de contribuição, k€; a verde, serviços</p>
       {{fig_mc_mix}}
-      <figcaption>Trading (azeite, café, água) faz 81 %; verificação e dados, 19 %. A verificação só deixa margem porque o banco ou o mutuário pagam custódia e laboratório (no base, 100 k€ de receita dão 18 k€). <span class="ref">Modelo</span></figcaption>
+      <figcaption>Comércio (azeite, granel, café, água) faz {{= pct((RC['margem_contribuicao']['total'][4]-RC['margem_contribuicao']['verificacao_terceiros_liquida'][4]-RC['margem_contribuicao']['dados'][4])/RC['margem_contribuicao']['total'][4],0) }}; verificação e dados, {{= pct((RC['margem_contribuicao']['verificacao_terceiros_liquida'][4]+RC['margem_contribuicao']['dados'][4])/RC['margem_contribuicao']['total'][4],0) }}, ambos por provar. A verificação só deixa margem porque o banco ou o mutuário pagam custódia e laboratório (no Base, {{= k(B['receitas']['verificacao_terceiros'][4]) }} k€ de receita dão {{= k(B['margem_contribuicao']['verificacao_terceiros_liquida'][4]) }} k€). <span class="ref">Modelo</span></figcaption>
     </figure>
   </div>
 
   {{tbl_pl}}
   {{tbl_pl_base}}
 
-  <h2><span class="sn">13.3</span>Cash flow, financiamento e aplicação de fundos</h2>
+  <h2><span class="sn">13.3</span>Fluxos de caixa, financiamento e aplicação de fundos</h2>
   {{tbl_cf}}
   <div class="fig-side">
     <div>
       {{tbl_fundos}}
     </div>
     <div class="small">
-      <p><b>Pré-seed de 1,1 M€</b> até 31-01-2027 (ou 0,8 M€ mais um compromisso firme de bridge de 0,3 M€). Cobre o pré-arranque e o capital da SPV (145 k€), a fase 0, o piloto e o gate, mais set.–dez. 2027 para fechar a seed ou encerrar, e 150 k€ de caixa mínima. Gasto até ao gate de 31-08-2027: 653 k€ no recomendado (734 k€ no base); até 31-12-2027, 824 k€ (948 k€). Runway: 16,4 meses (14,1 no base) <span class="ref">Modelo · 01 §5.5</span>.</p>
-      <p><b>Depois do pré-seed</b>, o recomendado ainda precisa de 2,92 M€ de capital próprio entre 2028 e 2031 (622, 816, 797 e 686 k€) e continua a precisar em 2031. O capital de giro é financiado a 90 % por obrigações da SPV: 2,77 M€ em circulação em 2031, ~55 investidores a ~50 k€. <b>Seed: não dimensionada.</b> Com estes números, o plano não é financiável como capital de risco; a seed só faz sentido se o piloto mudar os pressupostos (cap. 14).</p>
+      <p><b>Pré-seed de 1,1 M€</b> em três tranches (13.7). Cobre o pré-arranque e o capital da SPV ({{= k(T0) }} k€), a fase 0, o piloto e o gate, mais set.–dez. 2027 para fechar a seed ou encerrar, e 150 k€ de caixa mínima. Gasto até ao gate de 31-08-2027: {{= k(GATE) }} k€ no Recomendado ({{= k(B['gasto_ate_gate_2027_08']) }} k€ no Base); até 31-12-2027, {{= k(RC['gasto_ate_2027_12']) }} k€ ({{= k(B['gasto_ate_2027_12']) }} k€). Autonomia: {{= nf(RC['runway_pre_seed_meses'],1) }} meses ({{= nf(B['runway_pre_seed_meses'],1) }} no Base) <span class="ref">Modelo · 01 §5.5</span>.</p>
+      <p><b>Depois do pré-seed</b>, o Recomendado ainda precisa de {{= M(RC['capital_proprio_levantado_acumulado'][4]-RC['capital_proprio_levantado_acumulado'][0]) }} M€ de capital próprio entre 2028 e 2031 e continua a precisar em 2031; a preços verificados, {{= M(RV['capital_proprio_levantado_acumulado'][4]-RV['capital_proprio_levantado_acumulado'][0]) }} M€. O fundo de maneio é financiado a 75 % por obrigações da SPV: {{= M(RC['capital_financiado']['obrigacoes_em_circulacao'][4]) }} M€ em circulação em 2031 (média), ~{{= nf(RC['capital_financiado']['investidores_estimados'][4],0) }} investidores a ~50 k€. <b>Seed: não dimensionada.</b> Com estes números, o plano não é financiável como capital de risco tradicional; a seed só faz sentido se o piloto mudar os pressupostos (cap. 14).</p>
     </div>
+  </div>
+  <h3>Quanto custa financiar o stock por obrigações</h3>
+  {{tbl_funding}}
+  <div class="cols small">
+    <p>Somando o cupão e os custos fixos da SPV, as obrigações custam {{= pct(RC['custo_financiamento_obrigacoes']['pct_obrigacoes'][1],0) }} do saldo médio em 2028, {{= pct(RC['custo_financiamento_obrigacoes']['pct_obrigacoes'][2],0) }} em 2029 e {{= pct(RC['custo_financiamento_obrigacoes']['pct_obrigacoes'][4],0) }} em 2031; em 2027 a SPV custa {{= k(RC['custos_spv'][0]) }} k€ sem obrigações nenhumas. É mais caro do que o capital de retalho via ECSP (10–13 %/ano [E]), que este plano rejeita por consumir a margem, e quase certamente mais caro do que uma linha bancária de <i>borrowing base</i> ou <i>factoring</i> sem recurso com seguro de crédito, cujo preço ainda não temos (NV); {{= pct(REC_SHARE,0) }} do colateral de 2031 são recebíveis. A caixa parada nas séries chega a {{= k(RC['custo_financiamento_obrigacoes']['caixa_parada_series'][4]) }} k€ em 2031, a pagar cupão.</p>
+    <p><b>Recomendação.</b> Na fase 2, pedir cotação de linha bancária e de <i>factoring</i> e financiar o fundo de maneio por aí enquanto a carteira for inferior a 2–3 M€; manter a SPV registada, para o prazo do CSC correr, mas sem séries nem funções pagas até a carteira o justificar; emitir por tranches, ou com notas de taxa variável, para reduzir a caixa parada. O modelo mantém as obrigações, porque é a estrutura cotável hoje; a alternativa bancária entra quando houver cotação. O modelo é anual: antes da 1.ª série falta a curva mensal de 2027–2028 (<i>borrowing base</i> contra obrigações e capital próprio, com o pico das compras de nov.–fev.). Até lá, o capital próprio tem de cobrir o fundo de maneio que uma série atrasada deixaria por financiar, até {{= k(RC['capital_financiado']['obrigacoes_em_circulacao'][1]) }} k€ em 2028, ou uma linha bancária de reserva tem de o fazer.</p>
   </div>
 
   <h2><span class="sn">13.4</span>Break-even: o que teria de ser verdade</h2>
   {{tbl_tem_de_ser}}
-  <p class="tblnote">Cada linha é uma alavanca sozinha, com tudo o resto igual. O EBITDA mensal não cruza o zero dentro do horizonte em nenhum cenário nem caso de sensibilidade; por isso o modelo não indica mês de break-even. Prolongar o modelo além de 2031 exigiria pressupostos novos.</p>
+  <p class="tblnote">Cada linha é uma alavanca sozinha, com tudo o resto igual. No Recomendado, o granel está em corretagem com verificação, que deixa {{= nf(UE['granel_corretagem_100t']['recomendado']['margem'],3) }} €/kg; daí o volume impossível. O EBITDA mensal não cruza o zero dentro do horizonte em nenhum cenário nem caso de sensibilidade; por isso o modelo não indica mês de break-even. Prolongar o modelo além de 2031 exigiria pressupostos novos.</p>
 
-  <h2><span class="sn">13.5</span>Os quatro cenários</h2>
+  <h2><span class="sn">13.5</span>Os cenários, e o que depende de preços por medir</h2>
   {{tbl_cenarios}}
-  <p class="tblnote">O pessimista é o mundo em que o Sprout vende azeite <i>standard</i>: os distribuidores ficam abaixo do custo a 4,20 €/kg e a margem de contribuição é negativa; a decisão aí é parar no gate, depois de ~0,73 M€. O otimista não chega ao break-even porque a referência mais alta e o cupão mais baixo são comidos por uma estrutura de 28 pessoas.</p>
+  {{tbl_decomp}}
+  <p class="tblnote">O Recomendado junta à estrutura mais leve, que só depende de decisões dos fundadores, quatro alavancas comerciais por provar; a coluna «A preços verificados» tira-as. Cada alavanca tem um KPI do piloto ou um marco da fase 2 que a prova (cap. 14). O Pessimista é o mundo em que o Sprout vende azeite <i>standard</i>: os distribuidores ficam abaixo do custo a 4,20 €/kg e a margem de contribuição é negativa; a decisão aí é parar no gate, depois de ~{{= M(PE['gasto_ate_gate_2027_08']) }} M€. O Otimista não chega ao break-even porque a referência mais alta e o cupão mais baixo são comidos por uma estrutura de 28 pessoas.</p>
 
   <h2><span class="sn">13.6</span>Sensibilidade</h2>
   <figure>
-    <p class="fig-title">EBITDA de 2031 no recomendado, por sensibilidade</p>
-    <p class="fig-sub">k€; cada barra parte do caso central (−530 k€); a verde, as que melhoram</p>
+    <p class="fig-title">EBITDA de 2031 no Recomendado, por sensibilidade</p>
+    <p class="fig-sub">k€; cada barra parte do caso central ({{= k(RC['ebitda'][4]) }} k€) e o valor está na ponta livre; a verde, as que melhoram</p>
     {{fig_tornado}}
   </figure>
   {{tbl_sens}}
   <div class="cols small">
-    <p>O preço do AOVE −30 %, repassado proporcionalmente às referências de venda com embalamento, logística e custos fixos inalterados, é o choque que mais pesa: −987 k€ no recomendado, −1 814 k€ no base, onde a margem HoReCa passa a −0,10 €/kg. O desconto de 15 % custa −61 k€ ao recomendado e −115 k€ ao base em 2031. Volumes ±30 % movem pouco o recomendado (−682 a −378 k€), porque a margem por kg é baixa.</p>
-    <p>«Topo dos intervalos» junta prémio de origem de 0,20 €/kg pago por distribuidores e exportadores, a carteira de verificação do otimista (10 M€ em 2031) e volumes +30 %: EBITDA de 2031 de −47 k€ e necessidade de capital de 3,08 M€. É o melhor caso que a investigação suporta, e ainda não fecha dentro do horizonte. Inconsistências registadas no modelo: o lote de água do 01 tem 38 € de financiamento e o modelo dá 30 €; os gestores de conta do base em 2030 ficam em 433 contas cada, dentro do «~400» <span class="ref">pressupostos.json</span>.</p>
+    <p>O preço do AOVE −30 %, com repercussão proporcional nas referências de venda e com embalamento, logística e custos fixos inalterados, é o choque que mais pesa: {{= k(s_rec('preco_aove_menos_30')) }} k€ no Recomendado e {{= k(s_base('preco_aove_menos_30')) }} k€ no Base, onde a margem HoReCa passa a {{= nf(s_base('preco_aove_menos_30','margem_horeca_2029_eur_kg'),2) }} €/kg. Logo a seguir vem a ausência das alavancas por provar ({{= k(s_rec('precos_verificados')-RC['ebitda'][4], sign=True) }} k€). Volumes ±30 % mexem ±{{= k((s_rec('volume_mais_30')-s_rec('volume_menos_30'))/2) }} k€ no Recomendado, mais do que o desconto de 15 % ({{= k(s_rec('desconto_15')-RC['ebitda'][4], sign=True) }} k€) e mais do que o mesmo choque no Base (±{{= k((s_base('volume_mais_30')-s_base('volume_menos_30'))/2) }} k€), mas não chegam para o break-even: a margem por kg é baixa. Um cupão de 10 % custa {{= k(s_rec('cupao_10')-RC['ebitda'][4], sign=True) }} k€; de 12 %, {{= k(s_rec('cupao_12')-RC['ebitda'][4], sign=True) }} k€.</p>
+    <p>«Topo dos intervalos» junta um prémio de origem de 0,20 €/kg pago por distribuidores e exportadores, a carteira de verificação do Otimista (10 M€ em 2031) e volumes +30 %: EBITDA de 2031 de {{= k(s_rec('topo_dos_intervalos')) }} k€ e necessidade de capital de {{= M(s_rec('topo_dos_intervalos','necessidade_capital_proprio')) }} M€. É o melhor caso que a investigação suporta, e ainda não fecha dentro do horizonte. O granel como principal valeria {{= k(s_rec('granel_principal')-RC['ebitda'][4], sign=True) }} k€, se houver comprador que pague a certificação. Inconsistências registadas no modelo: o lote de água do 01 tem 38 € de financiamento e o modelo dá 30 €; os gestores de conta do Base em 2030 ficam em 433 contas cada, dentro do «~400».</p>
+  </div>
+
+  <h2><span class="sn">13.7</span>O pedido: tranches, termos e caso de sucesso</h2>
+  {{tbl_tranches}}
+  <div class="cols">
+    <p><b>Porquê tranches.</b> O teste mais barato e mais decisivo (as cotações de referência e as perguntas 2, 4 e 10 do parecer) termina a 31-01-2027, o dia em que o pré-seed fecharia de uma vez. Em tranches, o dinheiro da T1 só entra depois de o preço e a estrutura jurídica terem resposta, e a T2 só depois do gate. A T0 é gasta em out.–nov. 2026, antes de qualquer investidor: tem de ser adiantada pelos fundadores ou por uma bridge, e isso tem de estar decidido esta semana.</p>
+    <p><b>Termos a propor.</b> Instrumento: nota convertível, ou equivalente, com desconto e cap a negociar; o cap ainda não está fixado. Direitos de informação mensais (indicadores do gate, tesouraria, risco); veto sobre emissões da SPV, operações com partes relacionadas, orçamento anual e endividamento; um lugar de observador no conselho; devolução <i>pro rata</i> do saldo não gasto se o gate mandar parar (a T2 não desembolsada e o que restar da T1).</p>
+    <p><b>Caso de sucesso.</b> É o definido pelas metas do gate: referência de origem ≥ 6,00 €/kg e prémio dos distribuidores ≥ 0,10 €/kg documentados, ou seja, o Recomendado ({{= k(RC['ebitda'][4]) }} k€ de EBITDA em 2031; {{= M(RC['necessidade_capital_proprio']) }} M€) e, com tudo no topo do que a investigação suporta, {{= k(s_rec('topo_dos_intervalos')) }} k€ e {{= M(s_rec('topo_dos_intervalos','necessidade_capital_proprio')) }} M€. Mesmo no caso de sucesso, o modelo não mostra break-even até 2031: o ano de break-even fica fora do horizonte e depende de pressupostos novos para 2032 em diante. A valorização não se pode ancorar em múltiplos de EBITDA; ancora-se no valor de opção do piloto (preço medido, um lote financiado por banco com <i>advance rate</i> melhor do que um lote não certificado) e na carteira de verificação.</p>
   </div>
 </section>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sprout · Business plan</title>
-<meta name="description" content="Business plan do Sprout (nome de trabalho), versão de trabalho de 13/10/2026: lotes de azeite português verificados, vendidos back-to-back e financiados por obrigações a investidores profissionais.">
+<title>Sprout · Plano de negócios</title>
+<meta name="description" content="Plano de negócios do Sprout (nome de trabalho), versão de trabalho de 13-10-2026: lotes de azeite português verificados, vendidos back-to-back e financiados por obrigações subscritas só por investidores profissionais.">
 <meta name="author" content="Sprout (nome de trabalho)">
 <link rel="stylesheet" href="../tools/print.css">
 <style>
   :root { --fs-body: 9pt; --lh-body: 1.44; }
   @page {
-    @top-right { content: "Business plan · versão de trabalho de 13/10/2026"; }
+    @top-right { content: "Plano de negócios · versão de trabalho de 13-10-2026"; }
     @bottom-left { content: "Documento confidencial · versão de trabalho · nome de trabalho · não constitui oferta nem recomendação de investimento"; }
   }
   @page :first {
@@ -50,7 +50,8 @@
   /* ---------- capítulos ---------- */
   .chapter { break-before: page; }
   .chapter.flow { break-before: auto; margin-top: 9mm; }
-  .chapter.flow .ch-head h1 { font-size: 18pt; }
+  .chapter.cont { break-before: auto; margin-top: 11mm; }
+  .chapter.flow .ch-head h1, .annex .ch-head h1 { font-size: 18pt; }
   .chapter.flow .ch-head .ch-num { padding-top: 1.5pt; }
   .ch-head { display: grid; grid-template-columns: 13mm 1fr; border-top: 1.4pt solid var(--ink); padding-top: 2.6mm; margin: 0 0 5mm; break-after: avoid; }
   .ch-head .ch-num { font-family: var(--f-mono); font-size: 12pt; font-weight: 500; color: var(--muted); padding-top: 5.5pt; font-variant-numeric: tabular-nums; }
@@ -100,9 +101,6 @@
   /* ---------- figuras ---------- */
   figure { margin: 2.6mm 0 3.6mm; }
   figure img { display: block; width: 100%; height: auto; border: 0.5pt solid var(--rule); border-radius: 1mm; }
-  .shots { display: grid; grid-template-columns: 0.94fr 1fr 1.38fr; column-gap: 4mm; align-items: start; }
-  .shots figure { margin: 0; }
-  .shots figcaption { margin-top: 1.2mm; }
   .fig-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
   .fig-row figure { margin-top: 0; }
   .fig-side { display: grid; grid-template-columns: 1.15fr 1fr; column-gap: 7mm; align-items: start; }
@@ -148,7 +146,7 @@
   /* ---------- anexos ---------- */
   .src-cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; align-items: start; margin: 0 0 2.4mm; }
   ul.src { margin: 0; }
-  ul.src > li { font-family: var(--f-mono); font-size: 5.9pt; line-height: 1.32; padding-left: 2.6mm; margin-bottom: 0.4mm; word-break: break-all; break-inside: avoid; }
+  ul.src > li { font-family: var(--f-mono); font-size: 5.9pt; line-height: 1.32; padding-left: 2.6mm; margin-bottom: 0.4mm; overflow-wrap: anywhere; word-break: normal; break-inside: avoid; }
   ul.src > li::before { top: 0.55em; width: 1.2mm; }
   ul.src a { color: var(--ink); text-decoration: none; }
   .annex h4 { font-family: var(--f-display); font-stretch: 87.5%; font-size: 8.4pt; margin: 2.6mm 0 1mm; break-after: avoid; }
@@ -170,7 +168,6 @@
   .risk-grid + table { margin-top: 3mm; }
   table.t-lote td:first-child { width: 74mm; }
   table.t-canais td:first-child { width: 68mm; }
-  table.t-scen4 td:first-child { width: 62mm; }
   table.t-scen4 td.em, table.t-scen4 th.em { background: var(--panel); }
   table.t-scen td:first-child { width: 48mm; }
   table.t-sens td:first-child { width: 64mm; }
@@ -179,6 +176,17 @@
   table.tight tr.grp td { padding-top: 1.8mm; }
   table.t-press td:nth-child(2), table.t-press td:nth-child(3) { width: 46mm; }
   table.t-fundos td:first-child { width: 58mm; }
+  table.t-decomp tr.step td { color: var(--ink); }
+  table.t-decomp tr.step td:first-child { padding-left: 3mm; }
+  table.t-decomp tr.total td { border-top: 0.5pt solid var(--rule-strong); font-weight: 600; }
+  table.t-decomp tr.total td.muted { font-weight: 400; }
+  table.t-decomp tr.em td { border-top: 0.9pt solid var(--ink); }
+  table.spec td:first-child { width: 38mm; font-weight: 600; }
+  table.spec td { line-height: 1.34; }
+  table.t-scen4 td:first-child { width: 56mm; }
+  .keep-p { break-inside: avoid; }
+  .cols .keep-p { break-inside: avoid-column; }
+  .legend .dot { display: inline-block; width: 2mm; height: 2mm; border-radius: 50%; background: var(--sw, var(--ink)); }
 </style>
 </head>
 <body>
@@ -189,18 +197,18 @@
     <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#3F5A1E"/><path d="M16 27V14" stroke="#F4F5EF" stroke-width="2.4" stroke-linecap="round"/><path d="M16 16.5c0-5.2 3.4-8.6 9-9.2 0 5.6-3.5 9.2-9 9.2z" fill="#E1E8CF"/><path d="M16 20c0-4.2-2.9-7.2-8-7.8 0 4.7 3 7.8 8 7.8z" fill="#E1E8CF"/></svg>
     <span>Sprout</span>
   </div>
-  <h1 class="display">Business plan 2027–2031</h1>
-  <p class="subtitle">Lotes de azeite português verificados, vendidos back-to-back e financiados por obrigações a investidores profissionais, com uma app de investimento em que o jogo vive na colheita e no saber, nunca no dinheiro.</p>
+  <h1 class="display">Plano de negócios 2027–2031</h1>
+  <p class="subtitle">Lotes de azeite português verificados, vendidos <i class="nowrap">back-to-back</i> e financiados por obrigações de uma SPV subscritas só por investidores profissionais. Uma app em que o jogo vive na colheita e no saber, e nunca no dinheiro.</p>
   <div class="verdict">
-    <p>Tal como foi descrito a 13/10, o negócio não chega ao break-even até 2031 em nenhum cenário. No caso base, o EBITDA de 2031 é de −1,22 M€ e o capital próprio necessário passa os 5,5 M€, ainda a subir.</p>
-    <p>O desenho que a investigação recomenda reduz o prejuízo de 2031 para −0,53 M€ e a necessidade de capital para 4,0 M€. Também não fecha dentro do horizonte. Este plano pede o dinheiro de um piloto que compre informação, 1,1 M€ de pré-seed, com um gate a 31-08-2027 e regras de paragem escritas antes de começar.</p>
+    <p>O negócio descrito no documento-fonte de 13-10-2026 não chega ao break-even até 2031 em nenhum cenário. No cenário Base, o EBITDA de 2031 é de {{= M(B['ebitda'][4]) }} M€ e o capital próprio necessário passa os {{= M(B['necessidade_capital_proprio'], 1) }} M€, ainda a subir.</p>
+    <p>O desenho que a investigação recomenda reduz o EBITDA de 2031 para {{= M(RC['ebitda'][4]) }} M€ e a necessidade de capital para {{= M(RC['necessidade_capital_proprio'], 1) }} M€. Também não fecha dentro do horizonte, e {{= k(LEV) }} k€ dessa melhoria dependem de preços que ninguém mediu: sem eles, o EBITDA de 2031 fica em {{= M(RV['ebitda'][4]) }} M€. Este plano pede o dinheiro de um piloto que compre essa informação: 1,1 M€ de pré-seed em três tranches, com um gate a 31-08-2027 e regras de paragem escritas antes de começar.</p>
   </div>
   <div class="meta-block">
     <div><span class="k">Data</span><span class="date">13-10-2026</span></div>
     <div><span class="k">Estado</span>Documento confidencial · versão de trabalho · «Sprout» é nome de trabalho</div>
-    <div><span class="k">Para</span>Fundadores; Gonçalo Almeida (jurídico); Pedro Marques (operações, âncora Lagar do Val); investidores qualificados prospetivos</div>
-    <div><span class="k">Base</span>Base factual verificada (00), desenho do modelo (01), relatórios 10–50 e Sprout-Modelo-Financeiro.xlsx (26 475 fórmulas, 0 erros)</div>
-    <p class="fine">Não é oferta pública, recomendação de investimento nem parecer jurídico. Os números financeiros são projeções de um modelo, não previsões. As normas marcadas [L] aguardam confirmação escrita de advogado independente.</p>
+    <div><span class="k">Para</span>Fundadores; Gonçalo Almeida (jurídico); Pedro Marques (operações, âncora Lagar do Val). A versão para investidores qualificados sai depois do parecer jurídico e das cotações do cap. 14.</div>
+    <div><span class="k">Base</span>Base factual verificada (00), desenho do modelo (01), relatórios 10–50 e modelo financeiro em Excel ({{= nf(R['verificacao']['formulas']) }} fórmulas, 0 erros)</div>
+    <p class="fine">Não é oferta pública, recomendação de investimento nem parecer jurídico. Os números financeiros são projeções de um modelo e dependem de pressupostos ainda por verificar. As normas marcadas [L] aguardam confirmação escrita de advogado independente.</p>
   </div>
 </section>
 
@@ -212,29 +220,29 @@
     <div>
       <h3>Como ler as referências</h3>
       <dl class="defs">
-        <dt>00 §1.4</dt><dd>Base factual consolidada, secção 1.4 (docs/research/00-base-factual.md). É a única base numérica autorizada.</dd>
-        <dt>01 §2.2</dt><dd>Desenho do modelo de negócio recomendado (01-desenho-do-modelo.md).</dd>
+        <dt>00 §1.4</dt><dd>Base factual consolidada, secção 1.4: a base numérica do plano (ficheiros no anexo C).</dd>
+        <dt>01 §2.2</dt><dd>Desenho do modelo de negócio recomendado, secção 2.2.</dd>
         <dt>10–50</dt><dd>Relatórios de mercado, regulação, pagamentos e infraestrutura, risco e coberturas, concorrência.</dd>
-        <dt>Modelo</dt><dd>Sprout-Modelo-Financeiro.xlsx, lido de modelo/resultados.json depois de recalculado. Todas as tabelas e gráficos financeiros deste documento são gerados a partir desse ficheiro.</dd>
+        <dt>Modelo</dt><dd>Modelo financeiro em Excel, lido depois de recalculado. Todas as tabelas e gráficos financeiros e os números do modelo citados no texto saem desse ficheiro.</dd>
       </dl>
     </div>
     <div>
       <h3>Etiquetas de evidência</h3>
       <dl class="defs">
-        <dt>[F]</dt><dd>Facto com fonte e URL (anexo C), em regra recolhido por extrato de motor de pesquisa: confiança média.</dd>
-        <dt>[L]</dt><dd>Norma ou especificação citada do texto de referência, não relida online a 13/10/2026. Confirmar com advogado.</dd>
-        <dt>[E]</dt><dd>Estimativa nossa, com método.</dd>
-        <dt>[I]</dt><dd>Inferência ou opinião nossa.</dd>
-        <dt>NV</dt><dd>Não verificado; não usar em materiais externos.</dd>
+        <dt>[F · M]</dt><dd>Facto com fonte e URL (anexo C), em regra recolhido por extrato de motor de pesquisa. Depois do ponto, a confiança: A alta, M média, B baixa.</dd>
+        <dt>[C · M]</dt><dd>Conhecimento de referência sem URL acedido a 13-10-2026, com a mesma escala de confiança.</dd>
+        <dt>[L]</dt><dd>Norma ou especificação citada do texto de referência, não relida online a 13-10-2026. Confirmar com advogado.</dd>
+        <dt>[E] · [I]</dt><dd>Estimativa nossa, com método · inferência ou opinião nossa.</dd>
+        <dt>NV</dt><dd>Não verificado: hipótese de trabalho, a substituir por cotação antes da versão para investidores; a sensibilidade vem indicada (ex.: [E · NV]).</dd>
       </dl>
     </div>
     <div>
-      <h3>Os quatro cenários do modelo</h3>
-      <p><b>Pessimista, base e otimista</b> são a tese do documento-fonte (HoReCa e distribuição com desconto de 10–15 %, água como segundo produto, obrigações a 18 meses) com as 53 correções verificadas aplicadas, sem retoques. <b>Recomendado</b> é o desenho reestruturado que a investigação aponta (capítulo 3); cada pressuposto alterado está listado, com fonte, em pressupostos.json e no capítulo 13.</p>
+      <h3>Os cenários do modelo</h3>
+      <p><b>Pessimista, Base e Otimista</b> são a tese do documento-fonte (HoReCa com 10 % de desconto, com 12,5 % e 15 % em sensibilidade, distribuidores sem desconto, água como segundo produto, obrigações a 18 meses), com as 53 correções verificadas aplicadas e sem retoques. <b>Recomendado</b> é o desenho reestruturado que a investigação aponta (cap. 3). <b>Recomendado a preços verificados</b> é o mesmo desenho sem as alavancas comerciais por provar: referência HoReCa de 5,65 €/kg, sem prémio dos distribuidores, sem verificação para terceiros nem dados.</p>
     </div>
     <div>
       <h3>Unidades e convenções</h3>
-      <p>Euros correntes, sem IVA. Azeite em kg (1 L = 0,916 kg) e t; água em paletes de 750 L. Anos 2027–2031; preços das mercadorias constantes ao nível de out. 2026, porque o modelo compra back-to-back. «k€» = milhares de euros. Data de referência: 13-10-2026.</p>
+      <p>Euros correntes, sem IVA. Azeite em kg (1 L = 0,916 kg) e t; água em paletes de 750 L. Anos 2027–2031; preços das mercadorias constantes ao nível de out. 2026, porque o modelo compra <i class="nowrap">back-to-back</i>. «k€» = milhares de euros. Datas no formato <span class="nowrap">DD-MM-AAAA</span>. Data de referência: 13-10-2026.</p>
     </div>
   </div>
 </section>

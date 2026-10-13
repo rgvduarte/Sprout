@@ -584,7 +584,7 @@ export function timeline(o) {
   const labW = o.labelWidth ?? Math.max(...lanes.map((l) => textW(l.label, THEME.fs.label, 'body', 600))) + 12;
   const laneH = o.laneHeight ?? 30;
   const barH = Math.min(o.barHeight ?? 13, 24);
-  const m = { t: 16, b: 4 };
+  const m = { t: 16, b: o.today ? 13 : 4 };
   const H = m.t + lanes.length * laneH + m.b;
   const sx = linear(t0, t1, labW, W - 6);
   let g = svgOpen(W, H, o.ariaLabel);
@@ -639,7 +639,7 @@ export function timeline(o) {
   if (o.today) {
     const x = sx(toT(o.today));
     g += `<line x1="${r2(x)}" x2="${r2(x)}" y1="${m.t - 2}" y2="${r2(H - m.b)}" stroke="${THEME.ink}" stroke-width="1.25"/>`;
-    g += text(x + 3, H - m.b - 2, o.todayLabel || 'hoje', { size: THEME.fs.tick, weight: 600 });
+    g += text(x + 3, H - 3, o.todayLabel || 'hoje', { size: THEME.fs.tick, weight: 600 });
   }
   return g + '</svg>';
 }
