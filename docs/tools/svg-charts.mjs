@@ -178,7 +178,9 @@ export function lineChart(o) {
   const ymin = o.y?.min ?? Math.min(yTicks[0], ...ys);
   const ymax = o.y?.max ?? Math.max(yTicks[yTicks.length - 1], ...ys);
   const fy = makeFmt(o.y?.format, { dec: 0 });
-  const fx = typeof o.x?.format === 'function' ? o.x.format : isTime ? (t) => fmtMonth(t, o.x?.format || {}) : makeFmt(o.x?.format);
+  const fx = typeof o.x?.format === 'function' ? o.x.format
+    : isTime ? (o.x?.format?.yearOnly ? (t) => String(new Date(t).getUTCFullYear()) : (t) => fmtMonth(t, o.x?.format || {}))
+    : makeFmt(o.x?.format);
 
   const yLabW = Math.max(...yTicks.map((t) => textW(fy(t), THEME.fs.tick, 'mono'))) + 6;
   const endLabW = Math.max(0, ...series.filter((s) => s.endLabel).map((s) => textW(s.endLabel === true ? s.name : s.endLabel, THEME.fs.label) + 10));
