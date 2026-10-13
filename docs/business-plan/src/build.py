@@ -920,18 +920,14 @@ def _():
 def _():
     txt = (BP.parent / 'research' / '00-base-factual.md').read_text()
     sec = txt.split('## Fontes (acesso a 13-10-2026)')[1].split('\n---')[0]
-    out = []
-    group = None
+    groups = []
     for ln in sec.splitlines():
         m = re.match(r'\*\*(.+?)\*\*', ln.strip())
         if m:
-            if group is not None:
-                out.append('</ul>')
-            group = m.group(1)
-            out.append(f'<h4>{esc(group)}</h4><ul class="src">')
+            groups.append((m.group(1), []))
             continue
         m = re.match(r'- (\S+)(.*)', ln.strip())
-        if m and group is not None:
+        if m and groups:
             url, rest = m.group(1), m.group(2).strip()
             tag = ''
             if '[C]' in rest:
@@ -939,8 +935,19 @@ def _():
             elif 'lido diretamente' in rest:
                 tag = ' <span class="tag-ev">lido diretamente</span>'
             shown = re.sub(r'^https?://(www\.)?', '', url)
-            out.append(f'<li><a href="{esc(url)}">{esc(shown)}</a>{tag}</li>')
-    out.append('</ul>')
+            lines = -(-len(shown + (' [C]' if tag else '')) // 74)
+            groups[-1][1].append((f'<li><a href="{esc(url)}">{esc(shown)}</a>{tag}</li>', lines))
+    out = []
+    for name, items in groups:
+        total = sum(n for _, n in items)
+        acc, cut = 0, len(items)
+        for i, (_, n) in enumerate(items):
+            if acc + n / 2 >= total / 2:
+                cut = i
+                break
+            acc += n
+        left, right = items[:cut], items[cut:]
+        out.append(f'<h4>{esc(name)}</h4><div class="src-cols"><ul class="src">' + ''.join(h for h, _ in left) + '</ul><ul class="src">' + ''.join(h for h, _ in right) + '</ul></div>')
     return ''.join(out)
 
 

@@ -206,7 +206,7 @@ export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCa
               <div className="min-w-0">
                 <p className="font-medium text-fg">Acompanhamento</p>
                 <p className="mt-0.5 text-sm text-muted">
-                  Relatório de inventário mensal com fotografia, extrato trimestral (o primeiro a {fmtDate(firstStatement(p.committedAt))}) e uma única liquidação no fim do ciclo.
+                  Inventário físico mensal com fotografia, extrato mensal no dia 5 (o primeiro a {fmtDate(firstStatement(p.committedAt))}) e uma única liquidação no fim do ciclo.
                 </p>
               </div>
             </li>

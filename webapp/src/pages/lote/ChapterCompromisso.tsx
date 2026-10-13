@@ -76,7 +76,7 @@ function Terms({ amount }: { amount: number }) {
     { label: 'Custos e comissões', value: `Sem comissão de entrada nem de saída. Os custos do lote (${num(e.costsPerUnit, d)} €/${lot.world === 'agua' ? 'L' : 'kg'}) já estão no preço financiado. Da margem bruta, ${pct(e.investorShare, 0)} vai para os co-financiadores, ${pct(1 - e.investorShare - e.reserveShare, 0)} para a operação e ${pct(e.reserveShare, 0)} para a reserva.` },
     { label: 'Saída antes do fim', value: 'Não há mercado secundário no piloto: o capital fica comprometido até à liquidação.' },
     { label: 'Período de reflexão', value: `Podes cancelar sem custos durante 4 dias (até ${fmtDate(reflectionEnd(today))}).` },
-    { label: 'Informação', value: 'Relatório de inventário mensal, extrato trimestral e uma única liquidação no fim (capital e resultado).' },
+    { label: 'Informação', value: 'Inventário físico mensal com fotografia, extrato mensal no dia 5 e uma única liquidação no fim (capital e resultado).' },
   ];
   return (
     <dl className="divide-y divide-border border-y border-border">

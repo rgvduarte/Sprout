@@ -145,11 +145,12 @@
   .stop strong { display: block; font-size: 8.8pt; }
 
   /* ---------- anexos ---------- */
-  ul.src { column-count: 2; column-gap: 6mm; margin: 0 0 2.4mm; }
+  .src-cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 6mm; align-items: start; margin: 0 0 2.4mm; }
+  ul.src { margin: 0; }
   ul.src > li { font-family: var(--f-mono); font-size: 5.9pt; line-height: 1.32; padding-left: 2.6mm; margin-bottom: 0.4mm; word-break: break-all; break-inside: avoid; }
   ul.src > li::before { top: 0.55em; width: 1.2mm; }
   ul.src a { color: var(--ink); text-decoration: none; }
-  .annex h4 { font-family: var(--f-display); font-stretch: 87.5%; font-size: 8.4pt; margin: 2.6mm 0 1mm; }
+  .annex h4 { font-family: var(--f-display); font-stretch: 87.5%; font-size: 8.4pt; margin: 2.6mm 0 1mm; break-after: avoid; }
   dl.gloss { display: grid; grid-template-columns: 34mm 1fr; column-gap: 4mm; row-gap: 1.2mm; font-size: 8pt; line-height: 1.36; margin: 0; }
   dl.gloss dt { font-weight: 600; }
   dl.gloss dd { margin: 0; }

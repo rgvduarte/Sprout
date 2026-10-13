@@ -63,12 +63,11 @@ export const reflectionEnd = (committedAt: string) => addDays(committedAt.slice(
 /** Data-limite da transferência SEPA: 5 dias depois do fim da reflexão. */
 export const transferDue = (committedAt: string) => addDays(reflectionEnd(committedAt), 5);
 
-/** Primeiro extrato trimestral: 5 dias depois do fim do trimestre seguinte ao compromisso. */
+/** Primeiro extrato mensal: dia 5 do mês seguinte ao compromisso (o mesmo calendário da Carteira). */
 export function firstStatement(committedAt: string): string {
   const [y, m] = committedAt.slice(0, 7).split('-').map(Number);
-  const qEndMonth = Math.ceil(m / 3) * 3;
-  const nextQ = qEndMonth + 1 > 12 ? { y: y + 1, m: 1 } : { y, m: qEndMonth + 1 };
-  return `${nextQ.y}-${String(nextQ.m).padStart(2, '0')}-05`;
+  const next = m === 12 ? { y: y + 1, m: 1 } : { y, m: m + 1 };
+  return `${next.y}-${String(next.m).padStart(2, '0')}-05`;
 }
 
 /* ------------------------------------------------------------ vocabulário por mundo */
