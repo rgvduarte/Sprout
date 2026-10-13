@@ -13,7 +13,7 @@
    - **[E]** estimativa nossa, com método.
    - **[I]** inferência ou opinião nossa.
    - **NV** não verificado. Não usar em materiais externos.
-3. **Limitação desta consolidação.** A 13-10-2026 o orçamento de pesquisa web da execução estava esgotado e o *proxy* bloqueava os domínios primários (EUR-Lex, BCE, Portal das Finanças: HTTP 403). **Não foram acrescentados factos novos verificados online.** Os factos [F] vêm das notas 10–50, que os recolheram através de extratos de motor de pesquisa das páginas citadas (por isso a confiança é, em regra, M). Os dados fiscais e laborais da secção 9 são [L].
+3. **Limitação desta consolidação.** A 13-10-2026 o orçamento de pesquisa web da execução estava esgotado (também na revisão registada no fim deste documento) e o *proxy* bloqueava os domínios primários (EUR-Lex, BCE, Portal das Finanças: HTTP 403). **Não foram acrescentados factos novos verificados online.** Os factos [F] vêm das notas 10–50, que os recolheram através de extratos de motor de pesquisa das páginas citadas (por isso a confiança é, em regra, M). Os dados fiscais e laborais da secção 9 são [L].
 4. **Antes de qualquer material para investidores**, os itens da secção 11 têm de ser confirmados no documento primário.
 
 ---
@@ -440,12 +440,18 @@ Todas as URL abaixo foram citadas e consultadas a 13-10-2026 nas notas 10–50 (
 - https://actlegal.com/publications/crowdfunding-services-in-light-of-ecsp-regulation
 - https://iberianlawyer.com/?p=189959
 - https://eur-lex.europa.eu/eli/reg/2014/1286/oj/eng
+- https://eur-lex.europa.eu/eli/dir/2014/65/oj/eng [C]
+- https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975 [C]
+- https://diariodarepublica.pt/dr/detalhe/decreto-lei/105-2004-523145 [C]
+- https://eur-lex.europa.eu/eli/dir/2002/47/oj/eng [C]
 - https://vlex.pt/vid/decreto-lei-n-298-1034385751
 - https://eur-lex.europa.eu/eli/dir/2015/2366/oj/eng
 - https://www.eba.europa.eu/single-rule-book-qa/qna/view/publicId/2020_5354
 - https://www.vixio.com/insights/pc-eus-psr-last-sweep-commercial-agent-exclusion
 - https://www.ecb.europa.eu/paym/retail/instant_payments/html/instant_payments_regulation.en.html
 - https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/lgt/Pages/lgt63e.aspx
+- https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/lgt/Pages/lgt63c.aspx [C]
+- https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/cirs_rep/Pages/irs2.aspx [C]
 - https://www.cssf.lu/en/2024/06/the-new-aml-cft-regulation-the-sixth-aml-cft-directive-and-the-future-eu-aml-cft-supervisor/
 - https://cm.twobirds.com/en/insights/2026/eu-list-of-highrisk-countries-and-jurisdictions-for-money-laundering-and-terrorism-financing-amended
 - https://portal.occ.pt/sites/default/files/public/2023-11/Guia_Pratico_RCBEa.pdf
@@ -502,3 +508,33 @@ Todas as URL abaixo foram citadas e consultadas a 13-10-2026 nas notas 10–50 (
 - https://acretrader.com/ [C]
 - https://www.finma.ch/en/news/ [C]
 - https://www.stenn.com/ [C]
+
+---
+
+## Registo de verificação (revisão de 13-10-2026)
+
+Revisão de coerência feita depois da consolidação, sobre este ficheiro, `01-desenho-do-modelo.md`, `10-mercado.md`, `20-regulatorio.md`, `40-risco-coberturas.md` e `docs/business-plan/modelo/pressupostos.json`. **Sem acesso a fontes primárias nesta revisão** (orçamento de pesquisa esgotado; DRE, EUR-Lex e Portal das Finanças inacessíveis): as correções jurídicas assentam no texto de referência [L] e ficam para reconfirmar no parecer; as numéricas são aritmética sobre fontes já citadas. Os resultados de referência passaram a ser gerados por `docs/business-plan/modelo/calculo_referencia.py`.
+
+| Tema | Antes | Depois | Ficheiros | Gravidade |
+|---|---|---|---|---|
+| Volume do piloto | 40 t (60% HoReCa) e €240k de GMV com 33 clientes HoReCa | 1 lote misto de 20 t (4 t HoReCa/*gourmet* + 16 t com *offtake*), 60 paletes de água, ~€106k; gate com GMV ≥ €90k e KPIs de margem por canal | 00 §4, §10; 01 §5; JSON | Crítica |
+| Referência HoReCa | 6,00 €/kg (derivação dava 5,27–5,84) | 5,65 base; 5,40 pessimista; 6,00 só no otimista | 00 §1.4; 01 §2; JSON | Crítica |
+| Data da 1.ª emissão | abr. 2027 (SPV constituída na fase 0) | ≥ 12 meses após o registo (CSC art. 348.º/2 [L]): nov. 2027–jan. 2028; piloto em capital próprio; garantia bancária como alternativa | 00 §5, §10; 01 §3, §5; 20 §7.1, §11; JSON | Importante |
+| Investidores | "Profissionais a pedido" testados pelo Sprout; ≥ €100k "não-retalho" | Classificação só por banco/empresa de investimento; ≥ €100k não profissional = retalho PRIIPs; 1.ª série só a profissionais; pergunta 10 do parecer | 00 §5; 01 §3; 20 §2.4, árvore, §11; JSON | Importante |
+| Distribuidores | Referência 5,00, desconto 5% (4,75 €/kg), margem 8,4%; IBC no canal | Preço de saída do embalador 4,35 (4,16–4,51), sem desconto, margem ~1,5%; IBC fora | 00 §1.4; 01 §2, §6; JSON | Importante |
+| HoReCa à escala | 880 t em 2031 (3.200–6.400 contas) com 3 gestores | Rampa de clientes dentro do SOM (2.000 contas, 410 t em 2031); 5 gestores (~400 contas cada) | 01 §6–7; JSON | Importante |
+| Custódia e logística HoReCa | €1.200 por lote, libertação encomenda a encomenda | Tranches para 3PL: €2.000 por lote + 0,06 €/kg de 3PL [E, NV] | 01 §1.4, §2; JSON | Importante |
+| Stock e capital | Stock 90/60 dias; obrigações = 90% do capital de giro; cupão também sobre capital próprio | Stock médio (45/30 dias; 180 dias HoReCa com < 300 clientes); obrigações = 90% ÷ utilização; cupão só sobre obrigações | 01 §2, §7; JSON | Menor |
+| Financiamento de terceiros | €100k de margem em 2031 sem custos | ~€18k líquidos (verificação a 0,018 €/kg verificado) | 01 §6; JSON | Importante |
+| Custos omitidos | Seguro de crédito fora do opex; sem funções independentes da SPV; sem subsídio de refeição; fundadores a 60% todo o ano; dupla contagem de KYC | Todos incluídos ou corrigidos; KYC e faturação só no fixo | 01 §4.6, §6; JSON | Menor |
+| Capital da SPV | Subordinado de €30k (abaixo do mínimo legal) | Capital social de €50k (CSC art. 276.º/5 [L]) = subordinado da 1.ª série (33%) | 00 §5, §10; 01 §3–5; JSON | Menor |
+| Rondas | Pré-*seed* €0,7M = queima até ao gate, sem caixa mínima | Pré-*seed* €1,1M (ou €0,8M + *bridge* €0,3M); *seed* não dimensionada | 01 §5.5, §7.3; JSON | Importante |
+| Métrica "88% redistribuído" | Usada como prova da tese | Retirada; repartição do bolo (46/4/21/28) só para explicar; tese medida por €/kg e EBITDA | 01 §1–2, §8–9 | Importante |
+| Garantias e derivados | Reserva com "penhor financeiro"; opção OTC em C(10) | Penhor de direitos de crédito (DL 105/2004 só com banco); C(5) | 00 §5, §7; 01 §1.4, §4.2; 40 §2, §5.3 | Menor |
+| Base legal da publicidade | MiFID art. 24.º(3) aplicada ao emitente | Reg. 2017/1129 art. 22.º e CVM art. 7.º; MiFID só para intermediários | 00 §5; 01 §2.4 | Menor |
+| Numerário | Faturas ≥ €1.000 no art. 63.º-E LGT | LGT art. 63.º-C, n.º 3 | 00 §5; 20 §4.6 | Menor |
+| Água | Comissão 4% (banda 3–5% inexistente na fonte); 120 paletes no piloto | 2% (0,5–3%); 60 paletes | 01 §2.7; JSON | Menor |
+| Dados de mercado | Deoleo 5,9%; "~175 kt (INE)" sem URL; consumo aparente 45–65 kt; UE 2025/26 de vintages misturadas; 3,50 atribuído ao SIMA; média Poolred 2024/25 = 3,89; PT "2.º produtor"; café 530/590/660 como série; SOM 0,6–3% | ~6,1%; ~175 kt [E]; 65–71 kt; vintage identificado; 3,50 = Oleista; média 2024/25 ~4,2–4,5 [I]; 3.º/4.º produtor; 695 M€ contra 2023 revisto (~650); SOM 0,6–5,1% | 00 §1, §3, §4; 10 §1, §3, §5; JSON | Menor |
+
+**Efeito conjunto no modelo (base, 2031):** EBITDA de −€23k para **−€1.220k**; margem do azeite de 10,6% para **2,7%** do GMV; necessidade de capital próprio de €2,9M para **≥ €5,5M** (sem vale no horizonte). As estimativas isoladas de cada correção (por exemplo, −€0,3M só pela referência HoReCa) subestimavam o efeito combinado. Nenhum cenário chega ao *break-even* até 2031.
+
