@@ -4,7 +4,7 @@ import { fundedFraction, getQuestsByWorld, getSealForLot, isInvestable, getWorld
 import type { Lot } from '../../data/types';
 import { LotGauge, OriginSeal, QuestList } from '../../components/game';
 import { ButtonLink, CommodityChip, Disclaimer, Page, StatusPill } from '../../components/ui';
-import { date as fmtDate, eur, num, pct, price } from '../../lib/format';
+import { date as fmtDate, eur, num, pct, price, tidyText } from '../../lib/format';
 import { lotQuantityLabel } from '../../lib/physical';
 import { useData, useGame } from '../../state';
 import { lotContext } from './model';
@@ -92,13 +92,13 @@ export function PhaseTwoLot({ lot }: { lot: Lot }) {
             <h2 className="mt-8 text-[1.25rem]">Porque ainda não se pode financiar</h2>
             <ul className="max-w-[62ch] mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-muted marker:text-world-ink">
               <li>O piloto da fase 1 está fechado a azeite e água, com investidores qualificados.</li>
-              <li>A cobertura com futuros ICE KC e câmbio EUR/USD precisa de um corretor ({lot.hedge.counterparty?.toLowerCase()}).</li>
+              <li>A cobertura com futuros ICE KC e câmbio EUR/USD precisa de um corretor de futuros, a selecionar na Fase 2.</li>
               <li>
                 A due diligence do produtor está em curso: amostra de pré-safra com{' '}
                 <span className="font-mono text-fg tnum">{analysis ? num(analysis.params.find((p) => p.id === 'sca')?.value ?? 0, 2) : '—'}</span> pontos SCA.
               </li>
               <li>
-                Abertura prevista a partir de <span className="font-mono text-fg tnum">{fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}</span>. Referência ilustrativa de hoje: {price(lot.economics.refPrice, 'kg')}.
+                Abertura prevista a partir de <span className="font-mono text-fg tnum">{fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}</span>. Referência ilustrativa de hoje: {tidyText(price(lot.economics.refPrice, 'kg'))}.
               </li>
             </ul>
             <div className="mt-6 flex flex-wrap gap-2">

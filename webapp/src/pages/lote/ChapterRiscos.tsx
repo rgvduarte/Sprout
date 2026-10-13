@@ -212,7 +212,7 @@ function Reserve() {
       </ul>
       {lost?.settlement.settledResult !== undefined && (
         <p className="mt-3 text-sm text-muted">
-          No piloto, o {lost.id} liquidou com <span className="font-mono text-fg tnum">{pct(lost.settlement.settledResult, 1, { sign: true })}</span> depois de a reserva absorver 5 % do valor do lote. A reserva reduz a perda; não a impede.
+          {lost.id === lot.id ? 'Este lote' : `No piloto, o ${lost.id}`} liquidou com <span className="font-mono text-fg tnum">{pct(lost.settlement.settledResult, 1, { sign: true })}</span> depois de a reserva absorver 5 % do valor do lote. A reserva reduz a perda; não a impede.
         </p>
       )}
     </div>
@@ -303,7 +303,7 @@ export function ChapterRiscos({ label }: { label: string }) {
             <Hedge />
             <Reserve />
             <div>
-              <h3 className="text-[1.1875rem]">Joga esta campanha antes de decidir</h3>
+              <h3 className="text-[1.1875rem]">{lot.status === 'aberto' ? 'Joga esta campanha antes de decidir' : 'Joga esta campanha no simulador'}</h3>
               <p className="mt-1 text-sm text-muted">
                 O simulador usa os parâmetros deste lote com dinheiro fictício: choques de preço, colheita fraca, vendas atrasadas, extensão e refunding. Há campanhas que acabam em perda.
               </p>

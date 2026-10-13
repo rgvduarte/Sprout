@@ -109,7 +109,7 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
             )}
             <div className="mt-10">
               <h3 className="text-[1.1875rem]">Diário do lote</h3>
-              <CampaignFeed className="mt-2" events={events} limit={6} live={{ paused: feed.paused, reason: feed.pauseReason }} linkLots={false} emptyText="Ainda sem eventos registados para este lote." />
+              <CampaignFeed className="mt-2" events={events} limit={6} live={settled ? undefined : { paused: feed.paused, reason: feed.pauseReason }} linkLots={false} emptyText="Ainda sem eventos registados para este lote." />
             </div>
           </div>
 

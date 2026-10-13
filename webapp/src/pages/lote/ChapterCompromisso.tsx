@@ -264,7 +264,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
                     <ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />
                   </button>
                 )}
-                {!c.done && (c.id === 'classe' || c.id === 'kyc') && !blocked && (
+                {!c.done && c.id === 'kyc' && !blocked && (
                   <TextLink to="/onboarding" className="min-h-11 shrink-0 content-center text-sm">
                     Fazer o registo
                   </TextLink>

@@ -4,7 +4,9 @@ import type { Quest } from '../../data/types';
 import { JourneyTrack, LotGauge } from '../../components/game';
 import { Button, ButtonLink, CommodityChip, RiskNote, StatusPill } from '../../components/ui';
 import { cn } from '../../lib/cn';
-import { date as fmtDate, eur, num, pct, price } from '../../lib/format';
+import { date as fmtDate, eur, num, pct, price as rawPrice, tidyText } from '../../lib/format';
+
+const price = (v: number, unit: string, d?: number) => tidyText(rawPrice(v, unit, d));
 import { lotQuantityLabel } from '../../lib/physical';
 import { useData, useGame, useRole } from '../../state';
 import { lotPhysicalDetail, priceDecimals } from './model';

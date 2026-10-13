@@ -3,7 +3,7 @@ import { useMotionValueEvent, type MotionValue } from 'motion/react';
 import { MARKET_TODAY, priceUnit } from '../../data';
 import { Chapter } from '../../components/game';
 import { cn } from '../../lib/cn';
-import { num, pct, price } from '../../lib/format';
+import { num, pct, price, tidyText } from '../../lib/format';
 import { useGame } from '../../state';
 import { marginSplit, priceDecimals, referenceChange } from './model';
 import { PriceChart } from './PriceChart';
@@ -24,7 +24,7 @@ function PrecoBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
   const split = marginSplit(lot);
   const change = referenceChange(lot);
   const today = MARKET_TODAY[lot.world];
-  const fmt = (v: number) => price(v, unit, d);
+  const fmt = (v: number) => tidyText(price(v, unit, d));
   const trigger = lot.hedge.trigger?.match(/(\d+,\d+)\s€\/kg/)?.[1];
 
   // missão "Compara o preço de entrada com a referência" (mundo do azeite, lote aberto)
