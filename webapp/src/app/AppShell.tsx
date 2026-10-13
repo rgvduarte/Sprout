@@ -86,7 +86,9 @@ function RailIdentity() {
   return (
     <div className="rounded-sm border border-rail-border p-3">
       <p className="text-xs text-rail-muted">{ROLE_LABEL[role]}</p>
-      <p className="mt-0.5 text-sm font-medium leading-snug text-rail-fg">{role === 'equipa' ? 'Vista interna da equipa' : investor.nome}</p>
+      <p className="mt-0.5 text-sm font-medium leading-snug text-rail-fg">
+        {role === 'equipa' ? 'Vista interna da equipa' : role === 'visitante' && game.onboarding.status !== 'aprovado' ? 'Sem registo no piloto' : investor.nome}
+      </p>
       {role !== 'equipa' && (
         <div className="mt-2 flex items-center gap-2 text-xs text-rail-muted">
           <span className="inline-flex items-center rounded-xs bg-rail-fg px-1.5 py-0.5 font-medium text-rail">{game.level.nome}</span>
