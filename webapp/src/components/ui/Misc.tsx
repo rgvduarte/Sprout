@@ -48,12 +48,15 @@ export interface Step {
   description?: string;
 }
 
-/** Passos numerados (a sequência é informação: onboarding, simulador). */
-export function Stepper({ steps, current, className, onStepClick }: { steps: Step[]; current: number; className?: string; onStepClick?: (index: number) => void }) {
+/**
+ * Passos numerados (a sequência é informação: onboarding, simulador).
+ * Com `onStepClick`, os passos anteriores e os já alcançados (`reached`) são botões.
+ */
+export function Stepper({ steps, current, reached = current, className, onStepClick }: { steps: Step[]; current: number; reached?: number; className?: string; onStepClick?: (index: number) => void }) {
   return (
     <ol className={cn('flex min-w-0 flex-wrap gap-x-2 gap-y-3', className)} aria-label="Passos">
       {steps.map((s, i) => {
-        const state = i < current ? 'done' : i === current ? 'current' : 'todo';
+        const state = i < current ? 'done' : i === current ? 'current' : i <= reached ? 'reached' : 'todo';
         const inner = (
           <>
             <span
@@ -61,6 +64,7 @@ export function Stepper({ steps, current, className, onStepClick }: { steps: Ste
                 'inline-flex size-7 shrink-0 items-center justify-center rounded-full border font-mono text-sm tnum',
                 state === 'done' && 'border-accent bg-accent text-accent-fg',
                 state === 'current' && 'border-accent bg-accent-soft text-accent',
+                state === 'reached' && 'border-accent bg-surface text-accent',
                 state === 'todo' && 'border-border bg-surface text-muted',
               )}
             >
@@ -72,11 +76,13 @@ export function Stepper({ steps, current, className, onStepClick }: { steps: Ste
             </span>
           </>
         );
+        const clickable = onStepClick && i !== current && i <= Math.max(reached, current);
         return (
           <li key={s.id} className="flex min-w-0 items-center gap-2" aria-current={state === 'current' ? 'step' : undefined}>
-            {onStepClick && i < current ? (
-              <button type="button" onClick={() => onStepClick(i)} className="flex min-h-11 items-center gap-2 rounded-sm pr-2 hover:bg-surface-2">
+            {clickable ? (
+              <button type="button" onClick={() => onStepClick(i)} className="flex min-h-11 items-center gap-2 rounded-sm pr-2 transition-colors duration-150 hover:bg-surface-2">
                 {inner}
+                <span className="sr-only">{state === 'done' ? ' · feito, voltar a este passo' : ' · já visitado, ir para este passo'}</span>
               </button>
             ) : (
               <span className="flex min-h-11 items-center gap-2 pr-2">{inner}</span>
@@ -146,11 +152,12 @@ export function NoAccess({ title = 'Este ecrã é da equipa Sprout', body, allow
   const { setRole, roleLabel } = useRole();
   return (
     <div className="mx-auto flex max-w-[640px] flex-col items-start gap-4 px-4 py-16 sm:px-6">
-      <span aria-hidden className="inline-flex size-11 items-center justify-center rounded-sm border border-border bg-surface text-muted">
-        <Lock className="size-5" strokeWidth={1.75} />
-      </span>
       <h1 className="text-[1.75rem]">{title}</h1>
-      <p className="text-muted">{body ?? `Estás a ver a plataforma como ${roleLabel}. Esta área só está disponível para ${allowed.map((r) => ROLE_LABEL[r]).join(' ou ')}.`}</p>
+      <p className="measure text-muted">{body ?? `Estás a ver a plataforma como ${roleLabel}. Esta área só está disponível para ${allowed.map((r) => ROLE_LABEL[r]).join(' ou ')}.`}</p>
+      <p className="inline-flex items-center gap-2 text-sm text-muted">
+        <Lock aria-hidden className="size-4" strokeWidth={1.75} />
+        Papel atual: <span className="font-medium text-fg">{roleLabel}</span>
+      </p>
       <div className="flex flex-wrap gap-2">
         {allowed.map((r) => (
           <Button key={r} variant="primary" onClick={() => setRole(r)}>

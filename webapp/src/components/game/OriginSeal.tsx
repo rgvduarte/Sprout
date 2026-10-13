@@ -64,7 +64,7 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
     : `Selo de origem ${producer.nome}, ${region.nome}, campanha ${seal.campanha}: por ganhar.`;
 
   return (
-    <figure className={cn('inline-flex min-w-0 flex-col items-center gap-2', className)} data-world={seal.world}>
+    <figure className={cn('inline-flex shrink-0 flex-col items-center gap-2', className)} data-world={seal.world}>
       <svg role="img" aria-label={label} viewBox="0 0 120 120" width={size} height={size} className="block shrink-0 overflow-visible">
         <defs>
           <path id={`rim-${uid}`} d="M60,98 a38,38 0 1,1 0,-76 a38,38 0 1,1 0,76" />

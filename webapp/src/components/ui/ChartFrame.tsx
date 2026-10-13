@@ -37,26 +37,25 @@ export function ChartFrame<T>({ title, description, legend, table, height = 260,
   return (
     <figure className={cn('min-w-0', className)}>
       <div className="mb-3 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-        <figcaption className="min-w-0 flex-1">
+        <figcaption className="min-w-0 flex-[1_1_16rem]">
           <span className="block font-display text-[1.0625rem] font-semibold leading-tight text-fg">{title}</span>
           {description && <span className="mt-1 block text-sm text-muted">{description}</span>}
         </figcaption>
-        <div className="flex flex-wrap items-center gap-2">
-          {actions}
-          {table && (
-            <SegmentedControl
-              label="Vista do gráfico"
-              size="sm"
-              value={view}
-              onChange={setView}
-              options={[
-                { value: 'chart', label: 'Gráfico' },
-                { value: 'table', label: 'Tabela' },
-              ]}
-            />
-          )}
-        </div>
+        {table && (
+          <SegmentedControl
+            label="Vista do gráfico"
+            size="sm"
+            value={view}
+            onChange={setView}
+            options={[
+              { value: 'chart', label: 'Gráfico' },
+              { value: 'table', label: 'Tabela' },
+            ]}
+          />
+        )}
       </div>
+      {/* filtros numa linha própria, por cima do gráfico, para não espremer o título */}
+      {actions && <div className="mb-3 flex min-w-0 flex-wrap items-center gap-2">{actions}</div>}
       {legend && legend.length > 0 && view === 'chart' && (
         <ul className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted" aria-label="Legenda">
           {legend.map((l) => (

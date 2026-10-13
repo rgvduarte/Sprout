@@ -337,7 +337,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
       )}
 
       <div ref={top} className="scroll-mt-20 rounded-md border border-border bg-surface px-4 py-4 sm:px-6 sm:py-5">
-        <Stepper steps={STEPS.map((s) => ({ id: s.id, label: s.label }))} current={step} onStepClick={goTo} />
+        <Stepper steps={STEPS.map((s) => ({ id: s.id, label: s.label }))} current={step} reached={draft.reached} onStepClick={goTo} />
         <div className="mt-4 border-t border-border pt-4">
           <MissionBar fractions={fractions} current={step} counts={{ done: check.done, total: check.total }} />
         </div>

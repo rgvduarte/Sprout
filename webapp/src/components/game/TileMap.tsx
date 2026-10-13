@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { getProducersByRegion, getRegionsByMap } from '../../data';
 import type { MapId, Region, RegionState, WorldId } from '../../data/types';
@@ -46,8 +46,32 @@ function hexPoints(cx: number, cy: number, r: number) {
   }).join(' ');
 }
 
-export function TileMap({ map, states, world, selectedId, onSelect, labels = true, className, title }: TileMapProps) {
+export function TileMap({ map, states, world, selectedId, onSelect, labels: labelsProp = true, className, title }: TileMapProps) {
   const reduce = useReducedMotion();
+  // Os rótulos SVG escalam com o viewBox: abaixo de ~80 % do tamanho natural ficam
+  // com menos de 11 px. Nesse caso saem do SVG e passam a lista HTML por baixo.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [renderedW, setRenderedW] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el || !labelsProp) return;
+    setRenderedW(el.getBoundingClientRect().width);
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([e]) => setRenderedW(Math.round(e.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [labelsProp]);
+  const naturalW = useMemo(() => {
+    if (!labelsProp) return 0;
+    const R0 = map === 'pt' ? 28 : 22;
+    const W0 = Math.sqrt(3) * R0;
+    const regions = getRegionsByMap(map);
+    const maxCol = Math.max(...regions.flatMap((r) => r.tiles.map((t) => t.col + (t.row % 2 ? 0.5 : 0))));
+    const longest = Math.max(...regions.map((r) => r.nome.length));
+    return map === 'pt' ? (maxCol + 1) * W0 + longest * 6.9 * 2 + 46 : (maxCol + 1) * W0 + 30;
+  }, [map, labelsProp]);
+  const labels = labelsProp && (renderedW === null || renderedW >= naturalW * 0.8);
+  const htmlLabels = labelsProp && !labels;
   const R = map === 'pt' ? 28 : 22;
   const W = Math.sqrt(3) * R;
   const VS = R * 1.5;
@@ -137,7 +161,7 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
   const countries = map === 'cafe' ? Array.from(new Set(geo.map((g) => g.region.country!))) : [];
 
   return (
-    <div className={cn('min-w-0', className)} data-world={tint}>
+    <div ref={wrapRef} className={cn('min-w-0', className)} data-world={tint}>
       <svg
         role="group"
         aria-label={title ?? (map === 'pt' ? 'Mapa das regiões de origem em Portugal' : 'Mapa das origens de café')}
@@ -254,6 +278,49 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
             );
           })}
       </svg>
+      {htmlLabels && (
+        <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Regiões do mapa">
+          {geo
+            .filter((g) => g.active)
+            .map((g) => {
+              const state = states[g.region.id] ?? 'unexplored';
+              const selected = g.region.id === selectedId;
+              const dot = (
+                <span
+                  aria-hidden
+                  className="inline-block size-2.5 shrink-0 rounded-full border border-world-ink"
+                  style={{ background: state === 'participated' ? 'var(--world)' : state === 'learned' ? 'color-mix(in oklab, var(--world) 30%, var(--surface))' : 'var(--surface)' }}
+                />
+              );
+              const label = (
+                <>
+                  {dot}
+                  {g.region.nome}
+                  <span className="sr-only"> · {STATE_LABEL[state]}</span>
+                </>
+              );
+              return (
+                <li key={g.region.id}>
+                  {onSelect ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelect(g.region.id)}
+                      aria-pressed={selected}
+                      className={cn(
+                        'inline-flex min-h-11 items-center gap-1.5 rounded-sm border px-2.5 text-sm transition-colors duration-150',
+                        selected ? 'border-fg bg-surface-2 font-medium text-fg' : 'border-border bg-surface text-fg hover:bg-surface-2',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ) : (
+                    <span className="inline-flex min-h-8 items-center gap-1.5 px-1 text-sm text-fg">{label}</span>
+                  )}
+                </li>
+              );
+            })}
+        </ul>
+      )}
     </div>
   );
 }

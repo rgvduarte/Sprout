@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 
@@ -13,9 +14,10 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
  * são só para sobreposições). Não aninhar cartões: dentro de um Card use
  * divisórias, KeyValue ou listas.
  */
-export function Card({ as: Tag = 'section', padding = 'md', tinted, className, children, ...rest }: CardProps) {
+export function Card({ as: Tag = 'section', padding = 'md', tinted, className, children, ref, ...rest }: CardProps & { ref?: React.Ref<HTMLElement> }) {
   return (
     <Tag
+      ref={ref as React.Ref<never>}
       className={cn(
         'min-w-0 rounded-md border border-border',
         tinted ? 'bg-world-soft border-world-line' : 'bg-surface',
@@ -45,13 +47,14 @@ export function CardHeader({ title, description, actions, level = 2, className, 
   const H = level === 2 ? 'h2' : 'h3';
   return (
     <div className={cn('mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-2', className)}>
-      <div className="min-w-0 flex-1">
+      {/* base de 14rem: com ações largas, as ações passam para baixo em vez de espremer o título */}
+      <div className="min-w-0 flex-[1_1_14rem]">
         <H id={id} className={cn(level === 2 ? 'text-[1.1875rem]' : 'text-[1.0625rem]', 'leading-tight')}>
           {title}
         </H>
         {description && <p className="mt-1 text-sm text-muted">{description}</p>}
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">{actions}</div>}
     </div>
   );
 }

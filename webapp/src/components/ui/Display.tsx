@@ -165,12 +165,12 @@ export function Disclaimer({ children, kind = 'info', className, title, boxed }:
   );
 }
 
-/** Faixa fixa das simulações: "Simulação educativa · dinheiro fictício · não representa resultados reais". */
+/** Faixa fixa das simulações: "Simulação educativa · dinheiro fictício · não representa resultados reais nem previsões". */
 export function SimulationLabel({ className }: { className?: string }) {
   return (
     <p className={cn('flex items-start gap-2 text-sm font-medium text-info-ink', className)}>
       <FlaskConical aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
-      Simulação educativa · dinheiro fictício · não representa resultados reais
+      Simulação educativa · dinheiro fictício · não representa resultados reais nem previsões
     </p>
   );
 }

@@ -25,7 +25,7 @@ export function PageHeader({ title, description, actions, meta, className, aside
         <h1 className="text-[1.875rem] leading-[1.08] sm:text-[2.375rem]" style={{ letterSpacing: '-0.018em' }}>
           {title}
         </h1>
-        {description && <p className="measure mt-2 text-[1.0625rem] text-muted">{description}</p>}
+        {description && <p className="mt-2 max-w-[56ch] text-[1.0625rem] text-muted">{description}</p>}
         {meta && <div className="mt-3 flex flex-wrap items-center gap-2">{meta}</div>}
       </div>
       {(actions || aside) && (
@@ -62,7 +62,7 @@ export function Section({ title, description, actions, children, className, id }
     <section id={id} className={cn('mt-10 first:mt-0', className)} aria-labelledby={id && title ? `${id}-title` : undefined}>
       {(title || actions) && (
         <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-[1_1_16rem]">
             {title && (
               <h2 id={id ? `${id}-title` : undefined} className="text-[1.375rem] leading-tight">
                 {title}

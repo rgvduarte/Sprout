@@ -20,9 +20,10 @@ export function buttonClass(variant: ButtonVariant = 'primary', size: ButtonSize
     size === 'md' && 'h-11 px-4 text-[0.9375rem]',
     size === 'lg' && 'h-12 px-5 text-base',
     variant === 'primary' && 'bg-accent text-accent-fg hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--fg))] disabled:bg-surface-2 disabled:text-muted aria-disabled:bg-surface-2 aria-disabled:text-muted',
-    variant === 'secondary' && 'border border-border bg-surface text-fg hover:border-[color-mix(in_oklab,var(--accent)_45%,var(--border))] hover:bg-surface-2 disabled:text-muted aria-disabled:text-muted',
+    // indisponível: contorno tracejado e sem fundo, para não parecer ativo (o motivo vai ao lado, em texto)
+    variant === 'secondary' && 'border border-border bg-surface text-fg hover:border-[color-mix(in_oklab,var(--accent)_45%,var(--border))] hover:bg-surface-2 disabled:border-dashed disabled:border-[color-mix(in_oklab,var(--muted)_55%,var(--border))] disabled:bg-transparent disabled:text-muted aria-disabled:border-dashed aria-disabled:bg-transparent aria-disabled:text-muted',
     variant === 'ghost' && 'text-fg hover:bg-surface-2 disabled:text-muted aria-disabled:text-muted',
-    variant === 'quiet-danger' && 'border border-border bg-surface text-crit-ink hover:bg-[color-mix(in_oklab,var(--crit)_8%,var(--surface))] disabled:text-muted',
+    variant === 'quiet-danger' && 'border border-border bg-surface text-crit-ink hover:bg-[color-mix(in_oklab,var(--crit)_8%,var(--surface))] disabled:border-dashed disabled:bg-transparent disabled:text-muted',
     variant === 'on-rail' && 'border border-rail-border text-rail-fg hover:bg-rail-active',
     extra,
   );

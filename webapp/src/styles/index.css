@@ -300,8 +300,9 @@
   .font-display { font-family: var(--font-display); font-stretch: 87.5%; }
   .tnum { font-variant-numeric: tabular-nums; }
   .pnum { font-variant-numeric: proportional-nums; }
-  .measure { max-width: 68ch; }
-  .measure-narrow { max-width: 52ch; }
+  /* 60ch de '0' ≈ 72–76 caracteres de texto corrido em Public Sans */
+  .measure { max-width: 60ch; }
+  .measure-narrow { max-width: 48ch; }
   .ease-expo { transition-timing-function: var(--ease-out-expo); }
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
