@@ -204,7 +204,7 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
               </span>
             ))}
           </div>
-          <p className="measure mt-4 text-[1.0625rem] leading-relaxed text-fg">
+          <p className="max-w-[62ch] mt-4 text-[1.0625rem] leading-relaxed text-fg">
             {lot.product}. {colhido?.note}
           </p>
         </div>

@@ -1,12 +1,12 @@
 import { useId, type ReactNode } from 'react';
-import { motion, useTransform, type MotionValue } from 'motion/react';
+import { motion, type MotionValue } from 'motion/react';
 import { Chapter, HarvestBand } from '../../components/game';
 import { getLot } from '../../data';
 import { addMonths } from '../../lib/clock';
 import { date, kg, lisbonParts, monthYear, pct, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { CYCLE, FOCUS_LOT_ID } from './model';
-import { ChapterHead, Frame, useStep } from './parts';
+import { ChapterHead, Frame, useStep, useRange } from './parts';
 
 /* =====================================================================
    4 · O ciclo de 18 meses. O cursor percorre a janela do lote sobre a
@@ -49,8 +49,8 @@ export function CycleChapter({ tall }: { tall: boolean }) {
 }
 
 function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {
-  const cursor = useTransform(progress, [0.06, 0.78], [0, 1]);
-  const fork = useTransform(progress, [0.76, 0.94], [0, 1]);
+  const cursor = useRange(progress, [0.06, 0.78], [0, 1]);
+  const fork = useRange(progress, [0.76, 0.94], [0, 1]);
   const month = useStep(cursor, (v) => Math.round(Math.max(0, Math.min(1, v)) * CYCLE.months));
   const activePhase = rich ? (month >= CYCLE.months ? 3 : PHASES.findIndex((p) => month >= p.from && month < p.to)) : -1;
   const forkOn = useStep(fork, (v) => (v > 0.02 ? 1 : 0));
@@ -126,7 +126,7 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
 
 function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boolean }) {
   const hatchId = useId().replace(/:/g, '');
-  const stem = useTransform(progress, [0, 0.5], [0, 1]);
+  const stem = useRange(progress, [0, 0.5], [0, 1]);
   const items = [
     {
       title: 'Liquidação prevista',
@@ -181,7 +181,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
 
 function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index: number; progress: MotionValue<number>; drawn: boolean; title: string; when: string; body: ReactNode; swatch: ReactNode }) {
   const start = 0.2 + index * 0.22;
-  const tick = useTransform(progress, [start, start + 0.3], [0, 1]);
+  const tick = useRange(progress, [start, start + 0.3], [0, 1]);
   return (
     <li className="relative min-w-0">
       <motion.span aria-hidden className="absolute -left-5 top-[0.7em] h-0.5 w-4 origin-left bg-world-ink" style={{ scaleX: drawn ? 1 : tick }} />

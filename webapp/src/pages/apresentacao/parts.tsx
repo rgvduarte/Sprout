@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { useMotionValueEvent, type MotionValue } from 'motion/react';
+import { useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
 import { tidyText } from '../../lib/format';
@@ -85,3 +85,16 @@ export function useStep(progress: MotionValue<number>, toStep: (v: number) => nu
  * empilhados e estáticos (o conteúdo não cabe num ecrã sem ser cortado).
  */
 export const useTallViewport = () => useMediaQuery('(min-height: 760px)', true);
+
+/**
+ * Mapeia um intervalo do progresso para valores (com limites), por função.
+ * Usamos uma função em vez de useTransform(v, [a, b], [x, y]) porque o motion
+ * acelera esses mapeamentos de opacidade com ScrollTimeline nativa e, dentro
+ * de capítulos fixos (sticky), o resultado não segue o progresso do capítulo.
+ */
+export function useRange(progress: MotionValue<number>, [a, b]: [number, number], [from, to]: [number, number]): MotionValue<number> {
+  return useTransform(progress, (v) => {
+    const t = b === a ? (v >= b ? 1 : 0) : Math.max(0, Math.min(1, (v - a) / (b - a)));
+    return from + (to - from) * t;
+  });
+}

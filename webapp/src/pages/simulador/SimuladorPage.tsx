@@ -45,7 +45,8 @@ export default function SimuladorPage() {
   const { toast } = useToast();
   const reduce = useReducedMotion();
   const phaseRef = useRef<HTMLDivElement>(null);
-  const firstRender = useRef(true);
+  const phaseKey = `${session.phase}-${session.runNonce}`;
+  const prevPhaseKey = useRef(phaseKey);
 
   const run = useMemo(() => {
     if (session.phase === 'setup' || !session.allocations.length) return null;
@@ -54,15 +55,13 @@ export default function SimuladorPage() {
 
   // ao mudar de fase, leva o topo da fase ao ecrã (sem sequestrar o scroll)
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    if (prevPhaseKey.current === phaseKey) return;
+    prevPhaseKey.current = phaseKey;
     const el = phaseRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top;
     if (top < 0 || top > window.innerHeight * 0.6) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  }, [session.phase, session.runNonce, reduce]);
+  }, [phaseKey, reduce]);
 
   // a série de campanhas seguidas termina quando se sai do simulador
   useEffect(() => () => update({ streak: 0, pauseAcknowledgedAt: 0 }), [update]);

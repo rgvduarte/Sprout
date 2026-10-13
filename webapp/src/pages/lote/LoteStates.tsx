@@ -24,7 +24,7 @@ export function UnknownLot({ id }: { id?: string }) {
           <Compass className="size-5" strokeWidth={1.75} />
         </span>
         <h1 className="text-[1.875rem] leading-tight">Não encontramos o lote {id ? <span className="font-mono">{id}</span> : 'pedido'}</h1>
-        <p className="measure text-muted">Os números de lote têm o formato AZ-2026-021 (azeite), AG-2026-007 (água) ou CF-2027-001 (café). Se vieste de uma ligação antiga, o lote pode ter mudado de número. Estes estão abertos a financiamento hoje:</p>
+        <p className="max-w-[62ch] text-muted">Os números de lote têm o formato AZ-2026-021 (azeite), AG-2026-007 (água) ou CF-2027-001 (café). Se vieste de uma ligação antiga, o lote pode ter mudado de número. Estes estão abertos a financiamento hoje:</p>
       </div>
       <ul className="divide-y divide-border border-y border-border">
         {open.map((l) => {
@@ -86,11 +86,11 @@ export function PhaseTwoLot({ lot }: { lot: Lot }) {
               <StatusPill status={lot.status} />
               <CommodityChip world={lot.world} label="world" />
             </div>
-            <p className="measure mt-4 text-[1.0625rem] text-fg">
+            <p className="max-w-[62ch] mt-4 text-[1.0625rem] text-fg">
               {lot.product}. {world.faseLabel}: o mundo já se explora e joga, mas este lote não aceita compromissos. {lotQuantityLabel(lot)} previstas para a safra {lot.campanha}.
             </p>
             <h2 className="mt-8 text-[1.25rem]">Porque ainda não se pode financiar</h2>
-            <ul className="measure mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-muted marker:text-world-ink">
+            <ul className="max-w-[62ch] mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-muted marker:text-world-ink">
               <li>O piloto da fase 1 está fechado a azeite e água, com investidores qualificados.</li>
               <li>A cobertura com futuros ICE KC e câmbio EUR/USD precisa de um corretor ({lot.hedge.counterparty?.toLowerCase()}).</li>
               <li>

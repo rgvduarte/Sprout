@@ -91,7 +91,7 @@ export function ChapterHeading({ id, n, title, lead, aside, className }: { id: s
           </span>
           <span className="min-w-0">{title}</span>
         </h2>
-        {lead && <p className="measure mt-3 text-[1.0625rem] leading-relaxed text-muted">{lead}</p>}
+        {lead && <p className="max-w-[62ch] mt-3 text-[1.0625rem] leading-relaxed text-muted">{lead}</p>}
       </div>
       {aside}
     </div>

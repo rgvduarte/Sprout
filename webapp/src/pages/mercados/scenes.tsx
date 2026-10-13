@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { useEffect, useId, useMemo, useState } from 'react';
+import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
 import { getProducer } from '../../data';
 import type { WorldId } from '../../data/types';
 import { num } from '../../lib/format';
@@ -340,6 +340,7 @@ function OlivalScene({ variant = 'hero', levels, fillOnMount = false, className,
 }
 
 function NascenteScene({ variant = 'hero', levels, fillOnMount = false, className, label }: SceneProps) {
+  const uid = useId().replace(/:/g, '');
   const P = useMemo(() => makeProj(250, 56, U), []);
   const W = 32;
   const D = 14;
@@ -366,15 +367,14 @@ function NascenteScene({ variant = 'hero', levels, fillOnMount = false, classNam
           <polygon points={pts([P(W, 0, s.z1), P(W, D, s.z1), P(W, D, s.z0), P(W, 0, s.z0)])} fill={`color-mix(in oklab, ${s.fill} 82%, var(--fg))`} />
         </g>
       ))}
-      {/* poros do aquífero */}
-      <g fill="var(--world-ink)" opacity={0.55}>
-        {Array.from({ length: 34 }, (_, i) => {
-          const x = 1 + ((i * 7.3) % 30);
-          const z = -3.8 - ((i * 3.1) % 1.6);
-          const [sx, sy] = P(x, D, z);
-          return <circle key={i} cx={sx} cy={sy} r={1.2} />;
-        })}
-      </g>
+      {/* poros do aquífero: textura de pontos, só na camada de água */}
+      <defs>
+        <pattern id={`poros-${uid}`} width="9" height="6" patternUnits="userSpaceOnUse" patternTransform="skewY(30)">
+          <circle cx="2" cy="2" r="1.1" fill="var(--world-ink)" opacity={0.55} />
+          <circle cx="6.5" cy="5" r="1.1" fill="var(--world-ink)" opacity={0.55} />
+        </pattern>
+      </defs>
+      <polygon points={pts([P(0, D, -5.5), P(W, D, -5.5), P(W, D, -3.5), P(0, D, -3.5)])} fill={`url(#poros-${uid})`} />
       {/* fraturas do granito */}
       <g stroke={INK.lineSoft} strokeWidth={0.9} fill="none">
         {[4, 13, 19, 25, 30].map((x, i) => (
@@ -416,28 +416,26 @@ function NascenteScene({ variant = 'hero', levels, fillOnMount = false, classNam
   );
 }
 
-/** Lugares de palete que se ocupam à medida que o armazém enche. */
+/** Lugares de palete que se ocupam à medida que o armazém enche (pela ordem de arrumação). */
 function PalletGrid({ P, ordered, level }: { P: Proj; ordered: { s: Pt; i: number }[]; level: MotionValue<number> }) {
   const n = ordered.length;
+  const toCount = (v: number) => ordered.filter(({ i }) => v >= (i + 0.5) / n).length;
+  const [count, setCount] = useState(() => toCount(level.get()));
+  useMotionValueEvent(level, 'change', (v) => {
+    const next = toCount(v);
+    setCount((c) => (c === next ? c : next));
+  });
   return (
     <g>
-      {ordered.map(({ s, i }) => (
-        <PalletSlot key={i} P={P} at={s} index={i} n={n} level={level} />
-      ))}
-    </g>
-  );
-}
-
-function PalletSlot({ P, at, index, n, level }: { P: Proj; at: Pt; index: number; n: number; level: MotionValue<number> }) {
-  // o enchimento segue a ordem de arrumação (índice), não a profundidade de desenho
-  const threshold = (index + 0.5) / n;
-  const opacity = useTransform(level, (v) => (v >= threshold ? 1 : 0));
-  return (
-    <g>
-      <WaterPallet P={P} x={at[0]} y={at[1]} filled={false} />
-      <motion.g style={{ opacity }}>
-        <WaterPallet P={P} x={at[0]} y={at[1]} filled />
-      </motion.g>
+      {ordered.map(({ s, i }) =>
+        i < count ? (
+          <motion.g key={`f${i}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22 }}>
+            <WaterPallet P={P} x={s[0]} y={s[1]} filled />
+          </motion.g>
+        ) : (
+          <WaterPallet key={`e${i}`} P={P} x={s[0]} y={s[1]} filled={false} />
+        ),
+      )}
     </g>
   );
 }

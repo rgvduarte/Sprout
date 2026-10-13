@@ -81,7 +81,7 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
               <p className="mt-1 text-[2rem] font-semibold leading-none text-fg pnum">{pct(lot.settlement.settledResult ?? 0, 1, { sign: true })}</p>
               <p className="mt-1 text-sm text-muted">do capital, em {lot.settlement.settledAt ? fmtDate(lot.settlement.settledAt) : '—'}</p>
             </div>
-            <p className="measure min-w-0 flex-1 text-[0.9375rem] text-fg">{lot.milestones.find((m) => m.stage === 'liquidado')?.note}</p>
+            <p className="max-w-[62ch] min-w-0 flex-1 text-[0.9375rem] text-fg">{lot.milestones.find((m) => m.stage === 'liquidado')?.note}</p>
           </div>
         )}
 

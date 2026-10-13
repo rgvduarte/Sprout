@@ -163,11 +163,11 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
 
           <Divider />
           <div className="flex items-end gap-2">
-            <Field label="Semente da campanha" id={`seed-${seedId}`} hint="A mesma semente repete os mesmos acontecimentos." className="min-w-0 flex-1">
-              {({ id, describedBy }) => (
+            <Field label="Semente da campanha" id={`seed-${seedId}`} className="min-w-0 flex-1">
+              {({ id }) => (
                 <Input
                   id={id}
-                  aria-describedby={describedBy}
+                  aria-describedby={`seed-${seedId}-hint`}
                   inputMode="numeric"
                   value={String(session.draftSeed)}
                   onChange={(e) => {
@@ -178,10 +178,13 @@ export function SetupPhase({ session, update, onStart }: SetupProps) {
                 />
               )}
             </Field>
-            <Button variant="secondary" className="mb-[26px] shrink-0" iconLeft={<RefreshCw aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => update({ draftSeed: nextSeed(session.draftSeed || DEFAULT_SEED) })}>
+            <Button variant="secondary" className="shrink-0" iconLeft={<RefreshCw aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => update({ draftSeed: nextSeed(session.draftSeed || DEFAULT_SEED) })}>
               Outra
             </Button>
           </div>
+          <p id={`seed-${seedId}-hint`} className="mt-1.5 text-sm text-muted">
+            A mesma semente repete os mesmos acontecimentos.
+          </p>
 
           {needsPause && (
             <div className="mt-4 rounded-sm bg-surface-2 px-4 py-3" role="note">
@@ -366,8 +369,10 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
                   Compra <span className="font-mono text-fg tnum">{phys.primary}</span> {phys.secondary}
                   {lot.world === 'azeite' && <> · ≈ {num(Math.max(1, Math.round(phys.units / 1000)))} IBC</>}
                 </>
-              ) : (
+              ) : canAdd ? (
                 'Fora da carteira.'
+              ) : (
+                `Fora da carteira. ${addReason}`
               )}
             </p>
           </div>

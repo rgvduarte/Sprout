@@ -264,7 +264,7 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
           ) : (
             <div className="rounded-sm border border-dashed border-world-line px-4 py-6">
               <h3 className="text-[1.1875rem]">Boletim por publicar</h3>
-              <p className="measure mt-1 text-muted">
+              <p className="max-w-[62ch] mt-1 text-muted">
                 O lote só abre a financiamento depois de o laboratório publicar a análise físico-química{lot.world === 'azeite' ? ' e o painel de prova' : ''}. Data prevista: <span className="font-mono text-fg tnum">{fmtDate(analisado?.planned ?? lot.funding.opensAt)}</span>.
               </p>
             </div>

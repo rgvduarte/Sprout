@@ -218,7 +218,7 @@ export default function MercadosPage() {
     <Page>
       <PageHeader
         title="Mercados"
-        description="Três mundos, o mesmo ciclo: a Sprout compra o lote ao produtor, vende-o 10–15 % abaixo da referência a compradores B2B e liquida aos co-financiadores numa janela de 18 meses."
+        description={<span className="block max-w-[58ch]">Três mundos, o mesmo ciclo: a Sprout compra o lote ao produtor, vende-o 10–15 % abaixo da referência a compradores B2B e liquida aos co-financiadores numa janela de 18 meses.</span>}
         meta={
           <>
             <Badge tone="accent" dot>

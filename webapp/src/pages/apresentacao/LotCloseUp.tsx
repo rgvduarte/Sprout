@@ -10,7 +10,7 @@ import { eur, kg, num, pct, relative, tidyText } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { cn } from '../../lib/cn';
 import { FOCUS_LOT_ID, FOCUS_PRODUCER_ID, LAGAR } from './model';
-import { ChapterHead, Frame } from './parts';
+import { ChapterHead, Frame, useRange } from './parts';
 
 /* =====================================================================
    3 · Um lote, de perto. Os depósitos do lagar enchem-se até à leitura real
@@ -31,9 +31,9 @@ function LotScene({ progress, rich }: { progress: MotionValue<number>; rich: boo
   const lot = getLot(FOCUS_LOT_ID)!;
   const units = telemetry[FOCUS_PRODUCER_ID] ?? [];
   const funded = fundedFraction(lot);
-  const tanks = useTransform(progress, [0.02, 0.4], [0, 1]);
-  const gauge = useTransform(progress, [0.3, 0.66], [0, funded]);
-  const journey = useTransform(progress, [0.6, 0.9], [0, 1]);
+  const tanks = useRange(progress, [0.02, 0.4], [0, 1]);
+  const gauge = useRange(progress, [0.3, 0.66], [0, funded]);
+  const journey = useRange(progress, [0.6, 0.9], [0, 1]);
 
   return (
     <Frame>

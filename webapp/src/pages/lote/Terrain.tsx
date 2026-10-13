@@ -13,8 +13,8 @@ import { cn } from '../../lib/cn';
    parallax decorativo.
    ===================================================================== */
 
-const W = 520;
-const H = 300;
+const W = 470;
+const H = 290;
 const L = 240;
 const D = 150;
 const T = 48;
@@ -95,10 +95,10 @@ function Contours({ seed }: { seed: string }) {
   return (
     <Layer>
       {Array.from({ length: 8 }, (_, k) => (
-        <path key={`a${k}`} d={ring(410, 70, k, 34, 14, 26, 11)} fill="none" stroke={k % 4 === 0 ? LINE : FAINT} strokeWidth={1} />
+        <path key={`a${k}`} d={ring(370, 64, k, 34, 14, 26, 11)} fill="none" stroke={k % 4 === 0 ? LINE : FAINT} strokeWidth={1} />
       ))}
       {Array.from({ length: 5 }, (_, k) => (
-        <path key={`b${k}`} d={ring(120, 40, k, 30, 12, 24, 9)} fill="none" stroke={FAINT} strokeWidth={1} />
+        <path key={`b${k}`} d={ring(96, 40, k, 30, 12, 24, 9)} fill="none" stroke={FAINT} strokeWidth={1} />
       ))}
     </Layer>
   );
@@ -111,7 +111,7 @@ function Ridges({ seed }: { seed: string }) {
       {Array.from({ length: 6 }, (_, k) => {
         const pts: [number, number][] = [];
         for (let x = -20; x <= W + 20; x += 40) {
-          const peak = Math.exp(-((x - 380) ** 2) / (2 * 110 ** 2)) * (86 - k * 12) + Math.exp(-((x - 120) ** 2) / (2 * 70 ** 2)) * (40 - k * 5);
+          const peak = Math.exp(-((x - 340) ** 2) / (2 * 100 ** 2)) * (80 - k * 11) + Math.exp(-((x - 100) ** 2) / (2 * 64 ** 2)) * (38 - k * 5);
           pts.push([x, 110 - Math.max(0, peak) + k * 5 + rng.range(-2, 2)]);
         }
         return <path key={k} d={smoothOpen(pts)} fill="none" stroke={k === 0 ? LINE : FAINT} strokeWidth={1} />;
@@ -413,9 +413,9 @@ export function Terrain({
   align?: 'left' | 'center';
 }) {
   const uid = useId().replace(/:/g, '');
-  const iso = makeIso(align === 'left' ? 150 : 221, 36);
+  const iso = makeIso(align === 'left' ? 140 : 196, 34);
   return (
-    <div className={cn('relative w-full overflow-hidden', crop ? 'aspect-[520/220] sm:aspect-[520/300]' : 'aspect-[520/300]', className)} role="img" aria-label={label} data-world={world}>
+    <div className={cn('relative w-full overflow-hidden', crop ? 'aspect-[470/214] sm:aspect-[470/290]' : 'aspect-[470/290]', className)} role="img" aria-label={label} data-world={world}>
       <ParallaxLayer distance={22} className="absolute inset-0">
         {world === 'agua' ? <Ridges seed={seed} /> : <Contours seed={seed} />}
       </ParallaxLayer>

@@ -64,8 +64,8 @@ function RiskItem({ r, idx, open, read, onToggle, onRead, btnRef }: { r: RiskFac
             transition={{ duration: 0.22, ease: EASE_OUT }}
             className="pb-4 pl-[34px]"
           >
-            <p className="measure text-fg">{r.body}</p>
-            <p className="measure mt-2 text-sm text-muted">
+            <p className="max-w-[62ch] text-fg">{r.body}</p>
+            <p className="max-w-[62ch] mt-2 text-sm text-muted">
               <span className="font-semibold text-fg">Como é mitigado: </span>
               {r.mitigation}
             </p>

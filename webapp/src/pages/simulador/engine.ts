@@ -458,7 +458,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
           l.downgraded += fx.downgrade.share;
         }
         if (fx.demand) {
-          l.e = Math.max(l.e - fx.demand.monthsFaster, t, l.s);
+          l.e = Math.max(l.e - fx.demand.monthsFaster, t, l.s, l.pausedUntil + 1);
           l.premium += fx.demand.premium;
         }
         if (fx.extraCost) l.costEvents += fx.extraCost;

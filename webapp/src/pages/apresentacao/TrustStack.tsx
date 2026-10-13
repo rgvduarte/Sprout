@@ -1,10 +1,10 @@
-import { motion, useTransform, type MotionValue } from 'motion/react';
+import { motion, type MotionValue } from 'motion/react';
 import { Chapter } from '../../components/game';
 import { useIsDesktop } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
 import { tidyText } from '../../lib/format';
 import { RECON } from './model';
-import { ChapterHead, Frame, useStep } from './parts';
+import { ChapterHead, Frame, useStep, useRange } from './parts';
 
 /* =====================================================================
    6 · Arquitetura de confiança. Oito camadas em placas axonométricas que
@@ -115,8 +115,8 @@ const FILL: Record<Layer['tone'], string> = {
 
 function Slab({ layer, index, progress, p, labels, active, labelX }: { layer: Layer; index: number; progress: MotionValue<number>; p: (x: number, y: number, z: number) => readonly [number, number]; labels: boolean; active: boolean; labelX: number }) {
   const r0 = START + index * STEP;
-  const y = useTransform(progress, [r0 - 0.04, r0 + 0.08], [-46, 0]);
-  const opacity = useTransform(progress, [r0 - 0.04, r0 + 0.04], [0, 1]);
+  const y = useRange(progress, [r0 - 0.04, r0 + 0.08], [-46, 0]);
+  const opacity = useRange(progress, [r0 - 0.04, r0 + 0.04], [0, 1]);
   const z0 = index * PITCH;
   const z1 = z0 + T;
   const pts = (arr: (readonly [number, number])[]) => arr.map((q) => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(' ');

@@ -38,7 +38,7 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
             options={(['azeite', 'agua', 'cafe'] as WorldId[]).map((w) => ({ value: w, label: getWorld(w).commodity, icon: <CommodityGlyph world={w} className="size-4" /> }))}
           />
           <p className="text-sm text-muted">
-            <span className="font-mono text-fg tnum">{lit}</span> de <span className="font-mono text-fg tnum">{regions.length}</span> regiões acesas em {getWorld(world).nome}
+            <span className="font-mono text-fg tnum">{lit}</span> de <span className="font-mono text-fg tnum">{regions.length}</span> regiões acesas {world === 'azeite' ? 'no Olival' : world === 'agua' ? 'na Nascente' : 'na Plantação'}
           </p>
         </div>
         <TileMap
@@ -124,7 +124,7 @@ export function OriginsMap({ reasonsFor, initialRegion }: { reasonsFor: (regionI
 
             <div className="mt-6">
               <ButtonLink to={`/mercados/${world}`} variant="secondary" size="sm">
-                Explorar {getWorld(world).nome}
+                {world === 'azeite' ? 'Explorar o Olival' : world === 'agua' ? 'Explorar a Nascente' : 'Explorar a Plantação'}
               </ButtonLink>
             </div>
           </>

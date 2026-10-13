@@ -418,7 +418,8 @@ export default function TesourariaTab() {
             </h2>
             <p className="measure mt-1 text-muted">Desde 01/09/2026, mais recentes primeiro. Montantes com sinal: entradas positivas, saídas negativas.</p>
           </div>
-          <div className="max-w-full overflow-x-auto no-scrollbar">
+          <div className="max-w-full overflow-x-auto pb-1">
+            <div className="w-max">
             <SegmentedControl<TxFilter>
               label="Filtrar movimentos"
               size="sm"
@@ -431,6 +432,7 @@ export default function TesourariaTab() {
                 { value: 'custos', label: 'Custos' },
               ]}
             />
+            </div>
           </div>
         </div>
         <DataTable columns={txCols} rows={txs} getRowId={(t) => t.id} caption="Movimentos na conta de clientes" />

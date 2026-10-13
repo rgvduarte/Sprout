@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, TriangleAlert } from 'lucide-react';
 import { getWorld, HEDGE_TRIGGERS, MARKET_TODAY, REFUNDING_PLAYBOOKS, type WorldId } from '../../data';
 import { LotGauge } from '../../components/game';
 import { Badge, Card, CardHeader, Checkbox, CommodityChip, DataTable, Disclaimer, KeyValue, SegmentedControl, StatusPill, type Column } from '../../components/ui';
@@ -179,13 +179,15 @@ export default function RiscoTab() {
           <p className="measure mt-1 text-muted">Escolhe um cenário: a marcação a mercado, os gatilhos, o calendário e os playbooks abaixo passam a mostrar esse cenário.</p>
         </div>
         <div className="flex flex-col gap-3">
-          <div className="-mx-4 overflow-x-auto px-4 no-scrollbar sm:mx-0 sm:px-0">
+          <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+            <div className="w-max">
             <SegmentedControl<ScenarioId>
               label="Cenário de esforço"
               value={sc}
               onChange={(v) => update({ cenario: v })}
               options={SCENARIO_IDS.map((id) => ({ value: id, label: scenario(id, false).label }))}
             />
+            </div>
           </div>
           <Checkbox
             label="Aplicar o choque de preço também à água"
@@ -331,8 +333,11 @@ export default function RiscoTab() {
                 </div>
                 <p className="mt-1.5 text-sm text-muted">Gatilho: {pb.trigger}</p>
                 {hits.length > 0 && (
-                  <p className="mt-2">
-                    <Badge tone="warn">Ativado neste cenário: {hits.join(', ')}</Badge>
+                  <p className="mt-2 flex items-start gap-2 text-sm font-medium text-warn-ink">
+                    <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
+                    <span>
+                      Ativado neste cenário: <span className="font-mono tnum">{hits.join(', ')}</span>
+                    </span>
                   </p>
                 )}
                 <ol className="mt-4 space-y-2">

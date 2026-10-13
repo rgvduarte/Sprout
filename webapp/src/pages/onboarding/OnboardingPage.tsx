@@ -236,7 +236,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
       toast({
         tone: 'accent',
         title: `Missão de registo cumprida: ${STEPS[step].label}`,
-        description: left === 0 ? 'Tudo pronto: só falta assinar.' : left === 1 ? 'Falta 1 passo.' : `Faltam ${left} passos.`,
+        description: `Segue-se: ${STEPS[ni].label.toLowerCase()}. ${left === 0 ? 'Tudo pronto: só falta assinar.' : left === 1 ? 'Falta 1 passo.' : `Faltam ${left} passos.`}`,
         duration: 3800,
       });
     }
@@ -494,8 +494,8 @@ export default function OnboardingPage() {
         </Badge>
       </>
     ) : status === 'em-analise' ? (
-      <Badge tone="warn" dot>
-        Em análise
+      <Badge tone="neutral">
+        <span className="font-mono tnum">{caseLabel(caseView.id)}</span>
       </Badge>
     ) : status === 'bloqueado' ? (
       <Badge tone="neutral" dot>

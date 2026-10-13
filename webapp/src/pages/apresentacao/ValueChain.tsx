@@ -1,11 +1,11 @@
 import { useId, useState, type ReactNode } from 'react';
-import { motion, useTransform, type MotionValue } from 'motion/react';
+import { motion, type MotionValue } from 'motion/react';
 import { Chapter } from '../../components/game';
 import { DataTable, SegmentedControl, type Column } from '../../components/ui';
-import { eur, num } from '../../lib/format';
+import { eur, num, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { CHAIN, FOCUS_LOT_ID } from './model';
-import { ChapterHead, Frame, useStep } from './parts';
+import { ChapterHead, Frame, useStep, useRange } from './parts';
 
 /* =====================================================================
    2 · A cadeia hoje. O momento focal da página: a margem do embalador
@@ -229,10 +229,10 @@ type Tip = { row: 'a' | 'b' | 'z'; seg: Seg } | null;
 
 function ChainChart({ progress }: { progress: MotionValue<number> }) {
   const [tip, setTip] = useState<Tip>(null);
-  const beam = useTransform(progress, [0.12, 0.3], [0, 1]);
-  const split = useTransform(progress, [0.3, 0.66], [0, 1]);
-  const oneBlockLabel = useTransform(split, [0, 0.3], [1, 0]);
-  const build = useTransform(progress, [0.64, 0.9], [0, 1]);
+  const beam = useRange(progress, [0.12, 0.3], [0, 1]);
+  const split = useRange(progress, [0.3, 0.66], [0, 1]);
+  const oneBlockLabel = useRange(split, [0, 0.3], [1, 0]);
+  const build = useRange(progress, [0.64, 0.9], [0, 1]);
 
   const bind = (row: 'a' | 'b' | 'z', seg: Seg) => ({
     tabIndex: 0,
@@ -297,8 +297,8 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
 
 /** Linha "Hoje": o preço ao produtor esbate-se e a margem do embalador ganha um contorno. */
 function TodaySegments({ progress, bind }: { progress: MotionValue<number>; bind: (row: 'a', seg: Seg) => Record<string, unknown> }) {
-  const dimProducer = useTransform(progress, [0.04, 0.22], [1, 0.5]);
-  const ring = useTransform(progress, [0.04, 0.22], [0, 1]);
+  const dimProducer = useRange(progress, [0.04, 0.22], [1, 0.5]);
+  const ring = useRange(progress, [0.04, 0.22], [0, 1]);
   return (
     <>
       {ROW_TODAY.map((s, i) => (
@@ -337,12 +337,12 @@ function Track({ children, tip, total, className }: { children: ReactNode; tip: 
           className="pointer-events-none absolute bottom-[calc(100%+10px)] z-20 w-max max-w-[260px] rounded-sm border border-border bg-surface px-3 py-2 text-sm shadow-pop"
           style={center < 18 ? { left: 0 } : center > 82 ? { right: 0 } : { left: `${center}%`, transform: 'translateX(-50%)' }}
         >
-          <p className="flex items-center gap-2">
+          <p className="flex items-center gap-2 whitespace-nowrap">
             <Swatch id={tip.id} />
             <span className="font-mono font-semibold text-fg tnum">{kgEur(value(tip))}</span>
-            <span className="text-muted">{SEG[tip.id].name}</span>
           </p>
-          <p className="mt-1 text-muted">{SEG[tip.id].who}</p>
+          <p className="mt-0.5 font-medium text-fg">{SEG[tip.id].name}</p>
+          <p className="mt-0.5 text-muted">{tidyText(SEG[tip.id].who)}</p>
         </div>
       )}
     </div>
@@ -352,7 +352,7 @@ function Track({ children, tip, total, className }: { children: ReactNode; tip: 
 function SproutSegment({ seg, index, build, bind }: { seg: Seg; index: number; build: MotionValue<number>; bind: Record<string, unknown> }) {
   // os segmentos ganham cor por ordem, da esquerda para a direita
   const start = Math.max(0, (index - 1) * 0.2);
-  const on = useTransform(build, [start, start + 0.4], [0, 1]);
+  const on = useRange(build, [start, start + 0.4], [0, 1]);
   const last = seg.id === 'discount';
   return (
     <div className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.ref), width: pct(value(seg), C.ref) }} {...bind}>
@@ -367,7 +367,7 @@ function SproutSegment({ seg, index, build, bind }: { seg: Seg; index: number; b
 
 function ZoomSegment({ seg, index, split, bind }: { seg: Seg; index: number; split: MotionValue<number>; bind: Record<string, unknown> }) {
   const start = index * 0.16;
-  const on = useTransform(split, [start, start + 0.46], [0, 1]);
+  const on = useRange(split, [start, start + 0.46], [0, 1]);
   const last = seg.id === 'discount';
   return (
     <div className={cn('absolute inset-y-0 outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.packager), width: pct(value(seg), C.packager) }} {...bind}>
@@ -397,7 +397,7 @@ function ZoomLabels({ split }: { split: MotionValue<number> }) {
 
 function ZoomKey({ seg, index, split }: { seg: Seg; index: number; split: MotionValue<number> }) {
   const start = index * 0.16;
-  const on = useTransform(split, [start, start + 0.46], [0.25, 1]);
+  const on = useRange(split, [start, start + 0.46], [0.25, 1]);
   return (
     <li className="flex min-w-0 items-start gap-2">
       <motion.span className="mt-[3px] inline-flex" style={{ opacity: on }}>

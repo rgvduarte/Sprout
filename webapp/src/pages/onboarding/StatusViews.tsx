@@ -198,7 +198,7 @@ export function ApprovedView({ c, profileId, onRestart }: { c: CaseView; profile
     {
       id: 'docs',
       state: 'done',
-      date: fmtDate(c.decidedAt ? addBusinessDays(c.submittedAt, 2) : c.submittedAt),
+      date: fmtDate(c.decidedAt && addBusinessDays(c.submittedAt, 2) < decided.slice(0, 10) ? addBusinessDays(c.submittedAt, 2) : decided),
       title: c.tipo === 'pessoa-coletiva' ? 'Certidão permanente, RCBE e documentos verificados' : 'Identidade, morada e IBAN verificados',
     },
     { id: 'decisao', state: 'done', date: fmtDate(decided), title: `Aprovado · ${CLASSE_LABEL[c.classe].toLowerCase()}`, body: c.rota },
