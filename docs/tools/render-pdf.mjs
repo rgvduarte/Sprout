@@ -12,7 +12,7 @@
  *   2. Emula media print, espera pela rede, por document.fonts.ready e, se <html> tiver
  *      data-await-ready, até o documento marcar data-ready="1" (gráficos desenhados).
  *   3. Tipografia pt-PT (desligável com --no-typeset): espaço inseparável entre número e
- *      unidade (%, €, kg, t, dias...), separador de milhares U+202F, sem quebra dentro de
+ *      unidade (%, €, kg, t, dias...), separador de milhares fino e inseparável, sem quebra dentro de
  *      intervalos numéricos (23–42 %) nem depois de ≥ ≤ ~ ≈, e espaço inseparável após
  *      palavras de uma letra (a, e, o, à, é) e abreviaturas (art., n.º, p., §).
  *   4. Verificações antes de imprimir: glifos fora das fontes da marca, elementos que
@@ -93,7 +93,9 @@ function startServer(root) {
 /* Corre dentro da página: tipografia pt-PT nos nós de texto. */
 function typesetInPage() {
   const NBSP = ' ';
-  const NNBSP = ' ';
+  // Separador de milhares: espaço fino (1/5 em, sintetizado pelo HarfBuzz) + word joiner,
+  // para não partir a linha. O U+202F sairia com metade do espaço da fonte (demasiado estreito).
+  const THIN_NB = '\u2009\u2060';
   const units = '(?:%|€|M€|k€|mil\\b|kg\\b|kt\\b|t\\b|L\\b|hl\\b|dias\\b|dia\\b|meses\\b|mês\\b|anos\\b|ano\\b|semanas\\b|p\\.p\\.|p\\.b\\.|h\\b|min\\b|FTE\\b|paletes\\b|clientes\\b|lotes\\b|lagares\\b|garrafas\\b|sacas\\b|USD\\b|°C)';
   const reUnit = new RegExp('(\\d)[ \\u00A0](?=' + units + ')', 'g');
   const reThousands = /\b(\d{1,3})((?:[  ]\d{3})+)(?!\d)/g;
@@ -114,7 +116,7 @@ function typesetInPage() {
   while ((n = walker.nextNode())) {
     const before = n.nodeValue;
     let t = before
-      .replace(reThousands, (m, a, rest) => a + rest.replace(/[  ]/g, NNBSP))
+      .replace(reThousands, (m, a, rest) => a + rest.replace(/[ \u00A0]/g, THIN_NB))
       .replace(reUnit, '$1' + NBSP)
       .replace(reEuroLead, '$1' + NBSP)
       .replace(reRange, '$1$2\u2060')

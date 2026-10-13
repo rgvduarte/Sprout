@@ -52,17 +52,17 @@ export const mm = (v) => v * PX_PER_MM;
 /* ---------- Formatação pt-PT ------------------------------------------- */
 
 const MINUS = '−';
-const NNBSP = ' ';
+const THIN = '\u2009'; // separador de milhares (1/5 em); em SVG não há quebra de linha
 const NBSP = ' ';
 
-/** Número pt-PT: vírgula decimal, milhares com U+202F (a partir de 1 000), menos tipográfico. */
+/** Número pt-PT: vírgula decimal, milhares com espaço fino (a partir de 1 000), menos tipográfico. */
 export function fmt(v, { dec = 0, prefix = '', suffix = '', sign = false, group = true } = {}) {
   if (v == null || Number.isNaN(v)) return '';
   const neg = v < 0;
   const abs = Math.abs(v);
   const k = 10 ** dec;
   let [int, frac] = (Math.round((abs + Number.EPSILON) * k) / k).toFixed(dec).split('.');
-  if (group && int.length > 3) int = int.replace(/\B(?=(\d{3})+(?!\d))/g, NNBSP);
+  if (group && int.length > 3) int = int.replace(/\B(?=(\d{3})+(?!\d))/g, THIN);
   const body = frac ? `${int},${frac}` : int;
   const isZero = Number(int.replace(/\D/g, '')) === 0 && !/[1-9]/.test(frac || '');
   const s = neg && !isZero ? MINUS : sign && v > 0 && !isZero ? '+' : '';
