@@ -13,7 +13,7 @@ export const PRODUCERS: Producer[] = [
       'Lagar cooperativo de 140 olivicultores em socalcos de xisto. Moe no próprio dia da apanha e guarda o azeite em quatro depósitos de inox com azoto. Entrou no piloto na campanha 2024/25.',
     variedades: ['Verdeal Transmontana', 'Madural', 'Cobrançosa'],
     certifications: ['DOP Azeite de Trás-os-Montes', 'IFS Food'],
-    capacidade: '4 depósitos de 20 000 kg · extração em duas fases',
+    capacidade: '4 depósitos de inox (78 420 kg) · extração em duas fases',
     since: '2024-11',
     fase: 1,
     telemetry: {
@@ -21,7 +21,7 @@ export const PRODUCERS: Producer[] = [
       unitLabel: 'kg',
       units: [
         { id: 'D1', label: 'Depósito 1', capacity: 20000, level: 20000 },
-        { id: 'D2', label: 'Depósito 2', capacity: 20000, level: 18420 },
+        { id: 'D2', label: 'Depósito 2', capacity: 18420, level: 17960 },
         { id: 'D3', label: 'Depósito 3', capacity: 20000, level: 3150 },
         { id: 'D4', label: 'Depósito 4', capacity: 20000, level: 0 },
       ],
