@@ -15,13 +15,16 @@ export interface FieldProps {
   id?: string;
   hint?: ReactNode;
   error?: ReactNode;
+  /** campo obrigatório: anunciado aos leitores de ecrã; visível só como «obrigatório» por baixo do rótulo */
   required?: boolean;
+  /** marca visível «opcional» (para formulários onde tudo o resto é obrigatório) */
+  optional?: boolean;
   children: (ids: { id: string; describedBy?: string; invalid: boolean }) => ReactNode;
   className?: string;
 }
 
 /** Rótulo + controlo + ajuda + erro, com ids estáveis e aria-describedby. */
-export function Field({ label, id, hint, error, required, children, className }: FieldProps) {
+export function Field({ label, id, hint, error, required, optional, children, className }: FieldProps) {
   const auto = useId();
   const cid = id ?? `f${auto.replace(/:/g, '')}`;
   const hintId = hint ? `${cid}-hint` : undefined;
@@ -29,9 +32,10 @@ export function Field({ label, id, hint, error, required, children, className }:
   const describedBy = [hintId, errId].filter(Boolean).join(' ') || undefined;
   return (
     <div className={cn('min-w-0', className)}>
-      <label htmlFor={cid} className="mb-1.5 block text-sm font-medium text-fg">
-        {label}
-        {required && <span className="text-muted"> (obrigatório)</span>}
+      <label htmlFor={cid} className="mb-1.5 flex flex-wrap items-baseline gap-x-2 text-sm font-medium text-fg">
+        <span className="min-w-0">{label}</span>
+        {required && <span className="text-xs font-normal text-muted">obrigatório</span>}
+        {optional && <span className="text-xs font-normal text-muted">opcional</span>}
       </label>
       {children({ id: cid, describedBy, invalid: Boolean(error) })}
       {hint && !error && (
@@ -131,8 +135,8 @@ export function RadioGroup<V extends string>({ legend, name, value, onChange, op
   return (
     <fieldset className={cn('min-w-0', className)}>
       <legend className="mb-1.5 text-sm font-medium text-fg">{legend}</legend>
-      {hint && <p className="mb-2 text-sm text-muted">{hint}</p>}
-      <div className="flex flex-col gap-1">
+      {hint && <p className="mb-2 max-w-[60ch] text-sm text-muted">{hint}</p>}
+      <div className="flex max-w-[68ch] flex-col gap-1">
         {options.map((o) => {
           const rid = `r${auto.replace(/:/g, '')}-${o.value}`;
           return (

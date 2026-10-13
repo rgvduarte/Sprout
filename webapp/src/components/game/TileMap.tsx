@@ -46,6 +46,54 @@ function hexPoints(cx: number, cy: number, r: number) {
   }).join(' ');
 }
 
+/** Geometria do mapa (mosaicos e rótulos), com ou sem rótulos laterais. */
+function computeLayout(map: MapId, world: WorldId | undefined, labels: boolean) {
+  const R = map === 'pt' ? 28 : 22;
+  const W = Math.sqrt(3) * R;
+  const VS = R * 1.5;
+  const CHAR = 6.9; // largura média de um carácter a 13 px
+
+  const regions = getRegionsByMap(map);
+  // rótulos do mar (oeste) à esquerda, os restantes à direita
+  const westOf = (r: Region) => map === 'pt' && r.tiles.every((t) => t.col === 0);
+  const leftW = map === 'pt' && labels ? Math.max(...regions.filter(westOf).map((r) => r.nome.length)) * CHAR + 22 : 6;
+  const geo: Geo[] = regions.map((region) => {
+    const tiles = region.tiles.map((t) => ({ cx: leftW + W / 2 + t.col * W + (t.row % 2 === 1 ? W / 2 : 0), cy: 6 + R + t.row * VS }));
+    const cx = tiles.reduce((s, t) => s + t.cx, 0) / tiles.length;
+    const cy = tiles.reduce((s, t) => s + t.cy, 0) / tiles.length;
+    return { region, tiles, cx, cy, active: !world || region.worlds.includes(world) };
+  });
+  const mapRight = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cx))) + W / 2;
+  const mapLeft = leftW;
+  const mapBottom = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cy))) + R;
+
+  type Lab = { id: string; side: 'left' | 'right'; ax: number; ay: number; y: number; text: string };
+  const labs: Lab[] = [];
+  if (map === 'pt' && labels) {
+    for (const side of ['left', 'right'] as const) {
+      const group = geo
+        .filter((g) => (side === 'left') === westOf(g.region))
+        .map((g) => {
+          // o mosaico mais exterior e mais perto do centro da região ancora o rótulo
+          const score = (t: { cx: number; cy: number }) => (side === 'left' ? -t.cx : t.cx) - Math.abs(t.cy - g.cy) * 0.9;
+          const edge = g.tiles.reduce((a, b) => (score(b) > score(a) ? b : a));
+          return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W / 2 + 3 : W / 2 - 3), ay: edge.cy, y: edge.cy, text: g.region.nome };
+        })
+        .sort((a, b) => a.ay - b.ay);
+      let prev = -Infinity;
+      for (const l of group) {
+        l.y = Math.max(l.ay, prev + 19);
+        prev = l.y;
+        labs.push(l);
+      }
+    }
+  }
+  const rightW = map === 'pt' && labels ? Math.max(...labs.filter((l) => l.side === 'right').map((l) => l.text.length)) * CHAR + 24 : 6;
+  const width = Math.ceil(mapRight + rightW + (map === 'cafe' && labels ? 24 : 0));
+  const height = Math.ceil(Math.max(mapBottom + 6, ...labs.map((l) => l.y + 10)) + (map === 'cafe' && labels ? 28 : 0));
+  return { geo, labs, mapLeft, mapRight, mapBottom, width, height };
+}
+
 export function TileMap({ map, states, world, selectedId, onSelect, labels: labelsProp = true, className, title }: TileMapProps) {
   const reduce = useReducedMotion();
   // Os rótulos SVG escalam com o viewBox: abaixo de ~80 % do tamanho natural ficam
@@ -61,65 +109,12 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels: labe
     ro.observe(el);
     return () => ro.disconnect();
   }, [labelsProp]);
-  const naturalW = useMemo(() => {
-    if (!labelsProp) return 0;
-    const R0 = map === 'pt' ? 28 : 22;
-    const W0 = Math.sqrt(3) * R0;
-    const regions = getRegionsByMap(map);
-    const maxCol = Math.max(...regions.flatMap((r) => r.tiles.map((t) => t.col + (t.row % 2 ? 0.5 : 0))));
-    const longest = Math.max(...regions.map((r) => r.nome.length));
-    return map === 'pt' ? (maxCol + 1) * W0 + longest * 6.9 * 2 + 46 : (maxCol + 1) * W0 + 30;
-  }, [map, labelsProp]);
+  const naturalW = useMemo(() => (labelsProp ? computeLayout(map, world, true).width : 0), [map, world, labelsProp]);
   const labels = labelsProp && (renderedW === null || renderedW >= naturalW * 0.8);
   const htmlLabels = labelsProp && !labels;
   const R = map === 'pt' ? 28 : 22;
-  const W = Math.sqrt(3) * R;
-  const VS = R * 1.5;
   const tint = world ?? (map === 'cafe' ? 'cafe' : 'azeite');
-  const CHAR = 6.9; // largura média de um carácter a 13 px
-
-  const layout = useMemo(() => {
-    const regions = getRegionsByMap(map);
-    // rótulos do mar (oeste) à esquerda, os restantes à direita
-    const westOf = (r: Region) => map === 'pt' && r.tiles.every((t) => t.col === 0);
-    const leftW = map === 'pt' && labels ? Math.max(...regions.filter(westOf).map((r) => r.nome.length)) * CHAR + 22 : 6;
-    const geo: Geo[] = regions.map((region) => {
-      const tiles = region.tiles.map((t) => ({ cx: leftW + W / 2 + t.col * W + (t.row % 2 === 1 ? W / 2 : 0), cy: 6 + R + t.row * VS }));
-      const cx = tiles.reduce((s, t) => s + t.cx, 0) / tiles.length;
-      const cy = tiles.reduce((s, t) => s + t.cy, 0) / tiles.length;
-      return { region, tiles, cx, cy, active: !world || region.worlds.includes(world) };
-    });
-    const mapRight = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cx))) + W / 2;
-    const mapLeft = leftW;
-    const mapBottom = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cy))) + R;
-
-    type Lab = { id: string; side: 'left' | 'right'; ax: number; ay: number; y: number; text: string };
-    const labs: Lab[] = [];
-    if (map === 'pt' && labels) {
-      for (const side of ['left', 'right'] as const) {
-        const group = geo
-          .filter((g) => (side === 'left') === westOf(g.region))
-          .map((g) => {
-            // o mosaico mais exterior e mais perto do centro da região ancora o rótulo
-            const score = (t: { cx: number; cy: number }) => (side === 'left' ? -t.cx : t.cx) - Math.abs(t.cy - g.cy) * 0.9;
-            const edge = g.tiles.reduce((a, b) => (score(b) > score(a) ? b : a));
-            return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W / 2 + 3 : W / 2 - 3), ay: edge.cy, y: edge.cy, text: g.region.nome };
-          })
-          .sort((a, b) => a.ay - b.ay);
-        let prev = -Infinity;
-        for (const l of group) {
-          l.y = Math.max(l.ay, prev + 19);
-          prev = l.y;
-          labs.push(l);
-        }
-      }
-    }
-    const rightW = map === 'pt' && labels ? Math.max(...labs.filter((l) => l.side === 'right').map((l) => l.text.length)) * CHAR + 24 : 6;
-    const width = Math.ceil(mapRight + rightW + (map === 'cafe' && labels ? 24 : 0));
-    const height = Math.ceil(Math.max(mapBottom + 6, ...labs.map((l) => l.y + 10)) + (map === 'cafe' && labels ? 28 : 0));
-    return { geo, labs, mapLeft, mapRight, mapBottom, width, height };
-  }, [map, W, R, VS, world, labels]);
-
+  const layout = useMemo(() => computeLayout(map, world, labels), [map, world, labels]);
   const { geo, labs, mapLeft, mapRight, mapBottom, width, height } = layout;
   const focusables = geo.filter((g) => g.active);
   const [focusId, setFocusId] = useState<string | undefined>(selectedId ?? focusables[0]?.region.id);

@@ -235,15 +235,24 @@ export function SeasonTrack({ world = 'azeite', today = TODAY_DATE, compact, cla
       )}
       <div role="img" aria-label={`${w.season.label}. Hoje, ${fmtDate(today)}, ${current?.phase ? `fase: ${current.phase.label}` : ''}.`} className="relative">
         <div className="flex h-9 overflow-hidden rounded-sm border border-border">
-          {groups.map((g, i) => (
+          {groups.map((g, i) => {
+            // o rótulo da fase começa depois do marcador de hoje, para a linha nunca o atravessar
+            const local = t * 12 - g.from;
+            const hasToday = local >= 0 && local < g.to - g.from + 1;
+            return (
             <div
               key={i}
               className="flex h-full items-center overflow-hidden border-r border-border px-2 last:border-r-0"
-              style={{ flex: g.to - g.from + 1, background: isStrongPhase(g.phase) ? PHASE_BG.strong : PHASE_BG.light }}
+              style={{
+                flex: g.to - g.from + 1,
+                background: isStrongPhase(g.phase) ? PHASE_BG.strong : PHASE_BG.light,
+                paddingLeft: hasToday ? `calc(${(local / 12) * 100}% + 8px)` : undefined,
+              }}
             >
               <span className="truncate text-xs font-medium text-world-ink">{g.phase?.label}</span>
             </div>
-          ))}
+            );
+          })}
         </div>
         <div className="pointer-events-none absolute -bottom-1 -top-1 w-0" style={{ left: `${t * 100}%` }}>
           <div className="absolute inset-y-0 -left-px w-0.5 bg-fg" />

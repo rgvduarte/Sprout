@@ -28,7 +28,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
   return (
     <motion.li
       layout={!reduce}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, transition: { duration: 0.15 } }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
@@ -46,11 +46,16 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: (id: strin
   );
 }
 
-/** Zona de avisos (aria-live educado), canto inferior direito. */
+/**
+ * Zona de avisos (aria-live educado). No telemóvel fica no topo, por baixo da
+ * barra superior, e mostra só os dois mais recentes, para não tapar campos de
+ * formulário nem a barra de controlos do simulador; a partir de 640 px fica no
+ * canto inferior direito.
+ */
 export function ToastViewport({ items, onDismiss }: { items: ToastItem[]; onDismiss: (id: string) => void }) {
   return (
-    <div aria-live="polite" aria-relevant="additions" className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-end p-4 sm:p-6">
-      <ol className="flex w-full max-w-[380px] flex-col gap-2">
+    <div aria-live="polite" aria-relevant="additions" className="pointer-events-none fixed inset-x-0 top-[57px] z-[60] flex justify-end px-3 pt-2 sm:bottom-0 sm:top-auto sm:p-6">
+      <ol className="flex w-full max-w-[380px] flex-col gap-2 max-sm:[&>li:nth-last-child(n+3)]:hidden">
         <AnimatePresence initial={false}>
           {items.map((t) => (
             <ToastCard key={t.id} item={t} onDismiss={onDismiss} />

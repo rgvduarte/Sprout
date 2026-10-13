@@ -40,7 +40,8 @@ export function JourneyTrack({ lot, world: worldProp, milestones: msProp, orient
   const labels = getWorld(world).journeyLabels;
   const reduce = useReducedMotion();
   const doneCount = milestones.filter((m) => m.done).length;
-  const [lit, setLit] = useState(progress ? 0 : doneCount);
+  // começa no valor atual do progresso (um MotionValue constante, como o do Chapter estático, nunca muda)
+  const [lit, setLit] = useState(() => (progress ? Math.round(Math.max(0, Math.min(1, progress.get())) * doneCount) : doneCount));
   const fallback = useMotionValue(1);
   useMotionValueEvent(progress ?? fallback, 'change', (v) => {
     const n = Math.round(Math.max(0, Math.min(1, v)) * doneCount);

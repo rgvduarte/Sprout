@@ -100,14 +100,24 @@ export function LevelProgress({ points, compact, className }: { points: number; 
         </p>
       </div>
       {!compact && (
-        <div className="mt-5">
+        <div className="@container mt-5">
           <div className="relative h-2 rounded-full bg-[color-mix(in_oklab,var(--accent)_16%,var(--surface-2))]" role="meter" aria-label="Pontos de conhecimento" aria-valuemin={0} aria-valuemax={max} aria-valuenow={points} aria-valuetext={`${points} pontos, nível ${level.nome}`}>
             <div className="absolute inset-y-0 left-0 rounded-full bg-accent transition-[width] duration-500 ease-out" style={{ width: `${pos(points)}%` }} />
             {LEVELS.map((l) => (
               <span key={l.id} aria-hidden className={cn('absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2', points >= l.minPoints ? 'border-accent bg-accent' : 'border-border bg-surface')} style={{ left: `${pos(l.minPoints)}%` }} />
             ))}
           </div>
-          <ol className="relative mt-2 h-10" aria-label="Níveis">
+          {/* em colunas estreitas (< 30rem) os rótulos passam a lista; acima, ficam por baixo de cada marca */}
+          <ol className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 @min-[30rem]:hidden" aria-label="Níveis">
+            {LEVELS.map((l) => (
+              <li key={l.id} className={cn('flex items-baseline gap-2 text-xs', points >= l.minPoints ? 'text-fg' : 'text-muted')}>
+                <span aria-hidden className={cn('inline-block size-2 shrink-0 translate-y-[-1px] rounded-full border', points >= l.minPoints ? 'border-accent bg-accent' : 'border-border bg-surface')} />
+                <span className="min-w-0 font-medium">{l.nome}</span>
+                <span className="font-mono tnum">{l.minPoints}</span>
+              </li>
+            ))}
+          </ol>
+          <ol className="relative mt-2 hidden h-10 @min-[30rem]:block" aria-hidden>
             {LEVELS.map((l, i) => (
               <li
                 key={l.id}

@@ -46,6 +46,32 @@ export function useSectionProgress(
   return scrollYProgress;
 }
 
+/**
+ * Interpolação por troços de um MotionValue, calculada em JS.
+ * Usar em vez de useTransform(v, [a, b], [x, y]) quando `v` vem de useScroll:
+ * a forma com intervalos pode ser entregue ao ScrollTimeline nativo do browser,
+ * que dentro de um painel fixo (Chapter) não segue o capítulo (opacidade
+ * presa ou ao contrário). A forma com função corre sempre no motion.
+ */
+export function useMapRange(value: MotionValue<number>, input: number[], output: number[], clamp = true): MotionValue<number> {
+  return useTransform(value, (v) => mapRange(v, input, output, clamp));
+}
+
+/** Interpolação linear por troços (pura). */
+export function mapRange(v: number, input: number[], output: number[], clamp = true): number {
+  const n = input.length;
+  if (n === 0) return v;
+  if (v <= input[0]) return clamp ? output[0] : output[0] + ((v - input[0]) / (input[1] - input[0] || 1)) * (output[1] - output[0]);
+  if (v >= input[n - 1]) return clamp ? output[n - 1] : output[n - 1] + ((v - input[n - 1]) / (input[n - 1] - input[n - 2] || 1)) * (output[n - 1] - output[n - 2]);
+  for (let i = 1; i < n; i++) {
+    if (v <= input[i]) {
+      const t = (v - input[i - 1]) / (input[i] - input[i - 1] || 1);
+      return output[i - 1] + t * (output[i] - output[i - 1]);
+    }
+  }
+  return output[n - 1];
+}
+
 /* ------------------------------------------------------------ Reveal */
 
 /**
@@ -86,7 +112,7 @@ export function ParallaxLayer({ children, distance = 40, className }: { children
   const ref = useRef<HTMLDivElement>(null);
   const rich = useRichMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], [-distance, distance]);
+  const y = useTransform(scrollYProgress, (v) => -distance + v * 2 * distance);
   return (
     <motion.div ref={ref} aria-hidden className={cn('pointer-events-none', className)} style={rich ? { y } : undefined}>
       {children}
@@ -199,16 +225,18 @@ export interface ChapterProps {
   stickyClassName?: string;
   /** força o modo estático */
   static?: boolean;
+  /** altura do que fica fixo por cima (barra superior, barra de capítulos), em px: o painel fixa-se por baixo */
+  topOffset?: number;
 }
 
 /**
  * Capítulo com painel fixo (sticky) e orçamento de altura ≤ 250vh.
  * Abaixo de 900 px ou com movimento reduzido: secção empilhada, estado final.
  */
-export function Chapter({ id, label, heightVh = 200, children, className, stickyClassName, static: forceStatic }: ChapterProps) {
+export function Chapter({ id, label, heightVh = 200, children, className, stickyClassName, static: forceStatic, topOffset = 0 }: ChapterProps) {
   const ref = useRef<HTMLElement>(null);
   const rich = useRichMotion() && !forceStatic;
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: [`start ${topOffset}px`, 'end end'] });
   const finalState = useStaticProgress(1);
   const h = Math.max(100, Math.min(250, heightVh));
   const content = typeof children === 'function' ? children(rich ? scrollYProgress : finalState, rich) : children;
@@ -221,7 +249,9 @@ export function Chapter({ id, label, heightVh = 200, children, className, sticky
   }
   return (
     <section ref={ref} id={id} data-chapter={label} className={cn('relative', className)} style={{ height: `${h}vh` }}>
-      <div className={cn('sticky top-0 flex h-[100dvh] flex-col justify-center overflow-hidden', stickyClassName)}>{content}</div>
+      <div className={cn('sticky flex flex-col justify-center overflow-hidden', stickyClassName)} style={{ top: topOffset, height: `calc(100dvh - ${topOffset}px)` }}>
+        {content}
+      </div>
     </section>
   );
 }
