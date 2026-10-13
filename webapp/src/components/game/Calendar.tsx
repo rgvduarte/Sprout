@@ -127,12 +127,16 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
       </div>
       {/* meses */}
       <div className="mt-1.5 flex" aria-hidden>
-        {cells.map((cell, i) => (
-          <div key={i} className={cn('flex-1 truncate text-center font-mono text-[11px] leading-4 text-muted', i % 2 === 1 && totalMonths > 13 && 'max-sm:invisible')}>
-            {MONTHS_SHORT[cell.m - 1]}
-            {(cell.m === 1 || i === 0) && <span className="block text-fg">{cell.y}</span>}
-          </div>
-        ))}
+        {cells.map((cell, i) => {
+          const hideOnPhone = totalMonths > 13 ? i % 3 !== 0 : i % 2 === 1;
+          const showYear = cell.m === 1 || (i === 0 && cell.m <= 10);
+          return (
+            <div key={i} className="min-w-0 flex-1 overflow-visible whitespace-nowrap text-center font-mono text-[11px] leading-4 text-muted">
+              <span className={cn('block', hideOnPhone && 'max-sm:invisible')}>{MONTHS_SHORT[cell.m - 1]}</span>
+              {showYear && <span className="block text-fg">{cell.y}</span>}
+            </div>
+          );
+        })}
       </div>
       {markers.length > 0 && (
         <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">

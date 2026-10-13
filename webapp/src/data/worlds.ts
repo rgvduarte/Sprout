@@ -1,6 +1,7 @@
+import { tidyDeep } from '../lib/format';
 import type { Region, World } from './types';
 
-export const WORLDS: World[] = [
+export const WORLDS: World[] = tidyDeep([
   {
     id: 'azeite',
     nome: 'O Olival',
@@ -112,7 +113,7 @@ export const WORLDS: World[] = [
     },
     physical: { container: 'Saca de juta de 60 kg', containerCapacity: '60 kg de café verde', storage: 'Armazém seco, humidade do grão 10–12 %' },
   },
-];
+]);
 
 /* --------------------------------------------------------------------
    Mapa de mosaico (hexágonos pointy-top, offset odd-r). Não é um contorno

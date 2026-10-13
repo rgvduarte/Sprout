@@ -1,3 +1,4 @@
+import { tidyDeep } from '../lib/format';
 import type { KnowledgeLevel, KnowledgeModule, OriginSealDef, Quest } from './types';
 
 /* =====================================================================
@@ -31,7 +32,7 @@ export const SEALS: OriginSealDef[] = [
 
 /* ------------------------------------------------------------ módulos */
 
-export const MODULES: KnowledgeModule[] = [
+export const MODULES: KnowledgeModule[] = tidyDeep([
   {
     id: 'm-lote',
     world: 'geral',
@@ -322,11 +323,11 @@ export const MODULES: KnowledgeModule[] = [
       { id: 'q2', prompt: 'Quanto dura o período de reflexão pré-contratual?', options: ['24 horas', '4 dias', '14 dias', '30 dias'], correct: 1, explanation: '4 dias, durante os quais o investidor pode desistir sem custos.' },
     ],
   },
-];
+]);
 
 /* ------------------------------------------------------------ missões */
 
-export const QUESTS: Quest[] = [
+export const QUESTS: Quest[] = tidyDeep([
   { id: 'q-painel-3', title: 'Identifica 3 atributos no painel de prova', description: 'Associa três descrições sensoriais ao atributo certo no mini-jogo Painel de prova.', world: 'azeite', points: 20, criteria: { type: 'minigame', gameId: 'painel-prova', minScore: 3 }, href: '/academia#painel-prova' },
   { id: 'q-extensao', title: 'Percebe o que acontece numa extensão', description: 'Completa o módulo sobre o ciclo de 18 meses.', world: 'geral', points: 15, criteria: { type: 'module', moduleId: 'm-ciclo-18m' }, href: '/academia#m-ciclo-18m' },
   { id: 'q-comparar-preco', title: 'Compara o preço de entrada com a referência', description: 'No mundo do azeite, vê quanto abaixo da referência é vendido um lote aberto.', world: 'azeite', points: 10, criteria: { type: 'manual' }, href: '/mercados/azeite' },
@@ -341,7 +342,7 @@ export const QUESTS: Quest[] = [
   { id: 'q-origens-cafe', title: 'Explora as origens de café', description: 'Entra no mundo do café e percorre o mapa das origens.', world: 'cafe', points: 10, sealId: 'seal-altomogiana-2728', criteria: { type: 'world-visit', worldId: 'cafe' }, href: '/mercados/cafe' },
   { id: 'q-cereja', title: 'Ordena as etapas da cereja à chávena', description: 'No mini-jogo Da cereja à chávena, acerta pelo menos 4 respostas.', world: 'cafe', points: 20, sealId: 'seal-altomogiana-2728', criteria: { type: 'minigame', gameId: 'cereja-chavena', minScore: 4 }, href: '/academia#cereja-chavena' },
   { id: 'q-contas', title: 'Percebe para onde vai o dinheiro', description: 'Completa o módulo sobre PSP, contas segregadas e reconciliação.', world: 'geral', points: 10, criteria: { type: 'module', moduleId: 'm-rails' }, href: '/academia#m-rails' },
-];
+]);
 
 /* ------------------------------------------------------------ progresso inicial */
 

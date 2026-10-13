@@ -1,3 +1,4 @@
+import { tidyDeep } from '../lib/format';
 import { createRng } from '../lib/prng';
 import type { HedgeTrigger, KycCase, PilotKpi, ReconciliationRun, RefundingPlaybook, Transaction } from './types';
 
@@ -6,14 +7,14 @@ import type { HedgeTrigger, KycCase, PilotKpi, ReconciliationRun, RefundingPlayb
    Funções da equipa, nunca nomes de pessoas (esses só aparecem em /plano).
    ===================================================================== */
 
-export const PILOT_KPIS: PilotKpi[] = [
+export const PILOT_KPIS: PilotKpi[] = tidyDeep([
   { id: 'fill-rate', label: 'Fill rate dos lotes abertos na campanha', value: 0.78, format: 'pct', target: 0.8, higherIsBetter: true, status: 'warn', note: 'Volume financiado sobre volume oferecido desde 01/10/2026, incluindo lotes fechados no mesmo período.', history: [0.71, 0.84, 0.92, 0.88, 0.81, 0.78] },
   { id: 'base', label: 'Desconto médio ao comprador vs. referência', value: -0.121, format: 'pct', target: -0.12, higherIsBetter: false, status: 'ok', note: 'Média ponderada por volume das vendas dos últimos 90 dias.', history: [-0.118, -0.12, -0.122, -0.119, -0.121, -0.121] },
   { id: 'sla-produtor', label: 'Pagamentos a produtores em ≤ 2 dias úteis', value: 0.96, format: 'pct', target: 0.95, higherIsBetter: true, status: 'ok', note: '24 de 25 pagamentos no prazo; 1 atrasou por IBAN mal validado.', history: [0.9, 0.93, 1, 0.95, 0.96, 0.96] },
   { id: 'sla-investidor', label: 'Liquidações a investidores no prazo', value: 1, format: 'pct', target: 1, higherIsBetter: true, status: 'ok', note: '3 lotes liquidados desde junho de 2026, todos dentro da janela.', history: [1, 1, 1, 1, 1, 1] },
   { id: 'reconciliacao', label: 'Dias reconciliados sem diferença em aberto', value: 30, format: 'num', target: 30, higherIsBetter: true, status: 'ok', note: '2 diferenças nos últimos 30 dias, ambas explicadas e fechadas no dia seguinte.', history: [30, 30, 29, 30, 30, 30] },
   { id: 'prazo-venda', label: 'Prazo médio de venda de um lote', value: 7.8, format: 'meses', target: 9, higherIsBetter: false, status: 'ok', note: 'Do fecho do financiamento à última expedição, lotes de 2025.', history: [9.4, 8.9, 8.6, 8.1, 7.9, 7.8] },
-];
+]);
 
 /* ------------------------------------------------------------ reconciliação: 30 dias */
 
@@ -88,7 +89,7 @@ export const HEDGE_TRIGGERS: HedgeTrigger[] = [
 
 /* ------------------------------------------------------------ refunding */
 
-export const REFUNDING_PLAYBOOKS: RefundingPlaybook[] = [
+export const REFUNDING_PLAYBOOKS: RefundingPlaybook[] = tidyDeep([
   {
     id: 'pb-azeite-preco',
     world: 'azeite',
@@ -141,7 +142,7 @@ export const REFUNDING_PLAYBOOKS: RefundingPlaybook[] = [
       { order: 3, title: 'Comunicar aos co-financiadores', owner: 'Produto & Comercial', sla: '5 dias úteis' },
     ],
   },
-];
+]);
 
 /* ------------------------------------------------------------ transações */
 

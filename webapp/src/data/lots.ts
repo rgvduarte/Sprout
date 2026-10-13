@@ -1,4 +1,4 @@
-import { PALETE, SACA_KG } from '../lib/format';
+import { PALETE, SACA_KG, tidyDeep } from '../lib/format';
 import type {
   HedgeCoverage,
   JourneyStage,
@@ -341,7 +341,7 @@ function lot(l: Omit<Lot, 'funding'> & { funding: Omit<Lot['funding'], 'goal'> &
   return { ...l, funding: { ...l.funding, goal: g, raised } };
 }
 
-export const LOTS: Lot[] = [
+export const LOTS: Lot[] = tidyDeep([
   /* ============================ AZEITE ============================ */
   lot({
     id: 'AZ-2025-004',
@@ -822,4 +822,4 @@ export const LOTS: Lot[] = [
     storage: { local: 'Beneficio partilhado, Pitalito (Huila)', container: 'Saca de 60 kg', containers: 150 },
     stock: 0,
   }),
-];
+]);

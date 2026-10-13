@@ -78,7 +78,7 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
             <circle cx="60" cy="60" r="47" fill="none" stroke="var(--seal-deep)" strokeWidth="1.5" />
             <circle cx="60" cy="60" r="31" fill="none" stroke="var(--seal-deep)" strokeWidth="1.25" />
             <text fontSize="8.2" letterSpacing="1.5" fontFamily="var(--font-display)" fontWeight={700} fill="var(--seal-on)" style={{ fontStretch: '87.5%' }}>
-              <textPath href={`#rim-${uid}`} startOffset="50%" textAnchor="middle">
+              <textPath href={`#rim-${uid}`} startOffset="25%" textAnchor="middle">
                 {rim}
               </textPath>
             </text>
@@ -98,7 +98,7 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
             <circle cx="60" cy="60" r="47" fill="none" stroke="color-mix(in oklab, var(--fg) 16%, var(--surface))" strokeWidth="1.25" />
             <circle cx="60" cy="60" r="31" fill="none" stroke="color-mix(in oklab, var(--fg) 14%, var(--surface))" strokeWidth="1" />
             <text fontSize="8.2" letterSpacing="1.5" fontFamily="var(--font-display)" fontWeight={700} fill="color-mix(in oklab, var(--fg) 38%, var(--surface))" style={{ fontStretch: '87.5%' }} aria-hidden>
-              <textPath href={`#rim-${uid}`} startOffset="50%" textAnchor="middle">
+              <textPath href={`#rim-${uid}`} startOffset="25%" textAnchor="middle">
                 {rim}
               </textPath>
             </text>
@@ -111,7 +111,7 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
       {showCaption && (
         <figcaption className="max-w-[180px] text-center">
           <span className="block text-sm font-medium leading-tight text-fg">{producer.nome}</span>
-          <span className="block font-mono text-xs text-muted tnum">
+          <span className="block text-xs text-muted tnum">
             {region.nome} · {seal.campanha}
           </span>
           <span className={cn('mt-0.5 block text-xs', earned ? 'text-seal-ink' : 'text-muted')}>
@@ -190,7 +190,7 @@ export function WaxSealStamp({ stamped, onStamped, size = 128, ...props }: WaxSe
       {props.showCaption && (
         <p className="mt-2 max-w-[200px] text-center">
           <span className="block text-sm font-medium leading-tight text-fg">{props.producer.nome}</span>
-          <span className="block font-mono text-xs text-muted tnum">
+          <span className="block text-xs text-muted tnum">
             {props.region.nome} · {props.seal.campanha}
           </span>
         </p>

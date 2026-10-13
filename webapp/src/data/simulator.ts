@@ -1,3 +1,4 @@
+import { tidyDeep } from '../lib/format';
 import type { SimEvent, SimLot, SimRules } from './types';
 
 /* =====================================================================
@@ -87,7 +88,7 @@ export const SIM_LOTS: SimLot[] = [
   },
 ];
 
-export const SIM_EVENTS: SimEvent[] = [
+export const SIM_EVENTS: SimEvent[] = tidyDeep([
   { id: 'choque-preco', title: 'Choque de preço −30 %', description: 'Uma colheita recorde em Espanha faz cair a referência de origem em 30 % em poucas semanas.', worlds: ['azeite'], probPerMonth: 0.035, months: [2, 16], effect: { priceShock: -0.3 }, hedgeMitigates: true, tone: 'adverso' },
   { id: 'choque-kc', title: 'Queda do arábica em Nova Iorque', description: 'Chuvas no Brasil melhoram a previsão da safra e o KC cai 25 %.', worlds: ['cafe'], probPerMonth: 0.05, months: [1, 12], effect: { priceShock: -0.25 }, hedgeMitigates: true, tone: 'adverso' },
   { id: 'colheita-fraca', title: 'Colheita fraca', description: 'Seca no verão reduz a produção; o preço sobe, mas o lote entrega menos do que o previsto.', worlds: ['azeite', 'cafe'], probPerMonth: 0.02, months: [1, 4], effect: { qtyLoss: 0.12, priceShock: 0.08 }, hedgeMitigates: false, tone: 'adverso' },
@@ -98,4 +99,4 @@ export const SIM_EVENTS: SimEvent[] = [
   { id: 'comprador-falha', title: 'Comprador paga tarde', description: 'Um comprador entra em dificuldades; o seguro de crédito cobre 90 % depois de 120 dias.', worlds: ['azeite', 'agua', 'cafe'], probPerMonth: 0.01, months: [8, 18], effect: { salesDelayMonths: 4, extraCost: 0.01 }, hedgeMitigates: false, tone: 'adverso' },
   { id: 'procura-forte', title: 'Procura forte', description: 'Um distribuidor fecha um contrato grande; o lote vende-se mais depressa e com um pequeno prémio.', worlds: ['azeite', 'agua', 'cafe'], probPerMonth: 0.04, months: [3, 14], effect: { demand: { monthsFaster: 2, premium: 0.03 } }, hedgeMitigates: false, tone: 'favoravel' },
   { id: 'recuperacao', title: 'Recuperação de preço', description: 'A referência recupera 10 % depois de um inverno seco.', worlds: ['azeite', 'cafe'], probPerMonth: 0.03, months: [6, 18], effect: { priceShock: 0.1 }, hedgeMitigates: true, tone: 'favoravel' },
-];
+]);

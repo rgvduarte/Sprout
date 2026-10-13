@@ -1,7 +1,8 @@
+import { tidyDeep } from '../lib/format';
 import type { Producer } from './types';
 
 /** Produtores fictícios. Nenhum número aqui descreve uma empresa real. */
-export const PRODUCERS: Producer[] = [
+export const PRODUCERS: Producer[] = tidyDeep([
   {
     id: 'lagar-ribeira-alta',
     nome: 'Lagar da Ribeira Alta',
@@ -184,4 +185,4 @@ export const PRODUCERS: Producer[] = [
     fase: 2,
     telemetry: { kind: 'sacas', unitLabel: 'sacas', units: [{ id: 'S1', label: 'Armazém', capacity: 400, level: 0 }], live: false, ratePerReading: [0, 0] },
   },
-];
+]);

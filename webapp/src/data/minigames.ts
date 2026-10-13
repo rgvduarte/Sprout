@@ -1,3 +1,4 @@
+import { tidyDeep } from '../lib/format';
 import type {
   CoffeeDefect,
   CoffeeProcess,
@@ -25,7 +26,7 @@ export const MINI_GAMES: MiniGameMeta[] = [
 /* ------------------------------------------------------------ Painel de prova */
 
 /** Atributos e defeitos do método do COI (Reg. Delegado (UE) 2022/2104, anexo III). */
-export const OLIVE_ATTRIBUTES: SensoryAttribute[] = [
+export const OLIVE_ATTRIBUTES: SensoryAttribute[] = tidyDeep([
   { id: 'frutado-verde', nome: 'Frutado verde', tipo: 'positivo', descricao: 'Aromas de azeitona sã colhida antes de madura: erva cortada, folha de oliveira, tomateiro, amêndoa verde.' },
   { id: 'frutado-maduro', nome: 'Frutado maduro', tipo: 'positivo', descricao: 'Aromas de azeitona sã colhida madura: fruta doce, tomate maduro, frutos secos.' },
   { id: 'amargo', nome: 'Amargo', tipo: 'positivo', descricao: 'Sabor elementar sentido na parte de trás da língua, típico de azeitona verde ou em pintor.' },
@@ -35,7 +36,7 @@ export const OLIVE_ATTRIBUTES: SensoryAttribute[] = [
   { id: 'avinhado', nome: 'Avinhado-avinagrado', tipo: 'defeito', descricao: 'Lembra vinho ou vinagre, com nota ácida.', causa: 'Fermentação aeróbia da azeitona que gera ácido acético e acetato de etilo.' },
   { id: 'ranco', nome: 'Ranço', tipo: 'defeito', descricao: 'Cheiro a gordura velha, a frutos secos passados.', causa: 'Oxidação por exposição a oxigénio, luz ou calor durante a armazenagem.' },
   { id: 'metalico', nome: 'Metálico', tipo: 'defeito', descricao: 'Sabor a metal, a moeda.', causa: 'Contacto prolongado com superfícies metálicas durante a moenda ou a armazenagem.' },
-];
+]);
 
 export const OLIVE_SAMPLES: OliveSample[] = [
   { id: 'A', label: 'Amostra A', origem: 'Trás-os-Montes, outubro', acidez: 0.19, peroxidos: 6.4, k232: 1.82, k268: 0.13, deltaK: 0.001, medianaDefeito: 0, medianaFrutado: 5.6, notas: 'Erva cortada, folha de oliveira, amargo e picante intensos.', atributos: ['frutado-verde', 'amargo', 'picante'], defeitos: [] },
@@ -94,22 +95,22 @@ export function mineralizationClass(w: WaterLabel): string {
 
 /* ------------------------------------------------------------ Da cereja à chávena */
 
-export const COFFEE_STEPS: CoffeeStep[] = [
+export const COFFEE_STEPS: CoffeeStep[] = tidyDeep([
   { id: 'colheita', order: 1, nome: 'Colheita da cereja', descricao: 'À mão, cereja a cereja, ou por derriça e máquina, quando a maioria está madura.' },
   { id: 'processo', order: 2, nome: 'Processamento', descricao: 'Natural, honey ou lavado: decide quanta polpa fica em contacto com o grão durante a secagem.' },
   { id: 'secagem', order: 3, nome: 'Secagem no terreiro', descricao: 'Ao sol, revolvida várias vezes ao dia, até 10–12 % de humidade.' },
   { id: 'descasque', order: 4, nome: 'Descasque e classificação', descricao: 'Retira-se o pergaminho; o grão verde é separado por peneira, densidade e cor.' },
   { id: 'ensaque', order: 5, nome: 'Ensaque e embarque', descricao: 'Sacas de juta de 60 kg em contentor, com ou sem saco hermético.' },
   { id: 'torra', order: 6, nome: 'Torra e prova', descricao: 'A torrefação transforma o grão verde; a prova SCA pontua o resultado de 0 a 100.' },
-];
+]);
 
-export const COFFEE_PROCESSES: CoffeeProcess[] = [
+export const COFFEE_PROCESSES: CoffeeProcess[] = tidyDeep([
   { id: 'lavado', nome: 'Lavado', descricao: 'A polpa é retirada, o grão fermenta em tanque para soltar a mucilagem e é lavado antes de secar.', perfil: 'Limpo, acidez viva, corpo leve a médio.', passos: ['Despolpa', 'Fermentação em tanque 12–36 h', 'Lavagem', 'Secagem do pergaminho'] },
   { id: 'natural', nome: 'Natural', descricao: 'A cereja seca inteira, com a polpa, durante 2 a 4 semanas.', perfil: 'Fruta madura, doçura, corpo encorpado; mais risco de defeitos.', passos: ['Seleção da cereja', 'Secagem inteira no terreiro', 'Descasque da cereja seca'] },
   { id: 'honey', nome: 'Honey (cereja descascado)', descricao: 'Retira-se a pele e parte da polpa; a mucilagem seca agarrada ao grão.', perfil: 'Doçura de mel, acidez média, entre o lavado e o natural.', passos: ['Despolpa', 'Secagem com mucilagem', 'Descasque'] },
-];
+]);
 
-export const COFFEE_DEFECTS: CoffeeDefect[] = [
+export const COFFEE_DEFECTS: CoffeeDefect[] = tidyDeep([
   { id: 'preto', nome: 'Grão preto', categoria: 1, equivalencia: 1, descricao: 'Grão totalmente preto, de cereja sobremadura ou fermentada.' },
   { id: 'azedo', nome: 'Grão ardido (azedo)', categoria: 1, equivalencia: 1, descricao: 'Grão castanho-avermelhado de fermentação excessiva.' },
   { id: 'cereja-seca', nome: 'Cereja seca', categoria: 1, equivalencia: 1, descricao: 'Cereja que não foi descascada.' },
@@ -120,7 +121,7 @@ export const COFFEE_DEFECTS: CoffeeDefect[] = [
   { id: 'imaturo', nome: 'Verde (imaturo)', categoria: 2, equivalencia: 5, descricao: 'Grão de cereja verde, pálido e enrugado.' },
   { id: 'concha', nome: 'Concha', categoria: 2, equivalencia: 5, descricao: 'Grão malformado em forma de concha.' },
   { id: 'pergaminho', nome: 'Pergaminho', categoria: 2, equivalencia: 5, descricao: 'Grão que ainda tem a película de pergaminho.' },
-];
+]);
 
 /** Escala SCA (Specialty Coffee Association). */
 export const SCA_SCALE = [

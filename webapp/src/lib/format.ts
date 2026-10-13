@@ -144,3 +144,29 @@ export const eurToSacas = (amount: number, pricePerKg: number, sacaKg = SACA_KG)
 export function plural(n: number, singular: string, pluralForm: string, decimals = 0): string {
   return `${num(n, decimals)} ${Math.abs(n) === 1 ? singular : pluralForm}`;
 }
+
+/* ------------------------------------------------- tipografia de números */
+
+const NBSP = ' ';
+const UNIT_AFTER = /(\d) (?=(?:kg|t|L|g|mg\/L|meq|paletes|palete|IBC|sacas|saca|garrafas|packs|ha|h|min|dias|meses|anos|pts|pontos|m|USD|€|°C|%|p\.p\.)(?![\p{L}]))/gu;
+
+/**
+ * Espaços não separáveis em números de texto escrito à mão:
+ * "11 800 kg" não parte entre "11" e "800", nem entre o número e a unidade.
+ */
+export function tidyText(text: string): string {
+  return text.replace(/(\d) (?=\d{3}(?!\d))/g, `$1${NBSP}`).replace(UNIT_AFTER, `$1${NBSP}`);
+}
+
+/** Aplica tidyText a todas as strings de um objeto (dados de demonstração). */
+export function tidyDeep<T>(value: T): T {
+  if (typeof value === 'string') return tidyText(value) as T;
+  if (Array.isArray(value)) return value.map((v) => tidyDeep(v)) as T;
+  if (value && typeof value === 'object') {
+    if (typeof (value as { test?: unknown }).test === 'function') return value;
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = typeof v === 'function' ? v : tidyDeep(v);
+    return out as T;
+  }
+  return value;
+}

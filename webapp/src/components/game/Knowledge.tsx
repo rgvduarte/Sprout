@@ -75,7 +75,16 @@ export function KnowledgeLevelBadge({ level, size = 'md', className }: { level: 
 export function LevelProgress({ points, compact, className }: { points: number; compact?: boolean; className?: string }) {
   const { level, next, progress } = levelForPoints(points);
   const max = LEVELS[LEVELS.length - 1].minPoints;
-  const pos = (p: number) => Math.min(1, p / max) * 100;
+  // escala por troços: os quatro níveis ficam igualmente espaçados
+  const pos = (p: number) => {
+    const n = LEVELS.length - 1;
+    for (let i = 0; i < n; i++) {
+      const a = LEVELS[i].minPoints;
+      const b = LEVELS[i + 1].minPoints;
+      if (p < b) return ((i + Math.max(0, p - a) / (b - a)) / n) * 100;
+    }
+    return 100;
+  };
   return (
     <div className={cn('min-w-0', className)}>
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

@@ -65,9 +65,10 @@ export function LotGauge({ kind, value, highlight, size = 'md', label, valueText
   const px = SIZE_PX[size];
   const scale = showScale ?? (size === 'lg' || size === 'xl');
   const text = valueText ?? `${Math.round(Math.max(0, Math.min(1, value)) * 100)} %`;
+  const vbW = k === 'ibc' && scale ? 214 : 200;
   return (
     <figure className={cn('inline-flex min-w-0 flex-col items-center gap-2', className)} data-world={world}>
-      <svg role="img" aria-label={`${label}: ${text}`} viewBox="0 0 200 224" width={px} height={(px * 224) / 200} className="block max-w-full overflow-visible">
+      <svg role="img" aria-label={`${label}: ${text}`} viewBox={`0 0 ${vbW} 224`} width={(px * vbW) / 200} height={(px * 224) / 200} className="block h-auto max-w-full overflow-visible">
         {k === 'ibc' && <IbcTank fill={fill} highlight={highlight} scale={scale} detail={size !== 'xs' && size !== 'sm'} />}
         {k === 'pallet' && <PalletStack fill={fill} highlight={highlight} detail={size !== 'xs'} />}
         {k === 'sacks' && <SackStack fill={fill} highlight={highlight} detail={size !== 'xs'} />}
@@ -150,11 +151,17 @@ function IbcTank({ fill, highlight, scale, detail }: { fill: MotionValue<number>
           return <line key={t} x1={TANK.x + 4} x2={TANK.x + (major ? 16 : 10)} y1={y} y2={y} stroke={LINE} strokeWidth="1.25" />;
         })}
       {scale &&
-        [0.25, 0.5, 0.75].map((t) => (
-          <text key={t} x={TANK.x + 24} y={TANK.y + TANK.h * (1 - t) + 4} fontSize="11" fontFamily="var(--font-mono)" fill="var(--fg)" opacity="0.75">
-            {Math.round(t * 100)}
-          </text>
-        ))}
+        [0.25, 0.5, 0.75].map((t) => {
+          const y = TANK.y + TANK.h * (1 - t);
+          return (
+            <g key={t}>
+              <line x1="186" x2="191" y1={y} y2={y} stroke={LINE} strokeWidth="1.25" />
+              <text x="194" y={y + 4} fontSize="11" fontFamily="var(--font-mono)" fill="var(--muted)">
+                {Math.round(t * 100)}
+              </text>
+            </g>
+          );
+        })}
       {/* grade metálica */}
       <rect x="16" y="22" width="168" height="176" rx="3" fill="none" stroke={LINE} strokeWidth="2.25" />
       {detail && (

@@ -1,3 +1,4 @@
+import { tidyDeep } from '../lib/format';
 import type { CampaignEvent, CampaignEventKind, WorldId } from './types';
 
 /* =====================================================================
@@ -49,7 +50,7 @@ const ROWS: Row[] = [
   ['2026-10-13T09:52:00+01:00', 'azeite', 'rececao', 'Lagar Serra da Gardunha recebeu 9,4 t de azeitona', { producerId: 'lagar-serra-gardunha' }],
 ];
 
-export const CAMPAIGN_EVENTS: CampaignEvent[] = ROWS.map(([at, world, kind, title, ref, detail], i) => ({
+export const CAMPAIGN_EVENTS: CampaignEvent[] = tidyDeep(ROWS).map(([at, world, kind, title, ref, detail], i) => ({
   id: `ev-${String(i + 1).padStart(3, '0')}`,
   at,
   world,
