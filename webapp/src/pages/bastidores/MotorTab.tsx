@@ -164,7 +164,7 @@ export default function MotorTab() {
               <p className="text-sm text-muted">
                 {b.reason} <span className="text-fg">Exemplo recusado: {b.example}.</span>
               </p>
-              <StatusPill tone="crit" label="Bloqueado" />
+              <StatusPill tone="crit" label="Bloqueado" className="justify-self-start" />
             </li>
           ))}
         </ul>

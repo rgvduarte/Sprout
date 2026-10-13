@@ -129,7 +129,6 @@ export function FileDrop({
   onFile,
   onRemove,
   error,
-  ex,
 }: {
   id: string;
   label: string;
@@ -139,7 +138,6 @@ export function FileDrop({
   onFile: (f: DocFile) => void;
   onRemove: () => void;
   error?: string;
-  ex?: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [over, setOver] = useState(false);

@@ -160,7 +160,6 @@ export function StepDocumentos(p: StepProps) {
           hint={s.hint}
           required={s.required}
           file={d.docs[s.slot]}
-          ex={d.example}
           error={err(`doc-${s.slot}`)}
           onFile={(f) => {
             set((x) => ({ docs: { ...x.docs, [s.slot]: f } }));

@@ -166,7 +166,7 @@ function SpecRow({ label, value, detail, mono = true }: { label: string; value: 
 }
 
 export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
-  const { lot, ctx, win, positions, goTo } = useJourney();
+  const { lot, ctx, win, positions, goTo, ending } = useJourney();
   const { isVisitor } = useRole();
   const data = useData();
   const e = lot.economics;
@@ -224,12 +224,12 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
         {/* ação */}
         <div className="order-2 min-w-0 lg:order-none">
           <div className="flex flex-wrap gap-2">
-            {lot.status === 'aberto' && !isVisitor && (
+            {ending === 'compromisso' && !isVisitor && (
               <Button variant="primary" size="lg" iconRight={<ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => goTo('compromisso')}>
-                Comprometer capital
+                {positions.some((p) => p.session) ? 'Ver o teu compromisso' : 'Comprometer capital'}
               </Button>
             )}
-            {lot.status === 'aberto' && isVisitor && (
+            {ending === 'compromisso' && isVisitor && (
               <>
                 <ButtonLink to="/onboarding" variant="primary" size="lg">
                   Pedir acesso ao piloto
@@ -239,8 +239,8 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
                 </Button>
               </>
             )}
-            {lot.status !== 'aberto' && (
-              <Button variant="primary" size="lg" iconRight={<ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => goTo(lot.status === 'liquidado' ? 'liquidacao' : lot.status === 'em-preparacao' ? 'abertura' : 'acompanhamento')}>
+            {ending !== 'compromisso' && (
+              <Button variant="primary" size="lg" iconRight={<ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => goTo(ending)}>
                 {lot.status === 'liquidado' ? 'Ver a liquidação' : lot.status === 'em-preparacao' ? 'Ver a abertura' : 'Acompanhar o lote'}
               </Button>
             )}

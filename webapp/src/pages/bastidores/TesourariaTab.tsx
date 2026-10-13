@@ -255,7 +255,7 @@ export default function TesourariaTab() {
         </div>
       ),
     },
-    { key: 'montante', header: 'Montante', align: 'right', mono: true, sortValue: (p) => p.amount, render: (p) => <span>{p.kind === 'liquidacao' ? '≈ ' : ''}{eur(p.amount)}</span> },
+    { key: 'montante', header: 'Montante', align: 'right', mono: true, className: 'whitespace-nowrap', sortValue: (p) => p.amount, render: (p) => <span>{p.kind === 'liquidacao' ? '≈ ' : ''}{eur(p.amount)}</span> },
     { key: 'data', header: 'Data prevista', align: 'right', mono: true, sortValue: (p) => p.due ?? '9999', render: (p) => (p.due ? fmtDate(p.due) : '—') },
     {
       key: 'aprov',
@@ -311,8 +311,8 @@ export default function TesourariaTab() {
 
   const txs = TRANSACTIONS.filter(TX_FILTER[txFilter]).sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
   const txCols: Column<Transaction>[] = [
-    { key: 'data', header: 'Data', mono: true, sortValue: (t) => t.date, render: (t) => fmtDate(t.date) },
-    { key: 'tipo', header: 'Tipo', sortValue: (t) => t.type, render: (t) => TX_LABEL[t.type] },
+    { key: 'data', header: 'Data', mono: true, className: 'whitespace-nowrap', sortValue: (t) => t.date, render: (t) => fmtDate(t.date) },
+    { key: 'tipo', header: 'Tipo', className: 'whitespace-nowrap', sortValue: (t) => t.type, render: (t) => TX_LABEL[t.type] },
     { key: 'contraparte', header: 'Contraparte', minWidth: 220, render: (t) => t.counterparty },
     { key: 'lote', header: 'Lote', mono: true, render: (t) => (t.lotId ? <Link to={`/lote/${t.lotId}`} className="text-accent hover:underline">{t.lotId}</Link> : '—') },
     { key: 'montante', header: 'Montante', align: 'right', mono: true, sortValue: (t) => t.amount, render: (t) => signedEur(t.amount, Number.isInteger(t.amount) ? 0 : 2) },
@@ -404,7 +404,7 @@ export default function TesourariaTab() {
             <li key={p.title} className="grid gap-x-6 gap-y-1 py-3 first:pt-0 last:pb-0 md:grid-cols-[18rem_minmax(0,1fr)_auto] md:items-baseline">
               <p className="font-medium text-fg">{p.title}</p>
               <p className="text-sm text-muted">{p.evidence}</p>
-              <StatusPill tone="ok" label="Em vigor" />
+              <StatusPill tone="ok" label="Em vigor" className="justify-self-start" />
             </li>
           ))}
         </ul>

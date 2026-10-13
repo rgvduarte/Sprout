@@ -454,8 +454,7 @@ export function StepAdequacao(p: StepProps & { blockPanel: ReactNode }) {
               label={d.rota === 'grande' ? 'Evidência: últimas contas aprovadas ou IES' : 'Evidência dos critérios'}
               hint={d.rota === 'grande' ? 'Balanço e demonstração de resultados do último exercício.' : 'Extratos da carteira, registo de operações ou declaração do empregador.'}
               required
-              ex={d.example}
-              file={d.docs.evidencia}
+                  file={d.docs.evidencia}
               error={err('doc-evidencia')}
               onFile={(f) => {
                 set((x) => ({ docs: { ...x.docs, evidencia: f } }));

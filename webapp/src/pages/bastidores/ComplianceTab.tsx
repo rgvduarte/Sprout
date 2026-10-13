@@ -465,7 +465,7 @@ export default function ComplianceTab() {
                   </ul>
                 )}
               </div>
-              <StatusPill tone={c.status.tone} label={c.status.label} />
+              <StatusPill tone={c.status.tone} label={c.status.label} className="justify-self-start" />
             </li>
           ))}
         </ul>

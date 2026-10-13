@@ -4,7 +4,7 @@ import type { Lot } from '../../data/types';
 import { cn } from '../../lib/cn';
 import { mergeLot, useData, useRole, type PositionView } from '../../state';
 import { positionKey, useLedger } from './ledger';
-import { lotContext, lotWindow, type LotContext, type LotWindow } from './model';
+import { lotContext, lotWindow, type ChapterId, type LotContext, type LotWindow } from './model';
 
 /* =====================================================================
    Peças partilhadas pelos capítulos da jornada.
@@ -25,6 +25,8 @@ export interface Journey {
   /** capítulos fixos com scroll (≥ 900 px de largura, ≥ 720 px de altura, sem movimento reduzido) */
   rich: boolean;
   goTo: (id: string) => void;
+  /** último capítulo: compromisso, acompanhamento, liquidação ou abertura */
+  ending: ChapterId;
 }
 
 const JourneyContext = createContext<Journey | null>(null);

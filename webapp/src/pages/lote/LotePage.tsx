@@ -26,11 +26,11 @@ import { journeyBase, JourneyProvider, scrollToChapter, useEffectiveLot, useJour
 const STICKY = new Set(['colheita', 'preco', 'ciclo']);
 
 function JornadaContent() {
-  const { lot, goTo } = useJourney();
+  const { lot, goTo, ending } = useJourney();
   const game = useGame();
   const diligence = useDiligence();
   const copy = WORLD_COPY[lot.world];
-  const ending = endingFor(lot);
+
   const read = game.riskRead(lot.id).filter((id) => lot.riskFactors.some((r) => r.id === id)).length;
   const total = lot.riskFactors.length;
 
@@ -89,7 +89,12 @@ function Jornada({ lotId }: { lotId: string }) {
   const reduce = useReducedMotion() ?? false;
   const rich = richMotion && tall;
   const goTo = useCallback((id: string) => scrollToChapter(id, { reduce, sticky: rich && STICKY.has(id) }), [reduce, rich]);
-  const value: Journey | null = useMemo(() => (lot ? { lot, positions, rich, goTo, ...journeyBase(lot) } : null), [lot, positions, rich, goTo]);
+  const value: Journey | null = useMemo(() => {
+    if (!lot) return null;
+    // um compromisso que feche o lote mantém o capítulo de compromisso (reflexão e cancelamento)
+    const ending = lot.status === 'financiado' && positions.some((p) => p.session) ? 'compromisso' : endingFor(lot);
+    return { lot, positions, rich, goTo, ending, ...journeyBase(lot) };
+  }, [lot, positions, rich, goTo]);
   if (!value) return null;
   return (
     <div data-world={value.lot.world} className="min-w-0">

@@ -96,7 +96,7 @@ function typesetInPage() {
   const units = '(?:%|€|M€|k€|mil\\b|kg\\b|kt\\b|t\\b|L\\b|hl\\b|dias\\b|dia\\b|meses\\b|mês\\b|anos\\b|ano\\b|semanas\\b|p\\.p\\.|p\\.b\\.|h\\b|min\\b|FTE\\b|paletes\\b|clientes\\b|lotes\\b|lagares\\b|garrafas\\b|sacas\\b|USD\\b|°C)';
   const reUnit = new RegExp('(\\d)[ \\u00A0](?=' + units + ')', 'g');
   const reThousands = /\b(\d{1,3})((?:[  ]\d{3})+)(?!\d)/g;
-  const reShort = /(^|[\s(])([aeoAEOàÀéÉ]|§|n\.º|n\.os|art\.|arts\.|al\.|p\.|pp\.|Dir\.|Reg\.|DL|CSC|CVM|LGT|CC)[ ](?=\S)/g;
+  const reShort = /(?<=^|[\s(\u00A0])([aeoAEOàÀéÉ]|§|n\.º|n\.os|art\.|arts\.|al\.|p\.|pp\.|Dir\.|Reg\.|DL|CSC|CVM|LGT|CC)[ ](?=\S)/g;
   const reEuroLead = /(€)[ ](?=\d)/g;
   const skip = new Set(['SCRIPT', 'STYLE', 'CODE', 'PRE', 'TEXTAREA', 'svg', 'SVG']);
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
@@ -114,7 +114,7 @@ function typesetInPage() {
       .replace(reThousands, (m, a, rest) => a + rest.replace(/[  ]/g, NNBSP))
       .replace(reUnit, '$1' + NBSP)
       .replace(reEuroLead, '$1' + NBSP)
-      .replace(reShort, (m, pre, w) => pre + w + NBSP);
+      .replace(reShort, (m, w) => w + NBSP);
     if (t !== before) { n.nodeValue = t; changed++; }
   }
   return changed;
