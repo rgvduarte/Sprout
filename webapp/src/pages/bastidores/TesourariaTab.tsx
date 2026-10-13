@@ -140,7 +140,7 @@ function ReconCard() {
               items={[
                 { label: 'Saldo no PSP', value: eur(sel.pspBalance, { decimals: 2 }), mono: true },
                 { label: 'Saldo no razão', value: eur(sel.ledgerBalance, { decimals: 2 }), mono: true },
-                { label: 'Diferença', value: sel.difference ? signedEur(sel.difference) : eur(0, { decimals: 2 }), mono: true },
+                { label: 'Diferença', value: signedEur(sel.difference, 2), mono: true },
                 { label: 'Fecho', value: time(sel.closedAt), mono: true, hint: sel.status === 'conciliado' ? 'conciliado' : 'diferença resolvida' },
               ]}
             />
@@ -304,7 +304,7 @@ export default function TesourariaTab() {
     { key: 'data', header: 'Dia', mono: true, sortValue: (r) => r.date, render: (r) => fmtDate(r.date) },
     { key: 'psp', header: 'PSP', align: 'right', mono: true, render: (r) => eur(r.pspBalance, { decimals: 2 }) },
     { key: 'razao', header: 'Razão', align: 'right', mono: true, render: (r) => eur(r.ledgerBalance, { decimals: 2 }) },
-    { key: 'dif', header: 'Diferença', align: 'right', mono: true, sortValue: (r) => r.difference, render: (r) => signedEur(r.difference) },
+    { key: 'dif', header: 'Diferença', align: 'right', mono: true, sortValue: (r) => r.difference, render: (r) => signedEur(r.difference, 2) },
     { key: 'estado', header: 'Estado', render: (r) => <StatusPill tone={r.status === 'em-aberto' ? 'crit' : 'ok'} label={r.status === 'em-aberto' ? 'Em aberto' : 'Resolvida'} /> },
     { key: 'nota', header: 'Causa e resolução', minWidth: 320, render: (r) => <span className="text-muted">{r.note}</span> },
   ];
@@ -315,7 +315,7 @@ export default function TesourariaTab() {
     { key: 'tipo', header: 'Tipo', sortValue: (t) => t.type, render: (t) => TX_LABEL[t.type] },
     { key: 'contraparte', header: 'Contraparte', minWidth: 220, render: (t) => t.counterparty },
     { key: 'lote', header: 'Lote', mono: true, render: (t) => (t.lotId ? <Link to={`/lote/${t.lotId}`} className="text-accent hover:underline">{t.lotId}</Link> : '—') },
-    { key: 'montante', header: 'Montante', align: 'right', mono: true, sortValue: (t) => t.amount, render: (t) => signedEur(t.amount) },
+    { key: 'montante', header: 'Montante', align: 'right', mono: true, sortValue: (t) => t.amount, render: (t) => signedEur(t.amount, Number.isInteger(t.amount) ? 0 : 2) },
     { key: 'rail', header: 'Rail', render: (t) => t.rail },
     { key: 'estado', header: 'Estado', render: (t) => <StatusPill tone={t.status === 'liquidada' ? 'ok' : 'info'} label={t.status === 'liquidada' ? 'Liquidada' : t.status === 'pendente' ? 'Pendente' : 'Em trânsito'} /> },
   ];

@@ -204,7 +204,7 @@ export default function RiscoTab() {
             className="mt-4"
             columns={4}
             items={[
-              { label: 'Margem bruta prevista do piloto', value: eur(res.totalMargin), mono: true, hint: sc === 'base' ? 'com as referências de hoje' : `${signedEur(delta)} face a hoje` },
+              { label: 'Margem bruta prevista do piloto', value: eur(res.totalMargin, { decimals: 0 }), mono: true, hint: sc === 'base' ? 'com as referências de hoje' : `${signedEur(delta)} face a hoje` },
               { label: 'Gatilhos de cobertura que disparam', value: num(res.triggers.length), mono: true, hint: ids(res.triggers) },
               { label: 'Lotes que entram em extensão', value: num(res.extensions.length), mono: true, hint: ids(res.extensions) },
               { label: 'Lotes em refunding', value: num(res.refundings.length), mono: true, hint: ids(res.refundings) },

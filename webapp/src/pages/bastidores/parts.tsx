@@ -13,7 +13,7 @@ import { date as fmtDate, eur, lisbonParts, MONTHS_SHORT, num, pct } from '../..
    reconciliação, calendário das janelas de liquidação e régua de gatilhos.
    ===================================================================== */
 
-export const signedEur = (v: number) => (Math.abs(v) < 0.5 ? '0 €' : eur(v, { sign: true }));
+export const signedEur = (v: number, decimals = 0) => (Math.abs(v) < 0.5 && decimals === 0 ? eur(0, { decimals: 0 }) : eur(v, { sign: true, decimals }));
 export const signedPct = (v: number, d = 1) => (Math.abs(v) < 0.0005 ? pct(0, d) : pct(v, d, { sign: true }));
 
 /* ------------------------------------------------------------ histórico de um indicador */
