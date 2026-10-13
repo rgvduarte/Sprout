@@ -35,13 +35,15 @@ export interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   rowClassName?: (row: T) => string | undefined;
   className?: string;
+  /** borda e fundo próprios (por omissão sim); dentro de um Card use framed={false} */
+  framed?: boolean;
 }
 
 /**
  * Tabela ordenável com cabeçalho fixo e contentor próprio de scroll horizontal
  * (a página nunca faz scroll lateral). Densa: 14 px, algarismos tabulares.
  */
-export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible, initialSort, empty, maxHeight, dense = true, onRowClick, rowClassName, className }: DataTableProps<T>) {
+export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible, initialSort, empty, maxHeight, dense = true, onRowClick, rowClassName, className, framed = true }: DataTableProps<T>) {
   const [sort, setSort] = useState(initialSort);
   const sorted = useMemo(() => {
     if (!sort) return rows;
@@ -59,7 +61,7 @@ export function DataTable<T>({ columns, rows, getRowId, caption, captionVisible,
   if (!rows.length && empty) return <EmptyState title={empty.title} body={empty.body} action={empty.action} className={className} />;
 
   return (
-    <div className={cn('min-w-0 rounded-md border border-border bg-surface', className)}>
+    <div className={cn('min-w-0', framed && 'rounded-md border border-border bg-surface', !framed && '-mx-4 sm:mx-0', className)}>
       <div className="overflow-x-auto" style={maxHeight ? { maxHeight, overflowY: 'auto' } : undefined} tabIndex={0} role="region" aria-label={caption}>
         <table className={cn('w-full border-collapse text-left', dense ? 'text-sm' : 'text-[0.9375rem]')}>
           <caption className={captionVisible ? 'px-4 pb-1 pt-3 text-left text-sm text-muted' : 'sr-only'}>{caption}</caption>

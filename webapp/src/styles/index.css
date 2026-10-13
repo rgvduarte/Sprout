@@ -303,10 +303,6 @@
   .measure { max-width: 68ch; }
   .measure-narrow { max-width: 52ch; }
   .ease-expo { transition-timing-function: var(--ease-out-expo); }
-  /* Tracejado diagonal para projeções (extensão, previsão) — não decorativo */
-  .hatch {
-    background-image: repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 6px);
-  }
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }

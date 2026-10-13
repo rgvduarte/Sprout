@@ -229,6 +229,7 @@ export default function AcademiaPage() {
               ) },
               { value: 'b', label: 'Tabela', count: data.positions.length, content: (
                 <DataTable
+                  framed={false}
                   caption="Posições"
                   rows={data.positions}
                   getRowId={(p) => p.id}

@@ -139,19 +139,24 @@ export function RiskNote({ className, compact }: { className?: string; compact?:
   );
 }
 
-/** Aviso genérico (demonstração, simulação, regulamentar). */
-export function Disclaimer({ children, kind = 'info', className, title }: { children: ReactNode; kind?: 'info' | 'simulacao' | 'regulatorio'; className?: string; title?: string }) {
+/**
+ * Aviso genérico (demonstração, simulação, regulamentar). Por omissão é texto
+ * com ícone (cabe dentro de um Card sem criar um cartão aninhado); `boxed`
+ * dá-lhe fundo próprio para usar diretamente na página.
+ */
+export function Disclaimer({ children, kind = 'info', className, title, boxed }: { children: ReactNode; kind?: 'info' | 'simulacao' | 'regulatorio'; className?: string; title?: string; boxed?: boolean }) {
   const Icon = kind === 'simulacao' ? FlaskConical : kind === 'regulatorio' ? ShieldAlert : Info;
   return (
     <div
       role="note"
       className={cn(
-        'flex items-start gap-3 rounded-sm border px-4 py-3 text-sm',
-        kind === 'simulacao' ? 'border-[color-mix(in_oklab,var(--info)_35%,var(--border))] bg-[color-mix(in_oklab,var(--info)_9%,var(--surface))] text-fg' : 'border-border bg-surface-2 text-fg',
+        'flex items-start gap-3 text-sm text-fg',
+        boxed && 'rounded-sm px-4 py-3',
+        boxed && (kind === 'simulacao' ? 'bg-[color-mix(in_oklab,var(--info)_10%,var(--surface))]' : 'bg-surface-2'),
         className,
       )}
     >
-      <Icon aria-hidden className={cn('mt-0.5 size-4 shrink-0', kind === 'simulacao' ? 'text-info-ink' : 'text-muted')} strokeWidth={1.75} />
+      <Icon aria-hidden className={cn('mt-0.5 size-4 shrink-0', kind === 'simulacao' ? 'text-info-ink' : kind === 'regulatorio' ? 'text-warn-ink' : 'text-muted')} strokeWidth={1.75} />
       <div className="min-w-0">
         {title && <p className="font-semibold">{title}</p>}
         <div className={cn(title && 'mt-0.5', 'text-muted [&_strong]:text-fg')}>{children}</div>
@@ -163,8 +168,8 @@ export function Disclaimer({ children, kind = 'info', className, title }: { chil
 /** Faixa fixa das simulações: "Simulação educativa · dinheiro fictício · não representa resultados reais". */
 export function SimulationLabel({ className }: { className?: string }) {
   return (
-    <p className={cn('inline-flex items-center gap-2 rounded-xs border border-[color-mix(in_oklab,var(--info)_35%,var(--border))] bg-[color-mix(in_oklab,var(--info)_10%,var(--surface))] px-2.5 py-1 text-sm font-medium text-info-ink', className)}>
-      <FlaskConical aria-hidden className="size-4" strokeWidth={1.75} />
+    <p className={cn('flex items-start gap-2 text-sm font-medium text-info-ink', className)}>
+      <FlaskConical aria-hidden className="mt-0.5 size-4 shrink-0" strokeWidth={1.75} />
       Simulação educativa · dinheiro fictício · não representa resultados reais
     </p>
   );

@@ -50,6 +50,20 @@ function isStrongPhase(ph?: SeasonPhase) {
   return ph?.kind === 'colheita' || ph?.kind === 'engarrafamento';
 }
 
+/** Tracejado diagonal (projeção, extensão): padrão SVG na tinta do mundo. */
+function Hatched({ id }: { id: string }) {
+  return (
+    <svg aria-hidden className="block h-full w-full" preserveAspectRatio="none">
+      <defs>
+        <pattern id={id} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--world-ink)" strokeWidth="1.5" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------ HarvestBand */
 
 export interface HarvestBandProps {
@@ -103,7 +117,11 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
         {/* janela de 18 meses */}
         <div className="pointer-events-none absolute inset-x-0 top-[18px] h-[18px]">
           <div className="absolute h-full rounded-xs bg-world-ink" style={{ left: `${a * 100}%`, width: `${(b - a) * 100}%` }} />
-          {extEnd && <div className="hatch absolute h-full rounded-xs border border-world-ink text-world-ink" style={{ left: `${b * 100}%`, width: `${(c - b) * 100}%` }} />}
+          {extEnd && (
+            <div className="absolute h-full overflow-hidden rounded-xs border border-world-ink" style={{ left: `${b * 100}%`, width: `${(c - b) * 100}%` }}>
+              <Hatched id={`ext-${uid}`} />
+            </div>
+          )}
         </div>
         {/* hoje */}
         {showToday && (
@@ -163,7 +181,9 @@ export function HarvestBand({ world, start, months = 18, extensionMonths = 0, to
           </li>
           {extEnd && (
             <li className="inline-flex items-center gap-2">
-              <span aria-hidden className="hatch inline-block h-2 w-4 rounded-[2px] border border-world-ink text-world-ink" />
+              <span aria-hidden className="inline-block h-2.5 w-4 overflow-hidden rounded-[2px] border border-world-ink">
+                <Hatched id={`exl-${uid}`} />
+              </span>
               Extensão de {extensionMonths} meses
             </li>
           )}
