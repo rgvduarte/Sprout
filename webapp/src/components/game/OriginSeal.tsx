@@ -67,7 +67,7 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
     <figure className={cn('inline-flex min-w-0 flex-col items-center gap-2', className)} data-world={seal.world}>
       <svg role="img" aria-label={label} viewBox="0 0 120 120" width={size} height={size} className="block shrink-0 overflow-visible">
         <defs>
-          <path id={`rim-${uid}`} d="M60,60 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+          <path id={`rim-${uid}`} d="M60,98 a38,38 0 1,1 0,-76 a38,38 0 1,1 0,76" />
         </defs>
         {earned ? (
           <g>
@@ -77,8 +77,8 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
             <path d="M28,40 A38,38 0 0 1 52,22" fill="none" stroke="var(--seal-on)" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
             <circle cx="60" cy="60" r="48" fill="none" stroke="var(--seal-deep)" strokeWidth="1.5" />
             <circle cx="60" cy="60" r="28" fill="none" stroke="var(--seal-deep)" strokeWidth="1.25" />
-            <text fontSize="12" letterSpacing="0.4" fontFamily="var(--font-display)" fontWeight={700} fill="var(--seal-on)" style={{ fontStretch: '87.5%' }}>
-              <textPath href={`#rim-${uid}`} startOffset="25%" textAnchor="middle">
+            <text fontSize="12" letterSpacing="0.2" fontFamily="var(--font-display)" fontWeight={700} fill="var(--seal-on)" style={{ fontStretch: '87.5%' }}>
+              <textPath href={`#rim-${uid}`} startOffset="50%" textAnchor="middle">
                 {rim}
               </textPath>
             </text>
@@ -97,8 +97,8 @@ export function OriginSeal({ seal, producer, region, state, size = 112, earnedBy
             <path d={path} fill="none" stroke="var(--surface)" strokeWidth="1.25" transform="translate(-0.6 -0.9)" />
             <circle cx="60" cy="60" r="47" fill="none" stroke="color-mix(in oklab, var(--fg) 16%, var(--surface))" strokeWidth="1.25" />
             <circle cx="60" cy="60" r="28" fill="none" stroke="color-mix(in oklab, var(--fg) 14%, var(--surface))" strokeWidth="1" />
-            <text fontSize="12" letterSpacing="0.4" fontFamily="var(--font-display)" fontWeight={700} fill="color-mix(in oklab, var(--fg) 38%, var(--surface))" style={{ fontStretch: '87.5%' }} aria-hidden>
-              <textPath href={`#rim-${uid}`} startOffset="25%" textAnchor="middle">
+            <text fontSize="12" letterSpacing="0.2" fontFamily="var(--font-display)" fontWeight={700} fill="color-mix(in oklab, var(--fg) 38%, var(--surface))" style={{ fontStretch: '87.5%' }} aria-hidden>
+              <textPath href={`#rim-${uid}`} startOffset="50%" textAnchor="middle">
                 {rim}
               </textPath>
             </text>
