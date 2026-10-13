@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { getLot, getProducer, getProducersByWorld, getRegion, getWorld, isWorldId } from '../../data';
+import { getLot, getProducer, getProducersByWorld, getWorld, isWorldId } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
 import { Badge, ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
 import { CampaignFeed, SeasonTrack } from '../../components/game';
 import { num } from '../../lib/format';
 import { useData, useFeed, useGame } from '../../state';
-import { MarketReference } from './MarketReference';
+import { ReferenceChart } from './MarketChart';
 import { MissionList, RunningLotsTable } from './MissionBoard';
 import { LearnWorld } from './Learn';
 import { OriginsExplorer, regionsFor } from './Origins';
@@ -184,10 +184,10 @@ function World({ world }: { world: WorldId }) {
         </Section>
 
         {/* ------------------------------------------------ preço e cadeia */}
-        <Section id="mercado" title="Preço e margem" description={`A referência de mercado conta o risco de preço; a cadeia mostra de onde vem o desconto ao comprador.${getRegion(chainLot.regionId) ? '' : ''}`}>
+        <Section id="mercado" title="Preço e margem" description="A referência de mercado conta o risco de preço; a cadeia mostra de onde vem o desconto ao comprador.">
           <div className="grid min-w-0 gap-6 xl:grid-cols-2">
             <Card>
-              <MarketReference
+              <ReferenceChart
                 world={world}
                 lots={open}
                 onCompare={() => {
