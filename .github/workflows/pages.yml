@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      publicar: ${{ steps.resultado.outputs.publicar }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,9 +26,12 @@ jobs:
         with:
           node-version: 22
 
-      # Se a webapp não compilar, o job falha e o Pages mantém a última versão publicada.
+      # Commits intermédios podem ainda não compilar. Nesse caso o deploy é
+      # saltado sem marcar o run como falhado, e o site mantém a última versão boa.
       - name: Construir a webapp
+        id: webapp
         if: hashFiles('webapp/package.json') != ''
+        continue-on-error: true
         working-directory: webapp
         run: |
           npm ci || npm install
@@ -38,7 +43,18 @@ jobs:
           mkdir -p _site
           cp .github/pages/index.html _site/index.html
 
+      - name: Decidir se publica
+        id: resultado
+        run: |
+          if [ -f _site/index.html ] && [ "${{ steps.webapp.outcome }}" != "failure" ]; then
+            echo "publicar=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publicar=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::A webapp ainda não compila neste commit; mantém-se a versão publicada anterior."
+          fi
+
       - name: Documentos (PDF e Excel)
+        if: steps.resultado.outputs.publicar == 'true'
         run: |
           mkdir -p _site/documentos
           for f in docs/resumo/*.pdf docs/business-plan/*.pdf docs/business-plan/*.xlsx; do
@@ -47,15 +63,16 @@ jobs:
           touch _site/.nojekyll
 
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
+        if: steps.resultado.outputs.publicar == 'true'
 
       - uses: actions/upload-pages-artifact@v3
+        if: steps.resultado.outputs.publicar == 'true'
         with:
           path: _site
 
   deploy:
     needs: build
+    if: needs.build.outputs.publicar == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
