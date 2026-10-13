@@ -288,47 +288,56 @@
 | # | Tema | Versões | Resolução | Porquê |
 |---|---|---|---|---|
 | 1 | Subida máxima do AOVE | 10: +157% (abr. 2022 → dez. 2023); 40: +160% (→ jan. 2024) | **+160%** | Usa o máximo histórico Poolred (8,988, jan. 2024), com fonte A |
-| 2 | Produção PT 2025/26 | 160 (Olivum), ~175 (INE), 179 (Governo) | **~175 kt**, intervalo 160–179 | INE é a estatística oficial; o intervalo fica visível |
+| 2 | Produção PT 2025/26 | 160 (Olivum), ~175 (atribuído ao INE, sem URL), 179 (Governo) | **~175 kt [E]**, intervalo 160–179 | Ponto médio de 160 e 179; não se localizou a publicação INE com o valor (em hl × 0,916). Citar o INE só quando houver URL |
 | 3 | Entrada em vigor do DL 76/2021 | 10: 01-11-2021; 20: "entre 01-11-2021 e 01-11-2022" | **01-11-2021** | Notícia ECO de 01-11-2021 ("entram hoje em vigor"); a dúvida da nota 20 pode referir-se a um regime transitório de contratos (NV) |
 | 4 | IVA da água | 13% (informação vinculativa AT) vs. 6% (fontes comerciais) | **13%** | Fonte primária da AT; confirmar com nova informação vinculativa |
 | 5 | Âmbito UTP sobre a água | 10: aplica-se a "produtos alimentares"; 20: água "provavelmente não" (Anexo I TFUE) | **Irrelevante no desenho**: a água fica em modelo agente (o comprador paga ao engarrafador); em qualquer caso, política Sprout de 30 dias | Remove a dependência de uma interpretação incerta |
-| 6 | GMV do piloto | 10: 0,1–0,4 M€ em 12 meses; 30: €120k/mês (hipótese de custos) | **~€240k em 6 meses** (azeite 40 t + água 120 paletes) | A hipótese da nota 30 servia para dimensionar custos e é alta para uma coorte HoReCa |
-| 7 | Dimensão da 1.ª série | 30: €0,5–1M; 40: €100–150k (HoReCa) ou book de €500k ilustrativo | **€150k** (€120k sénior + €30k subordinado) | Capital médio empregue no piloto ≈ €90–120k; série maior ficaria parada (custo de cupão sem ativo) |
+| 6 | GMV do piloto | 10: 0,1–0,4 M€ em 12 meses (~€30–75k para 36 clientes em 6 meses); 30: €120k/mês (hipótese de custos); 01 (versão anterior): €240k com 40 t | **~€106k em 6 meses**: 1 lote misto de 20 t (4 t HoReCa/*gourmet* + 16 t para distribuidores com *offtake*) + 60 paletes de água | 33 clientes HoReCa a 150–300 L/ano absorvem 2,3–4,5 t em 6 meses, não 24 t; o volume restante só escoa com *offtake* de distribuidores. Gate com GMV ≥ €90k |
+| 7 | Dimensão e data da 1.ª série | 30: €0,5–1M; 40: €100–150k (HoReCa) ou book de €500k ilustrativo; 01 (versão anterior): abr. 2027 | **€150k** (€100k sénior + €50k de capital social da SPV), **nov. 2027–jan. 2028**, só profissionais | CSC art. 348.º/2: a SPV só emite 12 meses após o registo, salvo garantia bancária; o piloto é financiado por capital próprio |
 | 8 | Limiar ECSP para não sofisticados | Uma fonte secundária lê "o menor" de €1.000 ou 5% | **"O maior"** | Leitura da nota 20 conforme o texto do art. 21.º |
 | 9 | "Hedge" do azeite | Documento-fonte: "hedge funds/taxas de cobertura" | **Não existe instrumento em bolsa** | MFAO extinto; nenhum substituto identificado |
 | 10 | Margem do embalador em % | 10: "5–14% do PVP"; 50: idem; 2020/21 = 5,6% | **0,19–0,50 €/kg (4,9–14,1%)** | O máximo (2019/20) é um ano de margem alta; usar o intervalo inteiro |
 | 11 | Modelo comercial | 20: marketplace puro com PSP marketplace; 30: principal | **Principal no azeite; agente com faturação direta na água** | Ver `01-desenho-do-modelo.md` §3; a tese de margem exige principal |
 | 12 | Concentração no produtor âncora | 40: ≤ 40–50% no piloto; política: ≤ 50% ano 1, ≤ 35% depois | **≤ 50% no piloto; ≤ 35% a partir de 2028** | Alinha a política de risco com a tabela de risco de entrega |
-| 13 | Capital subordinado do patrocinador | 40: 10% | **20% na série piloto; 10% em regime** | O *stress test* combinado da série piloto excede uma almofada de 15% (ver `01-desenho-do-modelo.md` §4.4) |
+| 13 | Capital subordinado do patrocinador | 40: 10%; 01 (versão anterior): 20% no piloto (€30k) | **33% na 1.ª série (capital social da SPV, €50k); 10% em regime** | O *stress test* combinado excede uma almofada de 15%; e €30k ficariam abaixo do capital mínimo legal de uma SA (€50k) |
+| 14 | Referência de preço HoReCa | 01 (versão anterior): 6,00 €/kg | **5,65 €/kg** (base); 5,40 (pessimista); 6,00 (otimista) | A derivação a partir do retalho de abril dá 5,27–5,84 €/kg; 6,00 €/kg s/ IVA (5,83 €/L c/ IVA) fica acima do retalho médio estimado para out. 2026 |
+| 15 | Preço aos distribuidores | 01 (versão anterior): referência 5,00, desconto 5% (4,75 €/kg) | **4,35 €/kg**, sem desconto (preço de saída do embalador; 4,16–4,51) | Compradores profissionais compram ao embalador ou ao índice; 4,75 ficava 0,24–0,59 €/kg acima do preço de saída do embalador |
+| 16 | Comissão de agente na água | JSON anterior: 4% ("3–5% com logística") | **2%** (banda 0,5–3%) | A banda 3–5% não existe na nota 50; só há 0,5–3% [E, NV] |
 
 ---
 
 ## 11. Lacunas críticas (verificar antes do deck), por ordem de impacto
 
-1. **Preço de cash & carry e *foodservice* PT** de AOVE 5 L e de origem identificada (20–30 cotações: Recheio, Makro, Bidfood, Garcias, distribuidores regionais). Decide se o desconto de 10% é viável.
+1. **Preço de cash & carry e *foodservice* PT** de AOVE 5 L e de origem identificada (20–30 cotações: Recheio, Makro, Bidfood, Garcias, distribuidores regionais). Decide se o desconto de 10% é viável: com mediana < 5,65 €/kg s/ IVA, a margem HoReCa fica abaixo de 7%; com < 5,40, abaixo de 3%.
 2. **Preço HoReCa da água por formato** e lista de preços de 2 engarrafadores a compradores diretos.
-3. **Parecer jurídico escrito** (as cinco perguntas da nota 20 §11.14 mais as de `01-desenho-do-modelo.md` §3.5).
-4. Tarifas de armazenagem e de *collateral manager* (Lagar do Val + 2 lagares + SGS/Bureau Veritas/Control Union).
-5. Série semanal DG AGRI 2015–2026 do AOVE para refazer volatilidade e *drawdowns*.
-6. Cupão de mercado para notas colateralizadas de *trade finance* a qualificados em PT (2 bancos privados/family offices).
-7. IRC 2027–2028, TSU e retenções (contabilista certificado).
-8. EUR/USD e Euribor de out. 2026.
-9. Comissões, juros e incumprimento de Raize, Goparity e Miimosa (fase 2).
-10. Prémios de seguro de crédito e de stock (3 cotações).
+3. **Parecer jurídico escrito** (as perguntas da nota 20 §11.14 mais as de `01-desenho-do-modelo.md` §3.5), com prioridade para: CSC art. 348.º/2 e RGICSF art. 9.º (data da 1.ª emissão), PRIIPs (KID para subscritores ≥ €100k não profissionais), classificação de profissionais a pedido e penhor da conta da reserva.
+4. **Redação em vigor do CSC arts. 276.º, 277.º e 348.º** no DRE (verificada só contra texto de referência nesta sessão).
+5. Tarifas de armazenagem, de *collateral manager* por libertação de tranche e de 3PL (armazenagem + *picking*) (Lagar do Val + 2 lagares + SGS/Bureau Veritas/Control Union + 2 operadores logísticos).
+6. Preço pago hoje por 3 distribuidores/exportadores a embaladores por AOVE 5 L em palete, e se pagam prémio por origem verificada.
+7. Série semanal DG AGRI 2015–2026 do AOVE para refazer volatilidade e *drawdowns*.
+8. Cupão de mercado para notas colateralizadas de *trade finance* a qualificados em PT (2 bancos privados/family offices).
+9. IRC 2027–2028, TSU, subsídio de refeição e retenções (contabilista certificado).
+10. EUR/USD e Euribor de out. 2026; custo de uma garantia bancária para a 1.ª emissão.
+11. Comissões, juros e incumprimento de Raize, Goparity e Miimosa (fase 2).
+12. Prémios de seguro de crédito e de stock (3 cotações).
+13. Publicação INE com a produção de azeite de 2025/26 e o ano do grau de autoaprovisionamento de 247,9%.
 
 ---
 
 ## 12. Implicações para o Sprout
 
 1. **O número que manda é o diferencial granel→prateleira, não a margem do embalador.** A margem líquida do embalador vale 0,19–0,50 €/kg; o diferencial vale 0,65–2,24 €/kg. Toda a comunicação deve usar o segundo.
-2. **Não há preço de referência HoReCa verificado.** Até haver 20–30 cotações reais, o desconto de 10–15% é uma hipótese, não uma promessa comercial.
-3. **O azeite não tem cobertura em bolsa.** Qualquer frase sobre "hedge" tem de nomear o instrumento físico (*back-to-back*, indexação, *offtake*).
-4. **Os 18 meses só podem existir do lado do capital** (Dir. 2019/633: produtor pago em ≤ 30/60 dias).
-5. **Retalho fora no piloto.** Os limiares de prospeto (€12M) não afastam a reserva bancária, a MiFID, os PRIIPs nem os precedentes Afinsa/Asset Land/Cimovelpark.
-6. **A água não tem margem de embalador a capturar** (embalamento na origem obrigatório) e vale ~0,24 €/L.
-7. **O café só depois do EUDR** e como *sourcing* de verde em EUR.
-8. **Rails:** bancos PT com SCT Inst + VoP e SDD B2B no modelo principal; Lemonway como primeira opção se houver fundos de terceiros; nunca Stripe nem carteiras de marketplace para dinheiro de investidores; excluir Treezor.
-9. **A verificação de stock é o produto**: Greensill, Stenn, Qingdao e Hin Leong falharam no colateral, não na tecnologia.
+2. **Não há preço de referência HoReCa verificado.** A derivação a partir do retalho dá 5,3–6,0 €/kg (base 5,65). Até haver 20–30 cotações reais, o desconto de 10% é uma hipótese, não uma promessa comercial; com 15% a margem desaparece.
+3. **Aos distribuidores não há desconto possível.** O preço de saída do embalador (4,16–4,51 €/kg) é praticamente o custo do Sprout (~4,29 €/kg em regime): o canal dá volume, não margem.
+4. **O azeite não tem cobertura em bolsa.** Qualquer frase sobre "hedge" tem de nomear o instrumento físico (*back-to-back*, indexação, *offtake*).
+5. **Os 18 meses só podem existir do lado do capital** (Dir. 2019/633: produtor pago em ≤ 30/60 dias).
+6. **Retalho fora no piloto e na 1.ª série.** Os limiares e isenções de prospeto (€12M; ≥ €100k) não afastam a reserva bancária, a MiFID, os PRIIPs (quem subscreve ≥ €100k sem ser profissional é retalho) nem os precedentes Afinsa/Asset Land/Cimovelpark.
+7. **O calendário de capital é ditado pelo CSC.** Sem garantia bancária, a SPV só emite obrigações 12 meses depois do registo: constituí-la já e financiar o piloto com capital próprio.
+8. **A água não tem margem de embalador a capturar** (embalamento na origem obrigatório) e vale ~0,24 €/L.
+9. **O café só depois do EUDR** e como *sourcing* de verde em EUR.
+10. **Rails:** bancos PT com SCT Inst + VoP e SDD B2B no modelo principal; Lemonway como primeira opção se houver fundos de terceiros; nunca Stripe nem carteiras de marketplace para dinheiro de investidores; excluir Treezor.
+11. **A verificação de stock é o produto**: Greensill, Stenn, Qingdao e Hin Leong falharam no colateral, não na tecnologia.
+12. **Com os preços corrigidos, o plano não chega ao *break-even* até 2031** (`01-desenho-do-modelo.md` §7): a margem média do azeite fica em ~0,12 €/kg contra ~0,68 €/kg necessários para pagar a estrutura. O piloto tem de medir a referência HoReCa e o prémio de origem que os distribuidores pagam, não só a operação.
 
 ---
 

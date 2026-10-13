@@ -28,7 +28,7 @@ function Diversification({ amount }: { amount: number }) {
   const c = concentrationAfter(data.positions, lot, amount, ctx.producer.nome);
   return (
     <div>
-      <h4 className="font-display text-[1.0625rem] font-semibold">Efeito na tua diversificação</h4>
+      <h3 className="text-[1.0625rem]">Efeito na tua diversificação</h3>
       <p className="mt-1 text-sm text-muted">
         Montante financiado em lotes ativos depois deste compromisso: <span className="font-mono text-fg tnum">{eur(c.totalAfter)}</span>
       </p>
@@ -236,7 +236,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
         </div>
 
         <div className="mt-8">
-          <h4 className="mb-2 font-display text-[1.0625rem] font-semibold">Condições</h4>
+          <h3 className="mb-2 text-[1.0625rem]">Condições</h3>
           <Terms amount={shown} />
         </div>
 
@@ -246,7 +246,7 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
 
         {/* elegibilidade e confirmação */}
         <div className="mt-8 border-t border-border pt-6">
-          <h4 className="font-display text-[1.0625rem] font-semibold">Antes de confirmar</h4>
+          <h3 className="text-[1.0625rem]">Antes de confirmar</h3>
           <ul className="mt-3 space-y-1">
             {checks.map((c) => (
               <li key={c.id} className="flex min-h-11 items-center gap-3">

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { ArrowUpRight, BookOpen, CalendarRange, CircleCheck, Puzzle } from 'lucide-react';
 import { Button, TextLink } from '../../components/ui';
 import { LevelGlyph, OriginSeal, QuestList, WaxSealStamp, EASE_OUT, useRichMotion } from '../../components/game';
@@ -79,48 +79,63 @@ export function CampaignTabs({ current, onSelect, counts }: { current: CampaignI
 
 /* ------------------------------------------------------------ página dupla com virar de página */
 
-export function Spread({ campaign, dir, children }: { campaign: CampaignId; dir: number; children: ReactNode }) {
+/**
+ * Virar de página: a página nova revela-se a partir da aresta (recorte com
+ * clip-path) enquanto a anterior fica por baixo; uma aresta de folha acompanha
+ * o recorte. Abaixo de 900 px ou com movimento reduzido, troca com um
+ * esvanecimento curto.
+ */
+export function Spread({ campaign, dir, render }: { campaign: CampaignId; dir: number; render: (id: CampaignId) => ReactNode }) {
   const rich = useRichMotion();
   const reduce = useReducedMotion();
-  const idx = CAMPAIGNS.findIndex((c) => c.id === campaign);
-  const variants = rich
-    ? {
-        enter: (d: number) => ({ clipPath: d >= 0 ? 'inset(0% 0% 0% 100%)' : 'inset(0% 100% 0% 0%)', zIndex: 2 }),
-        center: { clipPath: 'inset(0% 0% 0% 0%)', zIndex: 2, transition: { duration: 0.64, ease: EASE_OUT } },
-        exit: { zIndex: 1, opacity: [1, 1, 0], transition: { duration: 0.64, times: [0, 0.9, 1] } },
-      }
-    : {
-        enter: (d: number) => ({ opacity: 0, x: reduce ? 0 : d * 12, zIndex: 2 }),
-        center: { opacity: 1, x: 0, zIndex: 2, transition: { duration: 0.24, ease: EASE_OUT } },
-        exit: { opacity: 0, zIndex: 1, transition: { duration: 0.12 } },
-      };
-  return (
-    <div id="caderno-pagina" role="tabpanel" aria-labelledby={`caderno-tab-${idx}`} className="relative">
-      <AnimatePresence initial={false} custom={dir} mode="popLayout">
-        <motion.div key={campaign} custom={dir} variants={variants} initial="enter" animate="center" exit="exit" className="relative rounded-md border border-border bg-surface">
-          {children}
-        </motion.div>
-      </AnimatePresence>
-      {rich && <PageEdge key={`edge-${campaign}`} dir={dir} />}
-    </div>
-  );
-}
+  const [shown, setShown] = useState(campaign);
+  const [prev, setPrev] = useState<CampaignId | null>(null);
+  if (campaign !== shown) {
+    // estado derivado: a página que estava passa a ser a de baixo
+    setPrev(rich ? shown : null);
+    setShown(campaign);
+  }
+  const progress = useMotionValue(1);
+  useEffect(() => {
+    if (!prev) return;
+    progress.set(0);
+    const ctl = animate(progress, 1, { duration: 0.64, ease: EASE_OUT, onComplete: () => setPrev(null) });
+    return () => ctl.stop();
+  }, [prev, shown, progress]);
+  const clip = useTransform(progress, (v) => (dir >= 0 ? `inset(0% 0% 0% ${((1 - v) * 100).toFixed(2)}%)` : `inset(0% ${((1 - v) * 100).toFixed(2)}% 0% 0%)`));
+  const edgeX = useTransform(progress, (v) => `${(dir >= 0 ? 1 - v : v) * 100}%`);
+  const edgeOpacity = useTransform(progress, [0, 0.85, 1], [1, 1, 0]);
+  const idx = CAMPAIGNS.findIndex((c) => c.id === shown);
+  const frame = 'rounded-md border border-border bg-surface';
 
-/** A aresta da folha que vira, sincronizada com o recorte da página nova. */
-function PageEdge({ dir }: { dir: number }) {
-  const [active, setActive] = useState(dir !== 0);
-  if (!active) return null;
   return (
-    <motion.div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 z-[3]"
-      initial={{ x: dir > 0 ? '100%' : '0%', opacity: 1 }}
-      animate={{ x: dir > 0 ? '0%' : '100%', opacity: [1, 1, 0] }}
-      transition={{ x: { duration: 0.64, ease: EASE_OUT }, opacity: { duration: 0.64, times: [0, 0.8, 1] } }}
-      onAnimationComplete={() => setActive(false)}
-    >
-      <span className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklab,var(--fg)_30%,var(--border))] shadow-pop" />
-    </motion.div>
+    <div id="caderno-pagina" role="tabpanel" aria-labelledby={`caderno-tab-${idx}`} className={cn('relative', prev && 'overflow-hidden rounded-md')}>
+      {prev && (
+        <div className={cn('absolute inset-x-0 top-0 z-[1]', frame)} aria-hidden inert>
+          {render(prev)}
+        </div>
+      )}
+      {rich ? (
+        <motion.div className={cn('relative z-[2]', frame)} style={prev ? { clipPath: clip } : undefined}>
+          {render(shown)}
+        </motion.div>
+      ) : (
+        <motion.div
+          key={shown}
+          className={cn('relative z-[2]', frame)}
+          initial={dir === 0 ? false : { opacity: 0, x: reduce ? 0 : dir * 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.24, ease: EASE_OUT }}
+        >
+          {render(shown)}
+        </motion.div>
+      )}
+      {prev && (
+        <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-[3]" style={{ x: edgeX, opacity: edgeOpacity }}>
+          <span className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklab,var(--fg)_30%,var(--border))] shadow-pop" />
+        </motion.div>
+      )}
+    </div>
   );
 }
 

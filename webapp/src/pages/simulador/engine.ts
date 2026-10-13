@@ -370,6 +370,18 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
   let pending: Pending | undefined;
   let end = 0;
 
+  /** Lotes sem stock por vender ficam liquidados neste mês. */
+  const settle = (t: number, notices: Notice[]) => {
+    for (const l of active()) {
+      if (l.settledAt === undefined && l.rem <= EPS) {
+        l.rem = 0;
+        l.settledAt = t;
+        const v = lotValue(l, reserve);
+        notices.push({ kind: 'liquidado', simLotId: l.lot.id, month: t, text: `Lote liquidado: ${eur(v.value, { decimals: 0 })} fictícios (${pct(v.result, 1, { sign: true })}).` });
+      }
+    }
+  };
+
   for (let t = 1; t <= MAX_MONTH; t++) {
     const events: AppliedEvent[] = [];
     const notices: Notice[] = [];
@@ -555,6 +567,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
         notices.push({ kind: 'venda-fecho', simLotId: l.lot.id, month: t, text: `Venda de fecho no mês 18: ${unitsText(l.lot, units)} vendidos com ${pct(FIRE_SALE_DISCOUNT, 0)} de desconto.` });
       }
       if (pending) {
+        settle(t, notices);
         const lotsSnap = snapAll(t, sold);
         months.push({ month: t, lots: lotsSnap, value: lotsSnap.reduce((s, x) => s + x.value, 0), events, notices });
         end = t;
@@ -563,14 +576,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
     }
 
     /* 8. liquidação */
-    for (const l of active()) {
-      if (l.settledAt === undefined && l.rem <= EPS) {
-        l.rem = 0;
-        l.settledAt = t;
-        const v = lotValue(l, reserve);
-        notices.push({ kind: 'liquidado', simLotId: l.lot.id, month: t, text: `Lote liquidado: ${eur(v.value, { decimals: 0 })} fictícios (${pct(v.result, 1, { sign: true })}).` });
-      }
-    }
+    settle(t, notices);
 
     const lotsSnap = snapAll(t, sold);
     months.push({ month: t, lots: lotsSnap, value: lotsSnap.reduce((s, x) => s + x.value, 0), events, notices });
