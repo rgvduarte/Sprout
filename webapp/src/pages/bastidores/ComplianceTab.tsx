@@ -178,7 +178,7 @@ function MaterialRow({ m }: { m: Material }) {
         </summary>
         <div className="pb-3 pl-0 sm:pl-1">
           {m.blocked ? (
-            <p className="measure text-sm text-crit-ink">{m.blocked}</p>
+            <p className="max-w-[60ch] text-sm text-crit-ink">{m.blocked}</p>
           ) : (
             <>
               <fieldset>

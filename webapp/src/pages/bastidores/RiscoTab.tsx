@@ -369,7 +369,7 @@ export default function RiscoTab() {
         </summary>
         <ul className="list-disc space-y-1.5 px-4 pb-4 pl-9 text-sm text-muted sm:px-5 sm:pl-10">
           {PRESSUPOSTOS.map((p) => (
-            <li key={p} className="measure">
+            <li key={p} className="max-w-[60ch]">
               {p}
             </li>
           ))}

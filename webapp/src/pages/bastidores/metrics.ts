@@ -140,7 +140,7 @@ export const OPEN_KYC: KycCase['status'][] = ['em-analise', 'pendente'];
 export const KYC_SLA_DAYS = 10;
 
 export const KYC_WEEKS = ['2026-09-13', '2026-09-20', '2026-09-27', '2026-10-04', '2026-10-11', TODAY_DATE];
-export const KYC_WEEK_LABELS = ['13/09', '20/09', '27/09', '04/10', '11/10', 'hoje'];
+export const KYC_WEEK_LABELS = ['13 set', '20', '27', '4 out', '11', 'hoje'];
 
 /** Casos abertos no fim de cada semana (antes das decisões desta sessão). */
 export function kycBacklogHistory(): number[] {

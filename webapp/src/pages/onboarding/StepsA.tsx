@@ -19,7 +19,7 @@ export function StepPerfil(p: StepProps) {
     <div className="flex flex-col gap-8">
       <div data-field="tipo">
         <RadioGroup<Tipo>
-          legend={<Lbl ex={isEx('tipo')}>Vais investir como</Lbl>}
+          legend={<Lbl ex={isEx('tipo')} visible>Vais investir como</Lbl>}
           name="ob-tipo"
           value={d.tipo || undefined}
           onChange={chooseTipo}

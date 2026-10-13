@@ -2,7 +2,7 @@ import type { InputHTMLAttributes, ReactNode } from 'react';
 import { CircleCheck } from 'lucide-react';
 import { Field, Input, Select } from '../../components/ui';
 import type { Draft } from './draft';
-import { Lbl, type StepProps } from './parts';
+import { exampleField, Lbl, type StepProps } from './parts';
 
 type StringKey = { [K in keyof Draft]-?: Draft[K] extends string ? K : never }[keyof Draft];
 
@@ -59,6 +59,7 @@ export function TF({
           aria-describedby={describedBy}
           invalid={invalid}
           aria-required={required || undefined}
+          className={p.isEx(k) ? exampleField : undefined}
           value={value}
           onChange={(e) => p.set({ [k]: format ? format(e.target.value) : e.target.value } as Partial<Draft>)}
           onBlur={() => p.touch(k)}
@@ -96,6 +97,7 @@ export function SF({
           aria-describedby={describedBy}
           invalid={invalid}
           aria-required
+          className={p.isEx(k) ? exampleField : undefined}
           value={p.d[k]}
           onChange={(e) => {
             p.set({ [k]: e.target.value } as Partial<Draft>);

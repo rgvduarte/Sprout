@@ -134,7 +134,7 @@ export default function RevisaoTab() {
         </section>
       )}
 
-      <p className="measure text-sm text-muted">
+      <p className="max-w-[60ch] text-sm text-muted">
         Referências indicadas pelos fundadores: Smartico e Solitics (gamificação de trading), PlayEstates (play-to-earn imobiliário), Coral (app de imobiliário gamificada da Z1), Nasdaq, CFA Institute e Ontario Securities Commission (estudos sobre gamificação no investimento), Fundrise, Arrived e RealtyMogul (crowdfunding imobiliário).
       </p>
     </div>

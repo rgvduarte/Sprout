@@ -322,7 +322,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
             <Badge tone="neutral" className="mr-2 align-[1px]">
               exemplo
             </Badge>
-            Preenchemos o registo com dados fictícios para veres o percurso inteiro. Os campos marcados podem ser alterados; as três perguntas sobre o produto e a assinatura ficam para ti.
+            Preenchemos a identificação, a morada e os documentos com dados fictícios: aparecem com fundo tingido e borda tracejada, e passam a ser teus quando os alteras. As declarações, a adequação e a assinatura ficam para ti.
           </p>
           <Button variant="secondary" size="sm" className="shrink-0 self-start sm:self-center" onClick={() => replace({ ...emptyDraft() })}>
             Começar do zero

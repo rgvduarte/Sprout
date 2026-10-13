@@ -128,12 +128,12 @@ export function ReviewView({ c, profileId, onApprove, onRestart }: { c: CaseView
             Depois da aprovação, cada compromisso faz-se por transferência SEPA a partir da conta que indicaste. Não aceitamos numerário, e o dinheiro fica numa conta segregada, conciliada todos os dias.
           </p>
         </Card>
-        <LearningGoalPanel profileId={profileId} />
       </div>
       <aside className="flex min-w-0 flex-col gap-6" aria-label="Missões e demonstração">
         <Card>
           <RegistrationMissions submitted profileId={profileId} />
         </Card>
+        <LearningGoalPanel profileId={profileId} />
         <Card>
           <h2 className="text-[1.0625rem]">Demonstração</h2>
           <p className="mt-1 text-sm text-muted">Na operação real, a decisão é da equipa de compliance, em Bastidores. Aqui podes simulá-la para veres o resto do percurso.</p>

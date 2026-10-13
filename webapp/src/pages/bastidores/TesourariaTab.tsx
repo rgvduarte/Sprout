@@ -144,7 +144,7 @@ function ReconCard() {
                 { label: 'Fecho', value: time(sel.closedAt), mono: true, hint: sel.status === 'conciliado' ? 'conciliado' : 'diferença resolvida' },
               ]}
             />
-            {sel.note && <p className="measure mt-3 text-sm text-muted">{sel.note}</p>}
+            {sel.note && <p className="max-w-[60ch] mt-3 text-sm text-muted">{sel.note}</p>}
           </>
         ) : null}
       </div>
@@ -341,7 +341,7 @@ export default function TesourariaTab() {
           <div className="flex items-start gap-3">
             <Landmark aria-hidden className="mt-1 size-5 shrink-0 text-accent" strokeWidth={1.75} />
             <div className="min-w-0">
-              <h2 className="text-[1.1875rem] leading-tight">Conta de clientes segregada</h2>
+              <h2 className="text-[1.0625rem] leading-tight sm:text-[1.1875rem]">Conta de clientes segregada</h2>
               <p className="mt-0.5 text-sm text-muted">{PSP_NAME} · IBAN terminado em 4471</p>
             </div>
           </div>
@@ -362,14 +362,14 @@ export default function TesourariaTab() {
           <div className="flex items-start gap-3">
             <Building2 aria-hidden className="mt-1 size-5 shrink-0 text-muted" strokeWidth={1.75} />
             <div className="min-w-0">
-              <h2 className="text-[1.1875rem] leading-tight">Conta operacional Sprout</h2>
+              <h2 className="text-[1.0625rem] leading-tight sm:text-[1.1875rem]">Conta operacional Sprout</h2>
               <p className="mt-0.5 text-sm text-muted">Banco de liquidação na UE · separada da conta de clientes</p>
             </div>
           </div>
           <p className="mt-4 text-[1.75rem] font-semibold leading-tight text-fg pnum">{eur(OPERATING.balance)}</p>
           <p className="text-sm text-muted">saldo ilustrativo de {fmtDate(TODAY_DATE)}</p>
-          <p className="measure mt-4 border-t border-border pt-3 text-sm text-muted">{OPERATING.note}</p>
-          <p className="measure mt-2 text-sm text-muted">Transferências da conta de clientes para a operacional só na liquidação de um lote, pela parte da Sprout, com dupla aprovação.</p>
+          <p className="max-w-[60ch] mt-4 border-t border-border pt-3 text-sm text-muted">{OPERATING.note}</p>
+          <p className="max-w-[60ch] mt-2 text-sm text-muted">Transferências da conta de clientes para a operacional só na liquidação de um lote, pela parte da Sprout, com dupla aprovação.</p>
         </Card>
       </div>
 

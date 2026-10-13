@@ -216,23 +216,17 @@ export const STEPS = [
 
 /* ------------------------------------------------------------ exemplo */
 
+/**
+ * O exemplo preenche só dados factuais (identificação, morada, documentos,
+ * beneficiários). Declarações (conta própria, PEP, sanções), adequação e
+ * assinatura nunca vêm preenchidas: são da pessoa.
+ */
 const EXAMPLE_COMMON: Partial<Draft> = {
   pais: 'PT',
   morada: 'Rua do Almada, 214, 2.º',
   codigoPostal: '4050-032',
   localidade: 'Porto',
-  contaPropria: 'sim',
-  pep: 'nao',
   origemFundos: 'Venda de empresa ou de participações',
-  sancoes: true,
-  exp1: 'Uma a três vezes',
-  exp2: 'Indireta: fundos ou ETC de mercadorias',
-  fin1: 'Mais de 500 000 €',
-  fin2: 'Menos de 10 %',
-  fin3: 'sim',
-  rota: 'pedido',
-  criterios: ['carteira', 'experiencia'],
-  pedidoEscrito: true,
 };
 
 export const EXAMPLE: Record<Tipo, Partial<Draft>> = {

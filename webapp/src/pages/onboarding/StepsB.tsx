@@ -28,7 +28,7 @@ import {
   type UboRow,
 } from './draft';
 import { TF } from './fields';
-import { Appear, FieldGroup, FileDrop, Lbl, type StepProps } from './parts';
+import { Appear, exampleField, FieldGroup, FileDrop, Lbl, type StepProps } from './parts';
 import { formatNif } from './validation';
 
 /* ------------------------------------------------------------ 4 · Beneficiário efetivo e declarações */
@@ -53,16 +53,16 @@ function UboEditor(p: StepProps) {
         {rows.map((r, i) => (
           <div key={r.id} className="grid min-w-0 gap-4 border-b border-border pb-4 last:border-b-0 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.1fr)_6.5rem_auto] sm:items-start">
             <Field id={`ob-ubo-${r.id}-nome`} label={<Lbl ex={isEx('ubos')}>{`Nome · beneficiário ${i + 1}`}</Lbl>} error={err('ubos') ? err(`ubo-${r.id}-nome`) ?? undefined : undefined}>
-              {({ id, describedBy, invalid }) => <Input id={id} aria-describedby={describedBy} invalid={invalid} value={r.nome} onChange={(e) => patchRow(r.id, { nome: e.target.value })} onBlur={() => p.touch('ubos')} />}
+              {({ id, describedBy, invalid }) => <Input id={id} aria-describedby={describedBy} invalid={invalid} className={isEx('ubos') ? exampleField : undefined} value={r.nome} onChange={(e) => patchRow(r.id, { nome: e.target.value })} onBlur={() => p.touch('ubos')} />}
             </Field>
             <Field id={`ob-ubo-${r.id}-nif`} label="NIF" error={err('ubos') ? err(`ubo-${r.id}-nif`) ?? undefined : undefined}>
               {({ id, describedBy, invalid }) => (
-                <Input id={id} aria-describedby={describedBy} invalid={invalid} inputMode="numeric" maxLength={11} value={r.nif} onChange={(e) => patchRow(r.id, { nif: formatNif(e.target.value) })} onBlur={() => p.touch('ubos')} />
+                <Input id={id} aria-describedby={describedBy} invalid={invalid} className={isEx('ubos') ? exampleField : undefined} inputMode="numeric" maxLength={11} value={r.nif} onChange={(e) => patchRow(r.id, { nif: formatNif(e.target.value) })} onBlur={() => p.touch('ubos')} />
               )}
             </Field>
             <Field id={`ob-ubo-${r.id}-tipo`} label="Natureza">
               {({ id }) => (
-                <Select id={id} value={r.tipo} onChange={(e) => patchRow(r.id, { tipo: e.target.value as UboRow['tipo'], pct: e.target.value === 'controlo' ? '' : r.pct })}>
+                <Select id={id} className={isEx('ubos') ? exampleField : undefined} value={r.tipo} onChange={(e) => patchRow(r.id, { tipo: e.target.value as UboRow['tipo'], pct: e.target.value === 'controlo' ? '' : r.pct })}>
                   {UBO_TIPOS.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
@@ -79,6 +79,7 @@ function UboEditor(p: StepProps) {
                   invalid={invalid}
                   inputMode="decimal"
                   suffix="%"
+                  className={isEx('ubos') && r.tipo !== 'controlo' ? exampleField : undefined}
                   disabled={r.tipo === 'controlo'}
                   placeholder={r.tipo === 'controlo' ? 'n.a.' : undefined}
                   value={r.pct}
@@ -201,6 +202,7 @@ export function StepBeneficiario(p: StepProps) {
               id={id}
               aria-describedby={describedBy}
               invalid={invalid}
+              className={isEx('origemFundos') ? exampleField : undefined}
               value={d.origemFundos}
               onChange={(e) => {
                 set({ origemFundos: e.target.value });
@@ -282,7 +284,7 @@ function QuizQuestion({ q, value, onAnswer, error }: { q: (typeof QUIZ)[number];
       )}
       {answered && (
         <Appear className="mt-2 pl-8">
-          <p className={cn('text-sm', right ? 'text-ok-ink' : 'text-warn-ink')}>
+          <p className={cn('measure text-sm', right ? 'text-ok-ink' : 'text-warn-ink')}>
             <span className="font-semibold">{right ? 'Certo. ' : 'Não é bem assim. '}</span>
             <span className="text-fg">{q.explanation}</span>
           </p>
@@ -429,7 +431,7 @@ export function StepAdequacao(p: StepProps & { blockPanel: ReactNode }) {
 
         {(d.rota === 'grande' || d.rota === 'pedido') && (
           <Appear className="mt-5 flex flex-col gap-5">
-            <fieldset data-field="criterios" className="min-w-0 rounded-sm border border-border bg-surface-2 px-4 py-3">
+            <fieldset data-field="criterios" className="min-w-0 pl-8">
               <legend className="sr-only">Critérios cumpridos</legend>
               <p className="text-sm font-medium text-fg">
                 Critérios que cumpres <span className="font-mono text-muted tnum">({d.criterios.length} de 3 · são precisos 2)</span>
@@ -761,7 +763,7 @@ function PilotDocs({ topic, onClose, onTopic }: { topic: DocTopic | null; onClos
 export function BlockPanel({ reason, onWaitlist, onChange }: { reason: 'retail' | 'perda'; onWaitlist: () => void; onChange: () => void }) {
   return (
     <Appear>
-      <section aria-labelledby="ob-block-title" className="rounded-md border border-border bg-surface-2 px-5 py-5 sm:px-6">
+      <section aria-labelledby="ob-block-title" className="border-t border-border pt-7">
         <h3 id="ob-block-title" className="text-[1.25rem]">
           {reason === 'retail' ? 'No piloto, o acesso está limitado a investidores qualificados' : 'Os lotes podem perder parte ou todo o capital'}
         </h3>

@@ -30,15 +30,18 @@ export function ExampleTag({ show }: { show: boolean }) {
   return <span className="ml-2 rounded-xs bg-surface-2 px-1.5 py-0.5 align-[1px] text-xs font-medium text-neutral-ink">exemplo</span>;
 }
 
-/** Rótulo com a marca de exemplo. */
-export function Lbl({ children, ex }: { children: ReactNode; ex?: boolean }) {
+/** Rótulo de um campo de texto ou lista: o exemplo vê-se no próprio campo (fundo tingido, borda tracejada). */
+export function Lbl({ children, ex, visible }: { children: ReactNode; ex?: boolean; visible?: boolean }) {
   return (
     <>
       {children}
-      <ExampleTag show={Boolean(ex)} />
+      {visible ? <ExampleTag show={Boolean(ex)} /> : ex ? <span className="sr-only"> (valor de exemplo)</span> : null}
     </>
   );
 }
+
+/** Classes do campo enquanto mostra o valor de exemplo. */
+export const exampleField = 'border-dashed bg-[color-mix(in_oklab,var(--accent)_7%,var(--surface))]';
 
 /* ------------------------------------------------------------ barra de missões */
 
@@ -172,7 +175,6 @@ export function FileDrop({
       <p className="mb-1.5 text-sm font-medium text-fg">
         {label}
         {!required && <span className="text-muted"> (se aplicável)</span>}
-        <ExampleTag show={Boolean(ex && file?.example)} />
       </p>
       <input
         ref={input}
@@ -188,7 +190,7 @@ export function FileDrop({
         }}
       />
       {file ? (
-        <div className="flex min-w-0 items-center gap-3 rounded-sm border border-border bg-surface px-3 py-2.5">
+        <div className="flex min-w-0 items-center gap-3 border-y border-border py-2">
           <FileCheck2 aria-hidden className="size-5 shrink-0 text-ok-ink" strokeWidth={1.75} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[0.9375rem] text-fg" title={file.name}>
@@ -222,7 +224,7 @@ export function FileDrop({
           onDrop={onDrop}
           className={cn(
             'flex min-w-0 flex-col items-start gap-3 rounded-sm border border-dashed px-4 py-4 transition-colors duration-150 sm:flex-row sm:items-center',
-            over ? 'border-accent bg-accent-soft' : shownError ? 'border-crit bg-surface' : 'border-[color-mix(in_oklab,var(--fg)_28%,var(--border))] bg-surface',
+            over ? 'border-accent bg-accent-soft' : shownError ? 'border-crit' : 'border-[color-mix(in_oklab,var(--fg)_28%,var(--border))]',
           )}
         >
           <span aria-hidden className={cn('inline-flex size-10 shrink-0 items-center justify-center rounded-sm', over ? 'bg-surface text-accent' : 'bg-surface-2 text-muted')}>

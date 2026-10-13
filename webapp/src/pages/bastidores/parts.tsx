@@ -88,7 +88,7 @@ export function KpiHistory({ values, labels, kind, format, target, track, label,
         </rect>
       ))}
       {labels.map((l, i) => (
-        <text key={l + i} x={cx(i)} y={H - 6} textAnchor="middle" fontSize="10.5" fontFamily="var(--font-mono)" fill={i === n - 1 ? 'var(--fg)' : 'var(--muted)'}>
+        <text key={l + i} x={cx(i)} y={H - 5} textAnchor="middle" fontSize="11.5" fontFamily="var(--font-mono)" fill={i === n - 1 ? 'var(--fg)' : 'var(--muted)'}>
           {l}
         </text>
       ))}
@@ -466,3 +466,18 @@ export function Row({ label, value, hint, className }: { label: ReactNode; value
 }
 
 export const worldName = (w: WorldId) => getWorld(w).commodity;
+
+/** Cabeçalho de cartão com ações que passam para baixo do título em ecrãs estreitos (sem espremer o título). */
+export function HeaderRow({ title, description, actions, id }: { title: ReactNode; description?: ReactNode; actions?: ReactNode; id?: string }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+      <div className="min-w-[min(100%,18rem)] flex-1">
+        <h2 id={id} className="text-[1.1875rem] leading-tight">
+          {title}
+        </h2>
+        {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+    </div>
+  );
+}

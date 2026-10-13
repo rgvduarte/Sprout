@@ -44,13 +44,13 @@ interface KpiRowProps {
 
 function KpiRow({ label, note, value, sub, tone, toneLabel, history }: KpiRowProps) {
   return (
-    <li className="grid grid-cols-[minmax(0,1fr)_minmax(0,12.5rem)] items-start gap-x-6 gap-y-3 border-t border-border py-4 first:border-t-0 first:pt-1 xl:grid-cols-[minmax(0,1fr)_11.5rem_13.75rem] xl:gap-x-8">
+    <li className="grid grid-cols-[minmax(0,1fr)_minmax(0,11rem)] items-start gap-x-4 gap-y-3 border-t border-border py-4 first:border-t-0 first:pt-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,13.75rem)] sm:gap-x-6 xl:grid-cols-[minmax(0,1fr)_11.5rem_13.75rem] xl:gap-x-8">
       <div className="col-span-2 min-w-0 xl:col-span-1">
         <h3 className="text-[1rem] leading-snug">{label}</h3>
-        <p className="measure mt-1 text-sm text-muted">{note}</p>
+        <p className="max-w-[60ch] mt-1 text-sm text-muted">{note}</p>
       </div>
       <div className="min-w-0">
-        <p className="text-[1.5rem] font-semibold leading-tight text-fg pnum">{value}</p>
+        <p className="text-[1.3125rem] font-semibold leading-tight text-fg pnum sm:text-[1.5rem]">{value}</p>
         {sub && <p className="mt-0.5 text-sm text-muted">{sub}</p>}
         <StatusPill className="mt-2" tone={tone} label={toneLabel ?? TONE_LABEL[tone]} />
       </div>
@@ -239,8 +239,8 @@ export default function PilotoTab() {
           <KpiRow
             label="Reconciliação diária e quebras"
             note={`${rec.note} Hoje: ${st.recon ? `conciliado às ${st.recon.at.slice(11, 16)}` : 'por executar (SLA até às 20:00)'}.`}
-            value={`${num(rec.value)} de 30 dias`}
-            sub={`${plural(recon.breaks.length, 'quebra', 'quebras')} · ${num(recon.open.length)} em aberto`}
+            value={`${num(rec.value)} dias`}
+            sub={`de 30 sem diferença em aberto · ${plural(recon.breaks.length, 'quebra', 'quebras')}`}
             tone={recon.open.length === 0 ? 'ok' : 'warn'}
             toneLabel={recon.open.length === 0 ? 'Sem quebras em aberto' : undefined}
             history={<KpiHistory kind="line" values={rec.history} target={rec.target} labels={HISTORY_LABELS} format={(v) => `${num(v)} dias`} label="Dias reconciliados sem diferença em aberto, por mês" />}
