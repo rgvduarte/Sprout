@@ -99,13 +99,14 @@ const { events } = useData(); const feed = useFeed();
 ### Movimento e scroll (`motion.tsx`)
 | export | uso |
 |---|---|
-| `Chapter` | capítulo fixo (sticky) com orçamento de altura ≤ 250vh. `children` pode ser `(progress, rich) => …`. Abaixo de 900 px ou com movimento reduzido fica empilhado e recebe `progress = 1` (o conteúdo tem de estar completo nesse estado). |
+| `Chapter` | capítulo fixo (sticky) com orçamento de altura ≤ 250vh. `topOffset` (px) fixa o painel por baixo da barra superior ou de uma barra de capítulos. `children` pode ser `(progress, rich) => …`. Abaixo de 900 px ou com movimento reduzido fica empilhado e recebe `progress = 1` (o conteúdo tem de estar completo nesse estado). |
 | `ScrollProgress` | barra fina + rótulos de capítulo: `<ScrollProgress chapters={[{ id: 'origem', label: 'Origem' }, …]} />` (os ids são os dos `Chapter`). |
 | `Reveal` | entrada única para blocos abaixo da dobra; nunca esconde texto. |
 | `ParallaxLayer` | só camadas decorativas; desligado < 900 px e com movimento reduzido. |
 | `useSectionProgress(ref, offset?)` | progresso 0–1 de uma secção no viewport. |
 | `useRichMotion()` | `true` com ≥ 900 px e sem movimento reduzido. |
 | `useStaticProgress(v)` | MotionValue constante para estados finais. |
+| `useMapRange(v, [a, b], [x, y])` | interpolação por troços calculada em JS. Usar em vez de `useTransform(v, [a, b], [x, y])` com progresso de scroll: a forma com intervalos pode ir para o ScrollTimeline nativo e, dentro de um `Chapter`, não segue o capítulo. |
 | `CountUp` | conta grandezas físicas (kg, paletes); não usar para euros. |
 | `DrawPath` | caminho SVG que se desenha (ligado a `progress` ou uma vez ao entrar). |
 | `EASE_OUT`, `DUR` | curva `cubic-bezier(0.16, 1, 0.3, 1)`; 120 / 220 / 400 / 700 ms. |

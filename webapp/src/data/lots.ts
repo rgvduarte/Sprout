@@ -26,7 +26,7 @@ export const RESERVE_SHARE = 0.1;
 export const SETTLEMENT_MONTHS = 18;
 export const EXTENSION_MONTHS = 6;
 
-function economics(o: { ref: number; discount: number; acq: number; costs: number; decimals: number; captured?: number }): LotEconomics {
+function economics(o: { ref: number; discount: number; acq: number; costs: number; decimals: number }): LotEconomics {
   const buyerPrice = round(o.ref * (1 - o.discount), o.decimals);
   const fundingPrice = round(o.acq + o.costs, o.decimals);
   const grossMargin = round(buyerPrice - fundingPrice, o.decimals);
@@ -44,7 +44,6 @@ function economics(o: { ref: number; discount: number; acq: number; costs: numbe
     investorShare: INVESTOR_SHARE,
     reserveShare: RESERVE_SHARE,
     expectedRange: [round(low, 3), round(high, 3)],
-    packagerMarginCaptured: o.captured ?? 0.85,
   };
 }
 

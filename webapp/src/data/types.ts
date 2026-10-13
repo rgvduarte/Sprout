@@ -197,8 +197,6 @@ export interface LotEconomics {
   reserveShare: number;
   /** liquidação prevista em 18 meses, como fração do capital, [baixo, alto]. Não garantida. */
   expectedRange: [number, number];
-  /** fração da margem do embalador capturada (tese 80–90 %) */
-  packagerMarginCaptured: number;
 }
 
 export interface Lot {

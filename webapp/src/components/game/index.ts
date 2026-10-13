@@ -23,6 +23,8 @@ export {
   CountUp,
   DrawPath,
   useSectionProgress,
+  useMapRange,
+  mapRange,
   useStaticProgress,
   useRichMotion,
   EASE_OUT,

@@ -2,7 +2,7 @@ import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from '
 import { motion, useTransform, type MotionValue } from 'motion/react';
 import { getMarketSeries, priceUnit } from '../../data';
 import type { Lot } from '../../data/types';
-import { DrawPath } from '../../components/game';
+import { DrawPath, useMapRange } from '../../components/game';
 import { ChartFrame } from '../../components/ui';
 import { MONTHS_SHORT, num, pct, price } from '../../lib/format';
 import { seriesColor, useTokens } from '../../lib/useTokens';
@@ -72,10 +72,10 @@ export function PriceChart({ lot, end, progress, today = '2026-10-13' }: { lot: 
   const histPath = rows.map((r, i) => `${i === 0 ? 'M' : 'L'}${X(monthsSince(r.t) + 0.5).toFixed(1)},${Y(r.ref).toFixed(1)}`).join(' ');
   const lineAt = (v: number) => `M${X(x0).toFixed(1)},${Y(v).toFixed(1)} H${X(xEnd).toFixed(1)}`;
 
-  const histP = useTransform(progress, [0.02, 0.5], [0, 1], { clamp: true });
-  const levelsP = useTransform(progress, [0.45, 0.72], [0, 1], { clamp: true });
-  const bandW = useTransform(progress, [0.5, 0.8], [0, X(xEnd) - X(x0)], { clamp: true });
-  const labelsO = useTransform(progress, [0.7, 0.86], [0, 1], { clamp: true });
+  const histP = useMapRange(progress, [0.02, 0.5], [0, 1]);
+  const levelsP = useMapRange(progress, [0.45, 0.72], [0, 1]);
+  const bandW = useMapRange(progress, [0.5, 0.8], [0, X(xEnd) - X(x0)]);
+  const labelsO = useMapRange(progress, [0.7, 0.86], [0, 1]);
   const histO = useTransform(histP, (v) => (v > 0.005 ? 1 : 0));
   const levelsO = useTransform(levelsP, (v) => (v > 0.005 ? 1 : 0));
 

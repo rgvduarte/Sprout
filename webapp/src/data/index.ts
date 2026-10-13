@@ -29,6 +29,7 @@ export { WORLDS, REGIONS } from './worlds';
 export { PRODUCERS } from './producers';
 export { LOTS, INVESTOR_SHARE, RESERVE_SHARE, SETTLEMENT_MONTHS, EXTENSION_MONTHS } from './lots';
 export { MARKET, MARKET_TODAY } from './market';
+export { PRODUCER_PRICE_TODAY, CHAIN_DIFFERENTIAL, OLIVE_CHAIN_FACTS, FOUNDERS_THESIS } from './valueChain';
 export { INVESTORS, DEMO_INVESTOR_ID, SEED_POSITIONS, SEED_SEALS } from './investors';
 export { LEVELS, MODULES, QUESTS, SEALS, DEMO_PROGRESS, SIM_COMPLETE_POINTS, LEVEL_PERKS, REWARDS } from './game';
 export * from './minigames';

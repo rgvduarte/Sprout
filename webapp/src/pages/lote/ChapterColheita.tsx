@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
 import { Check, FileText, Minus } from 'lucide-react';
 import type { QualityAnalysis, QualityParam } from '../../data/types';
-import { Chapter, LotGauge, SeasonTrack } from '../../components/game';
+import { Chapter, LotGauge, SeasonTrack, useMapRange } from '../../components/game';
 import { Badge, Button, Drawer, KeyValue } from '../../components/ui';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, num } from '../../lib/format';
@@ -74,7 +74,7 @@ function AnalysisSheet({ analysis, progress }: { analysis: QualityAnalysis; prog
 function ParamRowTimed({ p, i, n, progress }: { p: QualityParam; i: number; n: number; progress: MotionValue<number> }) {
   const a = 0.38 + (i / n) * 0.42;
   const b = a + 0.42 / n + 0.06;
-  const t = useTransform(progress, [a, b], [0, 1], { clamp: true });
+  const t = useMapRange(progress, [a, b], [0, 1]);
   return <ParamRow p={p} t={t} />;
 }
 
@@ -120,7 +120,7 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
   const sheetRef = useRef<HTMLDivElement>(null);
   const firing = useRef(false);
   const stockFrac = lot.quantity > 0 ? Math.min(1, lot.stock / lot.quantity) : 0;
-  const fill = useTransform(progress, [0.04, 0.4], [0, stockFrac], { clamp: true });
+  const fill = useMapRange(progress, [0.04, 0.4], [0, stockFrac]);
   const stockText = useTransform(fill, (v) => stockLabel(lot, Math.round(v * lot.quantity)));
 
   const markRead = useCallback(() => {

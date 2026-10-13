@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, useMotionValueEvent, useTransform, type MotionValue } from 'motion/react';
 import { REFUNDING_PLAYBOOKS } from '../../data';
-import { Chapter, HarvestBand } from '../../components/game';
+import { Chapter, HarvestBand, useMapRange } from '../../components/game';
 import { addMonths, toDate } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, lisbonParts, monthYear, pct } from '../../lib/format';
@@ -67,8 +67,8 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
   const curveArea = curvePts.length ? `${curveLine} L${X(win.end).toFixed(1)},${plotBottom} Z` : '';
 
   // cursor ligado ao scroll (janela 0–18) e a bifurcação no fim
-  const cursor = useTransform(progress, [0.04, 0.8], [0, 1], { clamp: true });
-  const forkP = useTransform(progress, [0.8, 0.95], [0, 1], { clamp: true });
+  const cursor = useMapRange(progress, [0.04, 0.8], [0, 1]);
+  const forkP = useMapRange(progress, [0.8, 0.95], [0, 1]);
   const xStart = X(win.start);
   const xEnd = X(win.end);
   const cursorX = useTransform(cursor, (v) => xStart + (xEnd - xStart) * v);
