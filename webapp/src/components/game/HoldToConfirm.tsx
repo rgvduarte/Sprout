@@ -7,9 +7,17 @@ import { Checkbox } from '../ui/Form';
 
 /* =====================================================================
    HoldToConfirm · confirmação por pressão contínua (~1,2 s). O anel enche
-   enquanto se mantém premido; soltar antes cancela. Teclado: manter Espaço
-   ou Enter. Alternativa acessível: confirmação com caixa de verificação.
+   enquanto se mantém premido; soltar antes cancela, tal como arrastar o
+   ponteiro para fora do botão (8 px de folga) ou, no toque, mover o dedo
+   mais de 10 px (um deslize vertical faz scroll e cancela). Teclado: manter
+   Espaço ou Enter. Alternativa acessível: confirmação com caixa de
+   verificação.
    ===================================================================== */
+
+/** folga à volta do botão antes de cancelar (rato, caneta) */
+const LEAVE_SLACK = 8;
+/** deslocação máxima do dedo antes de cancelar (toque) */
+const TOUCH_SLOP = 10;
 
 export interface HoldToConfirmProps {
   onConfirm: () => void;
@@ -49,6 +57,7 @@ export function HoldToConfirm({
   const [altChecked, setAltChecked] = useState(false);
   const raf = useRef<number | null>(null);
   const start = useRef(0);
+  const origin = useRef<{ x: number; y: number; id: number; type: string } | null>(null);
   const statusRef = useRef(status);
   statusRef.current = status;
 
@@ -79,11 +88,12 @@ export function HoldToConfirm({
     raf.current = requestAnimationFrame(tick);
   };
 
-  const cancel = () => {
+  const cancel = (why: 'soltar' | 'fora' = 'soltar') => {
+    origin.current = null;
     if (statusRef.current !== 'holding') return;
     stopLoop();
     setStatus('idle');
-    setAnnounce('Confirmação cancelada. Soltaste antes do fim.');
+    setAnnounce(why === 'fora' ? 'Confirmação cancelada. O ponteiro saiu do botão.' : 'Confirmação cancelada. Soltaste antes do fim.');
     if (reduce) progress.set(0);
     else animate(progress, 0, { duration: 0.2, ease: [0.7, 0, 0.84, 0] });
   };
@@ -92,8 +102,25 @@ export function HoldToConfirm({
 
   const onPointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     if (e.button !== 0) return;
+    origin.current = { x: e.clientX, y: e.clientY, id: e.pointerId, type: e.pointerType };
+    // a captura só garante que o pointerup chega a este botão; sair do botão é verificado em onPointerMove
     e.currentTarget.setPointerCapture?.(e.pointerId);
     begin();
+  };
+  const onPointerMove = (e: PointerEvent<HTMLButtonElement>) => {
+    const o = origin.current;
+    if (!o || o.id !== e.pointerId || statusRef.current !== 'holding') return;
+    if (o.type === 'touch') {
+      if (Math.hypot(e.clientX - o.x, e.clientY - o.y) > TOUCH_SLOP) cancel('fora');
+      return;
+    }
+    const r = e.currentTarget.getBoundingClientRect();
+    const outside = e.clientX < r.left - LEAVE_SLACK || e.clientX > r.right + LEAVE_SLACK || e.clientY < r.top - LEAVE_SLACK || e.clientY > r.bottom + LEAVE_SLACK;
+    if (outside) cancel('fora');
+  };
+  const onPointerEnd = (e: PointerEvent<HTMLButtonElement>) => {
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    cancel();
   };
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
     if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
@@ -111,7 +138,7 @@ export function HoldToConfirm({
   };
 
   const done = status === 'done';
-  const reasonId = disabled && disabledReason ? `htc-${uid}-reason` : undefined;
+  const reasonId = disabled && disabledReason && !done ? `htc-${uid}-reason` : undefined;
 
   return (
     <div className={cn('min-w-0', className)}>
@@ -120,17 +147,19 @@ export function HoldToConfirm({
         aria-disabled={disabled || done || undefined}
         aria-describedby={[reasonId, `htc-${uid}-hint`].filter(Boolean).join(' ')}
         onPointerDown={onPointerDown}
-        onPointerUp={cancel}
-        onPointerLeave={cancel}
-        onPointerCancel={cancel}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
+        onLostPointerCapture={() => cancel()}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
-        onBlur={cancel}
+        onBlur={() => cancel()}
         onContextMenu={(e) => e.preventDefault()}
         onClick={(e) => e.preventDefault()}
         className={cn(
-          'relative flex h-14 w-full touch-none select-none items-center gap-3 overflow-hidden rounded-sm px-4 text-left font-medium transition-colors duration-150 sm:w-auto sm:min-w-[340px]',
-          disabled ? 'cursor-not-allowed bg-surface-2 text-muted' : done ? 'bg-accent-soft text-fg' : 'bg-accent text-accent-fg hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--fg))]',
+          // pan-y: um deslize vertical que comece no botão faz scroll da página (e o browser cancela o gesto)
+          'relative flex h-14 w-full touch-pan-y select-none items-center gap-3 overflow-hidden rounded-sm px-4 text-left font-medium transition-colors duration-150 [-webkit-touch-callout:none] sm:w-auto sm:min-w-[340px]',
+          done ? 'bg-accent-soft text-fg' : disabled ? 'cursor-not-allowed bg-surface-2 text-muted' : 'bg-accent text-accent-fg hover:bg-[color-mix(in_oklab,var(--accent)_88%,var(--fg))]',
         )}
       >
         {/* preenchimento da barra (feedback espacial) */}
@@ -147,7 +176,7 @@ export function HoldToConfirm({
       <p id={`htc-${uid}-hint`} className="mt-2 text-sm text-muted">
         {done ? 'Compromisso registado.' : 'Mantém premido cerca de 1 segundo (rato, toque, Espaço ou Enter). Soltar antes cancela.'}
       </p>
-      {reasonId && (
+      {reasonId && !done && (
         <p id={reasonId} className="mt-1 text-sm text-warn-ink">
           {disabledReason}
         </p>

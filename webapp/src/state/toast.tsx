@@ -17,7 +17,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const dismiss = useCallback((id: string) => setItems((list) => list.filter((t) => t.id !== id)), []);
   const toast = useCallback((t: ToastInput) => {
     const id = `t${++counter.current}`;
-    setItems((list) => [...list.slice(-3), { ...t, id }]);
+    // fila curta: um aviso igual ao que já está na fila não se repete
+    setItems((list) => (list.some((x) => x.title === t.title && x.description === t.description) ? list : [...list.slice(-5), { ...t, id }]));
     return id;
   }, []);
 

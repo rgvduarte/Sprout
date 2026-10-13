@@ -41,13 +41,16 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   icon?: ReactNode;
 }
 
-/** Etiqueta curta com tom. Para estados use StatusPill. */
+/**
+ * Etiqueta curta com tom. Para estados use StatusPill. Nunca corta o texto:
+ * sem espaço, parte em linhas (um estado cortado esconde o que importa).
+ */
 export function Badge({ tone = 'neutral', size = 'sm', dot, icon, className, children, ...rest }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-xs border font-medium leading-none',
-        size === 'sm' ? 'h-6 px-2 text-[0.8125rem]' : 'h-7 px-2.5 text-sm',
+        'inline-flex max-w-full items-center gap-1.5 rounded-xs border text-left font-medium leading-tight',
+        size === 'sm' ? 'min-h-6 px-2 py-[3px] text-[0.8125rem]' : 'min-h-7 px-2.5 py-1 text-sm',
         TONE_SOFT[tone],
         className,
       )}
@@ -55,7 +58,7 @@ export function Badge({ tone = 'neutral', size = 'sm', dot, icon, className, chi
     >
       {dot && <span aria-hidden className={cn('size-1.5 shrink-0 rounded-full', TONE_DOT[tone])} />}
       {icon}
-      <span className="truncate">{children}</span>
+      <span className="min-w-0 text-balance">{children}</span>
     </span>
   );
 }

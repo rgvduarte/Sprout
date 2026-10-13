@@ -127,7 +127,7 @@ export function Skeleton({ className, label = 'A carregar' }: { className?: stri
  */
 export function RiskNote({ className, compact }: { className?: string; compact?: boolean }) {
   return (
-    <p className={cn('flex items-start gap-2 text-sm text-muted', className)}>
+    <p className={cn('flex items-start gap-2 text-sm text-muted', !compact && 'max-w-[68ch]', className)}>
       <ShieldAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-warn-ink" strokeWidth={1.75} />
       <span>
         <strong className="font-semibold text-fg">Capital em risco.</strong>{' '}

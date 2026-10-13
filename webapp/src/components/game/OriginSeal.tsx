@@ -170,7 +170,18 @@ export function WaxSealStamp({ stamped, onStamped, size = 128, ...props }: WaxSe
               className="absolute inset-0"
               initial={animateIn ? (reduce ? { opacity: 0 } : { opacity: 0, scale: 1.45, rotate: -10, y: -14 }) : false}
               animate={reduce ? { opacity: 1 } : { opacity: 1, scale: [1.45, 0.96, 1], rotate: [-10, 1, 0], y: [-14, 0, 0] }}
-              transition={reduce ? { duration: 0.2 } : { duration: 0.52, times: [0, 0.78, 1], ease: EASE_OUT }}
+              // transições por propriedade: `times` de 3 keyframes só vale para o movimento; a opacidade (2 keyframes)
+              // sobe uma vez e fica a 1 (um `times` partilhado fazia o lacre aparecer e desvanecer durante o esmagamento)
+              transition={
+                reduce
+                  ? { duration: 0.2 }
+                  : {
+                      scale: { duration: 0.52, times: [0, 0.78, 1], ease: EASE_OUT },
+                      rotate: { duration: 0.52, times: [0, 0.78, 1], ease: EASE_OUT },
+                      y: { duration: 0.52, times: [0, 0.78, 1], ease: EASE_OUT },
+                      opacity: { duration: 0.12, ease: 'linear' },
+                    }
+              }
             >
               <OriginSeal {...props} showCaption={false} size={size} state="earned" />
             </motion.div>

@@ -6,7 +6,7 @@ import { eur } from '../lib/format';
 import { readStorage, STORAGE_KEYS, writeStorage } from '../lib/storage';
 import { useLiveFeed, type LiveFeed } from '../lib/useLiveFeed';
 import { useMediaQuery } from '../lib/useMediaQuery';
-import { gameReducer, initialGameState, knowledgePoints, mergeLot, type GameState, type KycDecisionKind, type ProfileId, type ProfileState } from './gameStore';
+import { gameReducer, initialGameState, knowledgePoints, mergeLot, type GameState, type KycDecisionKind, type ProfileId, type ProfileState, type StoreProfileId } from './gameStore';
 import { ToastProvider, useToast } from './toast';
 
 /* =====================================================================
@@ -31,6 +31,9 @@ export function applyTheme(theme: ThemePref) {
   if (theme === 'system') el.removeAttribute('data-theme');
   else el.setAttribute('data-theme', theme);
 }
+
+/** Motivo visível quando a Equipa Sprout chega ao ritual de compromisso. */
+export const TEAM_VIEW_MESSAGE = 'Vista da equipa: só o investidor pode comprometer capital.';
 
 /** Dias do período de reflexão depois de um compromisso (política Sprout, à imagem dos 4 dias do ECSP). */
 export const REFLECTION_DAYS = 4;
@@ -59,7 +62,7 @@ export interface ThemeCtx {
   resolved: 'light' | 'dark';
 }
 
-export type CommitFailure = 'onboarding' | 'bloqueado' | 'lote-indisponivel' | 'riscos-por-ler' | 'montante-minimo' | 'montante-maximo';
+export type CommitFailure = 'onboarding' | 'bloqueado' | 'equipa' | 'lote-indisponivel' | 'riscos-por-ler' | 'montante-minimo' | 'montante-maximo';
 
 export type CommitResult =
   | { ok: true; position: Position; sealId?: string; firstSealForOrigin: boolean }
@@ -98,15 +101,21 @@ export interface GameActions {
 
 export interface GameCtx {
   state: GameState;
+  /** perfil de leitura (posições semente, investidor): a equipa lê como 'demo' */
   profileId: ProfileId;
+  /** perfil ativo na loja (a equipa tem um perfil próprio) */
   profile: ProfileState;
   actions: GameActions;
+  /** vista da Equipa Sprout: não compromete capital em nome da investidora */
+  teamView: boolean;
 }
 
 export const RoleContext = createContext<RoleCtx | null>(null);
 export const ThemeContext = createContext<ThemeCtx | null>(null);
 export const GameContext = createContext<GameCtx | null>(null);
 export const FeedContext = createContext<LiveFeed | null>(null);
+/** Referência estável ao Diário ao vivo (lida sem subscrever as leituras). */
+export const FeedRefContext = createContext<{ readonly current: LiveFeed } | null>(null);
 
 /* ------------------------------------------------------------ provider */
 
@@ -140,13 +149,16 @@ function AppState({ children }: { children: ReactNode }) {
   useEffect(() => applyTheme(theme), [theme]);
 
   const profileId: ProfileId = role === 'visitante' ? 'visitante' : 'demo';
-  const profileRef = useRef(profileId);
-  profileRef.current = profileId;
-  const profile = state.profiles[profileId];
+  const teamView = role === 'equipa';
+  // a equipa lê os dados da investidora mas aprende e joga num perfil próprio
+  const storeProfile: StoreProfileId = teamView ? 'equipa' : profileId;
+  const profileRef = useRef(storeProfile);
+  profileRef.current = storeProfile;
+  const profile = state.profiles[storeProfile];
 
   /* ---- avisos de missões, níveis e selos (conhecimento, nunca dinheiro) ---- */
-  const seen = useRef<{ profile: ProfileId; quests: Set<string>; seals: Set<string>; points: number }>({
-    profile: profileId,
+  const seen = useRef<{ profile: StoreProfileId; quests: Set<string>; seals: Set<string>; points: number }>({
+    profile: storeProfile,
     quests: new Set(profile.questsCompleted.map((q) => q.id)),
     seals: new Set(profile.seals.map((s) => s.sealId)),
     points: knowledgePoints(profile),
@@ -154,8 +166,8 @@ function AppState({ children }: { children: ReactNode }) {
   useEffect(() => {
     const s = seen.current;
     const points = knowledgePoints(profile);
-    if (s.profile !== profileId) {
-      seen.current = { profile: profileId, quests: new Set(profile.questsCompleted.map((q) => q.id)), seals: new Set(profile.seals.map((x) => x.sealId)), points };
+    if (s.profile !== storeProfile) {
+      seen.current = { profile: storeProfile, quests: new Set(profile.questsCompleted.map((q) => q.id)), seals: new Set(profile.seals.map((x) => x.sealId)), points };
       return;
     }
     for (const q of profile.questsCompleted) {
@@ -176,7 +188,7 @@ function AppState({ children }: { children: ReactNode }) {
     const after = levelForPoints(points).level;
     if (after.minPoints > before.minPoints) toast({ tone: 'accent', title: `Novo nível de conhecimento: ${after.nome}`, description: after.description });
     s.points = points;
-  }, [profile, profileId, toast]);
+  }, [profile, storeProfile, toast]);
 
   /* ---- ações ---- */
   const checkCommit = useCallback(
@@ -186,6 +198,7 @@ function AppState({ children }: { children: ReactNode }) {
       const p = st.profiles[pid];
       const base = getLot(lotId);
       if (!base) return { ok: false, reason: 'lote-indisponivel', message: 'Este lote não existe.' };
+      if (pid === 'equipa') return { ok: false, reason: 'equipa', message: TEAM_VIEW_MESSAGE };
       const lot = mergeLot(base, st.lotDeltas);
       if (p.onboarding.status === 'bloqueado')
         return { ok: false, reason: 'bloqueado', message: 'O piloto está fechado a investidores qualificados. A tua classificação não permite comprometer capital nesta fase.' };
@@ -193,7 +206,7 @@ function AppState({ children }: { children: ReactNode }) {
       if (!isInvestable(lot)) return { ok: false, reason: 'lote-indisponivel', message: 'Este lote não está aberto a financiamento.' };
       const read = p.riskRead[lotId] ?? [];
       const missing = lot.riskFactors.filter((r) => !read.includes(r.id)).length;
-      if (missing > 0) return { ok: false, reason: 'riscos-por-ler', message: `Faltam ler ${missing} de ${lot.riskFactors.length} fatores de risco.` };
+      if (missing > 0) return { ok: false, reason: 'riscos-por-ler', message: `Falta ler ${missing} de ${lot.riskFactors.length} fatores de risco.` };
       const max = maxCommit(lot);
       const min = Math.min(lot.funding.minTicket, max);
       if (amount < min) return { ok: false, reason: 'montante-minimo', message: `O montante mínimo neste lote é ${eur(min)}.` };
@@ -232,7 +245,7 @@ function AppState({ children }: { children: ReactNode }) {
         commitSeq.current += 1;
         const position: Position = {
           id: `pos-s${commitSeq.current}-${lotId}`,
-          investorId: pid() === 'demo' ? 'inv-marta-calado' : 'visitante',
+          investorId: pid() === 'visitante' ? 'visitante' : 'inv-marta-calado',
           lotId,
           amount: Math.round(amount),
           committedAt: at.toISOString(),
@@ -263,19 +276,23 @@ function AppState({ children }: { children: ReactNode }) {
   }, [checkCommit]);
 
   const feed = useLiveFeed({ enabled: true });
+  const feedRef = useRef(feed);
+  feedRef.current = feed;
 
   const roleValue = useMemo<RoleCtx>(
     () => ({ role, setRole, roleLabel: ROLE_LABEL[role], profileId, isTeam: role === 'equipa', isVisitor: role === 'visitante' }),
     [role, setRole, profileId],
   );
   const themeValue = useMemo<ThemeCtx>(() => ({ theme, setTheme, resolved: theme === 'system' ? (systemDark ? 'dark' : 'light') : theme }), [theme, setTheme, systemDark]);
-  const gameValue = useMemo<GameCtx>(() => ({ state, profileId, profile, actions }), [state, profileId, profile, actions]);
+  const gameValue = useMemo<GameCtx>(() => ({ state, profileId, profile, actions, teamView }), [state, profileId, profile, actions, teamView]);
 
   return (
     <RoleContext.Provider value={roleValue}>
       <ThemeContext.Provider value={themeValue}>
         <GameContext.Provider value={gameValue}>
-          <FeedContext.Provider value={feed}>{children}</FeedContext.Provider>
+          <FeedRefContext.Provider value={feedRef}>
+            <FeedContext.Provider value={feed}>{children}</FeedContext.Provider>
+          </FeedRefContext.Provider>
         </GameContext.Provider>
       </ThemeContext.Provider>
     </RoleContext.Provider>

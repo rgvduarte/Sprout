@@ -313,6 +313,14 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
+/* Avisos: no telemóvel por baixo da barra superior; na jornada do lote, por baixo também da barra de capítulos
+   (a nota de capital em risco fica sempre à vista). A partir de 640 px vão para o canto inferior direito. */
+[data-toast-root] { top: 57px; }
+body:has([data-chrome="jornada"]) [data-toast-root] { top: 102px; }
+@media (min-width: 640px) {
+  [data-toast-root], body:has([data-chrome="jornada"]) [data-toast-root] { top: auto; }
+}
+
 /* Slider (input range) com trilho do mesmo tom */
 .sprout-range { --track: color-mix(in oklab, var(--accent) 18%, var(--surface-2)); }
 .sprout-range::-webkit-slider-runnable-track {

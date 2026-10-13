@@ -1,4 +1,4 @@
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useId, useRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
@@ -97,8 +97,9 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({ label, description, className, id, ...rest }, ref) {
   const auto = useId();
   const cid = id ?? `c${auto.replace(/:/g, '')}`;
+  // a linha inteira (caixa + texto) é a área de toque, com pelo menos 44 px de altura
   return (
-    <div className={cn('flex min-h-11 items-start gap-3 py-1.5', className)}>
+    <label htmlFor={cid} className={cn('flex min-h-11 cursor-pointer items-start gap-3 py-1.5', rest.disabled && 'cursor-not-allowed', className)}>
       <span className="relative mt-0.5 inline-flex size-5 shrink-0">
         <input
           ref={ref}
@@ -110,15 +111,15 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         />
         <Check aria-hidden className="pointer-events-none absolute inset-0.5 size-4 text-accent-fg opacity-0 peer-checked:opacity-100" strokeWidth={2.5} />
       </span>
-      <label htmlFor={cid} className="min-w-0 cursor-pointer">
+      <span className="min-w-0">
         <span className="block text-fg">{label}</span>
         {description && (
           <span id={`${cid}-d`} className="mt-0.5 block text-sm text-muted">
             {description}
           </span>
         )}
-      </label>
-    </div>
+      </span>
+    </label>
   );
 });
 
@@ -203,15 +204,25 @@ export interface SegmentOption<V extends string> {
   ariaLabel?: string;
 }
 
-/** Escolha exclusiva compacta (radiogroup), p.ex. filtros e tema. */
+/** Escolha exclusiva compacta (radiogroup), p.ex. filtros e tema. Setas, Home e End mudam a escolha e levam o foco com ela. */
 export function SegmentedControl<V extends string>({ label, value, onChange, options, className, size = 'md', onRail }: { label: string; value: V; onChange: (v: V) => void; options: SegmentOption<V>[]; className?: string; size?: 'sm' | 'md'; onRail?: boolean }) {
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const select = (i: number) => {
+    const o = options[i];
+    if (!o) return;
+    onChange(o.value);
+    refs.current[i]?.focus();
+  };
   return (
     <div role="radiogroup" aria-label={label} className={cn('inline-flex max-w-full items-center gap-0.5 rounded-sm border p-0.5', onRail ? 'border-rail-border' : 'border-border bg-surface', className)}>
-      {options.map((o) => {
+      {options.map((o, idx) => {
         const active = o.value === value;
         return (
           <button
             key={o.value}
+            ref={(el) => {
+              refs.current[idx] = el;
+            }}
             type="button"
             role="radio"
             aria-checked={active}
@@ -219,18 +230,25 @@ export function SegmentedControl<V extends string>({ label, value, onChange, opt
             onClick={() => onChange(o.value)}
             onKeyDown={(e) => {
               const i = options.findIndex((x) => x.value === value);
+              const n = options.length;
               if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                 e.preventDefault();
-                onChange(options[(i + 1) % options.length].value);
+                select((i + 1) % n);
               } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                 e.preventDefault();
-                onChange(options[(i - 1 + options.length) % options.length].value);
+                select((i - 1 + n) % n);
+              } else if (e.key === 'Home') {
+                e.preventDefault();
+                select(0);
+              } else if (e.key === 'End') {
+                e.preventDefault();
+                select(n - 1);
               }
             }}
             tabIndex={active ? 0 : -1}
             className={cn(
               'relative inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xs px-3 text-sm font-medium transition-colors duration-150',
-              size === 'md' ? 'h-10 min-w-10' : 'h-8 min-w-8 after:absolute after:-inset-1.5 after:content-[""]',
+              size === 'md' ? 'h-10 min-w-10 pointer-coarse:h-11' : 'h-8 min-w-8 after:absolute after:-inset-1.5 after:content-[""] pointer-coarse:h-11',
               onRail
                 ? active
                   ? 'bg-rail-fg text-rail'

@@ -7,7 +7,26 @@ import { IconButton } from './Button';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]';
+
+/** Paragens reais de Tab dentro do painel (sem tabindex=-1 dos grupos com foco itinerante, sem nós escondidos). */
+function tabStops(panel: HTMLElement): HTMLElement[] {
+  return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((n) => n.tabIndex >= 0 && n.offsetParent !== null && !n.closest('[inert]'));
+}
+
+/** Torna inerte tudo o que está fora do portal do diálogo (a app por trás não recebe foco nem cliques). */
+function inertOutside(host: HTMLElement | null): () => void {
+  if (!host) return () => {};
+  const changed: HTMLElement[] = [];
+  for (const el of Array.from(document.body.children) as HTMLElement[]) {
+    if (el.contains(host) || el.tagName === 'SCRIPT' || el.hasAttribute('inert')) continue;
+    // o portal dos avisos (aria-live) fica fora do diálogo mas deve continuar a ser anunciado
+    if (el.hasAttribute('data-toast-root')) continue;
+    el.setAttribute('inert', '');
+    changed.push(el);
+  }
+  return () => changed.forEach((el) => el.removeAttribute('inert'));
+}
 
 /** Armadilha de foco + Esc + devolução do foco ao fechar + bloqueio do scroll. */
 function useModalBehaviour(open: boolean, onClose: () => void, panel: React.RefObject<HTMLElement | null>) {
@@ -21,9 +40,12 @@ function useModalBehaviour(open: boolean, onClose: () => void, panel: React.RefO
     const html = document.documentElement;
     const prevOverflow = html.style.overflow;
     html.style.overflow = 'hidden';
+    let restoreInert = () => {};
     const t = window.setTimeout(() => {
       const el = panel.current;
-      const first = el?.querySelector<HTMLElement>('[data-autofocus]') ?? el?.querySelector<HTMLElement>(FOCUSABLE);
+      // o painel vive num portal: o que está fora dele (a app) fica inerte enquanto o diálogo está aberto
+      restoreInert = inertOutside(el?.closest<HTMLElement>('[data-overlay-root]') ?? el ?? null);
+      const first = el?.querySelector<HTMLElement>('[data-autofocus]') ?? (el ? tabStops(el)[0] : undefined);
       (first ?? el)?.focus();
     }, 30);
     const onKey = (e: KeyboardEvent) => {
@@ -33,14 +55,16 @@ function useModalBehaviour(open: boolean, onClose: () => void, panel: React.RefO
         return;
       }
       if (e.key !== 'Tab' || !panel.current) return;
-      const nodes = Array.from(panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((n) => n.offsetParent !== null);
+      const nodes = tabStops(panel.current);
       if (!nodes.length) return;
       const first = nodes[0];
       const last = nodes[nodes.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      const active = document.activeElement as HTMLElement | null;
+      const inside = Boolean(active && panel.current.contains(active));
+      if (e.shiftKey && (active === first || active === panel.current || !inside)) {
         e.preventDefault();
         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
+      } else if (!e.shiftKey && (active === last || !inside)) {
         e.preventDefault();
         first.focus();
       }
@@ -48,6 +72,7 @@ function useModalBehaviour(open: boolean, onClose: () => void, panel: React.RefO
     document.addEventListener('keydown', onKey);
     return () => {
       window.clearTimeout(t);
+      restoreInert();
       document.removeEventListener('keydown', onKey);
       html.style.overflow = prevOverflow;
       previous?.focus?.();
@@ -80,7 +105,7 @@ export function Drawer({ open, onClose, title, description, children, footer, si
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50" data-overlay-root>
           <motion.div
             className="absolute inset-0 bg-[var(--overlay-scrim)]"
             initial={{ opacity: 0 }}
@@ -110,21 +135,31 @@ export function Drawer({ open, onClose, title, description, children, footer, si
             exit={reduce ? { opacity: 0 } : { x: offset, transition: { duration: 0.2, ease: [0.7, 0, 0.84, 0] } }}
             transition={{ duration: 0.38, ease: EASE }}
           >
-            <div className={cn('flex items-start justify-between gap-3 px-5 pb-3 pt-4', hideHeader && 'sr-only', tone === 'rail' ? '' : 'border-b border-border')}>
-              <div className="min-w-0 pt-2">
-                <h2 id={`${id}-t`} className={cn('text-lg leading-tight', tone === 'rail' && 'text-rail-fg')}>
+            {hideHeader ? (
+              <div className="flex justify-end px-3 pt-3">
+                {/* só o título e a descrição ficam acessíveis; um único botão "Fechar", visível, recebe o foco inicial */}
+                <h2 id={`${id}-t`} className="sr-only">
                   {title}
                 </h2>
                 {description && (
-                  <p id={`${id}-d`} className={cn('mt-1 text-sm', tone === 'rail' ? 'text-rail-muted' : 'text-muted')}>
+                  <p id={`${id}-d`} className="sr-only">
                     {description}
                   </p>
                 )}
+                <IconButton label="Fechar" icon={<X className="size-5" strokeWidth={1.75} />} onClick={onClose} variant={tone === 'rail' ? 'on-rail' : 'ghost'} />
               </div>
-              <IconButton label="Fechar" icon={<X className="size-5" strokeWidth={1.75} />} onClick={onClose} variant={tone === 'rail' ? 'on-rail' : 'ghost'} />
-            </div>
-            {hideHeader && (
-              <div className="flex justify-end px-3 pt-3">
+            ) : (
+              <div className={cn('flex items-start justify-between gap-3 px-5 pb-3 pt-4', tone === 'rail' ? '' : 'border-b border-border')}>
+                <div className="min-w-0 pt-2">
+                  <h2 id={`${id}-t`} className={cn('text-lg leading-tight', tone === 'rail' && 'text-rail-fg')}>
+                    {title}
+                  </h2>
+                  {description && (
+                    <p id={`${id}-d`} className={cn('mt-1 text-sm', tone === 'rail' ? 'text-rail-muted' : 'text-muted')}>
+                      {description}
+                    </p>
+                  )}
+                </div>
                 <IconButton label="Fechar" icon={<X className="size-5" strokeWidth={1.75} />} onClick={onClose} variant={tone === 'rail' ? 'on-rail' : 'ghost'} />
               </div>
             )}
@@ -159,7 +194,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 grid place-items-center p-4">
+        <div className="fixed inset-0 z-50 grid place-items-center p-4" data-overlay-root>
           <motion.div className="absolute inset-0 bg-[var(--overlay-scrim)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }} onClick={onClose} aria-hidden />
           <motion.div
             ref={panel}

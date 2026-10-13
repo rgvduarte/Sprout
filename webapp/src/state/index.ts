@@ -12,10 +12,10 @@ import {
 } from '../data';
 import type { CampaignEvent, CancelledCommitment, EarnedSeal, LeagueState, Investor, KnowledgeLevel, LearningGoalState, Lot, OriginSealDef, Position, Producer, Region, RegionState, RewardRequest, WorldId } from '../data/types';
 import type { TelemetryState } from '../lib/useLiveFeed';
-import { FeedContext, GameContext, RoleContext, ThemeContext, type CommitFailure, type GameActions } from './AppProvider';
+import { FeedContext, FeedRefContext, GameContext, RoleContext, TEAM_VIEW_MESSAGE, ThemeContext, type CommitFailure, type GameActions } from './AppProvider';
 import { allPositions, knowledgePoints, mergeLot, regionStates } from './gameStore';
 
-export { AppProvider, ROLES, ROLE_LABEL, THEMES, THEME_LABEL, applyTheme, REFLECTION_DAYS, reflectionEndOf } from './AppProvider';
+export { AppProvider, ROLES, ROLE_LABEL, THEMES, THEME_LABEL, applyTheme, REFLECTION_DAYS, reflectionEndOf, TEAM_VIEW_MESSAGE } from './AppProvider';
 export type { Role, ThemePref, CommitResult, CommitFailure, GameActions } from './AppProvider';
 export type { ProfileId, ProfileState, GameState, KycDecisionKind } from './gameStore';
 export { useToast } from './toast';
@@ -32,8 +32,23 @@ export const useRole = () => need(useContext(RoleContext), 'useRole');
 /** Preferência de tema: system | light | dark (+ tema resolvido). */
 export const useTheme = () => need(useContext(ThemeContext), 'useTheme');
 
-/** Diário ao vivo (eventos gerados nesta sessão) e telemetria dos produtores. */
+/**
+ * Diário ao vivo (eventos gerados nesta sessão), telemetria dos produtores e
+ * estado de pausa. Re-renderiza a cada leitura (~6,5 s): usar só em widgets do
+ * Diário e da telemetria, nunca no topo de uma página.
+ */
 export const useFeed = () => need(useContext(FeedContext), 'useFeed');
+
+/** Telemetria dos produtores (depósitos, armazéns), ao vivo. Só para widgets de telemetria. */
+export function useTelemetry(): TelemetryState {
+  return useFeed().telemetry;
+}
+
+/** Diário de campanha: eventos ao vivo desta sessão + histórico, mais recente primeiro. Só para widgets do Diário. */
+export function useCampaignEvents(): CampaignEvent[] {
+  const { events } = useFeed();
+  return useMemo(() => [...events, ...CAMPAIGN_EVENTS], [events]);
+}
 
 export interface GameView extends GameActions {
   profileId: 'demo' | 'visitante';
@@ -66,24 +81,30 @@ export interface GameView extends GameActions {
   cancelled: CancelledCommitment[];
   /** Liga de campanha (Simulador, dinheiro fictício) */
   league: LeagueState;
-  /** pode comprometer capital (onboarding aprovado) */
+  /** pode comprometer capital (onboarding aprovado, e não é a vista da equipa) */
   canCommit: boolean;
   /** motivo genérico de bloqueio, independente do lote */
-  commitBlock: Extract<CommitFailure, 'onboarding' | 'bloqueado'> | null;
+  commitBlock: Extract<CommitFailure, 'onboarding' | 'bloqueado' | 'equipa'> | null;
   commitBlockMessage: string | null;
+  /**
+   * Vista da equipa: lê os dados da investidora de demonstração, mas o que
+   * a equipa aprende, joga ou abre fica num perfil próprio e não pode
+   * comprometer capital em nome da investidora.
+   */
+  teamView: boolean;
 }
 
 /** Estado do jogo do perfil ativo + ações. */
 export function useGame(): GameView {
   const ctx = need(useContext(GameContext), 'useGame');
-  const { profile, actions, profileId } = ctx;
+  const { profile, actions, profileId, teamView } = ctx;
   return useMemo(() => {
     const points = knowledgePoints(profile);
     const { level, next, progress } = levelForPoints(points);
     const modules = new Set(profile.modulesCompleted.map((m) => m.id));
     const quests = new Map(profile.questsCompleted.map((q) => [q.id, q.at]));
     const status = profile.onboarding.status;
-    const commitBlock = status === 'aprovado' ? null : status === 'bloqueado' ? 'bloqueado' : 'onboarding';
+    const commitBlock = teamView ? 'equipa' : status === 'aprovado' ? null : status === 'bloqueado' ? 'bloqueado' : 'onboarding';
     return {
       ...actions,
       profileId,
@@ -110,13 +131,16 @@ export function useGame(): GameView {
       canCommit: commitBlock === null,
       commitBlock,
       commitBlockMessage:
-        commitBlock === 'bloqueado'
-          ? 'O piloto está fechado a investidores qualificados.'
-          : commitBlock === 'onboarding'
-            ? 'Para comprometer capital é preciso concluir o registo e a verificação.'
-            : null,
+        commitBlock === 'equipa'
+          ? TEAM_VIEW_MESSAGE
+          : commitBlock === 'bloqueado'
+            ? 'O piloto está fechado a investidores qualificados.'
+            : commitBlock === 'onboarding'
+              ? 'Para comprometer capital é preciso concluir o registo e a verificação.'
+              : null,
+      teamView,
     };
-  }, [profile, actions, profileId]);
+  }, [profile, actions, profileId, teamView]);
 }
 
 export interface PositionView extends Position {
@@ -144,17 +168,27 @@ export interface DataView {
   seals: SealView[];
   earnedSeals: SealView[];
   regionStates: Record<string, RegionState>;
-  /** diário: ao vivo + histórico, mais recente primeiro */
+  /**
+   * @deprecated usar useCampaignEvents() no widget que mostra o Diário. Aqui é
+   * uma leitura no momento (não re-renderiza a cada leitura ao vivo).
+   */
   events: CampaignEvent[];
+  /** @deprecated usar useTelemetry() no widget de telemetria (leitura no momento, sem re-render). */
   telemetry: TelemetryState;
 }
 
 const VISITOR: Investor = { id: 'visitante', nome: 'Visitante', tipo: 'pessoa-singular', classe: 'nao-qualificado', kyc: 'nao-iniciado', pais: 'Portugal' };
 
-/** Dados vivos do perfil ativo. Os números batem certo em todas as páginas. */
+/**
+ * Dados do perfil ativo: lotes, posições, selos, regiões. Os números batem
+ * certo em todas as páginas. Não depende do Diário ao vivo: as leituras de
+ * telemetria (a cada ~6,5 s) não voltam a calcular lotes nem posições nem
+ * re-renderizam as páginas; os widgets do Diário usam useCampaignEvents() e
+ * useTelemetry().
+ */
 export function useData(): DataView {
   const ctx = need(useContext(GameContext), 'useData');
-  const feed = need(useContext(FeedContext), 'useData');
+  const feedRef = need(useContext(FeedRefContext), 'useData');
   const { state, profile, profileId } = ctx;
   return useMemo(() => {
     const lots = LOTS.map((l) => mergeLot(l, state.lotDeltas));
@@ -179,9 +213,12 @@ export function useData(): DataView {
       seals,
       earnedSeals: seals.filter((s) => s.earned),
       regionStates: regionStates(profile, profileId),
-      events: [...feed.events, ...CAMPAIGN_EVENTS],
-      telemetry: feed.telemetry,
+      get events() {
+        return [...feedRef.current.events, ...CAMPAIGN_EVENTS];
+      },
+      get telemetry() {
+        return feedRef.current.telemetry;
+      },
     };
-  }, [state.lotDeltas, profile, profileId, feed.events, feed.telemetry]);
+  }, [state.lotDeltas, profile, profileId, feedRef]);
 }
-

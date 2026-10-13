@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
+import { tidyText } from '../../lib/format';
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
   as?: 'section' | 'article' | 'div' | 'aside';
@@ -52,7 +53,7 @@ export function CardHeader({ title, description, actions, level = 2, className, 
         <H id={id} className={cn(level === 2 ? 'text-[1.1875rem]' : 'text-[1.0625rem]', 'leading-tight')}>
           {title}
         </H>
-        {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+        {description && <p className="measure mt-1 text-sm text-muted">{typeof description === 'string' ? tidyText(description) : description}</p>}
       </div>
       {actions && <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">{actions}</div>}
     </div>

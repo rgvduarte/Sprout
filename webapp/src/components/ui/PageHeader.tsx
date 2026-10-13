@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react';
 import { cn } from '../../lib/cn';
+import { tidyText } from '../../lib/format';
+
+/** Texto corrido com espaços inseparáveis nos milhares e antes das unidades ("50 000 €" não parte). */
+const tidy = (node: ReactNode): ReactNode => (typeof node === 'string' ? tidyText(node) : node);
 
 export interface PageHeaderProps {
   title: ReactNode;
@@ -25,7 +29,7 @@ export function PageHeader({ title, description, actions, meta, className, aside
         <h1 className="text-[1.875rem] leading-[1.08] sm:text-[2.375rem]" style={{ letterSpacing: '-0.018em' }}>
           {title}
         </h1>
-        {description && <p className="mt-2 max-w-[56ch] text-[1.0625rem] text-muted">{description}</p>}
+        {description && <p className="mt-2 max-w-[56ch] text-[1.0625rem] text-muted">{tidy(description)}</p>}
         {meta && <div className="mt-3 flex flex-wrap items-center gap-2">{meta}</div>}
       </div>
       {(actions || aside) && (
@@ -68,7 +72,7 @@ export function Section({ title, description, actions, children, className, id }
                 {title}
               </h2>
             )}
-            {description && <p className="measure mt-1 text-muted">{description}</p>}
+            {description && <p className="measure mt-1 text-muted">{tidy(description)}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>

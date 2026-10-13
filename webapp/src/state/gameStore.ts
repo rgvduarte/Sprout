@@ -28,6 +28,14 @@ import type {
 
 export type ProfileId = 'demo' | 'visitante';
 
+/**
+ * Perfis guardados na loja. 'equipa' é uma cópia da investidora de
+ * demonstração para a vista da Equipa Sprout: o que a equipa lê, joga ou
+ * abre fica aqui e não mexe nos pontos, missões e selos da investidora.
+ * Para leitura (posições semente, investidor), a equipa vê-se como 'demo'.
+ */
+export type StoreProfileId = ProfileId | 'equipa';
+
 export interface ProfileState {
   modulesCompleted: { id: string; at: string; quizScore?: number }[];
   questsCompleted: { id: string; at: string }[];
@@ -55,27 +63,27 @@ export interface ProfileState {
 export type KycDecisionKind = 'aprovar' | 'pedir-info' | 'rejeitar';
 
 export interface GameState {
-  profiles: Record<ProfileId, ProfileState>;
+  profiles: Record<StoreProfileId, ProfileState>;
   /** efeito dos compromissos da sessão nos lotes (partilhado entre perfis) */
   lotDeltas: Record<string, { raised: number; coFinancers: number }>;
 }
 
 export type GameAction =
-  | { type: 'completeModule'; profile: ProfileId; moduleId: string; quizScore?: number }
-  | { type: 'completeQuest'; profile: ProfileId; questId: string }
-  | { type: 'recordMiniGame'; profile: ProfileId; gameId: MiniGameId; score: number }
-  | { type: 'markRiskRead'; profile: ProfileId; lotId: string; factorId: string }
-  | { type: 'markAnalysisRead'; profile: ProfileId; lotId: string }
-  | { type: 'visitRegion'; profile: ProfileId; regionId: string }
-  | { type: 'visitWorld'; profile: ProfileId; worldId: WorldId }
-  | { type: 'commit'; profile: ProfileId; position: Position }
-  | { type: 'cancelCommitment'; profile: ProfileId; positionId: string }
-  | { type: 'requestReward'; profile: ProfileId; request: RewardRequest }
-  | { type: 'setLearningGoal'; profile: ProfileId; goal?: LearningGoalState }
+  | { type: 'completeModule'; profile: StoreProfileId; moduleId: string; quizScore?: number }
+  | { type: 'completeQuest'; profile: StoreProfileId; questId: string }
+  | { type: 'recordMiniGame'; profile: StoreProfileId; gameId: MiniGameId; score: number }
+  | { type: 'markRiskRead'; profile: StoreProfileId; lotId: string; factorId: string }
+  | { type: 'markAnalysisRead'; profile: StoreProfileId; lotId: string }
+  | { type: 'visitRegion'; profile: StoreProfileId; regionId: string }
+  | { type: 'visitWorld'; profile: StoreProfileId; worldId: WorldId }
+  | { type: 'commit'; profile: StoreProfileId; position: Position }
+  | { type: 'cancelCommitment'; profile: StoreProfileId; positionId: string }
+  | { type: 'requestReward'; profile: StoreProfileId; request: RewardRequest }
+  | { type: 'setLearningGoal'; profile: StoreProfileId; goal?: LearningGoalState }
   | { type: 'decideKyc'; profile: ProfileId; decision: KycDecisionKind; note: string }
-  | { type: 'setLeague'; profile: ProfileId; patch: Partial<LeagueState> }
-  | { type: 'recordSimRun'; profile: ProfileId; run: SimRunResult }
-  | { type: 'updateOnboarding'; profile: ProfileId; patch: Partial<OnboardingState> }
+  | { type: 'setLeague'; profile: StoreProfileId; patch: Partial<LeagueState> }
+  | { type: 'recordSimRun'; profile: StoreProfileId; run: SimRunResult }
+  | { type: 'updateOnboarding'; profile: StoreProfileId; patch: Partial<OnboardingState> }
   | { type: 'reset' };
 
 const nowIso = () => now().toISOString();
@@ -126,13 +134,13 @@ function demoProfile(): ProfileState {
 }
 
 export function initialGameState(): GameState {
-  return { profiles: { demo: demoProfile(), visitante: emptyProfile() }, lotDeltas: {} };
+  return { profiles: { demo: demoProfile(), visitante: emptyProfile(), equipa: demoProfile() }, lotDeltas: {} };
 }
 
 /* ------------------------------------------------------------ derivados */
 
-export function allPositions(profile: ProfileState, profileId: ProfileId): Position[] {
-  const seed = profileId === 'demo' ? SEED_POSITIONS.filter((p) => p.investorId === DEMO_INVESTOR_ID) : [];
+export function allPositions(profile: ProfileState, profileId: StoreProfileId): Position[] {
+  const seed = profileId === 'demo' || profileId === 'equipa' ? SEED_POSITIONS.filter((p) => p.investorId === DEMO_INVESTOR_ID) : [];
   return [...seed, ...profile.commitments];
 }
 
@@ -176,7 +184,7 @@ function questSatisfied(q: Quest, p: ProfileState): boolean {
 }
 
 /** Fecha missões cumpridas e selos ganhos por diligência ou compromisso. */
-function settle(p: ProfileState, profileId: ProfileId): ProfileState {
+function settle(p: ProfileState, profileId: StoreProfileId): ProfileState {
   const at = nowIso();
   const done = new Set(p.questsCompleted.map((q) => q.id));
   const newQuests = QUESTS.filter((q) => !done.has(q.id) && questSatisfied(q, p)).map((q) => ({ id: q.id, at }));
@@ -206,7 +214,7 @@ function settle(p: ProfileState, profileId: ProfileId): ProfileState {
   return { ...p, questsCompleted, seals: newSeals.length ? [...p.seals, ...newSeals] : p.seals };
 }
 
-function updateProfile(state: GameState, id: ProfileId, fn: (p: ProfileState) => ProfileState): GameState {
+function updateProfile(state: GameState, id: StoreProfileId, fn: (p: ProfileState) => ProfileState): GameState {
   const next = settle(fn(state.profiles[id]), id);
   if (next === state.profiles[id]) return state;
   return { ...state, profiles: { ...state.profiles, [id]: next } };
@@ -342,7 +350,7 @@ export function mergeLot(lot: Lot, deltas: GameState['lotDeltas']): Lot {
   };
 }
 
-export function regionStates(profile: ProfileState, profileId: ProfileId): Record<string, RegionState> {
+export function regionStates(profile: ProfileState, profileId: StoreProfileId): Record<string, RegionState> {
   const positions = allPositions(profile, profileId);
   const participated = new Set(positions.map((p) => LOTS.find((l) => l.id === p.lotId)?.regionId).filter(Boolean) as string[]);
   const learned = new Set<string>(profile.regionsVisited);
