@@ -40,7 +40,7 @@ export const THEME = {
   font: {
     body: "'Public Sans', 'Sprout Symbols', sans-serif",
     mono: "'IBM Plex Mono', 'Sprout Symbols', monospace",
-    display: "'Archivo', 'Public Sans', sans-serif",
+    display: "'Archivo', 'Sprout Symbols', 'Public Sans', sans-serif",
   },
   fs: { tick: 6.8, label: 7.2, value: 7.2, title: 8 }, // pt
 };
@@ -208,11 +208,11 @@ export function lineChart(o) {
     g += text(m.l - 6, y, fy(t), { size: THEME.fs.tick, fill: THEME.muted, anchor: 'end', mono: true, baseline: 'middle' });
   }
   if (o.y?.unit) g += text(m.l - 6, m.t - 8, o.y.unit, { size: THEME.fs.tick, fill: THEME.muted, anchor: 'end' });
-  // linhas de referência
+  // linhas de referência: fio fino na cor do eixo (nunca mais forte do que as séries), rótulo discreto
   for (const rl of o.refLines || []) {
     const y = sy(rl.y);
-    g += `<line x1="${r2(m.l)}" x2="${r2(W - m.r)}" y1="${r2(y)}" y2="${r2(y)}" stroke="${THEME.ink}" stroke-width="1"/>`;
-    if (rl.label) g += text(W - m.r, y - 4, rl.label, { size: THEME.fs.tick, fill: THEME.ink, anchor: 'end', weight: 500 });
+    g += `<line x1="${r2(m.l)}" x2="${r2(W - m.r)}" y1="${r2(y)}" y2="${r2(y)}" stroke="${THEME.axis}" stroke-width="0.75"/>`;
+    if (rl.label) g += text(rl.labelAt === 'start' ? m.l + 3 : W - m.r, y - 4, rl.label, { size: THEME.fs.tick, fill: THEME.muted, anchor: rl.labelAt === 'start' ? 'start' : 'end' });
   }
   // eixo x
   const xTicks = (o.x?.ticks || niceTicks(xmin, xmax, 5)).map((t) => (isTime ? toT(t) : t));
@@ -311,7 +311,7 @@ export function barChart(o) {
   const xmin = o.x?.min ?? Math.min(ticks[0], ...vals);
   const xmax = o.x?.max ?? Math.max(ticks[ticks.length - 1], ...vals);
   const valW = Math.max(...data.map((d) => textW(d.valueLabel ?? fx(d.value), THEME.fs.value, 'mono'))) + 8;
-  const m = { t: 4, r: valW, b: o.x?.hideAxis ? 2 : 16, l: labW };
+  const m = { t: (o.refLines || []).some((r) => r.label) ? 13 : 4, r: valW, b: o.x?.hideAxis ? 2 : 16, l: labW };
   const H = m.t + data.length * rowH + m.b;
   const sx = linear(xmin, xmax, m.l, W - m.r);
   let g = svgOpen(W, H, o.ariaLabel);
@@ -321,6 +321,11 @@ export function barChart(o) {
       g += `<line x1="${r2(x)}" x2="${r2(x)}" y1="${m.t}" y2="${r2(H - m.b)}" stroke="${t === 0 ? THEME.axis : THEME.grid}" stroke-width="${t === 0 ? 1 : 0.75}"/>`;
       g += text(x, H - m.b + 11, fx(t), { size: THEME.fs.tick, fill: THEME.muted, anchor: 'middle', mono: true });
     }
+  }
+  for (const rl of o.refLines || []) {
+    const x = sx(rl.x);
+    g += `<line x1="${r2(x)}" x2="${r2(x)}" y1="${m.t - 2}" y2="${r2(H - m.b)}" stroke="${THEME.muted}" stroke-width="0.75"/>`;
+    if (rl.label) g += text(x, m.t - 4, rl.label, { size: THEME.fs.tick, fill: THEME.muted, anchor: 'middle' });
   }
   data.forEach((d, i) => {
     const yc = m.t + i * rowH + rowH / 2 - (d.sub ? 4 : 0);
@@ -338,8 +343,13 @@ export function barChart(o) {
       g += text(m.l - 8, yc + (k - (lines.length - 1) / 2) * 9.5, ln, { size: THEME.fs.label, anchor: 'end', baseline: 'middle', weight: d.emphasis ? 600 : 400 });
     });
     if (d.sub) g += text(m.l - 8, yc + 9.5, d.sub, { size: THEME.fs.tick, anchor: 'end', baseline: 'middle', fill: THEME.muted });
-    const vx = Math.max(a, b) + 5;
-    g += text(vx, yc, d.valueLabel ?? fx(d.value), { size: THEME.fs.value, baseline: 'middle', mono: true, weight: d.emphasis ? 600 : 400 });
+    // valor na ponta livre da barra: à direita se cresce para a direita, à esquerda se cresce para a esquerda
+    const lab = d.valueLabel ?? fx(d.value);
+    if (dir === 'left' && !d.labelRight) {
+      g += text(Math.min(a, b) - 5, yc, lab, { size: THEME.fs.value, baseline: 'middle', mono: true, weight: d.emphasis ? 600 : 400, anchor: 'end' });
+    } else {
+      g += text(Math.max(a, b) + 5, yc, lab, { size: THEME.fs.value, baseline: 'middle', mono: true, weight: d.emphasis ? 600 : 400 });
+    }
   });
   return g + '</svg>';
 }
@@ -394,8 +404,8 @@ export function groupedColumns(o) {
   });
   for (const rl of o.refLines || []) {
     const y = sy(rl.y);
-    g += `<line x1="${r2(m.l)}" x2="${r2(W - m.r)}" y1="${r2(y)}" y2="${r2(y)}" stroke="${THEME.ink}" stroke-width="1"/>`;
-    if (rl.label) g += text(W - m.r, y - 4, rl.label, { size: THEME.fs.tick, anchor: 'end', weight: 500 });
+    g += `<line x1="${r2(m.l)}" x2="${r2(W - m.r)}" y1="${r2(y)}" y2="${r2(y)}" stroke="${THEME.axis}" stroke-width="0.75"/>`;
+    if (rl.label) g += text(W - m.r, y - 4, rl.label, { size: THEME.fs.tick, anchor: 'end', fill: THEME.muted });
   }
   return g + '</svg>';
 }
@@ -452,24 +462,48 @@ function segmentRow({ x, y, width, th, segments, scaleMax, fv, outside = 'below'
     }
     cx += w;
   });
-  // rótulos de fora: da direita para a esquerda, em degraus se colidirem
-  let lastRight = Infinity;
-  let row = 0;
+  // rótulos de fora: da esquerda para a direita, cada um ao lado (nunca por cima) da sua linha de chamada,
+  // que acaba 1,3 mm antes do texto. Desce/sobe de fila só quando o texto colide com outro da mesma fila;
+  // uma linha nunca atravessa o texto de outra fila.
+  const GAP = 5;            // px entre a linha de chamada e o texto (~1,3 mm)
+  const PAD = 6;            // px mínimos entre dois textos na mesma fila
+  const ROW = 20;
+  const minX = 0, maxX = x + width;
+  const boxes = [];         // { row, x0, x1 }
+  const leads = [];         // { x, row }
   let maxRow = 0;
-  for (let i = outsideLabels.length - 1; i >= 0; i--) {
+  const order = outsideLabels.map((L, i) => i).sort((a, b) => outsideLabels[a].cx - outsideLabels[b].cx);
+  for (const i of order) {
     const L = outsideLabels[i];
-    const right = L.cx + 2;
-    if (right + 2 > lastRight) row++;
-    else row = 0;
-    const ly = outside === 'below' ? y + th + 6 + row * 20 : y - 6 - row * 20;
-    const tx = L.cx;
-    svg += `<line x1="${r2(L.cx)}" x2="${r2(L.cx)}" y1="${r2(outside === 'below' ? y + th + 1 : y - 1)}" y2="${r2(outside === 'below' ? ly + 2 : ly - 2)}" stroke="${THEME.axis}" stroke-width="0.75"/>`;
-    const anchor = 'end';
-    const tyA = outside === 'below' ? ly + 9 : ly - 11;
-    svg += text(tx + 2, tyA, L.name, { size: THEME.fs.label, anchor, weight: 500 });
-    svg += text(tx + 2, tyA + 9.5, L.val, { size: THEME.fs.value, anchor, mono: true, fill: THEME.ink });
-    lastRight = tx + 2 - L.w;
-    maxRow = Math.max(maxRow, row);
+    const w = Math.max(textW(L.name, THEME.fs.label, 'body', 500), textW(L.val, THEME.fs.value, 'mono'));
+    let pick = null;
+    for (let row = 0; row < 6 && !pick; row++) {
+      for (const side of ['end', 'start']) {
+        const b = side === 'end' ? [L.cx - GAP - w, L.cx - GAP] : [L.cx + GAP, L.cx + GAP + w];
+        if (b[0] < minX || b[1] > maxX) continue;
+        if (boxes.some((p) => p.row === row && b[0] < p.x1 + PAD && b[1] > p.x0 - PAD)) continue;
+        if (boxes.some((p) => p.row < row && L.cx >= p.x0 - 2 && L.cx <= p.x1 + 2)) continue;
+        if (leads.some((l) => l.row >= row && l.x >= b[0] - 2 && l.x <= b[1] + 2)) continue;
+        pick = { row, side, b };
+        break;
+      }
+    }
+    if (!pick) pick = { row: 0, side: 'end', b: [L.cx - GAP - w, L.cx - GAP] };
+    boxes.push({ row: pick.row, x0: pick.b[0], x1: pick.b[1] });
+    leads.push({ x: L.cx, row: pick.row });
+    maxRow = Math.max(maxRow, pick.row);
+    const tx = pick.side === 'end' ? L.cx - GAP : L.cx + GAP;
+    if (outside === 'below') {
+      const ly = y + th + 6 + pick.row * ROW;
+      svg += `<line x1="${r2(L.cx)}" x2="${r2(L.cx)}" y1="${r2(y + th + 1)}" y2="${r2(ly + 6)}" stroke="${THEME.axis}" stroke-width="0.75"/>`;
+      svg += text(tx, ly + 9, L.name, { size: THEME.fs.label, anchor: pick.side, weight: 500 });
+      svg += text(tx, ly + 18.5, L.val, { size: THEME.fs.value, anchor: pick.side, mono: true, fill: THEME.ink });
+    } else {
+      const ly = y - 6 - pick.row * ROW;
+      svg += `<line x1="${r2(L.cx)}" x2="${r2(L.cx)}" y1="${r2(y - 1)}" y2="${r2(ly - 14)}" stroke="${THEME.axis}" stroke-width="0.75"/>`;
+      svg += text(tx, ly - 11, L.name, { size: THEME.fs.label, anchor: pick.side, weight: 500 });
+      svg += text(tx, ly - 1.5, L.val, { size: THEME.fs.value, anchor: pick.side, mono: true, fill: THEME.ink });
+    }
   }
   return { svg, spans, outsideRows: outsideLabels.length ? maxRow + 1 : 0 };
 }

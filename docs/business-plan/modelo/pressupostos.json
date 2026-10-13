@@ -405,7 +405,15 @@
      "inspecao_collateral_manager_eur_por_lote": 1200,
      "pagamentos_bancarios_eur_kg": 0.001,
      "provisao_credito_pct_vendas": 0.003,
-     "desconto_efetivo": 0.0
+     "desconto_efetivo": 0.0,
+     "modo_principal": {
+      "pessimista": 0,
+      "base": 0,
+      "otimista": 0,
+      "recomendado": 0
+     },
+     "comissao_corretagem_verificacao_pct_valor": 0.0075,
+     "nota_modo": "até haver prova (KPI do piloto: >= 1 embalador ou exportador assina carta de intenções a >= índice + 0,10 EUR/kg por lote certificado), o granel é corretagem com verificação: o Sprout não compra nem vende, não tem stock nem recebíveis de mercadoria e cobra 0,75% do valor ao índice (abaixo do teto prático de 1% da corretagem de granel; 50-concorrencia.md sec. 2.2 [E, NV]); paga o collateral manager e as análises do lote. modo_principal = 1 (compra ao índice, venda a índice + 0,15) fica como caso de sensibilidade 'granel como principal'"
     }
    },
    "custos_fisicos_e_custodia": {
@@ -479,7 +487,7 @@
      3500
     ]
    },
-   "producao_pt_referencia_kt": 175,
+   "producao_pt_referencia_kt": 169.5,
    "tese_documento_fonte": {
     "captura_margem_embalador": [
      0.8,
@@ -729,17 +737,18 @@
    ],
    "recomendado": [
     0.0,
-    0.9,
-    0.9,
-    0.9,
-    0.9
+    0.75,
+    0.75,
+    0.75,
+    0.75
    ]
   },
   "saldo_obrigacoes": "= pct x capital de giro / utilizacao_media_capital (capital levantado; o excedente fica em caixa na série); o cupão incide só sobre as obrigações",
-  "nota_2027": "2027 = 0%: a SPV só pode emitir obrigações 12 meses após o registo definitivo (CSC art. 348.º/2 [L]); sem garantia bancária, a 1.ª série sai em 2027-11 a 2028-01 e o stock do piloto (fev.-jul. 2027) e do 4.º trim. de 2027 é financiado por capital próprio (incl. capital social da SPV) ou linha bancária",
+  "nota_2027": "2027 = 0% (simplificação do modelo): sem exceção ao CSC art. 348.º/2 [L], a SPV só emite 12 meses após o registo definitivo; a redação do DL 26/2015 admite, entre outras exceções, a disponibilização de informação financeira auditada com <= 3 meses (a confirmar no parecer). O stock do piloto (fev.-jul. 2027) e do 4.º trim. de 2027 é financiado por capital próprio (incl. capital social da SPV) ou linha bancária",
   "capital_subordinado_patrocinador_pct": {
    "primeira_serie": 0.333,
-   "regime": 0.1
+   "regime": 0.1,
+   "regime_recomendado": 0.25
   },
   "capital_social_spv_eur": 50000,
   "capital_social_spv_realizacao": "integral antes da 1.ª emissão (a confirmar no parecer; mínimo legal: 30% na constituição, CSC art. 277.º/2 [L]); modelado como realizado em 2026 e como piso do capital de giro financiado por capital próprio",
@@ -837,11 +846,11 @@
    "publico_recomendado": "só clientes profissionais: per se (MiFID II Anexo II, I) ou já classificados como profissionais por banco/empresa de investimento, com declaração escrita (Reg. 2017/1129 art. 2.º al. e))",
    "ticket_min_profissional_eur": 25000,
    "ticket_min_nao_profissional_eur": 100000,
-   "data_emissao_alvo": "2027-12 (janela 2027-11 a 2028-01: 12 meses após o registo definitivo da SPV, que tem de ocorrer até 2026-12)",
-   "condicoes_previas": "parecer favorável às perguntas 2 (CSC art. 348.º e RGICSF art. 9.º) e 10 (PRIIPs) do 01-desenho-do-modelo.md sec. 3.5; gate de 2027-08-31 cumprido",
+   "data_emissao_alvo": "depois do gate de 2027-08-31: 2027-12 (janela 2027-11 a 2028-01) se a SPV tiver de cumprir 12 meses de registo; mais cedo se o parecer confirmar uma exceção do CSC art. 348.º/2 [L] (informação financeira auditada com <= 3 meses, redação do DL 26/2015, ou garantia de instituição de crédito). O modelo assume 0 obrigações em 2027 (simplificação)",
+   "condicoes_previas": "parecer favorável às perguntas 2 (CSC arts. 348.º e 349.º e RGICSF art. 9.º), 4 (quem comercializa: colocação direta pelo emitente) e 10 (PRIIPs); gate de 2027-08-31 cumprido; seed fechada ou autonomia comprometida >= 18 meses; servicer de reserva contratado; capital próprio da SPV intacto (>= 50.000 EUR)",
    "alternativa_garantia_bancaria": {
-    "data_emissao": "2027-04",
-    "custo": "comissão de garantia bancária NV; ordem de grandeza 1-2%/ano do montante garantido [E, NV]",
+    "data_emissao": "antes de 2027-11, se o parecer o confirmar",
+    "custo": "garantia bancária: comissão NV, ordem de grandeza 1-2%/ano do montante garantido [E, NV]; informação financeira auditada intercalar por ROC registado na CMVM: custo NV, a cotar",
     "estado": "não modelada"
    }
   },
@@ -891,7 +900,38 @@
     30000,
     30000
    ],
-   "nota_funcoes_independentes": "administrador independente da SPV (desde a constituição), membro independente do Comité de Risco e representante comum dos obrigacionistas (desde a 1.ª emissão) [E, NV]; não incluídos nos 25k/ano"
+   "nota_funcoes_independentes": "administrador independente da SPV (desde a constituição), membro independente do Comité de Risco e representante comum dos obrigacionistas (desde a 1.ª emissão) [E, NV]; não incluídos nos 25k/ano",
+   "servicer_reserva_eur": {
+    "pessimista": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "base": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "otimista": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "recomendado": [
+     0,
+     10000,
+     10000,
+     10000,
+     10000
+    ]
+   },
+   "nota_servicer_reserva": "servicer de reserva contratado desde a 1.ª série (collateral manager ou servicer de trade finance), com eventos de substituição do servicer: 10 k EUR/ano [E, NV], estimativa sem cotação; só no recomendado (estrutura proposta na revisão de 13-10-2026)"
   },
   "ronda_pre_seed_eur": {
    "pessimista": 1100000,
@@ -1748,31 +1788,31 @@
   "plataforma_desenvolvimento_capitalizavel_eur": {
    "pessimista": [
     60000,
-    15000,
-    15000,
-    15000,
-    15000
+    10000,
+    10000,
+    10000,
+    10000
    ],
    "base": [
     60000,
-    30000,
-    30000,
-    20000,
-    20000
+    15000,
+    15000,
+    10000,
+    10000
    ],
    "otimista": [
     60000,
-    45000,
-    40000,
-    30000,
-    30000
+    25000,
+    20000,
+    15000,
+    15000
    ],
    "recomendado": [
     60000,
-    30000,
-    30000,
-    20000,
-    20000
+    15000,
+    15000,
+    10000,
+    10000
    ]
   },
   "equipamento_informatico_eur_por_nova_fte": 2000,
@@ -1780,7 +1820,38 @@
    "software": 3,
    "equipamento_informatico": 4,
    "sensores": 5
-  }
+  },
+  "plataforma_area_investidor_capitalizavel_eur": {
+   "pessimista": [
+    0,
+    5000,
+    5000,
+    5000,
+    5000
+   ],
+   "base": [
+    0,
+    15000,
+    15000,
+    10000,
+    10000
+   ],
+   "otimista": [
+    0,
+    20000,
+    20000,
+    15000,
+    15000
+   ],
+   "recomendado": [
+    0,
+    15000,
+    15000,
+    10000,
+    10000
+   ]
+  },
+  "nota_plataforma": "plataforma_desenvolvimento_capitalizavel_eur = ledger, pagamentos, KYC e portais B2B (reescrita clean-room, 30 sec. 8.6); plataforma_area_investidor_capitalizavel_eur = área de reporte a investidores profissionais, só depois do gate e do parecer (0 em 2027). Divisão [E] da mesma despesa total da versão anterior"
  },
  "capital_de_giro": {
   "azeite": "stock médio x (granel + embalamento) + recebíveis x preço - fornecedores x (granel + embalamento) a 30 dias; dias por canal em commodities.azeite.canais (HoReCa por ano)",
@@ -1859,12 +1930,13 @@
   "investidores_qualificados": "0 no piloto (sem obrigações antes de 12 meses de registo da SPV); 1.ª série de 2 a 4 profissionais após o gate",
   "volume": {
    "azeite_t": 20,
-   "azeite_horeca_gourmet_t": 4,
-   "azeite_distribuidores_offtake_t": 16,
-   "lotes": 1,
-   "agua_paletes": 60
+   "azeite_horeca_gourmet_t": 3,
+   "azeite_distribuidores_offtake_t": 17,
+   "lotes": 2,
+   "agua_paletes": 60,
+   "nota_lotes": "2 lotes de 10 t de dois lagares (Lagar do Val <= 50%); 17 t com offtake (85%); 3 t HoReCa/gourmet = stock aberto autorizado (15%)"
   },
-  "gmv_alvo_eur": 106000,
+  "gmv_alvo_eur": 105405,
   "metas": {
    "fill_rate_min": 0.95,
    "variacao_base_compra_vs_indice_max_eur_kg": 0.15,
@@ -1888,7 +1960,7 @@
    "concentracao_lagar_ancora_max": 0.5,
    "compradores_horeca_recorrentes_min_3_encomendas": 0.6,
    "gmv_gate_min_eur": 90000,
-   "offtake_cobertura_min_lote": 0.8,
+   "offtake_cobertura_min_lote": 0.85,
    "margem_contribuicao_horeca_gourmet_min_pct": 0.06,
    "paragem_horeca_margem_eur_kg_2_meses": 0.15,
    "referencia_horeca_documentada_min_eur_kg": 5.65,
@@ -1899,10 +1971,11 @@
    300
   ],
   "gmv_alvo_detalhe": {
-   "azeite_horeca_gourmet": 20340,
-   "azeite_distribuidores": 69600,
+   "azeite_horeca_gourmet": 15255,
+   "azeite_distribuidores": 73950,
    "agua": 16200
-  }
+  },
+  "nota_gmv": "GMV a preços do base (HoReCa 5,085 EUR/kg; distribuidores 4,35 EUR/kg; água 0,36 EUR/L): conservador face ao recomendado"
  },
  "stress_tests": {
   "descricao": "parâmetros para o modelo financeiro; aplicação à 1.ª série (book de 150k EUR; almofada 33% = capital social da SPV) em 01-desenho-do-modelo.md sec. 4.4",
@@ -2309,7 +2382,7 @@
  "fontes": {
   "commodities.azeite.preco_indice_granel_eur_kg": "SIMA/GPP AOVE granel PT intervalo 3,40-3,80 EUR/kg início out. 2026 (https://www.agroportal.pt/azeite-e-azeitona-21-a-27-de-setembro-de-2026/); 3,50 EUR/kg sem. 39/2026 é cotação Oleista, não SIMA (10-mercado.md sec. 1.3; confirmar no boletim SIMA da sem. 39); Poolred 3,34 EUR/kg 29/09-05/10/2026 (https://wikifarmer.com/library/en/article/olive-oil-prices-spain-national-aforo-2026-27); Infaoliva 3,10 a 13/10/2026 (https://www.infobae.com/espana/2026/10/13/precio-del-aceite-de-oliva-en-espana-este-martes-13-de-octubre/). Índice tal como definido (média SIMA + Poolred) a out. 2026 = 3,42-3,47 (3,3-3,4 com as cotações ES de 13-10); o modelo usa 3,50, arredondado para cima (conservador para a margem). Constante: sem previsão de preço.",
   "commodities.azeite.premio_origem_pago_ao_lagar_eur_kg": "estimativa: prémio de origem/qualidade sobre o índice para lote individualizado com ficha analítica; diferencial AOVE-lampante de 0,24 EUR/kg em 2026 (https://navarraexports.com/en/market-intelligence/spanish-olive-oil-prices-september-2026-bulk-buyers) indica prémios de qualidade comprimidos",
-  "commodities.azeite.volume_t": "estimativa: piloto 20 t (1 lote misto: 4 t HoReCa/gourmet + 16 t distribuidores com offtake) + rampa; base 2031 = 2.200 t (~1,3% de ~175 kt [E, ponto médio de 160 (Olivum, https://observador.pt/2026/09/23/producao-de-azeite-em-portugal-pode-crescer-10-em-2026-2027-e-aproximar-se-das-177-mil-toneladas-da-campanha-anterior/) e 179 (Governo, https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/)]); a parte HoReCa está limitada ao SOM (10-mercado.md sec. 5: 1.000-2.000 clientes no ano 3); o resto vai para distribuidores/exportadores com offtake",
+  "commodities.azeite.volume_t": "estimativa: piloto 20 t (1 lote misto: 4 t HoReCa/gourmet + 16 t distribuidores com offtake) + rampa; base 2031 = 2.200 t (~1,3% de ~169,5 kt [E, ponto médio de 160 (Olivum, https://observador.pt/2026/09/23/producao-de-azeite-em-portugal-pode-crescer-10-em-2026-2027-e-aproximar-se-das-177-mil-toneladas-da-campanha-anterior/) e 179 (Governo, https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/)]); a parte HoReCa está limitada ao SOM (10-mercado.md sec. 5: 1.000-2.000 clientes no ano 3); o resto vai para distribuidores/exportadores com offtake",
   "commodities.azeite.mix_horeca_gourmet": "derivado de clientes_horeca_gourmet_ativos_medios x 0,205 t/ano (ponto médio de 150-300 L/ano = 137-275 kg; 10-mercado.md sec. 5); HoReCa: 74.524 empresas, 91% micro (https://tnews.pt/ahresp-setor-da-restauracao-revela-se-instavel-em-2024-devido-a-localizacao-dos-negocios/); 2.000 contas em 2031 = 2,7% das empresas",
   "commodities.azeite.canais.horeca_gourmet.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO no terreno): retalho PT AOVE 6,48 EUR/L c/ IVA mar-abr 2026 = 6,67 EUR/kg s/ IVA com granel a 4,43 (https://observatorioagroalimentar.gov.pt/wp-content/uploads/2026/05/Observatorio_Resumo_Periodo-042026.pdf); ajustado à descida do granel para 3,50-3,60: rácio 0,664 => 5,27-5,42; diferencial constante de 2,24 => 5,74-5,84; intervalo 5,3-6,0 (equivalente de retalho standard a out. 2026); base = 5,65 (ponto médio); 6,00 só no otimista, condicionado a cotações documentadas de AOVE de origem identificada; porta do lagar 5 L 6,08 EUR/L mar. 2026 (https://www.agroportal.pt/wp-content/uploads/2026/03/azei_News12.pdf). Validar com 20-30 cotações cash & carry/foodservice.",
   "commodities.azeite.canais.horeca_gourmet.desconto_efetivo": "documento-fonte (10-15%); base no limite inferior porque, com referência 5,65, 15% leva a margem de contribuição HoReCa a ~1,4% (01-desenho-do-modelo.md sec. 2.5)",
@@ -2339,7 +2412,7 @@
   "receitas.dados_e_indice_eur": "estimativa conservadora; Mintec/Expana e Poolred já publicam preços (50-concorrencia.md sec. 2.1)",
   "financiamento.cupao_anual": "estimativa: custo de capital do investidor de 8%/ano usado no modelo de carry (40-risco-coberturas.md sec. 5.2); custo ECSP de retalho 10-13%/ano (50-concorrencia.md sec. 3.3); descida com historial",
   "financiamento.utilizacao_media_capital": "estimativa: capital levantado a 12-18 meses vs. rotação de stock de 2-4 meses (40-risco-coberturas.md sec. 5.1); cash sweep reduz capital parado",
-  "financiamento.capital_subordinado_patrocinador_pct": "40-risco-coberturas.md sec. 5.3 (P3: 10% skin in the game) em regime; 1.ª série 33% porque o subordinado é o capital social da SPV (50k) e a reserva começa vazia (stress test em 01-desenho-do-modelo.md sec. 4.4)",
+  "financiamento.capital_subordinado_patrocinador_pct": "40-risco-coberturas.md sec. 5.3 (P3: 10% skin in the game) em regime; 1.ª série 33% porque o subordinado é o capital social da SPV (50k) e a reserva começa vazia (stress test em 01-desenho-do-modelo.md sec. 4.4) Recomendado: 25% em regime (obrigações a 75% do fundo de maneio), porque o S5 de um book de regime de 500 k EUR (~100 k EUR, 01 sec. 4.4) excede uma almofada de 15% em ~25 k EUR; com 25% + reserva fica absorvido",
   "financiamento.reserva_primeira_perda": "40-risco-coberturas.md sec. 5.3 (P3: 30% da margem bruta do lote, teto 5% do saldo vivo)",
   "financiamento.extensao": "40-risco-coberturas.md sec. 5.3 (P5) e sec. 8 (playbook): uma extensão de 6 meses, step-up +200-300 p.b., cash sweep 100%",
   "financiamento.retorno_investidor": "taxa liberatória de 28% sobre juros (singulares) e retenção de 25% (coletivas): conhecimento de referência [L], NÃO VERIFICADO online",
@@ -2371,12 +2444,12 @@
   "commodities.azeite.canais.horeca_gourmet.inspecao_collateral_manager_eur_por_lote": "estimativa [E, NV]: 300-500 EUR por visita (30-pagamentos-infra.md sec. 7.4); entrada + ~3 libertações de tranche para o 3PL + fecho = 2.000 EUR por lote de 20 t",
   "commodities.azeite.canais.distribuidores_export.dias_stock": "stock médio de 30 dias (paletes levantadas em ~60 dias)",
   "commodities.azeite.canais.horeca_gourmet.pagamentos_bancarios_eur_kg": "estimativa: só comissões bancárias por operação SEPA (~0-2 EUR por operação; 30-pagamentos-infra.md sec. 4.4); KYC e faturação no fixo de tecnologia",
-  "financiamento.pct_capital_giro_azeite_financiado_por_notes": "CSC art. 348.º/2 [L, redação a reconfirmar no DRE: https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975]: só emitem obrigações sociedades registadas há mais de 1 ano, salvo fusão/cisão com sociedade registada há mais de 1 ano, maioria de capital público ou garantia de instituição de crédito ou do Estado; RGICSF art. 9.º só cobre obrigações \"nos termos e limites do CSC\" => 2027 = 0%",
+  "financiamento.pct_capital_giro_azeite_financiado_por_notes": "CSC art. 348.º/2 [L, redação a reconfirmar no DRE: https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975]: só emitem obrigações sociedades registadas há mais de 1 ano, salvo exceções (fusão/cisão; maioria pública; garantia de instituição de crédito ou do Estado; e, na redação do DL 26/2015, informação financeira auditada reportada a data não superior a 3 meses; n.º 3: dispensa por portaria). CSC art. 349.º [L]: rácio de autonomia financeira >= 35% depois da emissão, salvo exceções (emissões só para investidores qualificados; valor nominal >= 100.000 EUR; notação de risco). RGICSF art. 9.º só cobre obrigações 'nos termos e limites do CSC'. Modelo: 2027 = 0%; base 90%; recomendado 75% (subordinado de 25%)",
   "financiamento.primeira_serie": "Reg. (UE) 2017/1129 art. 1.º(4)(a)/(d) e art. 2.º al. e) (https://eur-lex.europa.eu/eli/reg/2017/1129/oj/eng): investidor qualificado a pedido = tratado como profissional por empresa de investimento ou instituição de crédito (MiFID II Anexo II, Secção II, https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/mifid-ii/annex-ii), que comunica a classificação ao emitente; a SPV e a OpCo não fazem opt-up. Subscritores >= 100k não profissionais são retalho para os PRIIPs (Reg. 1286/2014 art. 4.º(6), https://eur-lex.europa.eu/eli/reg/2014/1286/oj/eng). Capital social mínimo de SA 50.000 EUR (CSC art. 276.º/5) e realização mínima de 30% (art. 277.º/2) [L]. Dimensão 100-150k EUR (40-risco-coberturas.md sec. 9.10)",
-  "commodities.azeite.canais.granel_certificado": "alavanca de escala: granel certificado (lote, ficha, custódia, telemetria) comprado back-to-back ao índice e vendido a embaladores/exportadores a índice + 0,15 EUR/kg; lote de 100 t com collateral manager 1.200 EUR e análises 600 EUR (os mesmos custos da verificação para terceiros); 3.500 t em 2031 = 2% da produção PT (~175 kt). Margem esperada 0,03-0,04 EUR/kg antes do seguro de crédito, dentro do intervalo 0-0,10 do JSON; o 40 estima margem bruta de trading de granel de 0,15-0,30 EUR/kg (usa-se 0,15, o ponto de encontro das duas fontes) Fontes: 10-mercado.md sec. 5 e 6.9; commodities.azeite.canais.distribuidores_export.descricao; 40-risco-coberturas.md sec. 1.3; receitas.financiamento_stock_terceiros.nota_custos",
+  "commodities.azeite.canais.granel_certificado": "alavanca de escala: granel certificado (lote, ficha, custódia, telemetria) comprado back-to-back ao índice e vendido a embaladores/exportadores a índice + 0,15 EUR/kg; lote de 100 t com collateral manager 1.200 EUR e análises 600 EUR (os mesmos custos da verificação para terceiros); 3.500 t em 2031 = ~2,1% da produção PT (~169,5 kt). Margem esperada 0,03-0,04 EUR/kg antes do seguro de crédito, dentro do intervalo 0-0,10 do JSON; o 40 estima margem bruta de trading de granel de 0,15-0,30 EUR/kg (usa-se 0,15, o ponto de encontro das duas fontes) Fontes: 10-mercado.md sec. 5 e 6.9; commodities.azeite.canais.distribuidores_export.descricao; 40-risco-coberturas.md sec. 1.3; receitas.financiamento_stock_terceiros.nota_custos. Revisão de 13-10-2026: o 01 sec. 2.8 põe o granel em IBC 'com margem' fora do modelo de principal (é corretagem ao índice); o recomendado modela-o como corretagem com verificação (0,75% do valor ao índice) e o modelo de principal passa a caso de sensibilidade",
   "commodities.azeite.canais.distribuidores_export.premio_origem_venda_eur_kg": "0 nos três cenários do documento-fonte; 0,10 no recomendado (01-desenho-do-modelo.md sec. 5.4: condição para a seed 0,10-0,20)",
   "commodities.azeite.canais.horeca_gourmet.premio_lagar_eur_kg": "igual a commodities.azeite.premio_origem_pago_ao_lagar_eur_kg nos três cenários do documento-fonte; recomendado 0,15 (DOP/monovarietal) [E]",
-  "commodities.azeite.producao_pt_referencia_kt": "~175 kt [E], ponto médio de 160 (Olivum) e 179 (Governo) para 2025/26 (00-base-factual.md sec. 1.1)",
+  "commodities.azeite.producao_pt_referencia_kt": "~169,5 kt [E]: ponto médio de 160 (Olivum) e 179 (Governo) para 2025/26, intervalo 160-179; 177 kt em 2024/25 (00-base-factual.md sec. 1.1). Usado só para quotas de produção e para o bolo a montante; não entra no EBITDA",
   "commodities.azeite.tese_documento_fonte": "Observatorio de la Cadena Alimentaria (00-base-factual.md sec. 1.4): margem líquida do embalador 0,187 / 0,499 / 0,206 EUR/kg; documento-fonte: 80-90% capturados e 10-15% de desconto",
   "commodities.agua.lote_tipo": "01-desenho-do-modelo.md sec. 2.7 (comparação principal vs agente); o financiamento usa o cupão base de 2027 (8%) sobre stock + depósitos SDR durante 30 dias = 30 EUR; o 01 indica 38 EUR (equivale a ~10%/ano): diferença de 8 EUR por lote, sem efeito no modelo (água em modelo agente)",
   "commodities.cafe.custo_cobertura_pct_compras": "40-risco-coberturas.md sec. 2.3-2.4: forward EUR/USD 0,1-0,5% [E/NV]; ICE < 0,5% do nocional por semestre; 0 nos cenários do documento-fonte (compra a preço fixo em EUR, custo embutido no preço do importador)",
@@ -2387,7 +2460,8 @@
   "custos.pessoal.funcoes.trader_granel_exportacao": "só no recomendado: originação de granel certificado e exportação embalada a partir de 2029 (em 2028 o CEO/comercial e Operações cobrem 500 t) [E, NV]",
   "sensibilidades": "aplicadas aos cenários base e recomendado no modelo financeiro (folha Motor); volume = todos os volumes físicos (azeite por canal, água, café), estrutura fixa inalterada; preço do AOVE = índice do granel e referências de venda HoReCa e distribuidores x (1 - 30%), com embalamento, logística e custos fixos inalterados (repasse proporcional, o caso conservador); a perda pontual no stock em aberto é mostrada à parte",
   "unit_economics": "lotes-tipo: HoReCa/gourmet 20 t, distribuidores/exportação 30 t, granel certificado 100 t (dimensões em commodities.azeite.canais.*.lote_medio_t); água 20 paletes (commodities.agua.lote_tipo)",
-  "cenario_recomendado": "ver cenario_recomendado.alteracoes (cada alteração com justificação e fonte)"
+  "cenario_recomendado": "ver cenario_recomendado.alteracoes (cada alteração com justificação e fonte)",
+  "capex.plataforma_area_investidor_capitalizavel_eur": "plataforma_desenvolvimento_capitalizavel_eur = ledger, pagamentos, KYC e portais B2B (reescrita clean-room, 30 sec. 8.6); plataforma_area_investidor_capitalizavel_eur = área de reporte a investidores profissionais, só depois do gate e do parecer (0 em 2027). Divisão [E] da mesma despesa total da versão anterior"
  },
  "unit_economics": {
   "ano_regime": 2029,
@@ -2409,7 +2483,13 @@
   "exposicao_aberta_back_to_back": 0.15,
   "nota": "aplicadas aos cenários base e recomendado no modelo financeiro (folha Motor); volume = todos os volumes físicos (azeite por canal, água, café), estrutura fixa inalterada; preço do AOVE = índice do granel e referências de venda HoReCa e distribuidores x (1 - 30%), com embalamento, logística e custos fixos inalterados (repasse proporcional, o caso conservador); a perda pontual no stock em aberto é mostrada à parte",
   "premio_origem_distribuidores_topo": 0.2,
-  "nota_topo": "caso combinado 'topo dos intervalos': prémio de origem pago por distribuidores/exportadores 0,20 €/kg (topo da condição 0,10-0,20 do 01 sec. 5.4), carteira de verificação para terceiros do otimista (10 M€ em 2031) e volumes físicos +30%; mostra se o caminho recomendado chega ao break-even mesmo com tudo no topo do que a investigação suporta"
+  "nota_topo": "caso combinado 'topo dos intervalos': prémio de origem pago por distribuidores/exportadores 0,20 €/kg (topo da condição 0,10-0,20 do 01 sec. 5.4), carteira de verificação para terceiros do otimista (10 M€ em 2031) e volumes físicos +30%; mostra se o caminho recomendado chega ao break-even mesmo com tudo no topo do que a investigação suporta",
+  "cupao": [
+   0.1,
+   0.12
+  ],
+  "dias_pagamento_produtor_rapido": 5,
+  "nota_casos_recomendado": "casos só do recomendado: 'a preços verificados' (referência HoReCa 5,65 do base, sem prémio de origem dos distribuidores, sem verificação para terceiros nem dados); 'granel como principal' (modo_principal = 1); 'obrigações a 90%' (desenho anterior, subordinado de 10%); 'pagamento ao lagar a D5'; cupão de 10% e 12% também no base"
  },
  "cenario_recomendado": {
   "nome": "Recomendado (reestruturado)",
@@ -2478,14 +2558,14 @@
      2500,
      3500
     ],
-    "justificacao": "alavanca de escala: granel certificado (lote, ficha, custódia, telemetria) comprado back-to-back ao índice e vendido a embaladores/exportadores a índice + 0,15 EUR/kg; lote de 100 t com collateral manager 1.200 EUR e análises 600 EUR (os mesmos custos da verificação para terceiros); 3.500 t em 2031 = 2% da produção PT (~175 kt). Margem esperada 0,03-0,04 EUR/kg antes do seguro de crédito, dentro do intervalo 0-0,10 do JSON; o 40 estima margem bruta de trading de granel de 0,15-0,30 EUR/kg (usa-se 0,15, o ponto de encontro das duas fontes)",
+    "justificacao": "alavanca de escala: granel certificado (lote, ficha, custódia, telemetria) comprado back-to-back ao índice e vendido a embaladores/exportadores a índice + 0,15 EUR/kg; lote de 100 t com collateral manager 1.200 EUR e análises 600 EUR (os mesmos custos da verificação para terceiros); 3.500 t em 2031 = ~2,1% da produção PT (~169,5 kt). Margem esperada 0,03-0,04 EUR/kg antes do seguro de crédito, dentro do intervalo 0-0,10 do JSON; o 40 estima margem bruta de trading de granel de 0,15-0,30 EUR/kg (usa-se 0,15, o ponto de encontro das duas fontes); revisão de 13-10-2026: modelado como corretagem com verificação (0,75% do valor ao índice) até haver carta de intenções a >= índice + 0,10 EUR/kg; a compra e venda como principal fica como caso de sensibilidade",
     "fonte": "10-mercado.md sec. 5 e 6.9; commodities.azeite.canais.distribuidores_export.descricao; 40-risco-coberturas.md sec. 1.3; receitas.financiamento_stock_terceiros.nota_custos"
    },
    {
     "parametro": "custos.seguro_credito.premio_pct_volume_seguro_granel",
-    "base": "n/a (0,4% em todas as vendas de azeite)",
+    "base": "0,4% nas vendas HoReCa/distribuidores (sem granel)",
     "recomendado": 0.002,
-    "justificacao": "compradores de granel são embaladores/exportadores, não restauração; o intervalo indicativo é 0,1-0,6%, mais alto na restauração; usa-se metade da taxa do modelo (0,4%) só sobre as vendas de granel",
+    "justificacao": "compradores de granel são embaladores/exportadores, não restauração; o intervalo indicativo é 0,1-0,6%, mais alto na restauração; usa-se metade da taxa do modelo (0,4%) só sobre as vendas de granel em modo principal (caso de sensibilidade)",
     "fonte": "40-risco-coberturas.md sec. 4.2"
    },
    {
@@ -2534,18 +2614,52 @@
     "recomendado": "2031: 55k / 55k / 18k / 36k / 8k / 12k",
     "justificacao": "metade das contas HoReCa do base (menos KYC/KYB e faturação); aquisição HoReCa limitada a 1.000 contas premium e granel/exportação vendidos por relação direta; cowork até haver equipa; menos contratações; contabilidade externa em vez de controller. Jurídico, ROC, segurança, seguros e SPV iguais ao base",
     "fonte": "01-desenho-do-modelo.md sec. 6.2 e 7.4 [E]"
+   },
+   {
+    "parametro": "commodities.azeite.canais.granel_certificado.modo_principal / comissao_corretagem_verificacao_pct_valor",
+    "base": "n/a (sem granel)",
+    "recomendado": "corretagem com verificação: 0,75% do valor ao índice",
+    "justificacao": "o 01 sec. 2.8 põe o granel em IBC 'com margem' fora do modelo de principal: é corretagem ao índice, e lagar e embalador podem negociar diretamente. Até haver carta de intenções a >= índice + 0,10 EUR/kg, o Sprout cobra uma comissão abaixo do teto prático de 1% e paga o collateral manager e as análises",
+    "fonte": "01-desenho-do-modelo.md sec. 2.8; 50-concorrencia.md sec. 2.2 [E, NV]; 00-base-factual.md sec. 8"
+   },
+   {
+    "parametro": "financiamento.pct_capital_giro_azeite_financiado_por_notes",
+    "base": [
+     0.0,
+     0.9,
+     0.9,
+     0.9,
+     0.9
+    ],
+    "recomendado": [
+     0.0,
+     0.75,
+     0.75,
+     0.75,
+     0.75
+    ],
+    "justificacao": "subordinado do patrocinador de 25% em regime (advance rate de 75%): o S5 de um book de 500 k EUR custa ~100 k EUR e excede uma almofada de 15% em ~25 k EUR; com 25% + reserva fica absorvido. Custa capital próprio (caso 'obrigações a 90%' na Sensibilidade)",
+    "fonte": "01-desenho-do-modelo.md sec. 4.4; 40-risco-coberturas.md sec. 5.4"
+   },
+   {
+    "parametro": "financiamento.custos_spv.servicer_reserva_eur",
+    "base": "0",
+    "recomendado": "10.000 EUR/ano desde 2028 [E, NV]",
+    "justificacao": "servicer de reserva contratado e eventos de substituição do servicer: a SPV não pode depender só de uma OpCo com EBITDA negativo",
+    "fonte": "revisão de 13-10-2026; estimativa sem cotação"
    }
   ],
-  "nao_alterado": "índice do granel 3,50; desconto HoReCa 10%; 0% de desconto a distribuidores; cupão 8% -> 7%; obrigações 0% em 2027 e 90% do capital de giro desde 2028 (CSC art. 348.º/2 [L]); utilização 80%; custos e funções independentes da SPV; seguro de crédito 0,4% nas vendas HoReCa e distribuidores; capex; caixa mínima; impostos; pré-seed de 1,1 M EUR",
-  "produto_investidor": "obrigações da Sprout Capital, SA (SPV PT) só a clientes profissionais e investidores qualificados (MiFID II Anexo II) ou com subscrição >= 100.000 EUR se o parecer afastar o KID PRIIPs; retalho só mais tarde, como promotor numa ECSP de terceiros (teto 5 M EUR/12 meses, custo 10-13%/ano [E]), fora do horizonte do modelo [L: confirmar com o advogado]",
+  "nao_alterado": "índice do granel 3,50; desconto HoReCa 10%; 0% de desconto a distribuidores; cupão 8% -> 7%; obrigações 0% em 2027 (simplificação; CSC art. 348.º/2 [L]); utilização 80%; custos e funções independentes da SPV; seguro de crédito 0,4% nas vendas HoReCa e distribuidores; capex; caixa mínima; impostos; pré-seed de 1,1 M EUR",
+  "produto_investidor": "obrigações da Sprout Capital, SA (SPV PT) integralmente subscritas por clientes profissionais, sem revenda a não profissionais (CSC art. 349.º [L]: emissões só para investidores qualificados ficam fora do rácio de autonomia financeira de 35%); retalho só mais tarde, como promotor numa ECSP de terceiros, com promotor diferente da SPV ou com autonomia financeira >= 35% (custo 10-13%/ano [E]), fora do horizonte do modelo [L: confirmar com o advogado]",
   "correcao_brasil": "a investigação diz que Portugal tem ~62% das importações de azeite do Brasil (2025/26), não que o Brasil compra 62% das exportações portuguesas: por volume, o 1.º destino é Espanha (37%, sobretudo granel); o Brasil é o 1.º destino do embalado com marca (00-base-factual.md sec. 1.7; 10-mercado.md sec. 1.2)"
  },
  "notas_verificacao_modelo_financeiro": [
-  "2026-10-13, build_model.py: o modelo em Excel (~26.500 fórmulas, 0 erros depois de recalculado no LibreOffice) reproduz calculo_referencia.py nos três cenários do documento-fonte com desvio máximo de 0,01% (EBITDA, GMV, margem, pessoal, opex, capex, capital de giro, obrigações, reserva, cash flow e necessidade de capital) e um espelho em Python do mesmo motor nos quatro cenários e nas 14 sensibilidades; o lote-tipo HoReCa de 2029 reproduz o 01 sec. 2.2 (0,347 €/kg; 6.943 €; cupão 959 €; obrigações 93.375 €; reserva 2.083 €; repartição de Π 46/4/21/28%); referência HoReCa 6,00 no base = +128k de EBITDA em 2031, como no 01 sec. 7.4. Ver resultados.json -> verificacao.",
+  "2026-10-13, build_model.py: o modelo em Excel (contagem de fórmulas e de erros em resultados.json -> verificacao; 0 erros depois de recalculado no LibreOffice) reproduz calculo_referencia.py nos três cenários do documento-fonte com desvio máximo de 0,01% (EBITDA, GMV, margem, pessoal, opex, capex, capital de giro, obrigações, reserva, cash flow e necessidade de capital) e um espelho em Python do mesmo motor nos quatro cenários e em todos os casos de sensibilidade; o lote-tipo HoReCa de 2029 reproduz o 01 sec. 2.2 (0,347 €/kg; 6.943 €; cupão 959 €; obrigações 93.375 €; reserva 2.083 €; repartição de Π 46/4/21/28%); referência HoReCa 6,00 no base = +128k de EBITDA em 2031, como no 01 sec. 7.4. Ver resultados.json -> verificacao.",
   "Água, lote de 20 paletes (01 sec. 2.7): o financiamento de 38 EUR implica ~10%/ano; com o cupão base de 8% durante 30 dias sobre stock + depósitos SDR dá 30 EUR. Parâmetros do lote acrescentados em commodities.agua.lote_tipo; diferença de 8 EUR sem efeito no modelo (água em modelo agente).",
   "Ticket médio HoReCa de 150-300 EUR/mês (azeite + água) só é coerente no piloto (~211 EUR/mês); no base de 2031 o consumo assumido dá ~107 EUR/mês (azeite 205 kg/ano a 5,085 + água 0,9 paletes/ano), porque as paletes de água por cliente caem de ~4,8/ano no piloto para 0,9/ano. Não altera margens (água em modelo agente); corrigir a frase no deck.",
   "Gestores de conta no base de 2030: 3 para 1.300 contas (433 por gestor) contra a regra de ~400; diferença dentro do arredondamento ('~400'); não alterado.",
   "Perda potencial de deter stock 18 meses sem cobertura: carry 19,8% + VaR95 37-57% - margem do lote. Com a margem base (6,8%) dá 50-70% (01 sec. 2.6); o intervalo 45-65% só sai com margem de ~12% (referência 6,00). Usar 50-70% no caso base.",
-  "Brasil: Portugal tem ~62% das importações de azeite do Brasil; não é o Brasil que compra 62% das exportações portuguesas (00 sec. 1.7)."
+  "Brasil: Portugal tem ~62% das importações de azeite do Brasil; não é o Brasil que compra 62% das exportações portuguesas (00 sec. 1.7).",
+  "Revisão de 13-10-2026 (2.ª): produção PT de referência 169,5 kt (ponto médio correto de 160 e 179; antes 175); granel do recomendado em corretagem com verificação; obrigações do recomendado a 75% do fundo de maneio; servicer de reserva; piloto com 17 t de offtake e 3 t HoReCa em aberto autorizado; capex da área de investidor separado e adiado para depois do gate; seguro de crédito imputado por kg nos lotes-tipo; casos novos na Sensibilidade (a preços verificados, granel como principal, obrigações a 90%, pagamento ao lagar a D5, cupão de 10% e 12%)."
  ]
 }

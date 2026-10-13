@@ -477,6 +477,7 @@ figcaption strong { color: var(--ink); font-weight: 600; }
 .legend .key { display: inline-flex; align-items: center; gap: 1.3mm; }
 .legend .sw { display: inline-block; width: 2.6mm; height: 2.6mm; border-radius: 0.5mm; background: var(--sw, var(--ink)); }
 .legend .ln { display: inline-block; width: 4mm; height: 0; border-top: 1.5pt solid var(--sw, var(--ink)); }
+.legend .ln.dash { border-top-style: dashed; width: 5mm; }
 
 /* ---------- Notas e chamadas (sem barras coloridas à esquerda) ---------- */
 

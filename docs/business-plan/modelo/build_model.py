@@ -18,7 +18,7 @@ Arquitetura (uma só definição do cálculo, duas disposições):
 - as linhas do motor (volumes, economia por kg, receitas, custos, pessoal, DR,
   cash flow, capital) são definidas uma vez em `define_lines()`;
 - disposição "detalhe": o cenário ativo (seletor em Pressupostos!C4) espalhado
-  pelas folhas Volumes, Receitas, Pessoal, Custos, DR, Cash flow e Capital;
+  pelas folhas Volumes, Receitas, Pessoal, Custos, DR, Fluxo de caixa e Capital;
 - disposição "Motor": as mesmas linhas em blocos fixos, um por cenário e um por
   caso de sensibilidade; Cenários, Unit economics e Sensibilidade leem daqui.
 """
@@ -53,6 +53,7 @@ ARIAL = "Arial"
 INK, MUTED, RULE, PANEL, ACCENT = "1A1E16", "5B6352", "D7DBCC", "F4F5EF", "3F5A1E"
 BLUE, GREEN, BLACK = "0000FF", "008000", "000000"
 WARN, CRIT, OK = "A86A12", "B42318", "2E7D4F"
+AGUA = "2D6E8E"   # separador dos inputs: cor água da paleta (não o azul puro dos inputs)
 
 FMT_EUR = '#,##0;(#,##0);"-"'
 FMT_EKG = '0.000;(0.000);"-"'
@@ -142,6 +143,34 @@ def section_row(ws, row, text, ncols=8):
 
 WRAP = Alignment(wrap_text=True, vertical="top")
 
+# Normalização do texto visível (pt-PT e convenções dos PDF): termos e espaços antes de % e nos milhares.
+PT_TERMS = [("Capital de giro", "Fundo de maneio"), ("capital de giro", "fundo de maneio"), ("Cash flow", "Fluxo de caixa"), ("cash flow", "fluxo de caixa"),
+            ("Runway", "Autonomia"), ("runway", "autonomia"), ("repasse", "repercussão"), ("governança", "governação"), ("escopo", "âmbito"),
+            ("precificado", "com preço formado"), ("embutido", "incorporado"), ("Stress tests", "Testes de esforço"), ("stress tests", "testes de esforço")]
+
+
+def normalize_text(t):
+    import re
+    if not isinstance(t, str) or t.startswith("="):
+        return t
+    for a, b in PT_TERMS:
+        t = t.replace(a, b)
+    parts = re.split(r"(https?://\S+|\S+\.(?:md|json|py|xlsx|pdf)\b)", t)
+    for i in range(0, len(parts), 2):
+        x = parts[i]
+        x = re.sub(r"(\d)[ \u00a0]?%", "\\1\u00a0%", x)
+        x = re.sub(r"(?<![\d.,/])([1-9]\d{0,2})\.(\d{3})(?![\d])", "\\1\u2009\\2", x)
+        x = re.sub(r"(?<![\d/-])(\d{2})/(\d{2})/(\d{4})", "\\1-\\2-\\3", x)
+        parts[i] = x
+    return "".join(parts)
+
+
+def normalize_sheet(ws):
+    for row in ws.iter_rows():
+        for c in row:
+            if isinstance(c.value, str):
+                c.value = normalize_text(c.value)
+
 
 # ----------------------------------------------------------------------------- pressupostos
 class Param:
@@ -220,6 +249,8 @@ def build_params(P):
       "[E] capital levantado a 12–18 meses vs. rotação do stock de 2–4 meses. 40 §5.1")
     p("fin_pre_seed", S4, "Ronda pré-seed (recebida até 31-01-2027)", "€", "scen", scen_vals(fin["ronda_pre_seed_eur"]), FMT_EUR,
       "01 §5.5 e §7.3: 1,1 M€ (ou 0,8 M€ + bridge firme de 0,3 M€)")
+    p("g_principal", S4, "Granel certificado em modo principal (1) ou corretagem com verificação (0)", "1/0", "scen", scen_vals(G["modo_principal"]), FMT_INT,
+      "Revisão de 13-10-2026: corretagem até haver carta de intenções a ≥ índice + 0,10 €/kg (01 §2.8); principal = caso de sensibilidade")
 
     # ------------------------------------------------------------ constantes
     C1 = "Azeite: canal HoReCa/gourmet (constantes)"
@@ -256,6 +287,8 @@ def build_params(P):
     p("g_cust", C3, "Custódia por lote", "€/lote", "const", G["inspecao_collateral_manager_eur_por_lote"], FMT_EUR, "1.200 € por lote de 100 t")
     p("g_pag", C3, "Pagamentos bancários", "€/kg", "const", G["pagamentos_bancarios_eur_kg"], FMT_EKG, "[E] poucas operações de valor alto")
     p("g_prov", C3, "Provisão de crédito", "% vendas", "const", G["provisao_credito_pct_vendas"], FMT_PCT2, "[E] igual aos distribuidores")
+    p("g_com", C3, "Corretagem com verificação: comissão sobre o valor ao índice", "% valor", "const", G["comissao_corretagem_verificacao_pct_valor"], FMT_PCT2,
+      "[E, NV] abaixo do teto prático de 1% da corretagem de granel (50 §2.2); igual à comissão de verificação por utilização")
     C4 = "Azeite: custos físicos, custódia e cobertura"
     p("az_arm", C4, "Armazenagem no lagar", "€/t/mês", "const", cfc["armazenagem_eur_t_mes"], FMT_EKG2, "[E] método de custo, 2–8 €/t/mês. 40 §1.5")
     p("az_seg", C4, "Seguro do stock", "%/ano", "const", cfc["seguro_stock_pct_ano"], FMT_PCT2, "[E, NV] 0,1–0,3%/ano. 40 §4.5")
@@ -273,7 +306,7 @@ def build_params(P):
     p("az_cons_cliente", C5, "Consumo por cliente HoReCa/gourmet", "t/ano", "const", az["consumo_por_cliente_horeca_gourmet_t_ano"], FMT_EKG,
       "[E] 150–300 L/ano = 137–275 kg. 10 §5")
     p("az_prod_pt", C5, "Produção de azeite em Portugal (referência)", "kt", "const", az["producao_pt_referencia_kt"], FMT_T,
-      "[E] ~175 kt (160 Olivum; 179 Governo). 00 §1.1")
+      "[E] ~169,5 kt: ponto médio de 160 (Olivum) e 179 (Governo), 2025/26. 00 §1.1")
     C6 = "Água (modelo agente; lote de comparação)"
     p("ag_l_pal", C6, "Litros por palete", "L", "const", ag["litros_por_palete"], FMT_INT, "[E] 500 garrafas de 1,5 L")
     p("ag_garrafas", C6, "Garrafas por palete", "n.º", "const", ag["garrafas_por_palete"], FMT_INT, "[E]")
@@ -388,7 +421,10 @@ def build_params(P):
     p("sens_premio_topo", C17, "Caso combinado: prémio de origem pago por distribuidores/exportadores (topo)", "€/kg", "const",
       sens["premio_origem_distribuidores_topo"], FMT_EKG2, "Topo da condição 0,10–0,20 do 01 §5.4; com carteira de terceiros do otimista e volumes +30%")
     p("sens_preco", C17, "Sensibilidade: preço do AOVE (índice e referências de venda)", "%", "const", sens["preco_aove"], FMT_PCT,
-      "Repasse proporcional; embalamento, logística e fixos inalterados")
+      "Repercussão proporcional; embalamento, logística e fixos inalterados")
+    p("sens_cup_1", C17, "Sensibilidade: cupão das obrigações — caso 1", "%", "const", sens["cupao"][0], FMT_PCT, "Comparável ECSP de retalho 10–13%/ano [E]")
+    p("sens_cup_2", C17, "Sensibilidade: cupão das obrigações — caso 2", "%", "const", sens["cupao"][1], FMT_PCT, "")
+    p("sens_dp", C17, "Sensibilidade: pagamento ao lagar (dias)", "dias", "const", sens["dias_pagamento_produtor_rapido"], FMT_DAYS, "Pagamento a D5 em vez de D30")
     p("tese_m_min", C17, "Margem líquida do embalador — mínimo (2018/19)", "€/kg", "const", tese["margem_liquida_embalador_eur_kg"]["min"], FMT_EKG,
       "[F] Observatorio. 00 §1.4")
     p("tese_m_med", C17, "Margem líquida do embalador — média de 3 campanhas", "€/kg", "const", tese["margem_liquida_embalador_eur_kg"]["media_3_campanhas"], FMT_EKG,
@@ -406,7 +442,7 @@ def build_params(P):
     p("d_vol", Q1, "Azeite para distribuidores/exportação com offtake", "t", "sseries", scen_vals(az["volume_distribuidores_export_t"]), FMT_T,
       "[E] restante volume do plano (base 2031 = 1,3% da produção PT)")
     p("g_vol", Q1, "Azeite granel certificado", "t", "sseries", scen_vals(az["volume_granel_certificado_t"]), FMT_T,
-      "[E] só no Recomendado: 3.500 t em 2031 = 2% da produção PT")
+      "[E] só no Recomendado: 3.500 t em 2031 ≈ 2,1% da produção PT")
     Q2 = "Azeite: logística e stock"
     p("h_log", Q2, "Logística até à HoReCa", "€/kg", "sseries", scen_vals(H["logistica_eur_kg"]), FMT_EKG2, "[E] 0,15–0,30 €/kg. 10 §1.7")
     p("h_ds", Q2, "Stock médio HoReCa (180 dias com < 300 clientes; 45 depois)", "dias", "sseries", scen_vals(H["dias_stock"]), FMT_DAYS, "[E] 01 §2.8")
@@ -420,15 +456,19 @@ def build_params(P):
     p("dd", Q3, "Dados e índice (subscrições)", "€", "sseries", scen_vals(dd), FMT_EUR, "[E] conservador: Poolred e Mintec já publicam preços")
     Q4 = "Financiamento"
     p("fin_pct", Q4, "Capital de giro financiado por obrigações", "%", "sseries", scen_vals(fin["pct_capital_giro_azeite_financiado_por_notes"]), FMT_PCT,
-      "[L] 0% em 2027: a SPV só emite 12 meses após o registo (CSC art. 348.º/2)")
+      "[L] 0% em 2027 (simplificação; CSC art. 348.º/2); Recomendado 75% (subordinado de 25% em regime)")
     p("fin_cupao", Q4, "Cupão anual das obrigações (bruto)", "%", "sseries", scen_vals(fin["cupao_anual"]), FMT_PCT2,
       "[E] 8%/ano no modelo de carry; ECSP de retalho 10–13%/ano")
     p("spv_series", Q4, "Séries emitidas no ano", "n.º", "sseries", scen_vals(spv["series_por_ano"]), FMT_INT, "[E]")
     p("sc_min", Q4, "Seguro de crédito: prémio mínimo anual", "€", "sseries", scen_vals(sc["premio_minimo_anual_eur"]), FMT_EUR, "[E, NV]")
+    p("spv_servicer", Q4, "SPV: servicer de reserva contratado", "€", "sseries", scen_vals(spv["servicer_reserva_eur"]), FMT_EUR,
+      "[E, NV] só no Recomendado, desde a 1.ª série; estimativa sem cotação")
     Q5 = "Capex"
     p("tel_locais", Q5, "Novos locais com telemetria", "n.º", "sseries", scen_vals(cx["locais_novos"]), FMT_INT, "[E]")
-    p("plat", Q5, "Desenvolvimento capitalizável da plataforma", "€", "sseries", scen_vals(cx["plataforma_desenvolvimento_capitalizavel_eur"]), FMT_EUR,
+    p("plat", Q5, "Plataforma B2B: ledger, pagamentos, KYC e portais (capitalizável)", "€", "sseries", scen_vals(cx["plataforma_desenvolvimento_capitalizavel_eur"]), FMT_EUR,
       "[E] reescrita clean-room de ledger, pagamentos e KYC. 30 §8.6")
+    p("plat_inv", Q5, "Área de reporte a investidores (capitalizável; só depois do gate)", "€", "sseries", scen_vals(cx["plataforma_area_investidor_capitalizavel_eur"]), FMT_EUR,
+      "[E] divisão da mesma despesa total; 0 em 2027")
     Q6 = "Pessoal (FTE por função)"
     for fn, v in pe["funcoes"].items():
         p("fte_" + fn, Q6, f"FTE — {ROLE_LABEL[fn]}", "FTE", "sseries", scen_vals(v["fte"]), FMT_FTE, ROLE_NOTE.get(fn, "[E]"))
@@ -518,7 +558,7 @@ def write_pressupostos(wb, params, P):
     ws.add_data_validation(dv)
     dv.add("C4")
     put(ws, "D4", "índice", color=MUTED, italic=True)
-    put(ws, "A5", "Muda as folhas Volumes, Receitas, Pessoal, Custos, DR, Cash flow e Capital & financiamento. Cenários, Unit economics e "
+    put(ws, "A5", "Muda as folhas Volumes, Receitas, Pessoal, Custos, DR, Fluxo de caixa e Capital & financiamento. Cenários, Unit economics e "
                   "Sensibilidade mostram cenários fixos (folha Motor).", color=MUTED, italic=True)
     widths = {"A": 62, "B": 14, "C": 13, "D": 13, "E": 13, "F": 13, "G": 13, "H": 95}
     for k, v in widths.items():
@@ -635,6 +675,8 @@ def define_lines():
     ln("v_h_t", V, s, "Azeite HoReCa/gourmet", "t", FMT_T, lambda c, y: c.p("h_vol", y))
     ln("v_d_t", V, s, "Azeite distribuidores/exportação (offtake)", "t", FMT_T, lambda c, y: c.p("d_vol", y))
     ln("v_g_t", V, s, "Azeite granel certificado", "t", FMT_T, lambda c, y: c.p("g_vol", y))
+    ln("v_gp_t", V, s, "dos quais comprados e vendidos como principal", "t", FMT_T, lambda c, y: f"{c.l('v_g_t', y)}*{c.p('g_principal')}")
+    ln("v_gc_t", V, s, "dos quais em corretagem com verificação (sem título nem stock)", "t", FMT_T, lambda c, y: f"{c.l('v_g_t', y)}-{c.l('v_gp_t', y)}")
     ln("v_az_t", V, s, "Azeite total", "t", FMT_T, lambda c, y: f"{c.l('v_h_t', y)}+{c.l('v_d_t', y)}+{c.l('v_g_t', y)}", style="key")
     ln("v_h_mix", V, s, "Peso da HoReCa/gourmet no volume", "%", FMT_PCT,
        lambda c, y: f"IF({c.l('v_az_t', y)}>0,{c.l('v_h_t', y)}/{c.l('v_az_t', y)},0)")
@@ -697,34 +739,52 @@ def define_lines():
            lambda c, y, k=k: (f"({c.l(k + '_gr', y)}+{c.l(k + '_emb', y)})*({c.l(k + '_ds', y)}-{c.p('az_dp')})/365"
                               f"+{c.l(k + '_price', y)}*{c.l(k + '_dr', y)}/365"))
 
+    s = "Economia por kg: granel em corretagem com verificação"
+    ln("gc_com", K, s, "Comissão de corretagem e verificação (% do valor ao índice)", "€/kg", FMT_EKG,
+       lambda c, y: f"{c.p('g_com')}*{c.p('az_indice')}")
+    ln("gc_custo", K, s, "Custódia (collateral manager), análises e pagamentos do lote", "€/kg", FMT_EKG,
+       lambda c, y: f"{c.l('g_cust', y)}+{c.l('g_anal', y)}+{c.l('g_pag', y)}")
+    ln("gc_margem", K, s, "Margem de contribuição da corretagem", "€/kg", FMT_EKG, lambda c, y: f"{c.l('gc_com', y)}-{c.l('gc_custo', y)}", style="key")
+
+    def vt(k):
+        """Volume com título e stock (o granel em corretagem não entra)."""
+        return "v_gp_t" if k == "g" else f"v_{k}_t"
+
     def vsum(c, y, expr):
-        """Σ por canal: volume (t) × 1000 × expr(canal)."""
-        return "+".join(f"{c.l('v_' + k + '_t', y)}*1000*({expr(k)})" for k, _ in CH)
+        """Σ por canal: volume com título (t) × 1000 × expr(canal)."""
+        return "+".join(f"{c.l(vt(k), y)}*1000*({expr(k)})" for k, _ in CH)
 
     # ---------------------------------------------------------------- Receitas
     R = "Receitas"
     s = "Receitas por fluxo (€)"
     for k, nm in CH:
-        ln(f"r_{k}", R, s, f"Vendas de azeite: {nm}", "€", FMT_EUR, lambda c, y, k=k: f"{c.l('v_' + k + '_t', y)}*1000*{c.l(k + '_price', y)}")
+        ln(f"r_{k}", R, s, f"Vendas de azeite: {nm}", "€", FMT_EUR, lambda c, y, k=k: f"{c.l(vt(k), y)}*1000*{c.l(k + '_price', y)}")
     ln("r_az", R, s, "Vendas de azeite", "€", FMT_EUR, lambda c, y: f"{c.l('r_h', y)}+{c.l('r_d', y)}+{c.l('r_g', y)}", style="sub")
     ln("r_cf", R, s, "Vendas de café verde", "€", FMT_EUR, lambda c, y: f"{c.l('v_cf_t', y)}*1000*{c.p('cf_pv')}")
     ln("gmv_ag", R, s, "Memo: GMV de água (faturado pelo engarrafador)", "€", FMT_EUR,
        lambda c, y: f"{c.l('v_ag_l', y)}*{c.p('ag_ref_l')}*(1-{c.p('ag_desc')})", style="memo")
     ln("r_ag", R, s, "Comissões de agente: água", "€", FMT_EUR, lambda c, y: f"{c.l('gmv_ag', y)}*{c.p('ag_com')}")
+    ln("r_gc", R, s, "Comissões de corretagem e verificação: granel", "€", FMT_EUR, lambda c, y: f"{c.l('v_gc_t', y)}*1000*{c.l('gc_com', y)}")
     ln("r_tp", R, s, "Comissões de originação e verificação (terceiros)", "€", FMT_EUR,
        lambda c, y: f"{c.l('v_tp_cart', y)}*({c.p('tp_taxa_util')}*{c.p('tp_rot')}+{c.p('tp_taxa_mon')})")
     ln("r_dd", R, s, "Dados e índice", "€", FMT_EUR, lambda c, y: c.p("dd", y))
     ln("r_total", R, s, "Receita total", "€", FMT_EUR,
-       lambda c, y: "+".join(c.l(x, y) for x in ("r_az", "r_cf", "r_ag", "r_tp", "r_dd")), style="key")
+       lambda c, y: "+".join(c.l(x, y) for x in ("r_az", "r_cf", "r_ag", "r_gc", "r_tp", "r_dd")), style="key")
     s = "GMV e capital de lotes (€)"
-    ln("gmv_total", R, s, "GMV total (azeite + café + água)", "€", FMT_EUR, lambda c, y: f"{c.l('r_az', y)}+{c.l('r_cf', y)}+{c.l('gmv_ag', y)}", style="key")
+    ln("gmv_gc", R, s, "Memo: valor do granel em corretagem (ao índice; faturado entre lagar e comprador)", "€", FMT_EUR,
+       lambda c, y: f"{c.l('v_gc_t', y)}*1000*{c.p('az_indice')}", style="memo")
+    ln("gmv_total", R, s, "GMV total (azeite + café + água + granel em corretagem)", "€", FMT_EUR,
+       lambda c, y: f"{c.l('r_az', y)}+{c.l('r_cf', y)}+{c.l('gmv_ag', y)}+{c.l('gmv_gc', y)}", style="key")
+    ln("gmv_sem_granel", R, s, "GMV sem granel certificado", "€", FMT_EUR, lambda c, y: f"{c.l('gmv_total', y)}-{c.l('gmv_gc', y)}-{c.l('r_g', y)}")
     ln("lotes_valor", R, s, "Valor de compra dos lotes (granel + embalamento; café verde)", "€", FMT_EUR,
        lambda c, y: vsum(c, y, lambda k: f"{c.l(k + '_gr', y)}+{c.l(k + '_emb', y)}") + f"+{c.l('v_cf_t', y)}*1000*{c.p('cf_pc')}")
     ln("lotes_fin_obr", R, s, "dos quais financiados por obrigações (capital financiado)", "€", FMT_EUR,
        lambda c, y: f"{c.l('lotes_valor', y)}*{c.p('fin_pct', y)}")
     s = "Margem de contribuição por fluxo (€)"
     for k, nm in CH:
-        ln(f"mc_{k}", R, s, f"Azeite: {nm}", "€", FMT_EUR, lambda c, y, k=k: f"{c.l('v_' + k + '_t', y)}*1000*{c.l(k + '_margem', y)}")
+        ln(f"mc_{k}", R, s, f"Azeite: {nm}", "€", FMT_EUR,
+           (lambda c, y, k=k: f"{c.l(vt(k), y)}*1000*{c.l(k + '_margem', y)}") if k != "g" else
+           (lambda c, y: f"{c.l('v_gp_t', y)}*1000*{c.l('g_margem', y)}+{c.l('v_gc_t', y)}*1000*{c.l('gc_margem', y)}"))
     ln("mc_az", R, s, "Azeite", "€", FMT_EUR, lambda c, y: f"{c.l('mc_h', y)}+{c.l('mc_d', y)}+{c.l('mc_g', y)}", style="sub")
     ln("mc_az_kg", R, s, "Margem média do azeite", "€/kg", FMT_EKG,
        lambda c, y: f"IF({c.l('v_az_t', y)}>0,{c.l('mc_az', y)}/({c.l('v_az_t', y)}*1000),0)")
@@ -762,8 +822,9 @@ def define_lines():
        lambda c, y: vsum(c, y, lambda k: c.l(k + "_hedge", y)) + f"+{c.l('v_cf_t', y)}*1000*{c.p('cf_hedge')}*{c.p('cf_pc')}")
     ln("cv_tp", K, s, "Verificação para terceiros (collateral manager e análises)", "€", FMT_EUR,
        lambda c, y: f"{c.l('v_tp_t', y)}*1000*{c.p('tp_custo_ver')}*{c.p('tp_share')}")
+    ln("cv_gc", K, s, "Granel em corretagem: custódia, análises e pagamentos", "€", FMT_EUR, lambda c, y: f"{c.l('v_gc_t', y)}*1000*{c.l('gc_custo', y)}")
     ln("cv_total", K, s, "Custos variáveis diretos", "€", FMT_EUR,
-       lambda c, y: "+".join(c.l(x, y) for x in ("cv_log", "cv_3pl", "cv_arm", "cv_qual", "cv_cust", "cv_pag", "cv_prov", "cv_hedge", "cv_tp")), style="sub")
+       lambda c, y: "+".join(c.l(x, y) for x in ("cv_log", "cv_3pl", "cv_arm", "cv_qual", "cv_cust", "cv_pag", "cv_prov", "cv_hedge", "cv_tp", "cv_gc")), style="sub")
     ln("cup_az", K, s, "Cupão das obrigações: azeite", "€", FMT_EUR, lambda c, y: vsum(c, y, lambda k: c.l(k + "_cupao", y)))
     ln("cup_cf", K, s, "Cupão das obrigações: café", "€", FMT_EUR, lambda c, y: f"{c.l('v_cf_t', y)}*1000*{c.l('cf_fin_kg', y)}")
     ln("cup_total", K, s, "Cupão das obrigações (custo de financiar o stock)", "€", FMT_EUR, lambda c, y: f"{c.l('cup_az', y)}+{c.l('cup_cf', y)}", style="sub")
@@ -796,18 +857,19 @@ def define_lines():
     for k in OPEX_KEYS:
         ln("ox_" + k, K, s, OPEX_LABEL[k], "€", FMT_EUR, lambda c, y, k=k: f"{c.p('ox_' + k, y)}*(1+{c.p('cont')})*(1+{c.p('infl')})^{y}")
     ln("ox_linhas", K, s, "Subtotal das linhas", "€", FMT_EUR, lambda c, y: "+".join(c.l("ox_" + k, y) for k in OPEX_KEYS), style="sub")
-    ln("ox_spv", K, s, "SPV: constituição, manutenção, séries e funções independentes", "€", FMT_EUR,
-       lambda c, y: (("" if y else f"{c.p('spv_setup')}+") + f"{c.p('spv_anual')}+{c.p('spv_serie')}*{c.p('spv_series', y)}+{c.p('spv_indep', y)}"))
+    ln("ox_spv", K, s, "SPV: constituição, manutenção, séries, funções independentes e servicer de reserva", "€", FMT_EUR,
+       lambda c, y: (("" if y else f"{c.p('spv_setup')}+") + f"{c.p('spv_anual')}+{c.p('spv_serie')}*{c.p('spv_series', y)}+{c.p('spv_indep', y)}+{c.p('spv_servicer', y)}"))
     ln("ox_seg", K, s, "Seguro de crédito (prémio proporcional ou mínimo)", "€", FMT_EUR,
        lambda c, y: (f"IF({c.l('ano', y)}<{c.p('sc_desde')},0,MAX({c.p('sc_min', y)},"
                      f"{c.p('sc_pct')}*({c.l('r_h', y)}+{c.l('r_d', y)})+{c.p('sc_pct_granel')}*{c.l('r_g', y)}))"))
     ln("ox_total", K, s, "Opex não salarial", "€", FMT_EUR, lambda c, y: f"{c.l('ox_linhas', y)}+{c.l('ox_spv', y)}+{c.l('ox_seg', y)}", style="key")
     s = "Capex e amortizações (€)"
     ln("cx_tel", K, s, "Telemetria nos lagares", "€", FMT_EUR, lambda c, y: f"{c.p('tel_eur')}*{c.p('tel_locais', y)}")
-    ln("cx_plat", K, s, "Plataforma (desenvolvimento capitalizável)", "€", FMT_EUR, lambda c, y: c.p("plat", y))
+    ln("cx_plat", K, s, "Plataforma B2B: ledger, pagamentos, KYC, portais (capitalizável)", "€", FMT_EUR, lambda c, y: c.p("plat", y))
+    ln("cx_plat_inv", K, s, "Área de reporte a investidores (capitalizável; depois do gate)", "€", FMT_EUR, lambda c, y: c.p("plat_inv", y))
     ln("cx_eq", K, s, "Equipamento informático (novas FTE)", "€", FMT_EUR,
        lambda c, y: (f"{c.p('eq_eur')}*MAX(0,{c.l('fte_total', y)})" if y == 0 else f"{c.p('eq_eur')}*MAX(0,{c.l('fte_total', y)}-{c.l('fte_total', y - 1)})"))
-    ln("capex", K, s, "Capex", "€", FMT_EUR, lambda c, y: f"{c.l('cx_tel', y)}+{c.l('cx_plat', y)}+{c.l('cx_eq', y)}", style="sub")
+    ln("capex", K, s, "Capex", "€", FMT_EUR, lambda c, y: f"{c.l('cx_tel', y)}+{c.l('cx_plat', y)}+{c.l('cx_plat_inv', y)}+{c.l('cx_eq', y)}", style="sub")
 
     def da(src, vida):
         def f(c, y):
@@ -815,10 +877,11 @@ def define_lines():
             return f"({terms})/{c.p(vida)}"
         return f
 
-    ln("da_plat", K, s, "Amortização: plataforma", "€", FMT_EUR, da("cx_plat", "vida_sw"))
+    ln("da_plat", K, s, "Amortização: plataforma B2B", "€", FMT_EUR, da("cx_plat", "vida_sw"))
+    ln("da_plat_inv", K, s, "Amortização: área de investidores", "€", FMT_EUR, da("cx_plat_inv", "vida_sw"))
     ln("da_tel", K, s, "Amortização: telemetria", "€", FMT_EUR, da("cx_tel", "vida_sens"))
     ln("da_eq", K, s, "Amortização: equipamento", "€", FMT_EUR, da("cx_eq", "vida_eq"))
-    ln("da", K, s, "Amortizações", "€", FMT_EUR, lambda c, y: f"{c.l('da_plat', y)}+{c.l('da_tel', y)}+{c.l('da_eq', y)}", style="sub")
+    ln("da", K, s, "Amortizações", "€", FMT_EUR, lambda c, y: f"{c.l('da_plat', y)}+{c.l('da_plat_inv', y)}+{c.l('da_tel', y)}+{c.l('da_eq', y)}", style="sub")
 
     # ---------------------------------------------------------------- DR
     DR = "DR"
@@ -832,10 +895,10 @@ def define_lines():
     ln("dr_mc", DR, s, "Margem de contribuição", "€", FMT_EUR, lambda c, y: f"{c.l('dr_mb', y)}+{c.l('dr_cv', y)}+{c.l('dr_cup', y)}", style="key")
     ln("dr_pess", DR, s, "Pessoal", "€", FMT_EUR, lambda c, y: f"-{c.l('pess_total', y)}")
     ln("dr_opex", DR, s, "Opex não salarial (incl. SPV e seguro de crédito)", "€", FMT_EUR, lambda c, y: f"-{c.l('ox_total', y)}")
-    ln("dr_ebitda", DR, s, "EBITDA", "€", FMT_EUR, lambda c, y: f"{c.l('dr_mc', y)}+{c.l('dr_pess', y)}+{c.l('dr_opex', y)}", style="key",
+    ln("dr_ebitda", DR, s, "EBITDA, depois do cupão das obrigações (custo de financiar o stock)", "€", FMT_EUR, lambda c, y: f"{c.l('dr_mc', y)}+{c.l('dr_pess', y)}+{c.l('dr_opex', y)}", style="key",
        note="Convenção do modelo (igual ao 01 e a calculo_referencia.py): inclui o cupão, que financia stock lote a lote")
     ln("dr_ebitda_pct", DR, s, "EBITDA em % da receita", "%", FMT_PCT, lambda c, y: f"IF({c.l('dr_rec', y)}>0,{c.l('dr_ebitda', y)}/{c.l('dr_rec', y)},0)", style="memo")
-    ln("dr_ebitda_xc", DR, s, "Memo: EBITDA sem o cupão (juros abaixo do EBIT, convenção SNC)", "€", FMT_EUR,
+    ln("dr_ebitda_xc", DR, s, "Memo: EBITDA antes do cupão (juros abaixo do EBITDA, convenção SNC)", "€", FMT_EUR,
        lambda c, y: f"{c.l('dr_ebitda', y)}+{c.l('cup_total', y)}", style="memo")
     ln("dr_da", DR, s, "Amortizações", "€", FMT_EUR, lambda c, y: f"-{c.l('da', y)}")
     ln("dr_ebit", DR, s, "EBIT", "€", FMT_EUR, lambda c, y: f"{c.l('dr_ebitda', y)}+{c.l('dr_da', y)}", style="key")
@@ -861,7 +924,7 @@ def define_lines():
     ln("dr_rl", DR, s, "Resultado líquido", "€", FMT_EUR, lambda c, y: f"{c.l('dr_ebit', y)}+{c.l('dr_imp', y)}", style="key")
 
     # ---------------------------------------------------------------- Cash flow
-    CF = "Cash flow"
+    CF = "Fluxo de caixa"
     s = "Capital de giro (€, nível médio do ano, sem IVA)"
     ln("cg_stock_az", CF, s, "Stock de azeite (ao custo)", "€", FMT_EUR,
        lambda c, y: vsum(c, y, lambda k: f"({c.l(k + '_gr', y)}+{c.l(k + '_emb', y)})*{c.l(k + '_ds', y)}/365"))
@@ -869,7 +932,7 @@ def define_lines():
        lambda c, y: f"{c.l('cg_stock_az', y)}+{c.l('v_cf_t', y)}*1000*{c.p('cf_pc')}*{c.p('cf_ds')}/365")
     ln("cg_rec", CF, s, "Recebíveis (prazos médios de recebimento)", "€", FMT_EUR,
        lambda c, y: (vsum(c, y, lambda k: f"{c.l(k + '_price', y)}*{c.l(k + '_dr', y)}/365")
-                     + f"+{c.l('r_cf', y)}*{c.p('cf_dr')}/365+{c.l('r_ag', y)}*{c.p('ag_dr_com')}/365"))
+                     + f"+{c.l('r_cf', y)}*{c.p('cf_dr')}/365+({c.l('r_ag', y)}+{c.l('r_gc', y)})*{c.p('ag_dr_com')}/365"))
     ln("cg_forn", CF, s, "Fornecedores (produtor pago a 30 dias)", "€", FMT_EUR,
        lambda c, y: (vsum(c, y, lambda k: f"({c.l(k + '_gr', y)}+{c.l(k + '_emb', y)})*{c.p('az_dp')}/365")
                      + f"+{c.l('v_cf_t', y)}*1000*{c.p('cf_pc')}*{c.p('cf_dp')}/365"))
@@ -997,6 +1060,10 @@ def define_lines():
     ln("i_alm", KF, s, "Almofada de primeira perda (capital próprio no giro + reserva) em % das obrigações", "%", FMT_PCT,
        lambda c, y: f"IF({c.l('ob', y)}>0,({c.l('cg_eq', y)}+{c.l('res', y)})/{c.l('ob', y)},0)")
     ln("i_n", KF, s, "Investidores estimados", "n.º", FMT_INT, lambda c, y: c.l("inv_n", y))
+    ln("fc_custo", KF, s, "Custo total do financiamento por obrigações (cupão + custos da SPV)", "€", FMT_EUR,
+       lambda c, y: f"{c.l('cup_total', y)}+{c.l('ox_spv', y)}")
+    ln("fc_pct", KF, s, "Custo total em % das obrigações em circulação (média do ano)", "%", FMT_PCT,
+       lambda c, y: f"IF({c.l('ob', y)}>0,{c.l('fc_custo', y)}/{c.l('ob', y)},\"\")")
     s = "O que tem de ser verdade para EBITDA = 0 (uma alavanca de cada vez)"
     ln("wt_gap", KF, s, "Défice de EBITDA a cobrir", "€", FMT_EUR, lambda c, y: f"MAX(0,-{c.l('dr_ebitda', y)})")
     ln("wt_ins", KF, s, "Seguro de crédito acima do prémio mínimo? (1 = sim)", "", FMT_INT,
@@ -1006,8 +1073,8 @@ def define_lines():
        lambda c, y: (f"IF({c.l('v_d_t', y)}>0,{c.l('wt_gap', y)}/({c.l('v_d_t', y)}*1000*(1-{c.p('d_desc')})*(1-{c.p('d_prov')}-{c.l('wt_ins', y)}*{c.p('sc_pct')})),\"n/a\")"))
     ln("wt_h", KF, s, "Referência HoReCa documentada necessária", "€/kg", FMT_EKG,
        lambda c, y: (f"IF({c.l('v_h_t', y)}>0,{c.p('h_ref')}+{c.l('wt_gap', y)}/({c.l('v_h_t', y)}*1000*(1-{c.p('h_desc')})*(1-{c.p('h_prov')}-{c.l('wt_ins', y)}*{c.p('sc_pct')})),\"n/a\")"))
-    ln("wt_g_m", KF, s, "Margem do granel depois do seguro de crédito", "€/kg", FMT_EKG,
-       lambda c, y: f"{c.l('g_margem', y)}-{c.l('wt_ins', y)}*{c.p('sc_pct_granel')}*{c.l('g_price', y)}")
+    ln("wt_g_m", KF, s, "Margem do granel por kg (principal: depois do seguro de crédito; corretagem: comissão líquida)", "€/kg", FMT_EKG,
+       lambda c, y: f"IF({c.p('g_principal')}=1,{c.l('g_margem', y)}-{c.l('wt_ins', y)}*{c.p('sc_pct_granel')}*{c.l('g_price', y)},{c.l('gc_margem', y)})")
     ln("wt_g", KF, s, "Volume de granel certificado necessário", "t", FMT_T,
        lambda c, y: f"IF({c.l('wt_g_m', y)}>0,{c.l('v_g_t', y)}+{c.l('wt_gap', y)}/({c.l('wt_g_m', y)}*1000),\"n/a\")")
     ln("wt_fix", KF, s, "Corte necessário nos custos fixos (pessoal + opex sem seguro de crédito)", "%", FMT_PCT,
@@ -1024,14 +1091,14 @@ PRE_IDS = None  # preenchido em main() a partir do JSON
 
 
 # ----------------------------------------------------------------------------- disposição
-DETAIL_SHEETS = ["Volumes", "Receitas", "Pessoal", "Custos", "DR", "Cash flow", "Capital & financiamento"]
+DETAIL_SHEETS = ["Volumes", "Receitas", "Pessoal", "Custos", "DR", "Fluxo de caixa", "Capital & financiamento"]
 DETAIL_TITLES = {
     "Volumes": ("Volumes", "Volumes físicos por mercadoria e canal, clientes e carteira de terceiros (cenário ativo)."),
     "Receitas": ("Receitas", "Receitas por fluxo, GMV, capital de lotes financiado e margem de contribuição por fluxo (cenário ativo)."),
     "Pessoal": ("Pessoal", "Equipa por função; salário bruto anual com 14 meses, TSU de 23,75% + 2% e subsídio de refeição (cenário ativo)."),
     "Custos": ("Custos", "Economia por kg de cada canal, custos diretos, opex não salarial, capex e amortizações (cenário ativo)."),
     "DR": ("Demonstração de resultados", "Receita, margem bruta, margem de contribuição, EBITDA, amortizações, EBIT, IRC com derramas e resultado líquido (cenário ativo)."),
-    "Cash flow": ("Cash flow", "Capital de giro por prazos médios, obrigações e float das séries, cash flow para o acionista, caixa e rondas (cenário ativo)."),
+    "Fluxo de caixa": ("Fluxo de caixa", "Fundo de maneio por prazos médios, obrigações e caixa parada nas séries, fluxo de caixa para o acionista, caixa e rondas (cenário ativo)."),
     "Capital & financiamento": ("Capital & financiamento", "Necessidade de capital, aplicação de fundos, runway, break-even, investidores e o que tem de ser verdade (cenário ativo)."),
 }
 DETAIL_START = {}
@@ -1194,6 +1261,17 @@ def motor_cases():
         ov["d_premio_venda"] = lambda ref, y: f"Pressupostos!$C${PREG.by['sens_premio_topo'].row}"
         ov["tp_cart"] = lambda ref, y: PREG.ref("tp_cart", 3, y)
         cases.append((f"{s}__topo", f"{lab} · topo dos intervalos (prémio 0,20; carteira do otimista; volumes +30%)", i, ov))
+        for j in (1, 2):
+            cases.append((f"{s}__cup_{j}", f"{lab} · cupão das obrigações caso {j}", i,
+                          {"fin_cupao": (lambda ref, y, j=j: f"Pressupostos!$C${PREG.by['sens_cup_' + str(j)].row}")}))
+    lab = SCEN_LONG[3]
+    cases.append(("recomendado__verificado", f"{lab} · a preços verificados (referência HoReCa do base; sem prémio dos distribuidores; sem verificação para terceiros nem dados)", 4,
+                  {"h_ref": (lambda ref, y: PREG.ref("h_ref", 2)), "d_premio_venda": (lambda ref, y: "0"),
+                   "tp_cart": (lambda ref, y: "0"), "dd": (lambda ref, y: "0")}))
+    cases.append(("recomendado__granel_principal", f"{lab} · granel certificado como principal (índice + 0,15)", 4, {"g_principal": (lambda ref, y: "1")}))
+    cases.append(("recomendado__obr_90", f"{lab} · obrigações a 90% do fundo de maneio (subordinado de 10%)", 4,
+                  {"fin_pct": (lambda ref, y: PREG.ref("fin_pct", 2, y))}))
+    cases.append(("recomendado__dp5", f"{lab} · pagamento ao lagar a D5", 4, {"az_dp": (lambda ref, y: f"Pressupostos!$C${PREG.by['sens_dp'].row}")}))
     return cases
 
 
@@ -1322,6 +1400,31 @@ def write_unit_economics(wb, preg, blocks):
             put(ws, f"{ck}{r}", f"=IF({ck}{rows['price']}>0,{ck}{rows['margem']}/{ck}{rows['price']},0)", fmt=FMT_PCT)
         rows["margem_pct"] = r
         r += 1
+        # seguro de crédito: no modelo está no opex (desde 2028); aqui imputa-se ao lote, à taxa proporcional
+        sc_id = "sc_pct_granel" if k == "g" else "sc_pct"
+        put(ws, f"A{r}", "Seguro de crédito imputado ao lote (no modelo: opex desde 2028, taxa proporcional)")
+        put(ws, f"B{r}", "€", color=MUTED)
+        for i, s_ in enumerate(SCEN):
+            ce, ck = "CEGI"[i], "DFHJ"[i]
+            put(ws, f"{ck}{r}", f"=-{preg.ref(sc_id, 0)}*{ck}{rows['price']}", fmt=FMT_EKG)
+            put(ws, f"{ce}{r}", f"={ck}{r}*{kg_cells[s_]}", fmt=FMT_EUR)
+        rows["segcred"] = r
+        r += 1
+        put(ws, f"A{r}", "Margem depois do seguro de crédito", bold=True)
+        put(ws, f"B{r}", "€", color=MUTED)
+        for i, s_ in enumerate(SCEN):
+            ce, ck = "CEGI"[i], "DFHJ"[i]
+            put(ws, f"{ck}{r}", f"={ck}{rows['margem']}+{ck}{rows['segcred']}", fmt=FMT_EKG, bold=True)
+            put(ws, f"{ce}{r}", f"={ck}{r}*{kg_cells[s_]}", fmt=FMT_EUR, bold=True)
+        rows["margem_seg"] = r
+        r += 1
+        put(ws, f"A{r}", "Margem depois do seguro de crédito em % da receita")
+        put(ws, f"B{r}", "%", color=MUTED)
+        for i in range(4):
+            ck = "DFHJ"[i]
+            put(ws, f"{ck}{r}", f"=IF({ck}{rows['price']}>0,{ck}{rows['margem_seg']}/{ck}{rows['price']},0)", fmt=FMT_PCT)
+        rows["margem_seg_pct"] = r
+        r += 1
         # investidor e reserva
         put(ws, f"A{r}", "Lado do investidor e almofada", bold=True, color=MUTED)
         r += 1
@@ -1385,6 +1488,8 @@ def write_unit_economics(wb, preg, blocks):
         ("pi_cd", "Custos diretos (3PL, custódia, qualidade, crédito, pagamentos, armazenagem)", "% de Π",
          lambda ck: ("=IF(PI>0,-(" + "+".join(f"{ck}{rows_h[x]}" for x in ("3pl", "arm", "seg", "anal", "perdas", "descl", "cust", "pag", "prov", "hedge")) + ")/PI,0)"), FMT_PCT),
         ("pi_sp", "Sprout: margem de contribuição", "% de Π", lambda ck: f"=IF(PI>0,{ck}{rows_h['margem']}/PI,0)", FMT_PCT),
+        ("pi_seg", "Seguro de crédito imputado (no modelo: opex)", "% de Π", lambda ck: f"=IF(PI>0,-{ck}{rows_h['segcred']}/PI,0)", FMT_PCT),
+        ("pi_sp_seg", "Sprout: margem depois do seguro de crédito", "% de Π", lambda ck: f"=IF(PI>0,{ck}{rows_h['margem_seg']}/PI,0)", FMT_PCT),
     ]
     for key, lab, unit, f, fmt in items:
         put(ws, f"A{r}", lab)
@@ -1476,8 +1581,30 @@ def write_unit_economics(wb, preg, blocks):
     UE_POS["d"] = rows_d
     put(ws, f"A{r}", "C. Lote de granel certificado (IBC/cisterna; só o Recomendado tem volume)", bold=True, color=INK)
     r += 1
-    r, rows_g = lot_block(r, "g", "Ponta a ponta no ano de regime (por lote e por kg)", "g_lote")
+    r, rows_g = lot_block(r, "g", "Ponta a ponta no ano de regime, se for comprado e vendido como principal (por lote e por kg)", "g_lote")
     UE_POS["g"] = rows_g
+    put(ws, f"A{r}", "C2. Granel certificado em corretagem com verificação (sem título, stock nem recebíveis de mercadoria; modelo do Recomendado)", bold=True, color=INK)
+    r += 1
+    header_row(ws, r, ["Rubrica", "Unidade"] + [f"{lab}: €/kg" for lab in SCEN_LABEL] + ["", "", "", "", "Notas"])
+    r += 1
+    gcp = {}
+    for key, lab, lid in (("val", "Valor do lote ao índice (faturado entre lagar e comprador)", "az_indice"), ("com", "Comissão de corretagem e verificação", "gc_com"),
+                          ("custo", "Custódia, análises e pagamentos do lote", "gc_custo"), ("margem", "Margem de contribuição da corretagem", "gc_margem")):
+        put(ws, f"A{r}", lab, bold=key == "margem")
+        put(ws, f"B{r}", "€/kg", color=MUTED)
+        for i, s_ in enumerate(SCEN):
+            fx = ("=" + preg.ref("az_indice", i + 1)) if key == "val" else ("=" + ("-" if key == "custo" else "") + at(s_, lid))
+            put(ws, f"{'CDEF'[i]}{r}", fx, fmt=FMT_EKG, bold=key == "margem")
+        gcp[key] = r
+        r += 1
+    put(ws, f"A{r}", "Margem por lote de 100 t")
+    put(ws, f"B{r}", "€", color=MUTED)
+    for i in range(4):
+        col = "CDEF"[i]
+        put(ws, f"{col}{r}", f"={col}{gcp['margem']}*{preg.ref('g_lote', 0)}*1000", fmt=FMT_EUR)
+    gcp["lote"] = r
+    r += 2
+    UE_POS["gc"] = gcp
     # D. água
     put(ws, f"A{r}", "D. Lote de água: 20 paletes (comparação principal vs. agente; recomendado: agente)", bold=True, color=INK)
     r += 1
@@ -1532,10 +1659,12 @@ CEN_POS = {}
 CEN_METRICS = [
     ("v_az_t", "Azeite transacionado", "t", FMT_T),
     ("gmv_total", "GMV total", "€", FMT_EUR),
+    ("gmv_sem_granel", "GMV sem granel certificado", "€", FMT_EUR),
     ("r_total", "Receita total", "€", FMT_EUR),
     ("r_h", "— vendas de azeite HoReCa/gourmet", "€", FMT_EUR),
     ("r_d", "— vendas de azeite a distribuidores/exportação", "€", FMT_EUR),
-    ("r_g", "— vendas de granel certificado", "€", FMT_EUR),
+    ("r_g", "— vendas de granel certificado (principal)", "€", FMT_EUR),
+    ("r_gc", "— comissões de corretagem do granel", "€", FMT_EUR),
     ("r_cf", "— vendas de café verde", "€", FMT_EUR),
     ("r_ag", "— comissões de água", "€", FMT_EUR),
     ("r_tp", "— verificação para terceiros", "€", FMT_EUR),
@@ -1629,7 +1758,7 @@ def write_cenarios(wb, blocks, P, detail_lay):
         r += 1
     put(ws, f"H{CEN_POS['wt_d']}", "Valor a somar ao prémio já assumido; comparar com 0,10–0,20 (condição do 01 para a seed)", color=MUTED, italic=True)
     put(ws, f"H{CEN_POS['wt_h']}", "Comparar com 5,3–6,0 €/kg (equivalente de retalho a out. 2026, NV)", color=MUTED, italic=True)
-    put(ws, f"H{CEN_POS['wt_g']}", "Comparar com ~175 kt de produção portuguesa", color=MUTED, italic=True)
+    put(ws, f"H{CEN_POS['wt_g']}", f"Comparar com ~{fmt_num(P['commodities']['azeite']['producao_pt_referencia_kt'], 1)} kt de produção portuguesa (2025/26)", color=MUTED, italic=True)
     r += 1
     section_row(ws, r, "4. O que muda no cenário Recomendado (reestruturado) face ao base")
     r += 1
@@ -1637,8 +1766,9 @@ def write_cenarios(wb, blocks, P, detail_lay):
     r += 1
     for a in P["cenario_recomendado"]["alteracoes"]:
         put(ws, f"A{r}", a["parametro"], align=WRAP)
-        put(ws, f"B{r}", fmt_val(a["base"]), color=MUTED, align=WRAP)
-        put(ws, f"C{r}", fmt_val(a["recomendado"]), color=ACCENT, align=WRAP)
+        is_pct = "pct" in a["parametro"]
+        put(ws, f"B{r}", fmt_val(a["base"], is_pct), color=MUTED, align=WRAP)
+        put(ws, f"C{r}", fmt_val(a["recomendado"], is_pct), color=ACCENT, align=WRAP)
         ws.merge_cells(f"C{r}:G{r}")
         put(ws, f"H{r}", a["justificacao"] + " Fonte: " + a["fonte"], color=MUTED, align=WRAP)
         ws.row_dimensions[r].height = 13 * max(2, (len(a["justificacao"]) + len(a["fonte"]) + 8) // 95 + 1)
@@ -1654,7 +1784,7 @@ def write_cenarios(wb, blocks, P, detail_lay):
     r += 1
     sel = "Pressupostos!$E$4"
     checks = []
-    for lid, lab in (("dr_ebitda", "EBITDA: folha DR − Motor (cenário ativo)"), ("cf_acum", "Cash flow acumulado: folha Cash flow − Motor")):
+    for lid, lab in (("dr_ebitda", "EBITDA: folha DR − Motor (cenário ativo)"), ("cf_acum", "Fluxo de caixa acumulado: folha Fluxo de caixa − Motor")):
         put(ws, f"A{r}", lab)
         for y in range(NY):
             sh, row = detail_lay.pos[lid]
@@ -1683,10 +1813,12 @@ def write_cenarios(wb, blocks, P, detail_lay):
     return ws
 
 
-def fmt_val(v):
+def fmt_val(v, pct=False):
     if isinstance(v, list):
-        return " / ".join(fmt_num(x) for x in v)
+        return " / ".join(fmt_val(x, pct) for x in v)
     if isinstance(v, (int, float)):
+        if pct:
+            return fmt_num(v * 100, 0 if abs(v * 100 - round(v * 100)) < 1e-9 else 1) + "\u00a0%"
         return fmt_num(v)
     return str(v)
 
@@ -1694,12 +1826,12 @@ def fmt_val(v):
 def fmt_num(x, dec=None):
     """Formatação pt-PT: ponto de milhar e vírgula decimal."""
     if isinstance(x, int) or (isinstance(x, float) and x.is_integer() and abs(x) >= 100):
-        s = f"{int(round(x)):,}".replace(",", ".")
+        s = f"{int(round(x)):,}".replace(",", "\u2009")
         return s
     if dec is None:
         dec = 2 if abs(x) < 100 else 0
     s = f"{x:,.{dec}f}"
-    return s.replace(",", "X").replace(".", ",").replace("X", ".")
+    return s.replace(",", "X").replace(".", ",").replace("X", "\u2009")
 
 
 # ----------------------------------------------------------------------------- Sensibilidade
@@ -1734,12 +1866,18 @@ def write_sensibilidade(wb, preg, blocks):
                  (f"{s}__desc_2", "Desconto HoReCa", "sens_desc_2"), (f"{s}__desc_3", "Desconto HoReCa", "sens_desc_3"),
                  (f"{s}__vol_neg", "Volumes físicos (estrutura fixa)", "sens_vol_neg"), (f"{s}__vol_pos", "Volumes físicos (estrutura fixa)", "sens_vol_pos"),
                  (f"{s}__preco", "Preço do AOVE (índice e referências; repasse proporcional)", "sens_preco"),
-                 (f"{s}__topo", "Topo dos intervalos: prémio de origem dos distribuidores, carteira de terceiros do otimista, volumes +30%", "sens_premio_topo")]
+                 (f"{s}__topo", "Topo dos intervalos: prémio de origem dos distribuidores, carteira de terceiros do otimista, volumes +30%", "sens_premio_topo"),
+                 (f"{s}__cup_1", "Cupão das obrigações", "sens_cup_1"), (f"{s}__cup_2", "Cupão das obrigações", "sens_cup_2")]
+        if s == "recomendado":
+            cases += [("recomendado__verificado", "A preços verificados: referência HoReCa do base, sem prémio dos distribuidores, sem verificação para terceiros nem dados", None),
+                      ("recomendado__granel_principal", "Granel certificado como principal (índice + 0,15 €/kg)", None),
+                      ("recomendado__obr_90", "Obrigações a 90% do fundo de maneio (subordinado de 10%)", None),
+                      ("recomendado__dp5", "Pagamento ao lagar a D5", "sens_dp")]
         ref_row = r
         for key, clab, pid in cases:
             put(ws, f"A{r}", clab, bold=key == s)
             if pid:
-                put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=(FMT_EKG2 if pid == "sens_premio_topo" else FMT_PCT), align=Alignment(horizontal="right"))
+                put(ws, f"B{r}", "=" + preg.ref(pid, 0), fmt=(FMT_EKG2 if pid == "sens_premio_topo" else FMT_DAYS if pid == "sens_dp" else FMT_PCT), align=Alignment(horizontal="right"))
             vals = {
                 "mh": "=" + mref(blocks, key, "h_margem", 2),
                 "e29": "=" + mref(blocks, key, "dr_ebitda", 2),
@@ -1810,9 +1948,9 @@ def write_leiame(wb, P):
     ws.title = "Leia-me"
     title(ws, "Sprout — Modelo financeiro 2027–2031",
           "Gerado por docs/business-plan/modelo/build_model.py a partir de pressupostos.json · data de referência 13-10-2026 · euros correntes, sem IVA")
-    for k, v in {"A": 50, "B": 12, "C": 20, "D": 20, "E": 20, "F": 20, "G": 40}.items():
+    for k, v in {"A": 66, "B": 12, "C": 20, "D": 20, "E": 20, "F": 20, "G": 34}.items():
         ws.column_dimensions[k].width = v
-    r = 16   # linhas 4–14: tabela de resultados (escrita depois de Cenários)
+    r = 18   # linhas 4–16: tabela de resultados (escrita depois de Cenários)
     blocks = [
         ("Para que serve", [
             "Testar, com números rastreáveis, se a tese do documento-fonte (marketplace B2B de azeite, água e café com desconto de 10–15%, captura de 80–90% "
@@ -1823,15 +1961,18 @@ def write_leiame(wb, P):
             "Os três cenários do documento-fonte, com as 53 correções verificadas e sem ajustes, não chegam ao break-even até 2031: a margem por kg não paga a estrutura.",
             "O cenário Recomendado (reestruturado) muda o produto, os canais e os custos como a investigação recomenda. O resultado está na tabela acima e na folha "
             "Cenários; não foi ajustado para dar break-even. A folha Sensibilidade mostra o caso com todas as alavancas no topo dos intervalos da investigação.",
+            "A coluna «Recomendado a preços verificados» separa o que depende da execução (estrutura, canais) do que depende de preços ainda por medir "
+            "(referência HoReCa de 6,00 €/kg, prémio de origem dos distribuidores, verificação paga pelo banco, receita de dados).",
         ]),
         ("Estrutura", [
             "Pressupostos — todos os inputs, por cenário, com fonte; seletor do cenário ativo em C4.",
             "Unit economics — lotes-tipo de ponta a ponta (HoReCa 20 t, distribuidores 30 t, granel 100 t, água 20 paletes) nos quatro cenários; bolo de intermediação; "
             "teste da tese literal; risco de preço; piloto de 2027.",
-            "Volumes, Receitas, Pessoal, Custos, DR, Cash flow, Capital & financiamento — o cenário ativo, ano a ano.",
+            "Volumes, Receitas, Pessoal, Custos, DR, Fluxo de caixa, Capital & financiamento — o cenário ativo, ano a ano.",
             "Cenários — os quatro cenários lado a lado; o que tem de ser verdade; o que muda no Recomendado; verificações.",
-            "Sensibilidade — desconto 10/12,5/15%, volumes ±30%, preço do AOVE −30% e topo dos intervalos (motor completo por caso), para o Base e o Recomendado; "
-            "grelha captura × desconto da tese literal; perda no stock com choque de preço.",
+            "Sensibilidade — desconto 10/12,5/15%, volumes ±30%, preço do AOVE −30%, cupão de 10% e 12% e topo dos intervalos (motor completo por caso), para o Base e "
+            "o Recomendado; no Recomendado também a preços verificados, granel como principal, obrigações a 90% e pagamento ao lagar a D5; grelha captura × desconto "
+            "da tese literal; perda no stock com choque de preço.",
             "Fontes — origem de cada pressuposto e registo de verificação. Motor — o cálculo em blocos fixos por cenário e caso (não editar).",
         ]),
         ("Como mudar de cenário", [
@@ -1845,10 +1986,12 @@ def write_leiame(wb, P):
         ]),
         ("Convenções", [
             "Preços das mercadorias constantes ao nível de out. 2026 (compra back-to-back, neutra ao nível de preço); salários +3%/ano; opex +2%/ano e 5% de contingência.",
-            "Capital de giro = nível médio do ano por prazos médios (stock, recebimento, pagamento ao produtor a 30 dias). Obrigações = % do capital de giro ÷ utilização; "
-            "0% em 2027 (CSC art. 348.º/2 [L]).",
-            "EBITDA inclui o cupão das obrigações como custo direto do lote (a SPV financia stock lote a lote), como no 01 e em calculo_referencia.py; a DR mostra "
-            "também o EBITDA sem cupão.",
+            "Fundo de maneio = nível médio do ano por prazos médios (stock, recebimento, pagamento ao produtor a 30 dias). Obrigações em circulação = % do fundo de maneio ÷ "
+            "utilização, também em nível médio do ano (não saldo de fim de ano); 0 em 2027 (simplificação: CSC art. 348.º/2 [L]); 90% no Base, 75% no Recomendado.",
+            "Granel certificado do Recomendado em corretagem com verificação (0,75% do valor ao índice, sem título nem stock) até haver carta de intenções a "
+            "≥ índice + 0,10 €/kg; o modo principal fica como caso de sensibilidade.",
+            "EBITDA = EBITDA depois do cupão das obrigações, custo direto do lote (a SPV financia stock lote a lote), como no 01 e em calculo_referencia.py; a DR mostra "
+            "também o EBITDA antes do cupão, comparável com múltiplos de mercado.",
             "IRC com taxa PME, derramas municipal e estadual e reporte de prejuízos a 65% [L]. Imposto pago no próprio ano (simplificação).",
             "Break-even em mês = cruzamento do EBITDA mensal com zero, interpolando linearmente entre os pontos médios dos anos (estimativa).",
         ]),
@@ -1870,29 +2013,42 @@ def write_leiame(wb, P):
     return ws, 4
 
 
-def write_leiame_summary(ws, r):
-    section_row(ws, r, "Resultados-chave (ligados à folha Cenários)", ncols=7)
+FMT_OUT = '#,##0;"\u2212"#,##0;0'
+
+
+def write_leiame_summary(ws, r, blocks):
+    """Resultados-chave: saídas em tinta (não a verde de ligação), negativos com o sinal de menos dos PDF."""
+    section_row(ws, r, "Resultados-chave (ligados às folhas Cenários e Motor)", ncols=7)
     r += 1
-    header_row(ws, r, ["Indicador", "Unidade"] + SCEN_LABEL)
+    header_row(ws, r, ["Indicador", "Unidade"] + SCEN_LABEL + ["Recomendado a preços verificados"])
     r += 1
-    items = [("EBITDA 2031", "dr_ebitda", 4, "€", FMT_EUR), ("Resultado líquido 2031", "dr_rl", 4, "€", FMT_EUR),
-             ("GMV 2031", "gmv_total", 4, "€", FMT_EUR), ("Cash flow acumulado para o acionista, 2027–2031", "cf_acum", 4, "€", FMT_EUR)]
+    vk = "recomendado__verificado"
+    items = [("EBITDA 2027", "dr_ebitda", 0, "€", FMT_OUT), ("EBITDA 2031", "dr_ebitda", 4, "€", FMT_OUT), ("Resultado líquido 2031", "dr_rl", 4, "€", FMT_OUT),
+             ("GMV 2031", "gmv_total", 4, "€", FMT_OUT), ("Fluxo de caixa acumulado para o acionista, 2027–2031", "cf_acum", 4, "€", FMT_OUT)]
     for lab, lid, y, unit, fmt in items:
         put(ws, f"A{r}", lab)
         put(ws, f"B{r}", unit, color=MUTED)
         for i, s in enumerate(SCEN):
-            put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{YC[y]}{CEN_POS[lid][s]}", fmt=fmt)
+            put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{YC[y]}{CEN_POS[lid][s]}", fmt=fmt, color=INK, bold=s == "recomendado")
+        put(ws, f"G{r}", "=" + mref(blocks, vk, lid, y), fmt=fmt, color=INK)
         r += 1
-    for lab, lid, unit, fmt in (("Necessidade de capital próprio (pico no horizonte)", "k_need", "€", FMT_EUR),
+    for lab, lid, unit, fmt in (("Necessidade de capital próprio (mínimo no horizonte; ainda a subir em 2031)", "k_need", "€", FMT_OUT),
                                 ("Break-even do EBITDA", "be_data", "mês", FMT_DATE),
-                                ("1.º ano com cash flow para o acionista ≥ 0", "be_ano_cf", "ano", FMT_YEAR)):
+                                ("1.º ano com fluxo de caixa para o acionista ≥ 0", "be_ano_cf", "ano", FMT_YEAR)):
         put(ws, f"A{r}", lab, bold=lid == "k_need")
         put(ws, f"B{r}", unit, color=MUTED)
         for i in range(4):
-            put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{'CDEF'[i]}{CEN_POS[lid]}", fmt=fmt, align=Alignment(horizontal="right"), bold=lid == "k_need")
+            put(ws, f"{'CDEF'[i]}{r}", f"=Cenários!{'CDEF'[i]}{CEN_POS[lid]}", fmt=fmt, align=Alignment(horizontal="right"), bold=lid == "k_need", color=INK)
+        put(ws, f"G{r}", "=" + mref(blocks, vk, lid), fmt=fmt, align=Alignment(horizontal="right"), color=INK)
         r += 1
     put(ws, f"A{r}", "Verificações do modelo (Cenários, secção 5)")
-    put(ws, f"C{r}", f"=Cenários!C{CEN_POS['estado']}", bold=True, align=Alignment(horizontal="right"))
+    put(ws, f"C{r}", f"=Cenários!C{CEN_POS['estado']}", bold=True, align=Alignment(horizontal="right"), color=INK)
+    r += 1
+    put(ws, f"A{r}", "Recomendado a preços verificados = Recomendado com a referência HoReCa do base (5,65 €/kg), sem prémio de origem dos distribuidores, "
+                     "sem verificação para terceiros nem receita de dados: o que o desenho dá sem as alavancas comerciais que o piloto ainda tem de provar.",
+        color=MUTED, italic=True, align=WRAP)
+    ws.merge_cells(f"A{r}:G{r}")
+    ws.row_dimensions[r].height = 28
 
 
 def write_fontes(wb, P):
@@ -1997,7 +2153,8 @@ def scan_errors(path):
 
 
 # ----------------------------------------------------------------------------- espelho em Python (verificação)
-def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
+def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None, cup_ov=None, dp_ov=None, g_principal=None,
+           fin_pct_scen=None, h_ref_scen=None, tp_zero=False, dd_zero=False):
     """Mesmo motor em Python, para verificar o livro (independente das fórmulas)."""
     az = P["commodities"]["azeite"]
     chs = {"h": az["canais"]["horeca_gourmet"], "d": az["canais"]["distribuidores_export"], "g": az["canais"]["granel_certificado"]}
@@ -2005,6 +2162,8 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
     fin, cu, cx = P["financiamento"], P["custos"], P["capex"]
     ag, cf = P["commodities"]["agua"], P["commodities"]["cafe"]
     ft = P["receitas"]["financiamento_stock_terceiros"]
+    gp = chs["g"]["modo_principal"][s] if g_principal is None else g_principal
+    dp = cfc["dias_pagamento_produtor"] if dp_ov is None else dp_ov
 
     def sv(x, y):
         if isinstance(x, dict):
@@ -2017,14 +2176,16 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
     prev_eq, prev_res, prev_fte, acum, loss = k_spv, 0.0, 0.0, 0.0, 0.0
     da = [0.0] * 5
     for y in range(5):
-        pct, cup, util = fin["pct_capital_giro_azeite_financiado_por_notes"][s][y], fin["cupao_anual"][s][y], fin["utilizacao_media_capital"][s]
+        pct = fin["pct_capital_giro_azeite_financiado_por_notes"][fin_pct_scen or s][y]
+        cup = fin["cupao_anual"][s][y] if cup_ov is None else cup_ov
+        util = fin["utilizacao_media_capital"][s]
         idx = az["preco_indice_granel_eur_kg"][s] * (1 + price)
         gmv_az = m_az = cg_az = 0.0
-        r_hd = r_g = 0.0
+        r_hd = r_g = r_gc = 0.0
         for k, ch in chs.items():
             g = idx + sv(ch["premio_lagar_eur_kg"], y)
             if k == "h":
-                ref = ch["preco_referencia_eur_kg"][s] * (1 + price)
+                ref = ch["preco_referencia_eur_kg"][h_ref_scen or s] * (1 + price)
                 dsc = desc if desc is not None else ch["desconto_efetivo"][s]
             elif k == "d":
                 ref = ch["preco_referencia_eur_kg"][s] * (1 + price) + (ch["premio_origem_venda_eur_kg"][s] if premio_d is None else premio_d)
@@ -2034,19 +2195,26 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
                 dsc = ch["desconto_efetivo"]
             pr = ref * (1 - dsc)
             emb, ds, dr = ch["embalamento_eur_kg"], sv(ch["dias_stock"], y), sv(ch["dias_recebimento"], y)
-            dp, lot = cfc["dias_pagamento_produtor"], ch["lote_medio_t"] * 1000
+            lot = ch["lote_medio_t"] * 1000
+            ver = ch["analises_por_lote"] * cfc["analise_fisico_quimica_painel_eur"] / lot + ch["inspecao_collateral_manager_eur_por_lote"] / lot + ch["pagamentos_bancarios_eur_kg"]
             c = (g + emb + sv(ch["logistica_eur_kg"], y) + ch["armazem_logistico_picking_eur_kg"] + cfc["armazenagem_eur_t_mes"] * ds / 30 / 1000
-                 + g * cfc["seguro_stock_pct_ano"] * ds / 365 + ch["analises_por_lote"] * cfc["analise_fisico_quimica_painel_eur"] / lot
+                 + g * cfc["seguro_stock_pct_ano"] * ds / 365 + ver
                  + cfc["perdas_fisicas_pct_valor"] * g + cfc["desclassificacao_prob_por_trimestre"] * cfc["desclassificacao_penalizacao_eur_kg"] * ds / 90
-                 + ch["inspecao_collateral_manager_eur_por_lote"] / lot + ch["pagamentos_bancarios_eur_kg"] + sv(ch["provisao_credito_pct_vendas"], y) * pr
+                 + sv(ch["provisao_credito_pct_vendas"], y) * pr
                  + P["custos"]["hedge"]["azeite"]["custo_explicito_pct"] * pr
                  + cup * (g + emb) * (ds + dr - dp) / 365 * pct / util)
-            v = vols[k][y] * 1000 * (1 + vol)
+            vtot = vols[k][y] * 1000 * (1 + vol)
+            v = vtot * (gp if k == "g" else 1)
             gmv_az += v * pr
             m_az += v * (pr - c)
             cg_az += v * ((g + emb) * (ds - dp) / 365 + pr * dr / 365)
             if k == "g":
                 r_g += v * pr
+                vb = vtot - v
+                com = ch["comissao_corretagem_verificacao_pct_valor"] * idx
+                r_gc += vb * com
+                m_az += vb * (com - ver)
+                gmv_az += vb * idx
             else:
                 r_hd += v * pr
         pal = ag["volume_paletes"][s][y] * (1 + vol)
@@ -2057,11 +2225,11 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
         m_cf = cv * (cf["preco_venda_eur_kg"] - cf["preco_compra_eur_kg"] - cf["logistica_eur_kg"] - cfin - cf["provisao_credito_pct_vendas"] * cf["preco_venda_eur_kg"]
                      - cf["pagamentos_ops_eur_kg"] - cf["custo_cobertura_pct_compras"][s] * cf["preco_compra_eur_kg"])
         cg_cf = cv * (cf["preco_compra_eur_kg"] * cf["dias_stock"] + cf["preco_venda_eur_kg"] * cf["dias_recebimento"] - cf["preco_compra_eur_kg"] * cf["dias_pagamento"]) / 365
-        cart = ft["carteira_media_eur"][tp_scen or s][y]
+        cart = 0.0 if tp_zero else ft["carteira_media_eur"][tp_scen or s][y]
         bruto = cart * (ft["taxa_verificacao_por_utilizacao_pct"] * ft["rotacoes_por_ano"] + ft["taxa_monitorizacao_anual_pct"])
         kgv = cart / (ft["valor_colateral_eur_kg"] * ft["ltv"]) * ft["rotacoes_por_ano"]
         m_tp = bruto - kgv * ft["custo_verificacao_eur_kg_verificado"] * ft["pct_custo_verificacao_suportado_sprout"][s]
-        m = m_az + m_ag + m_cf + m_tp + P["receitas"]["dados_e_indice_eur"][s][y]
+        m = m_az + m_ag + m_cf + m_tp + (0.0 if dd_zero else P["receitas"]["dados_e_indice_eur"][s][y])
         pe = cu["pessoal"]
         tot = fte = 0.0
         for fn, v in pe["funcoes"].items():
@@ -2073,13 +2241,14 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
         ox = cu["opex_nao_salarial_eur"]
         lines = sum(ox[k][s][y] for k in OPEX_KEYS)
         spv = fin["custos_spv"]
-        spvc = (spv["setup_eur"] if y == 0 else 0) + spv["anual_eur"] + spv["por_serie_eur"] * spv["series_por_ano"][s][y] + spv["funcoes_independentes_eur"][y]
+        spvc = ((spv["setup_eur"] if y == 0 else 0) + spv["anual_eur"] + spv["por_serie_eur"] * spv["series_por_ano"][s][y] + spv["funcoes_independentes_eur"][y]
+                + spv["servicer_reserva_eur"][s][y])
         sc = cu["seguro_credito"]
         seg = 0.0 if 2027 + y < sc["incluido_no_opex_desde"] else max(sc["premio_minimo_anual_eur"][s][y], sc["premio_pct_volume_seguro"] * r_hd + sc["premio_pct_volume_seguro_granel"] * r_g)
         opex = lines * (1 + ox["contingencia_pct"]) * (1 + ox["inflacao_anual"]) ** y + spvc + seg
         eb = m - pess - opex
         tel = cx["telemetria_eur_por_local"] * cx["locais_novos"][s][y]
-        plat = cx["plataforma_desenvolvimento_capitalizavel_eur"][s][y]
+        plat = cx["plataforma_desenvolvimento_capitalizavel_eur"][s][y] + cx["plataforma_area_investidor_capitalizavel_eur"][s][y]
         eq = cx["equipamento_informatico_eur_por_nova_fte"] * max(0.0, fte - prev_fte)
         capex = tel + plat + eq
         for amt, life in ((plat, cx["vida_util_anos"]["software"]), (tel, cx["vida_util_anos"]["sensores"]), (eq, cx["vida_util_anos"]["equipamento_informatico"])):
@@ -2094,7 +2263,7 @@ def mirror(P, s, desc=None, vol=0.0, price=0.0, premio_d=None, tp_scen=None):
         dm = imp["derrama_municipal_max"] * max(0, ti)
         de = sum(t["taxa"] * max(0, min(ti, t["ate"] if t["ate"] else 1e18) - t["de"]) for t in imp["derrama_estadual"])
         tax = irc + dm + de
-        cg = cg_az + m_ag * P["capital_de_giro"]["agua"]["dias_recebimento_comissao"] / 365 + cg_cf
+        cg = cg_az + (m_ag + r_gc) * P["capital_de_giro"]["agua"]["dias_recebimento_comissao"] / 365 + cg_cf
         ob = pct * cg / util
         eq_cg = max(cg - pct * cg, k_spv)
         res = fin["reserva_primeira_perda"]["teto_pct_saldo_notes"] * ob
@@ -2138,7 +2307,7 @@ def read_results(path, blocks, lines, P, preg):
         return [mo[f"{c}{row}"].value for c in YC]
 
     def nd_for(unit):
-        return {"€": 0, "ano": 0, "data": 0, "t": 1, "FTE": 1, "n.º": 1, "dias": 1, "mês": 1, "meses": 1}.get(unit, 4)
+        return {"€": 0, "ano": 0, "data": 0, "t": 1, "FTE": 1, "n.º": 1, "dias": 1, "mês": 1, "meses": 1}.get(unit, 6)
 
     def rr(x, nd):
         if not isinstance(x, (int, float)):
@@ -2164,7 +2333,9 @@ def read_results(path, blocks, lines, P, preg):
             "cenarios": dict(zip(SCEN, SCEN_LONG)),
             "convencoes": [
                 "EBITDA inclui o cupão das obrigações (custo de financiar stock, lote a lote), como no 01 e em calculo_referencia.py; ebitda_sem_cupao à parte",
-                "capital de giro = nível médio do ano por prazos médios; obrigações = % do capital de giro / utilização; 0% em 2027 (CSC art. 348.º/2 [L])",
+                "fundo de maneio (capital_giro) = nível médio do ano por prazos médios; obrigações em circulação = % do fundo de maneio / utilização, também nível médio do ano (não saldo de fim de ano); 0 em 2027 (simplificação; CSC art. 348.º/2 [L])",
+                "granel certificado do recomendado em corretagem com verificação (sem título nem stock); o caso 'granel como principal' está na sensibilidade",
+                "valores por kg e percentagens gravados com 6 casas decimais: arredondar só na apresentação",
                 "necessidade de capital próprio = pré-arranque + capital social da SPV + caixa mínima + vale do cash flow acumulado para o acionista",
                 "break-even em mês = cruzamento do EBITDA mensal (run-rate interpolado entre os pontos médios dos anos) com zero; estimativa",
                 "valores lidos do livro depois de recalculado pelo LibreOffice (headless); nenhum número foi escrito à mão",
@@ -2172,26 +2343,30 @@ def read_results(path, blocks, lines, P, preg):
         },
         "cenarios": {},
     }
-    for i, s in enumerate(SCEN):
-        A = all_lines(s)
+    def scen_dict(key, nome):
+        A = all_lines(key)
         sc = {
-            "nome": SCEN_LONG[i],
+            "nome": nome,
             "volumes_t": {"azeite_horeca_gourmet": A["v_h_t"], "azeite_distribuidores_exportacao": A["v_d_t"], "azeite_granel_certificado": A["v_g_t"],
                           "azeite_total": A["v_az_t"], "clientes_horeca_gourmet": A["v_h_cli"], "agua_paletes": A["v_ag_pal"], "cafe_verde": A["v_cf_t"],
                           "quota_producao_pt": A["v_quota"]},
             "gmv_total": A["gmv_total"],
+            "gmv_sem_granel": A["gmv_sem_granel"],
+            "gmv_granel_corretagem": A["gmv_gc"],
             "gmv_agua": A["gmv_ag"],
             "capital_financiado": {"obrigacoes_em_circulacao": A["ob"], "valor_lotes_comprados": A["lotes_valor"],
                                    "valor_lotes_financiado_por_obrigacoes": A["lotes_fin_obr"], "investidores_estimados": A["inv_n"],
                                    "cupao_pago": A["cup_total"], "reserva_primeira_perda": A["res"]},
             "receitas": {"azeite_horeca_gourmet": A["r_h"], "azeite_distribuidores_exportacao": A["r_d"], "azeite_granel_certificado": A["r_g"],
-                         "cafe_verde": A["r_cf"], "comissoes_agua": A["r_ag"], "verificacao_terceiros": A["r_tp"], "dados_indice": A["r_dd"], "total": A["r_total"]},
+                         "cafe_verde": A["r_cf"], "comissoes_agua": A["r_ag"], "comissoes_granel_corretagem": A["r_gc"], "verificacao_terceiros": A["r_tp"],
+                         "dados_indice": A["r_dd"], "total": A["r_total"]},
             "margem_bruta": A["dr_mb"],
             "margem_contribuicao": {"azeite_horeca_gourmet": A["mc_h"], "azeite_distribuidores_exportacao": A["mc_d"], "azeite_granel_certificado": A["mc_g"],
                                     "cafe_verde": A["mc_cf"], "agua": A["mc_ag"], "verificacao_terceiros_liquida": A["mc_tp"], "dados": A["mc_dd"],
                                     "total": A["mc_total"], "azeite_eur_kg": A["mc_az_kg"], "azeite_pct_vendas": A["mc_az_pct"]},
             "margem_por_kg": {"horeca_gourmet": A["h_margem"], "distribuidores_exportacao": A["d_margem"], "granel_certificado": A["g_margem"]},
-            "pessoal": A["pess_total"], "fte": A["fte_total"], "opex_nao_salarial": A["ox_total"], "seguro_credito": A["ox_seg"],
+            "pessoal": A["pess_total"], "fte": A["fte_total"], "opex_nao_salarial": A["ox_total"], "seguro_credito": A["ox_seg"], "custos_spv": A["ox_spv"],
+            "custo_financiamento_obrigacoes": {"total": A["fc_custo"], "pct_obrigacoes": A["fc_pct"], "caixa_parada_series": A["ob_float"]},
             "ebitda": A["dr_ebitda"], "ebitda_sem_cupao": A["dr_ebitda_xc"], "amortizacoes": A["da"], "ebit": A["dr_ebit"], "imposto": A["tx_total"],
             "resultado_liquido": A["dr_rl"], "capex": A["capex"], "capital_giro": A["cg"], "stock_azeite": A["cg_stock_az"],
             "cash_flow_acionista": A["cf_acion"], "cash_flow_acumulado": A["cf_acum"], "rondas_adicionais": A["cx_plug"], "caixa_livre_fim": A["cx_fim"],
@@ -2209,7 +2384,11 @@ def read_results(path, blocks, lines, P, preg):
                                               "carteira_terceiros_eur": A["wt_tp"][4]},
             "linhas": A,
         }
-        res["cenarios"][s] = sc
+        return sc
+
+    for i, s in enumerate(SCEN):
+        res["cenarios"][s] = scen_dict(s, SCEN_LONG[i])
+    res["cenarios"]["recomendado_verificado"] = scen_dict("recomendado__verificado", "Recomendado a preços verificados")
     # unit economics
     ue = wb["Unit economics"]
     uej = {"ano_regime": ue["C3"].value}
@@ -2219,22 +2398,25 @@ def read_results(path, blocks, lines, P, preg):
         for i, s in enumerate(SCEN):
             ce, ck = "CEGI"[i], "DFHJ"[i]
             dd = {"eur_kg": {}, "eur_lote": {}}
-            for key in ("ref", "desc", "price", "gr", "emb", "log", "3pl", "arm", "seg", "anal", "perdas", "descl", "cust", "pag", "prov", "hedge", "cupao", "margem"):
-                dd["eur_kg"][key] = rd(ue[f"{ck}{rows[key]}"].value, 4)
+            for key in ("ref", "desc", "price", "gr", "emb", "log", "3pl", "arm", "seg", "anal", "perdas", "descl", "cust", "pag", "prov", "hedge", "cupao", "margem",
+                        "segcred", "margem_seg"):
+                dd["eur_kg"][key] = rd(ue[f"{ck}{rows[key]}"].value, 6)
                 dd["eur_lote"][key] = rd(ue[f"{ce}{rows[key]}"].value)
-            dd["margem_pct"] = rd(ue[f"{ck}{rows['margem_pct']}"].value, 4)
+            dd["margem_pct"] = rd(ue[f"{ck}{rows['margem_pct']}"].value, 6)
+            dd["margem_seg_pct"] = rd(ue[f"{ck}{rows['margem_seg_pct']}"].value, 6)
             for key in ("cap", "ciclo", "pct", "notes", "sub", "cup", "cupliq", "cupciclo", "retciclo", "res", "livre", "kyc", "noc"):
                 v = ue[f"{ce}{rows[key]}"].value
-                dd[key] = rd(v, 4) if key in ("pct", "cup", "cupliq", "retciclo") else rd(v)
+                dd[key] = rd(v, 6) if key in ("pct", "cup", "cupliq", "retciclo") else rd(v)
             d[s] = dd
         uej[nm] = d
     for s_i, s in enumerate(SCEN):
         col = "CDEF"[s_i]
-        uej.setdefault("bolo_intermediacao_horeca", {})[s] = {k: rd(ue[f"{col}{UE_POS['pi'][k]}"].value, 4) for k in UE_POS["pi"]}
-        uej.setdefault("tese_literal_horeca", {})[s] = {k: (rd(ue[f"{col}{UE_POS['tese'][k]}"].value, 4) if k != "verd" else ue[f"{col}{UE_POS['tese'][k]}"].value)
+        uej.setdefault("bolo_intermediacao_horeca", {})[s] = {k: rd(ue[f"{col}{UE_POS['pi'][k]}"].value, 6) for k in UE_POS["pi"]}
+        uej.setdefault("tese_literal_horeca", {})[s] = {k: (rd(ue[f"{col}{UE_POS['tese'][k]}"].value, 6) if k != "verd" else ue[f"{col}{UE_POS['tese'][k]}"].value)
                                                      for k in UE_POS["tese"]}
-        uej.setdefault("risco_preco_horeca", {})[s] = {k: rd(ue[f"{col}{UE_POS['risco'][k]}"].value, 4) for k in UE_POS["risco"]}
-        uej.setdefault("piloto_2027_eur_kg", {})[s] = {k: rd(ue[f"{col}{UE_POS['piloto'][k]}"].value, 4) for k in UE_POS["piloto"]}
+        uej.setdefault("risco_preco_horeca", {})[s] = {k: rd(ue[f"{col}{UE_POS['risco'][k]}"].value, 6) for k in UE_POS["risco"]}
+        uej.setdefault("piloto_2027_eur_kg", {})[s] = {k: rd(ue[f"{col}{UE_POS['piloto'][k]}"].value, 6) for k in UE_POS["piloto"]}
+        uej.setdefault("granel_corretagem_100t", {})[s] = {k: rd(ue[f"{col}{UE_POS['gc'][k]}"].value, 6 if k != "lote" else 0) for k in UE_POS["gc"]}
     agj = {}
     for j, col in enumerate("CDEFGH"):
         name = ["principal_desconto_10", "principal_desconto_15", "agente_pessimista", "agente_base", "agente_otimista", "agente_recomendado"][j]
@@ -2247,20 +2429,28 @@ def read_results(path, blocks, lines, P, preg):
     sens = {"casos": {"desconto_horeca": P["sensibilidades"]["desconto_horeca"], "volume": P["sensibilidades"]["volume"], "preco_aove": P["sensibilidades"]["preco_aove"],
                       "topo_dos_intervalos": P["sensibilidades"]["nota_topo"]}}
     names = {"": "cenario", "__desc_1": "desconto_10", "__desc_2": "desconto_12_5", "__desc_3": "desconto_15",
-             "__vol_neg": "volume_menos_30", "__vol_pos": "volume_mais_30", "__preco": "preco_aove_menos_30", "__topo": "topo_dos_intervalos"}
+             "__vol_neg": "volume_menos_30", "__vol_pos": "volume_mais_30", "__preco": "preco_aove_menos_30", "__topo": "topo_dos_intervalos",
+             "__cup_1": "cupao_10", "__cup_2": "cupao_12", "__verificado": "precos_verificados", "__granel_principal": "granel_principal",
+             "__obr_90": "obrigacoes_90", "__dp5": "pagamento_lagar_d5"}
     for s in ("base", "recomendado"):
         d = {}
         for suf, nm in names.items():
             key = s + suf
+            if key not in blocks:
+                continue
             d[nm] = {
-                "margem_horeca_2029_eur_kg": rd(series(key, "h_margem")[2], 4),
+                "margem_horeca_2029_eur_kg": rd(series(key, "h_margem")[2], 6),
                 "ebitda_2029": rd(series(key, "dr_ebitda")[2]),
                 "ebitda_2031": rd(series(key, "dr_ebitda")[4]),
                 "ebitda": [rd(x) for x in series(key, "dr_ebitda")],
                 "cash_flow_acumulado_2031": rd(series(key, "cf_acum")[4]),
                 "necessidade_capital_proprio": rd(series(key, "k_need")),
                 "break_even_ebitda_mes": month_label(series(key, "be_mes")),
-                "margem_media_azeite_2031_eur_kg": rd(series(key, "mc_az_kg")[4], 4),
+                "margem_media_azeite_2031_eur_kg": rd(series(key, "mc_az_kg")[4], 6),
+                "gmv_2031": rd(series(key, "gmv_total")[4]),
+                "margem_contribuicao_2031": rd(series(key, "mc_total")[4]),
+                "obrigacoes_2031": rd(series(key, "ob")[4]),
+                "capital_proprio_levantado_acumulado": [rd(x) for x in series(key, "cx_rondas_acum")],
             }
         sens[s] = d
     tese = {}
@@ -2270,11 +2460,11 @@ def read_results(path, blocks, lines, P, preg):
             "margem_embalador_eur_kg": PREG.by[mid].vals,
             "captura": [se[f"{c}{hr}"].value for c in "BCD"],
             "desconto": [se[f"A{r}"].value for r in grid],
-            "saldo_eur_kg": [[rd(se[f"{c}{r}"].value, 4) for c in "BCD"] for r in grid],
+            "saldo_eur_kg": [[rd(se[f"{c}{r}"].value, 6) for c in "BCD"] for r in grid],
         }
     sens["tese_literal_horeca_base_2029"] = tese
     sens["choque_preco_stock_2031"] = {s: {"stock_azeite": rd(se[f"B{r}"].value), "perda_100_aberto": rd(se[f"C{r}"].value),
-                                           "perda_15_aberto": rd(se[f"D{r}"].value), "perda_100_sobre_margem_azeite": rd(se[f"E{r}"].value, 4)}
+                                           "perda_15_aberto": rd(se[f"D{r}"].value), "perda_100_sobre_margem_azeite": rd(se[f"E{r}"].value, 6)}
                                        for s, r in SENS_POS["stock"].items()}
     res["sensibilidade"] = sens
     cen = wb["Cenários"]
@@ -2312,13 +2502,21 @@ def main():
     write_cenarios(wb, blocks, P, det_lay)
     write_sensibilidade(wb, PREG, blocks)
     write_fontes(wb, P)
-    write_leiame_summary(ws_leia, r_leia)
-    order = ["Leia-me", "Pressupostos", "Unit economics", "Volumes", "Receitas", "Pessoal", "Custos", "DR", "Cash flow",
+    write_leiame_summary(ws_leia, r_leia, blocks)
+    order = ["Leia-me", "Pressupostos", "Unit economics", "Volumes", "Receitas", "Pessoal", "Custos", "DR", "Fluxo de caixa",
              "Capital & financiamento", "Cenários", "Sensibilidade", "Fontes", "Motor"]
     wb._sheets = [wb[n] for n in order]
     wb.active = 0
     for ws in wb.worksheets:
-        ws.sheet_properties.tabColor = ACCENT if ws.title in ("Leia-me", "Cenários") else (BLUE if ws.title == "Pressupostos" else None)
+        ws.sheet_properties.tabColor = ACCENT if ws.title in ("Leia-me", "Cenários") else (AGUA if ws.title == "Pressupostos" else None)
+        normalize_sheet(ws)
+        # impressão: folhas de leitura ajustadas à largura; o Motor só imprime o cabeçalho
+        ws.page_setup.orientation = "landscape"
+        ws.page_setup.paperSize = ws.PAPERSIZE_A4
+        ws.sheet_properties.pageSetUpPr.fitToPage = True
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToHeight = 0
+        ws.print_area = "A1:H3" if ws.title == "Motor" else ws.dimensions
     wb.save(OUT_XLSX)
     print("escrito:", OUT_XLSX)
     if "--no-recalc" in sys.argv:
@@ -2366,6 +2564,11 @@ def main():
         cases += [(s, {"vol": sens["volume"][0]}, f"{s}__vol_neg"), (s, {"vol": sens["volume"][1]}, f"{s}__vol_pos"),
                   (s, {"price": sens["preco_aove"]}, f"{s}__preco"),
                   (s, {"vol": sens["volume"][1], "premio_d": sens["premio_origem_distribuidores_topo"], "tp_scen": "otimista"}, f"{s}__topo")]
+        cases += [(s, {"cup_ov": sens["cupao"][j]}, f"{s}__cup_{j + 1}") for j in range(2)]
+    cases += [("recomendado", {"h_ref_scen": "base", "premio_d": 0.0, "tp_zero": True, "dd_zero": True}, "recomendado__verificado"),
+              ("recomendado", {"g_principal": 1}, "recomendado__granel_principal"),
+              ("recomendado", {"fin_pct_scen": "base"}, "recomendado__obr_90"),
+              ("recomendado", {"dp_ov": P["sensibilidades"]["dias_pagamento_produtor_rapido"]}, "recomendado__dp5")]
     wbv = load_workbook(OUT_XLSX, data_only=True)["Motor"]
     for s, kw, key in cases:
         m = mirror(P, s, **kw)

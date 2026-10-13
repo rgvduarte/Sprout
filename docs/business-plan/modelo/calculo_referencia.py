@@ -145,7 +145,8 @@ def run(P, s):
         eb = m - pess - opex
         # capex e amortizações (software 3, equipamento 4, sensores 5 anos)
         tel = cx["telemetria_eur_por_local"] * cx["locais_novos"][s][y]
-        plat = cx["plataforma_desenvolvimento_capitalizavel_eur"][s][y]
+        # plataforma B2B + área de investidores (separada na revisão de 13-10-2026; mesma despesa total)
+        plat = cx["plataforma_desenvolvimento_capitalizavel_eur"][s][y] + cx.get("plataforma_area_investidor_capitalizavel_eur", {}).get(s, [0] * 5)[y]
         eq = cx["equipamento_informatico_eur_por_nova_fte"] * max(0.0, fte - prev_fte)
         capex = tel + plat + eq
         for amt, life in [(plat, cx["vida_util_anos"]["software"]), (tel, cx["vida_util_anos"]["sensores"]),
