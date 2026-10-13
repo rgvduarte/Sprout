@@ -1,11 +1,70 @@
+import { Link } from 'react-router-dom';
 import { getWorld } from '../../data';
-import type { WorldId } from '../../data';
+import type { JourneyStage, Lot, WorldId } from '../../data';
 import { SeasonTrack } from '../../components/game';
-import { Card, TextLink } from '../../components/ui';
+import { Badge, Card, TextLink } from '../../components/ui';
 import { CommodityGlyph } from '../../components/ui/Commodity';
-import { CAMPAIGN, TODAY_DATE } from '../../lib/clock';
-import { date as fmtDate, MONTHS_SHORT } from '../../lib/format';
+import { useData } from '../../state';
+import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
+import { dateShort, date as fmtDate, MONTHS_SHORT } from '../../lib/format';
 import { ProducerTanks } from './ProducerTanks';
+
+const STAGE_PHRASE: Record<WorldId, Record<JourneyStage, string>> = {
+  azeite: { colhido: 'moenda', analisado: 'boletim de análises', 'em-deposito': 'IBC selados com o número do lote', 'em-venda': 'início das vendas', expedido: 'expedição ao comprador', liquidado: 'liquidação prevista' },
+  agua: { colhido: 'engarrafamento', analisado: 'boletim de análises', 'em-deposito': 'paletes em armazém', 'em-venda': 'início das vendas', expedido: 'expedição ao comprador', liquidado: 'liquidação prevista' },
+  cafe: { colhido: 'colheita', analisado: 'classificação SCA', 'em-deposito': 'sacas em armazém', 'em-venda': 'início das vendas', expedido: 'embarque', liquidado: 'liquidação prevista' },
+};
+
+interface AgendaItem {
+  date: string;
+  lot: Lot;
+  text: string;
+  mine: boolean;
+}
+
+/** Próximos marcos físicos e de financiamento, de todos os lotes, nas próximas semanas. */
+function useAgenda(limit = 5, horizonDays = 50): AgendaItem[] {
+  const { lots, positions } = useData();
+  const mine = new Set(positions.map((p) => p.lotId));
+  const items: AgendaItem[] = [];
+  for (const lot of lots) {
+    if (lot.status === 'fase-2' || lot.status === 'liquidado') continue;
+    for (const m of lot.milestones) {
+      if (m.done || !m.planned) continue;
+      const d = daysBetween(TODAY_DATE, m.planned);
+      if (d >= 0 && d <= horizonDays) items.push({ date: m.planned, lot, text: STAGE_PHRASE[lot.world][m.stage], mine: mine.has(lot.id) });
+    }
+    if (lot.status === 'em-preparacao' && lot.funding.opensPlanned) {
+      const d = daysBetween(TODAY_DATE, lot.funding.opensPlanned);
+      if (d >= 0 && d <= horizonDays) items.push({ date: lot.funding.opensPlanned, lot, text: 'abre a financiamento', mine: false });
+    }
+  }
+  return items.sort((a, b) => a.date.localeCompare(b.date) || a.lot.id.localeCompare(b.lot.id)).slice(0, limit);
+}
+
+function Agenda() {
+  const items = useAgenda();
+  if (!items.length) return null;
+  return (
+    <div className="mt-6 border-t border-border pt-4">
+      <h3 className="text-[1rem]">Próximos marcos da campanha</h3>
+      <ol className="mt-2">
+        {items.map((it) => (
+          <li key={`${it.lot.id}-${it.text}`} data-world={it.lot.world}>
+            <Link to={`/lote/${it.lot.id}`} className="group flex min-h-11 items-center gap-3 rounded-sm text-sm no-underline hover:bg-surface-2 sm:px-1">
+              <span className="w-[4.5rem] shrink-0 font-mono text-fg tnum">{dateShort(it.date)}</span>
+              <CommodityGlyph world={it.lot.world} className="size-4 text-world-ink" />
+              <span className="min-w-0 flex-1 text-muted">
+                <span className="font-mono text-fg tnum">{it.lot.id}</span> · {it.text}
+              </span>
+              {it.mine && <Badge tone="accent">na tua carteira</Badge>}
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
 
 function phaseNow(world: WorldId) {
   const w = getWorld(world);
@@ -44,7 +103,7 @@ export function SeasonCard() {
         <div className="mt-5 space-y-5">
           <WorldRow world="azeite" />
           <WorldRow world="agua" />
-          <div className="flex flex-wrap items-baseline gap-x-2 border-t border-border pt-4 text-sm" data-world="cafe">
+          <div className="flex flex-wrap items-baseline gap-x-2 text-sm" data-world="cafe">
             <span className="inline-flex items-center gap-1.5 font-semibold text-fg">
               <CommodityGlyph world="cafe" className="size-4 text-world-ink" />
               {getWorld('cafe').nome}
@@ -55,6 +114,7 @@ export function SeasonCard() {
             </TextLink>
           </div>
         </div>
+        <Agenda />
       </section>
       <ProducerTanks className="min-w-0 border-border lg:border-l lg:pl-8" />
     </Card>

@@ -71,7 +71,7 @@ function lotDiligence(lot: Lot, game: GameView): Mission {
   const quests = getQuestsByLot(lot.id);
   const seal = quests.map((q) => q.sealId).find(Boolean);
   const sealDef = seal ? getSeal(seal) : undefined;
-  const points = sum(quests.map((q) => q.points)) + (game.simRuns.length ? 0 : (QUESTS.find((q) => q.id === 'q-simulador')?.points ?? 0));
+  const points = sum(quests.map((q) => q.points));
   const risks = game.riskRead(lot.id).length;
   const steps: MissionStep[] = [];
   if (lot.analyses.length) steps.push({ id: 'analise', label: 'Lê o boletim de análises', done: game.hasReadAnalysis(lot.id), href: `/lote/${lot.id}#analises` });

@@ -22,7 +22,7 @@ const DECIMALS: Record<string, number> = {
   humidade: 1, cat1: 0, total: 0, sca: 2,
 };
 
-const fmtParam = (p: QualityParam, v: number) => `${num(v, DECIMALS[p.id] ?? 2)}${p.unit && p.unit !== '' && !p.unit.startsWith('ufc') && p.unit !== 'pts' ? (p.unit === '%' ? ' %' : '') : ''}`;
+const fmtParam = (p: QualityParam, v: number) => `${num(v, DECIMALS[p.id] ?? 2)}${p.unit === '%' ? ' %' : ''}`;
 
 function ParamRow({ p, t }: { p: QualityParam; t: MotionValue<number> }) {
   const display = useTransform(t, (v) => (v <= 0.001 ? '—' : fmtParam(p, p.value * Math.min(1, v))));
@@ -130,7 +130,6 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
   });
   useDwell(sheetRef, !rich && Boolean(analysis) && !read, markRead, 1600);
 
-  const quest = lot.analyses.length ? undefined : null;
   const colhido = lot.milestones.find((m) => m.stage === 'colhido');
   const analisado = lot.milestones.find((m) => m.stage === 'analisado');
 
@@ -264,7 +263,6 @@ function ColheitaBody({ progress, rich }: { progress: MotionValue<number>; rich:
               <p className="measure mt-1 text-muted">
                 O lote só abre a financiamento depois de o laboratório publicar a análise físico-química{lot.world === 'azeite' ? ' e o painel de prova' : ''}. Data prevista: <span className="font-mono text-fg tnum">{fmtDate(analisado?.planned ?? lot.funding.opensAt)}</span>.
               </p>
-              {quest === null && null}
             </div>
           )}
         </div>

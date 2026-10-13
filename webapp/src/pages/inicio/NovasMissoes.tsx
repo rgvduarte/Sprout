@@ -108,7 +108,10 @@ function UpcomingRow({ lot }: { lot: Lot }) {
               'Fase 2 · abre em 2027. Explorável e jogável na Academia; ainda não investível.'
             ) : (
               <>
-                {lot.world === 'agua' ? 'Engarrafamento' : 'Extração'} em curso: <span className="font-mono tnum">{num(lot.stock)}</span> de <span className="font-mono tnum">{num(lot.quantity)}</span> {unitWord(lot, lot.quantity)}
+                {lot.world === 'agua' ? 'Engarrafamento' : 'Extração'} em curso: <span className="font-mono tnum">{num(lot.stock)}</span> de{' '}
+                <span className="whitespace-nowrap">
+                  <span className="font-mono tnum">{num(lot.quantity)}</span> {unitWord(lot, lot.quantity)}
+                </span>
                 {lot.funding.opensPlanned && (
                   <>
                     {' '}

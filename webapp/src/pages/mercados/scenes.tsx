@@ -46,12 +46,12 @@ const INK = {
 
 /* ------------------------------------------------------------ peças */
 
-function IsoBox({ P, x, y, z = 0, w, d, h, top, left, right, stroke = INK.line, sw = 1 }: { P: Proj; x: number; y: number; z?: number; w: number; d: number; h: number; top: string; left: string; right: string; stroke?: string; sw?: number }) {
+function IsoBox({ P, x, y, z = 0, w, d, h, top, left, right, stroke = INK.line, sw = 1, dash }: { P: Proj; x: number; y: number; z?: number; w: number; d: number; h: number; top: string; left: string; right: string; stroke?: string; sw?: number; dash?: string }) {
   const t = [P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)];
   const l = [P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)];
   const r = [P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)];
   return (
-    <g stroke={stroke} strokeWidth={sw} strokeLinejoin="round">
+    <g stroke={stroke} strokeWidth={sw} strokeLinejoin="round" strokeDasharray={dash}>
       <polygon points={pts(l)} fill={left} />
       <polygon points={pts(r)} fill={right} />
       <polygon points={pts(t)} fill={top} />
@@ -255,19 +255,17 @@ function WaterPallet({ P, x, y, filled }: { P: Proj; x: number; y: number; fille
   );
 }
 
-/** Saca de juta de 60 kg (contorno tracejado = ainda por encher). */
+/** Saca de juta de 60 kg deitada (tracejada = ainda por encher). */
 function Sack({ P, x, y, z = 0, filled }: { P: Proj; x: number; y: number; z?: number; filled: boolean }) {
-  const [cx, cy] = P(x, y, z + 0.55);
-  const w = 15;
-  const h = 10;
-  const d = `M${r1(cx - w)} ${r1(cy - h * 0.2)} Q${r1(cx - w - 1.5)} ${r1(cy + h)} ${r1(cx)} ${r1(cy + h * 1.05)} Q${r1(cx + w + 1.5)} ${r1(cy + h)} ${r1(cx + w)} ${r1(cy - h * 0.2)} Q${r1(cx + w * 0.4)} ${r1(cy - h * 0.95)} ${r1(cx)} ${r1(cy - h * 0.7)} Q${r1(cx - w * 0.4)} ${r1(cy - h * 0.95)} ${r1(cx - w)} ${r1(cy - h * 0.2)} Z`;
-  return filled ? (
+  const w = 1.5;
+  const d = 0.95;
+  const h = 0.62;
+  if (!filled) return <IsoBox P={P} x={x} y={y} z={z} w={w} d={d} h={h} top="transparent" left="transparent" right="transparent" stroke={INK.line} sw={0.8} dash="2.5 2" />;
+  return (
     <g>
-      <path d={d} fill="color-mix(in oklab, var(--world) 45%, var(--surface))" stroke={INK.line} strokeWidth={0.9} />
-      <path d={`M${r1(cx - w * 0.6)} ${r1(cy + h * 0.15)} Q${r1(cx)} ${r1(cy + h * 0.4)} ${r1(cx + w * 0.6)} ${r1(cy + h * 0.15)}`} fill="none" stroke={INK.line} strokeWidth={0.7} />
+      <IsoBox P={P} x={x} y={y} z={z} w={w} d={d} h={h} top="color-mix(in oklab, var(--world) 30%, var(--surface))" left="color-mix(in oklab, var(--world) 42%, var(--surface))" right="color-mix(in oklab, var(--world) 58%, var(--surface-2))" stroke={INK.line} sw={0.8} />
+      <polyline points={pts([P(x + w * 0.5, y, z + h), P(x + w * 0.5, y + d, z + h), P(x + w * 0.5, y + d, z)])} fill="none" stroke={INK.line} strokeWidth={0.6} />
     </g>
-  ) : (
-    <path d={d} fill="color-mix(in oklab, var(--surface) 70%, transparent)" stroke={INK.line} strokeWidth={0.9} strokeDasharray="3 2.5" />
   );
 }
 
@@ -339,25 +337,25 @@ function OlivalScene({ variant = 'hero', levels, fillOnMount = false, className,
 }
 
 function NascenteScene({ variant = 'hero', levels, fillOnMount = false, className, label }: SceneProps) {
-  const P = useMemo(() => makeProj(250, 54, U), []);
-  const W = 36;
-  const D = 18;
+  const P = useMemo(() => makeProj(250, 56, U), []);
+  const W = 32;
+  const D = 14;
   const strata = [
-    { z0: 0, z1: -1.1, fill: 'color-mix(in oklab, var(--fg) 12%, var(--surface-2))', name: 'solo' },
-    { z0: -1.1, z1: -3.8, fill: 'color-mix(in oklab, var(--fg) 5%, var(--surface))', name: 'granito' },
-    { z0: -3.8, z1: -6.6, fill: 'color-mix(in oklab, var(--world) 30%, var(--surface))', name: 'aquifero' },
-    { z0: -6.6, z1: -8.6, fill: 'color-mix(in oklab, var(--fg) 17%, var(--surface-2))', name: 'base' },
+    { z0: 0, z1: -1, fill: 'color-mix(in oklab, var(--fg) 12%, var(--surface-2))', name: 'solo' },
+    { z0: -1, z1: -3.3, fill: 'color-mix(in oklab, var(--fg) 7%, var(--surface))', name: 'granito' },
+    { z0: -3.3, z1: -5.7, fill: 'color-mix(in oklab, var(--world) 30%, var(--surface))', name: 'aquifero' },
+    { z0: -5.7, z1: -7.2, fill: 'color-mix(in oklab, var(--fg) 17%, var(--surface-2))', name: 'base' },
   ];
   // armazém: 4 × 4 lugares de palete, ocupados ao nível da telemetria
   const slots: Pt[] = [];
-  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) slots.push([25.4 + i * 2.1, 7.2 + j * 2.1]);
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) slots.push([23.6 + i * 2, 4.6 + j * 2]);
   const level = levels[0] ?? 0;
   const lv = useLevel(level, fillOnMount);
   const ordered = slots.map((s, i) => ({ s, i })).sort((a, b) => a.s[0] + a.s[1] - (b.s[0] + b.s[1]));
-  const vb = variant === 'band' ? '6 10 520 300' : '0 0 560 330';
+  const vb = variant === 'band' ? '128 40 372 280' : '112 6 404 318';
   return (
     <svg viewBox={vb} role="img" aria-label={label} className={cn('block h-auto w-full', className)} preserveAspectRatio="xMidYMid meet">
-      <Contours P={P} cx={5} cy={4} radii={[9, 12.5, 16.5]} seed={0.4} />
+      <Contours P={P} cx={5} cy={4} radii={[8.5, 12, 16]} seed={0.4} />
       {/* bloco em corte com os estratos */}
       {strata.map((s) => (
         <g key={s.name} stroke={INK.line} strokeWidth={0.9} strokeLinejoin="round">
@@ -368,40 +366,40 @@ function NascenteScene({ variant = 'hero', levels, fillOnMount = false, classNam
       {/* poros do aquífero */}
       <g fill="var(--world-ink)" opacity={0.55}>
         {Array.from({ length: 34 }, (_, i) => {
-          const x = 1 + ((i * 7.3) % 34);
-          const z = -4.3 - ((i * 3.1) % 2);
+          const x = 1 + ((i * 7.3) % 30);
+          const z = -3.8 - ((i * 3.1) % 1.6);
           const [sx, sy] = P(x, D, z);
           return <circle key={i} cx={sx} cy={sy} r={1.2} />;
         })}
       </g>
       {/* fraturas do granito */}
       <g stroke={INK.lineSoft} strokeWidth={0.9} fill="none">
-        {[4, 9, 15, 22, 28, 33].map((x, i) => (
-          <polyline key={x} points={pts([P(x, D, -1.4), P(x + 0.8, D, -2.3 - (i % 2) * 0.4), P(x + 0.3, D, -3.4)])} />
+        {[4, 13, 19, 25, 30].map((x, i) => (
+          <polyline key={x} points={pts([P(x, D, -1.3), P(x + 0.8, D, -2.1 - (i % 2) * 0.4), P(x + 0.3, D, -3)])} />
         ))}
       </g>
       {/* topo do bloco */}
       <polygon points={pts([P(0, 0), P(W, 0), P(W, D), P(0, D)])} fill={INK.groundTop} stroke={INK.line} strokeWidth={1} />
-      <TopoHill P={P} cx={6} cy={5} radii={[5.4, 4.2, 3, 1.8]} step={0.75} seed={3.4} tone="neutral" />
+      <TopoHill P={P} cx={5.6} cy={4.6} radii={[4.6, 3.6, 2.6, 1.6]} step={0.75} seed={3.4} tone="neutral" />
       {/* captação: furo até ao aquífero, visível no corte */}
       <g>
-        <polygon points={pts([P(9.6, D, -5.9), P(10.4, D, -5.9), P(10.4, D, 0), P(9.6, D, 0)])} fill={INK.steel} stroke={INK.steelLine} strokeWidth={0.8} />
-        <polygon points={pts([P(9.8, D, -5.8), P(10.2, D, -5.8), P(10.2, D, -0.2), P(9.8, D, -0.2)])} fill={INK.liquid} opacity={0.85} />
-        <IsoBox P={P} x={9.2} y={16.6} w={1.4} d={1.4} h={1.2} top={INK.steel} left={INK.wallLeft} right={INK.wallRight} stroke={INK.steelLine} sw={0.8} />
+        <polygon points={pts([P(8.6, D, -5.1), P(9.4, D, -5.1), P(9.4, D, 0), P(8.6, D, 0)])} fill={INK.steel} stroke={INK.steelLine} strokeWidth={0.8} />
+        <polygon points={pts([P(8.8, D, -5), P(9.2, D, -5), P(9.2, D, -0.2), P(8.8, D, -0.2)])} fill={INK.liquid} opacity={0.85} />
+        <IsoBox P={P} x={8.3} y={12.6} w={1.4} d={1.4} h={1.2} top={INK.steel} left={INK.wallLeft} right={INK.wallRight} stroke={INK.steelLine} sw={0.8} />
       </g>
       {/* conduta até à linha de engarrafamento */}
-      <polyline points={pts([P(10.6, 17.3, 0.35), P(15.5, 17.3, 0.35), P(15.5, 12.4, 0.35), P(16.5, 12.4, 0.35)])} fill="none" stroke={INK.liquid} strokeWidth={2.2} strokeLinejoin="round" />
+      <polyline points={pts([P(9.7, 13.3, 0.35), P(13.6, 13.3, 0.35), P(13.6, 9.2, 0.35), P(14.8, 9.2, 0.35)])} fill="none" stroke={INK.liquid} strokeWidth={2.2} strokeLinejoin="round" />
       {/* nave de engarrafamento */}
-      <IsoBox P={P} x={16.5} y={5.5} w={7.6} d={7.5} h={3.6} top={INK.wallLeft} left={INK.wallLeft} right={INK.wallRight} />
+      <IsoBox P={P} x={14.8} y={3.4} w={7.2} d={7} h={3.4} top={INK.wallLeft} left={INK.wallLeft} right={INK.wallRight} />
       <g stroke={INK.lineSoft} strokeWidth={0.8}>
         {[1, 2, 3, 4, 5, 6].map((k) => (
-          <polyline key={k} fill="none" points={pts([P(16.5 + k * 1.08, 5.5, 3.6), P(16.5 + k * 1.08, 13, 3.6)])} />
+          <polyline key={k} fill="none" points={pts([P(14.8 + k * 1.03, 3.4, 3.4), P(14.8 + k * 1.03, 10.4, 3.4)])} />
         ))}
       </g>
-      <polygon points={pts([P(18, 13, 0), P(20.6, 13, 0), P(20.6, 13, 2.2), P(18, 13, 2.2)])} fill={INK.opening} />
+      <polygon points={pts([P(16.2, 10.4, 0), P(18.7, 10.4, 0), P(18.7, 10.4, 2.1), P(16.2, 10.4, 2.1)])} fill={INK.opening} />
       {/* garrafas à saída da linha */}
-      {[21.4, 22.1, 22.8, 23.5].map((x) => {
-        const [bx, by] = P(x, 13.9, 0);
+      {[19.4, 20.1, 20.8, 21.5].map((x) => {
+        const [bx, by] = P(x, 11.4, 0);
         return (
           <g key={x}>
             <rect x={bx - 2.2} y={by - 12} width={4.4} height={12} rx={1.6} fill="color-mix(in oklab, var(--world) 38%, var(--surface))" stroke={INK.line} strokeWidth={0.7} />
@@ -450,13 +448,16 @@ function PlantacaoScene({ variant = 'hero', levels, className, label }: ScenePro
     { x: 5.8, y: 4.9, w: 13.2, d: 4.2, z: 3.3 },
   ];
   const level = levels[0] ?? 0;
+  // tulha: 3 × 2 sacas sobre palete, mais 2 por cima
   const sacks: [number, number, number][] = [
-    [31.2, 16.6, 0],
-    [32.9, 16.6, 0],
-    [34.6, 16.6, 0],
-    [32, 16.2, 1.05],
-    [33.7, 16.2, 1.05],
-    [32.85, 15.8, 2.1],
+    [32.2, 15.6, 0.3],
+    [33.8, 15.6, 0.3],
+    [35.4, 15.6, 0.3],
+    [32.2, 16.65, 0.3],
+    [33.8, 16.65, 0.3],
+    [35.4, 16.65, 0.3],
+    [33, 16.1, 0.92],
+    [34.6, 16.1, 0.92],
   ];
   const vb = variant === 'band' ? '30 40 640 250' : '0 0 720 320';
   return (
@@ -492,8 +493,9 @@ function PlantacaoScene({ variant = 'hero', levels, className, label }: ScenePro
           <polyline key={`b${k}`} fill="none" points={pts([P(26.5, 4 + k * 2.25, 0.25), P(36.5, 4 + k * 2.25, 0.25)])} />
         ))}
       </g>
-      <GableHouse P={P} x={27} y={14.6} w={4.6} d={4.2} h={2.8} rise={1.3} windows={1} />
+      <GableHouse P={P} x={26.4} y={15} w={4.6} d={4.2} h={2.8} rise={1.3} windows={1} />
       {/* sacas: tracejadas até haver café na tulha */}
+      <IsoBox P={P} x={32} y={15.4} w={5} d={2.4} h={0.3} top={INK.wood} left={INK.wood} right={INK.wallRight} stroke={INK.steelLine} sw={0.7} />
       {sacks.map(([x, y, z], i) => (
         <Sack key={i} P={P} x={x} y={y} z={z} filled={level > (i + 0.5) / sacks.length} />
       ))}
@@ -512,12 +514,12 @@ function CoffeeRow({ P, from, to, z, spacing, flowers }: { P: Proj; from: Pt; to
         const [cx, cy] = P(x, y, z + 0.75);
         return (
           <g key={i}>
-            <circle cx={cx} cy={cy} r={5.2} fill="color-mix(in oklab, var(--c-azeite-ink) 52%, var(--world))" stroke={INK.line} strokeWidth={0.7} />
+            <ellipse cx={cx + 2} cy={cy + 4.4} rx={4.6} ry={1.8} fill={INK.shadow} />
+            <circle cx={cx} cy={cy} r={4.3} fill="color-mix(in oklab, var(--accent) 62%, var(--surface))" stroke="color-mix(in oklab, var(--accent) 70%, var(--fg))" strokeWidth={0.7} />
             {flowers && (
               <g fill="var(--surface)">
-                <circle cx={cx - 1.8} cy={cy - 1.5} r={0.95} />
-                <circle cx={cx + 1.9} cy={cy - 0.4} r={0.95} />
-                <circle cx={cx - 0.2} cy={cy + 1.9} r={0.95} />
+                <circle cx={cx - 1.5} cy={cy - 1.3} r={0.8} />
+                <circle cx={cx + 1.6} cy={cy - 0.2} r={0.8} />
               </g>
             )}
           </g>

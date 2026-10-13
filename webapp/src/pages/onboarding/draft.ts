@@ -64,6 +64,8 @@ export interface Draft {
   telefone: string;
   iban: string;
   certidao: string;
+  /** última atualização do código da certidão (vista aprovada) */
+  certidaoAtualizada?: string;
   docs: Partial<Record<DocSlot, DocFile>>;
   contaPropria: '' | 'sim' | 'nao';
   ubos: UboRow[];

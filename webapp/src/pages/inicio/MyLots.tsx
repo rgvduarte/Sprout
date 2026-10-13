@@ -35,7 +35,10 @@ function LotRow({ p }: { p: PositionView }) {
             {lot.title} · {region?.nome}
           </p>
           <p className="mt-1 text-sm text-muted">
-            <span className="font-mono text-fg tnum">{eur(p.amount)}</span> financiados · <span className="font-mono tnum">{share.primary}</span> {share.secondary}
+            <span className="font-mono text-fg tnum">{eur(p.amount)}</span> financiados
+          </p>
+          <p className="text-sm text-muted">
+            A tua parte: <span className="font-mono text-fg tnum">{share.primary}</span> {share.secondary}
           </p>
         </div>
         <div className="col-start-2 min-w-0 sm:col-start-auto sm:pt-1">

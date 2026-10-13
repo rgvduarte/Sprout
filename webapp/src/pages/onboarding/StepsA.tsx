@@ -82,8 +82,8 @@ export function StepDados(p: StepProps) {
       </FieldGroup>
 
       <FieldGroup title={col ? 'Sede' : 'Morada de residência'}>
-        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_10rem_minmax(0,14rem)]">
-          <TF k="morada" label="Rua, número e andar" p={p} autoComplete="street-address" className="sm:col-span-3" />
+        <div className="grid gap-5 sm:grid-cols-[11rem_minmax(0,1fr)]">
+          <TF k="morada" label="Rua, número e andar" p={p} autoComplete="street-address" className="sm:col-span-2" />
           <TF
             k="codigoPostal"
             label="Código postal"
@@ -93,7 +93,6 @@ export function StepDados(p: StepProps) {
             format={(v) => formatPostal(v, d.pais)}
             maxLength={d.pais === 'PT' ? 8 : 16}
             placeholder={d.pais === 'PT' ? '0000-000' : undefined}
-            className="sm:col-start-2"
           />
           <TF k="localidade" label="Localidade" p={p} autoComplete="address-level2" />
         </div>

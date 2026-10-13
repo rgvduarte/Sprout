@@ -6,7 +6,7 @@ import { useData, useFeed, useGame, useRole } from '../../state';
 import { GameContext } from '../../state/AppProvider';
 import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, num, pct } from '../../lib/format';
-import { plannedSettlement, windowOf } from '../carteira/positions';
+import { plannedSettlement, positionState, windowOf } from '../carteira/positions';
 import { LevelPanel } from './LevelPanel';
 import { buildMissions } from './missions';
 import { MissionList } from './MissionList';
@@ -71,10 +71,15 @@ export default function InicioPage() {
             </span>
             {nextStepLabel && (
               <span className="text-sm text-muted">
-                · próximo passo:{' '}
+                Próximo passo:{' '}
                 <TextLink to={nextStepLabel.href} className="text-sm">
                   {nextStepLabel.label}
-                  {nextStep?.kind === 'diligencia' ? ` (${nextStep.title.replace('Diligência do ', '')})` : ''}
+                  {nextStep?.kind === 'diligencia' && (
+                    <>
+                      {' '}
+                      do <span className="whitespace-nowrap">{nextStep.title.replace('Diligência do ', '')}</span>
+                    </>
+                  )}
                 </TextLink>
               </span>
             )}
@@ -123,7 +128,7 @@ export default function InicioPage() {
           ) : (
             <Section id="comecar" title="Começa por aqui" description="Primeiro conhecer, depois decidir. Nada aqui pede dinheiro." className="order-1 !mt-0 min-w-0 lg:order-none">
               <Card padding="md">
-                <MissionList missions={listMissions} limit={4} />
+                <MissionList missions={listMissions} limit={3} />
               </Card>
             </Section>
           )}
@@ -132,7 +137,7 @@ export default function InicioPage() {
           {approved && (
             <Section id="missoes" title="Missões de conhecimento" description="Diligência, campanha e selos. Os pontos vêm do que aprendes, nunca do que investes." className="order-3 !mt-0 min-w-0 lg:order-none">
               <Card padding="md">
-                <MissionList missions={listMissions} limit={4} />
+                <MissionList missions={listMissions} limit={3} />
               </Card>
             </Section>
           )}
@@ -177,15 +182,10 @@ export default function InicioPage() {
                 const w = windowOf(p.lot);
                 return (
                   <div key={p.id} className="min-w-0">
-                    <p className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                      <span className="min-w-0">
-                        <span className="font-mono text-sm text-fg tnum">{p.lot.id}</span> <span className="text-sm text-muted">· {p.producer.nome}</span>
-                      </span>
-                      <span className="text-sm text-muted">
-                        prevista a <span className="font-mono text-fg tnum">{fmtDate(at)}</span>
-                      </span>
+                    <p className="mb-6 text-sm">
+                      <span className="font-mono text-fg tnum">{p.lot.id}</span> <span className="text-muted">· {p.producer.nome} · {positionState(p).label.toLowerCase()}</span>
                     </p>
-                    <HarvestBand world={p.lot.world} start={w.start} months={p.lot.settlement.windowMonths} extensionMonths={w.extEnd ? 6 : 0} markers={[{ date: at, label: 'Liquidação prevista' }]} legend={i === settlements.length - 1} />
+                    <HarvestBand world={p.lot.world} start={w.start} months={p.lot.settlement.windowMonths} extensionMonths={w.extEnd ? 6 : 0} markers={[{ date: at, label: 'Liquidação prevista' }]} legend={i === 0 || settlements[i - 1].p.lot.world !== p.lot.world} />
                   </div>
                 );
               })}
