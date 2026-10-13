@@ -115,8 +115,8 @@ export function ReviewView({ c, profileId, onApprove, onRestart }: { c: CaseView
     { id: 'conta', state: 'upcoming', title: 'Conta segregada ativa', body: 'Recebes a referência para transferências SEPA para a conta segregada no prestador de pagamentos licenciado na UE.' },
   ];
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-      <div className="flex min-w-0 flex-col gap-6">
+    <div className="flex flex-col gap-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
         <Card padding="lg">
           <CardHeader
             title={`Processo ${caseLabel(c.id)}`}
@@ -128,25 +128,25 @@ export function ReviewView({ c, profileId, onApprove, onRestart }: { c: CaseView
             Depois da aprovação, cada compromisso faz-se por transferência SEPA a partir da conta que indicaste. Não aceitamos numerário, e o dinheiro fica numa conta segregada, conciliada todos os dias.
           </p>
         </Card>
+        <aside className="flex min-w-0 flex-col gap-6" aria-label="Missões de registo e demonstração">
+          <Card>
+            <RegistrationMissions submitted profileId={profileId} />
+          </Card>
+          <Card>
+            <h2 className="text-[1.0625rem]">Demonstração</h2>
+            <p className="mt-1 text-sm text-muted">Na operação real, a decisão é da equipa de compliance, em Bastidores. Aqui podes simulá-la para veres o resto do percurso.</p>
+            <div className="mt-4 flex flex-col items-start gap-2">
+              <Button variant="secondary" onClick={onApprove}>
+                Simular a aprovação
+              </Button>
+              <Button variant="ghost" size="sm" onClick={onRestart}>
+                Recomeçar o registo de exemplo
+              </Button>
+            </div>
+          </Card>
+        </aside>
       </div>
-      <aside className="flex min-w-0 flex-col gap-6" aria-label="Missões e demonstração">
-        <Card>
-          <RegistrationMissions submitted profileId={profileId} />
-        </Card>
-        <LearningGoalPanel profileId={profileId} />
-        <Card>
-          <h2 className="text-[1.0625rem]">Demonstração</h2>
-          <p className="mt-1 text-sm text-muted">Na operação real, a decisão é da equipa de compliance, em Bastidores. Aqui podes simulá-la para veres o resto do percurso.</p>
-          <div className="mt-4 flex flex-col items-start gap-2">
-            <Button variant="secondary" onClick={onApprove}>
-              Simular a aprovação
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onRestart}>
-              Recomeçar o registo de exemplo
-            </Button>
-          </div>
-        </Card>
-      </aside>
+      <LearningGoalPanel profileId={profileId} className="lg:max-w-[calc(100%-340px-1.5rem)]" />
     </div>
   );
 }

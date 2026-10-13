@@ -255,7 +255,7 @@ function QuizQuestion({ q, value, onAnswer, error }: { q: (typeof QUIZ)[number];
   const answered = value !== undefined;
   const right = value === q.correct;
   return (
-    <div data-field={q.id} className="min-w-0">
+    <div data-field={q.id} className="min-w-0 max-w-[68ch]">
       <RadioGroup
         legend={<span className="text-[0.9375rem]">{q.prompt}</span>}
         name={`ob-${q.id}`}

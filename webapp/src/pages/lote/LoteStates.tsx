@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Compass } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { fundedFraction, getQuestsByWorld, getSealForLot, isInvestable, getWorld } from '../../data';
 import type { Lot } from '../../data/types';
 import { LotGauge, OriginSeal, QuestList } from '../../components/game';
@@ -20,9 +20,6 @@ export function UnknownLot({ id }: { id?: string }) {
   return (
     <Page width="narrow">
       <div className="flex flex-col items-start gap-4 py-8">
-        <span aria-hidden className="inline-flex size-11 items-center justify-center rounded-sm border border-border bg-surface text-muted">
-          <Compass className="size-5" strokeWidth={1.75} />
-        </span>
         <h1 className="text-[1.875rem] leading-tight">Não encontramos o lote {id ? <span className="font-mono">{id}</span> : 'pedido'}</h1>
         <p className="max-w-[62ch] text-muted">Os números de lote têm o formato AZ-2026-021 (azeite), AG-2026-007 (água) ou CF-2027-001 (café). Se vieste de uma ligação antiga, o lote pode ter mudado de número. Estes estão abertos a financiamento hoje:</p>
       </div>

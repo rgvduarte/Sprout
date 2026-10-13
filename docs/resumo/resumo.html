@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pt-PT" data-await-ready>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprout · Resumo executivo</title>
+<meta name="description" content="Resumo executivo do plano estratégico de 13/10/2026 (marketplace B2B de commodities agroalimentares), com a leitura do conselheiro a partir da investigação verificada.">
+<meta name="author" content="Sprout (nome de trabalho)">
+<link rel="stylesheet" href="../tools/print.css">
+<style>
+  @page {
+    @top-right { content: "Resumo executivo · plano estratégico de 13/10/2026"; }
+    @bottom-left { content: "Nome de trabalho · documento interno, não constitui oferta nem recomendação de investimento · versão de 13/10/2026"; }
+  }
+
+  /* ---- Página 1: painel ---- */
+  .masthead { margin: 0 0 5mm; }
+  .masthead .display { max-width: 160mm; }
+  .masthead .standfirst { margin-top: 2.6mm; }
+  .masthead .meta { margin-top: 2.4mm; display: flex; flex-wrap: wrap; gap: 0 2.4mm; }
+  .masthead .meta span + span::before { content: "·"; margin-right: 2.4mm; color: var(--rule-strong); }
+  .howto { font-size: 7.6pt; color: var(--muted); margin: 0 0 4.5mm; max-width: 165mm; }
+
+  .board { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 5mm; }
+  .board section { border-top: 0.9pt solid var(--ink); padding-top: 2.2mm; }
+  .board h2 { margin: 0; font-size: 11pt; }
+  .board .dek { margin: 0.6mm 0 2.2mm; }
+  .board .wide { grid-column: 1 / -1; }
+
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4.5mm; row-gap: 2.4mm; }
+  .pillars h3 { margin: 0 0 0.4mm; font-size: 8.8pt; }
+  .pillars p { font-size: 8pt; line-height: 1.36; margin: 0; }
+
+  .zero { margin: 0; }
+  .zero li { padding-left: 5.5mm; margin-bottom: 1.8mm; }
+  .zero h3 { display: inline; font-size: 8.8pt; margin: 0; }
+  .zero h3::after { content: " — "; font-weight: 400; color: var(--muted); }
+
+  .product { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4.5mm; }
+  .product h3 { margin: 0 0 1mm; font-size: 8.8pt; }
+  .product ul { font-size: 8pt; line-height: 1.34; }
+  .product li { margin-bottom: 0.8mm; }
+
+  .pilot { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; column-gap: 4.5mm; }
+  .pilot div { font-size: 8pt; line-height: 1.34; border-top: 0.5pt solid var(--rule); padding-top: 1.4mm; }
+  .pilot strong { display: block; font-size: 8.4pt; }
+  .after-board { margin-top: 4mm; display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+
+  /* ---- Página 2 ---- */
+  .synopsis p { margin-bottom: 1.6mm; }
+  .synopsis p b { font-weight: 600; }
+  .pull { font-family: var(--f-display); font-stretch: 87.5%; font-weight: 600; font-size: 11pt; line-height: 1.25; margin: 2.4mm 0 2.4mm; max-width: 150mm; }
+  table.components td:first-child { font-weight: 600; width: 22mm; }
+  table.components td:nth-child(2) { width: 72mm; }
+  table.components td:nth-child(3) { width: 21mm; }
+  table.risk td:first-child { width: 62mm; font-weight: 600; }
+  table.risk td:nth-child(2) { width: 50mm; }
+
+  /* ---- Página 3 ---- */
+  table.owners { font-size: 7.5pt; }
+  table.owners td { padding-top: 1.7mm; padding-bottom: 1.7mm; }
+  table.owners td:first-child { width: 31mm; }
+  table.owners td:nth-child(2) { width: 73mm; }
+  table.owners td:nth-child(3) { width: 21mm; }
+  table.owners .who { font-weight: 600; display: block; }
+  table.owners ul.todo { margin: 0; }
+  table.owners ul.todo li { margin-bottom: 0.7mm; line-height: 1.3; }
+  table.owners .advice { font-size: 7.2pt; line-height: 1.32; }
+  table.agenda td:first-child { width: 14mm; font-family: var(--f-mono); font-size: 7.4pt; }
+  table.agenda td:nth-child(2) { width: 34mm; font-weight: 600; }
+  table.agenda td:last-child { width: 30mm; color: var(--muted); }
+
+  /* ---- Página 4 ---- */
+  ol.findings { margin: 0; }
+  ol.findings > li { padding: 1.5mm 0 1.5mm 6.5mm; margin: 0; border-top: 0.5pt solid var(--rule); display: grid; grid-template-columns: 1fr 27mm; column-gap: 4mm; font-size: 8pt; line-height: 1.36; }
+  ol.findings > li:first-child { border-top: 0.9pt solid var(--ink); }
+  ol.findings > li::before { top: 1.5mm; font-size: 8pt; color: var(--ink); font-weight: 600; }
+  ol.findings b { font-weight: 600; }
+  ol.findings .ref { text-align: right; white-space: normal; line-height: 1.35; padding-top: 0.3mm; }
+  .charts-2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-top: 3.5mm; }
+  .charts-2 figure { margin: 0; }
+  .path { margin-top: 3mm; }
+  .path ol > li { font-size: 8pt; line-height: 1.34; margin-bottom: 0.9mm; }
+  .path ol > li::before { content: counter(li, lower-alpha) ")"; }
+  .verdict { margin-top: 2.4mm; }
+  .closing { display: grid; grid-template-columns: 1fr auto; column-gap: 6mm; align-items: end; margin-top: 3mm; border-top: 0.9pt solid var(--ink); padding-top: 2mm; font-size: 7.6pt; }
+  .closing .url { font-family: var(--f-mono); font-size: 8.4pt; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- =============================== PÁGINA 1 =============================== -->
+<section class="sheet" id="p1">
+  <header class="masthead">
+    <h1 class="display">Marketplace B2B de commodities agro</h1>
+    <p class="standfirst">Desintermediação produtiva, captura de margem do embalador e estruturação financeira com liquidação a 18 meses.</p>
+    <p class="meta"><span>Estratégia &amp; execução B2B</span><span>Agroalimentar</span><span>Alinhamento 14h45–16h</span><span>Resumo da reunião de 13/10/2026</span></p>
+  </header>
+
+  <p class="howto">As páginas 1 a 3 resumem o documento-fonte sem lhe acrescentar teses. As notas <b>Verificação</b> e a página 4 dizem o que a investigação de 13/10/2026 confirmou, corrigiu ou deixou por provar; as etiquetas [E] (estimativa) e [L] (norma por reconfirmar pelo advogado) vêm da base factual.</p>
+
+  <div class="board">
+    <section>
+      <h2>Tese económica: captura de spread</h2>
+      <p class="dek">Eliminação de intermediários tradicionais e de margem concentrada.</p>
+      <div class="ledger">
+        <div class="v">80–90 %</div><div class="d">Margem do embalador capturada</div>
+        <div class="v">10–15 %</div><div class="d">Desconto ao cliente face ao mercado</div>
+        <div class="v">Spread</div><div class="d">Spread operacional retido, com hedging</div>
+      </div>
+      <p class="check"><span class="lbl">Verificação.</span> A margem líquida do embalador vale 0,19–0,50 €/kg; um desconto de 10 % sobre a referência-base de 5,65 €/kg custa 0,57 €/kg. Tal como escrita, a tese não fecha, e o azeite não tem futuros desde o fecho do MFAO (p. 4, n.os 2–3).</p>
+    </section>
+
+    <section>
+      <h2>Arquitetura de valor: pilares do sistema</h2>
+      <p class="dek"><span class="cm azeite">Azeite</span> · <span class="cm agua">Água</span> · <span class="cm cafe">Café</span></p>
+      <div class="pillars">
+        <div><h3>Oferta direta</h3><p>Acesso mapeado a produtores com stock e telemetria em tempo real (ex.: Lagar do Val).</p></div>
+        <div><h3>Ciclo de 18 meses</h3><p>Janelas previsíveis de liquidação, com extensão e refunding para choques.</p></div>
+        <div><h3>Target: investidores</h3><p>Ativo palpável e auditável para HNWIs, contra especulação e day trading.</p></div>
+        <div><h3>Go-to-market</h3><p>Fase 1: marketplace fechado, para controlo rigoroso de KYC/AML e de liquidez.</p></div>
+      </div>
+      <p class="check"><span class="lbl">Verificação.</span> O produtor tem de ser pago em 30 ou 60 dias (Dir. 2019/633): os 18 meses só cabem no vencimento das obrigações. «HNWI» não é categoria legal; a 1.ª série vai só a clientes profissionais (p. 4, n.os 4–5).</p>
+    </section>
+
+    <section>
+      <h2>Prioridade zero: bloqueio e regulação</h2>
+      <p class="dek">Evitar fricções financeiras fatais e desalinhamentos de tesouraria.</p>
+      <ol class="zero">
+        <li><h3>Jurisdição e rails bancários UE</h3>eliminar o risco de capital retido; operar só com PSP e instituições de moeda eletrónica licenciados na UE, com segregação de contas.</li>
+        <li><h3>Enquadramento regulatório (MiFID/AIFMD)</h3>blindar a distribuição a investidores contra o risco de venda irregular de instrumentos financeiros.</li>
+        <li><h3>Mismatch agrícola</h3>hedges e contrapartes para alinhar a volatilidade das colheitas com a liquidação a 18 meses.</li>
+      </ol>
+      <p class="check"><span class="lbl ok">Confirmado.</span> As três prioridades estão certas e por esta ordem. A via limpa é uma OpCo e uma SPV portuguesas, com bancos PT (SCT Inst, VoP, SDD B2B) e o risco de preço fechado em contratos físicos (p. 4, n.os 3, 5 e 6).</p>
+    </section>
+
+    <section>
+      <h2>Decisão de produto: jogo no sítio certo</h2>
+      <p class="dek">Diretriz aprovada a 13/10, atualizada pelos fundadores: seriedade financeira, jogo só no físico e no saber.</p>
+      <div class="product">
+        <div>
+          <h3>Onde vive o jogo</h3>
+          <ul>
+            <li>Mundos por mercado e estações de campanha.</li>
+            <li>Lotes como missões, com medidores físicos (IBC, palete, sacas).</li>
+            <li>Selos de origem colecionáveis; níveis de conhecimento; mini-jogos educativos.</li>
+            <li>Simulador de campanha: retornos e perdas jogados com dinheiro fictício.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Proibido com dinheiro real</h3>
+          <ul>
+            <li>Pontos ou níveis ligados a montantes investidos.</li>
+            <li>Rankings, streaks, confetes.</li>
+            <li>Contagens decrescentes e escassez («últimas vagas»).</li>
+            <li>Retornos prometidos ou «garantidos».</li>
+          </ul>
+        </div>
+      </div>
+      <p class="check"><span class="lbl accent">Face à diretriz original.</span> Os painéis de colheita, os badges de compliance e a rastreabilidade de lotes mantêm-se; a camada de jogo cresceu para o conhecimento e o simulador. A proibição sobre retornos não mudou.</p>
+    </section>
+
+    <section class="wide">
+      <h2>Escopo do piloto fechado</h2>
+      <p class="dek">Coorte restrita, regras fixas, medição diária.</p>
+      <div class="pilot">
+        <div><strong>Coorte</strong>Azeite + água; café fora do piloto.</div>
+        <div><strong>Contratos</strong>Padronizados, com cláusulas de força maior.</div>
+        <div><strong>Reconciliação</strong>SLA diário de reconciliação de contas.</div>
+        <div><strong>Execução</strong>Medição de fill rate.</div>
+      </div>
+      <p class="check"><span class="lbl">Dimensão recomendada.</span> Um lote misto de 20 t de azeite (4 t para HoReCa e lojas gourmet, 16 t com offtake de distribuidores) e 60 paletes de água: ~106 k€ de GMV entre fevereiro e julho de 2027, pago com capital próprio, porque a SPV só pode emitir obrigações 12 meses depois do registo (CSC art. 348.º/2 [L]). <span class="ref">01 §5.2</span></p>
+    </section>
+  </div>
+
+  <div class="after-board micro muted">
+    <p>Plano de execução: 5 responsáveis e 14 entregáveis, todos ainda sem prazo; o responsável de Risco e Tesouraria está por designar (p. 3).</p>
+    <p>Fontes: documento-fonte <span class="mono">docs/fonte/plano-estrategico-10-13.md</span>; verificação <span class="mono">docs/research/00</span> e <span class="mono">01</span>.</p>
+  </div>
+</section>
+
+<!-- =============================== PÁGINA 2 =============================== -->
+<section class="sheet" id="p2">
+  <h1>Sinopse central</h1>
+  <div class="synopsis">
+    <p><b>Oportunidade.</b> Um marketplace B2B de commodities agroalimentares (azeite, água, café) ancorado no acesso direto a produtores e na captura da margem do embalador (80–90 %), com estrutura jurídica e liquidação em janelas de 18 meses protegidas por coberturas de risco.</p>
+    <p><b>Prova.</b> Produtores já mapeados (Lagar do Val, com Pedro Marques, e stock quase em tempo real), um parceiro jurídico (Gonçalo Almeida) e um desenho preliminar de teses de jurisdição e pagamentos.</p>
+    <p><b>Subtexto.</b> Dois vetores. Urgência, e medo de executar: já existe um backoffice «reverse engineered» e a perceção de que, com um modelo plug and play, se monetizaria em 12 horas. E a vontade de fugir aos mercados comoditizados e fechados (os combustíveis, travados por intermediários e comissões absurdas) com desintermediação produtiva e uma estrutura de risco clara para investidores não sofisticados («jogadores», HNWIs): desconto de 10–15 % ao preço de mercado, liquidação previsível, planos de hedge e refunding.</p>
+    <p><b>Em jogo.</b> Transformar uma tese com ativos reais e âncoras de oferta numa operação compliant, escalável e defensável, antes que escolhas erradas de jurisdição, pagamentos ou promoção a investidores criem bloqueios bancários, risco regulatório e perda de confiança.</p>
+  </div>
+  <p class="pull">«Somos um negócio de liquidez operacional sobre ativos físicos.» O compromisso: fechar a arquitetura legal e de pagamentos, instrumentar o risco e lançar um piloto fechado com governança de compliance desde o dia zero.</p>
+  <p class="check"><span class="lbl crit">O ponto mais perigoso da sinopse.</span> «Investidores não sofisticados (jogadores)» com retorno e refunding: em Portugal, fora de obrigações emitidas nos termos e limites do CSC, isto é captação de fundos reembolsáveis, crime pelo RGICSF art. 200.º. O desconto de 10–15 % é do cliente, não é retorno de investidor (p. 4, n.º 5).</p>
+
+  <h2>Arquitetura do marketplace e tese de valor</h2>
+  <table class="components compact">
+    <thead><tr><th>Componente</th><th>Proposta do documento-fonte</th><th>Estado</th><th>O que a verificação mudou</th></tr></thead>
+    <tbody>
+      <tr><td>Oferta</td><td>Produtores mapeados (azeite, água, café) com vantagem logística e de qualidade (ex.: Lagar do Val) e stock quase em tempo real.</td><td><span class="st warn">Por provar</span></td><td>Feed de stock, curva de produção e SLA ainda por entregar; Lagar do Val até 50 % do volume no piloto.</td></tr>
+      <tr><td>Margem</td><td>Captura de 80–90 % da margem do embalador; 10–15 % de desconto ao cliente final; spread retido.</td><td><span class="st crit">Não fecha</span></td><td>O desconto de 10 % custa 1,3 a 5,6 vezes o que se captura; com 15 % a margem HoReCa cai para 1,4 %.</td></tr>
+      <tr><td>Ciclo financeiro</td><td>Janelas de 18 meses com liquidação prevista; refunding e extensão em choque de preços.</td><td><span class="st warn">A corrigir</span></td><td>Produtor pago em 30/60 dias; lote roda em 2–6 meses; 18 meses = vencimento das obrigações.</td></tr>
+      <tr><td>Risco</td><td>Coberturas («hedge funds/taxas de cobertura») contra volatilidade e choques de oferta e procura.</td><td><span class="st warn">A corrigir</span></td><td>Sem futuros de azeite; cobertura física: back-to-back, indexação, offtake e limites.</td></tr>
+      <tr><td>Legal e compliance</td><td>Âncora jurídica (Gonçalo Almeida); decisão de jurisdição e de regras de promoção a investidores.</td><td><span class="st crit">Bloqueante</span></td><td>Parecer escrito de escritório independente antes do primeiro euro de investidor.</td></tr>
+      <tr><td>Go-to-market</td><td>Roadshows a investidores não sofisticados: ativo palpável e auditável contra day trading e imobiliário especulativo.</td><td><span class="st crit">Fora na fase 1</span></td><td>Só clientes profissionais; retalho mais tarde e só via plataforma ECSP de terceiros.</td></tr>
+      <tr><td>Sistema-alvo</td><td>Marketplace fechado na fase 1 (KYC/AML, qualidade, liquidez); expansão após prova de risco e tesouraria.</td><td><span class="st ok">Confirmado</span></td><td>Mantém-se, com gate de decisão a 31/08/2027.</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <p class="fig-title">Lote-tipo HoReCa de azeite virgem extra: para onde vão os 5,65 €/kg da referência</p>
+    <p class="fig-sub">€/kg sem IVA, cenário base, regime de 2029, desconto de 10 %. A barra de baixo amplia o bolo de intermediação.</p>
+    <div data-chart="valueChain"><script type="application/json">
+    {
+      "ariaLabel": "Decomposição do preço de referência de 5,65 €/kg e do bolo de intermediação de 1,22 €/kg",
+      "format": { "dec": 2 },
+      "thickness": 25,
+      "top": { "label": "Referência HoReCa", "sub": "5,65 €/kg [E]", "segments": [
+        { "label": "Granel ao lagar", "value": 3.60, "color": "neutral.1" },
+        { "label": "Embalamento", "value": 0.55, "color": "neutral.2" },
+        { "label": "Logística", "value": 0.28, "color": "neutral.2", "forceOutside": true },
+        { "label": "Bolo de intermediação", "value": 1.22, "color": "accentSoft", "zoom": true }
+      ]},
+      "bottom": { "label": "Bolo de intermediação", "sub": "1,22 €/kg", "segments": [
+        { "label": "Desconto ao comprador", "valueLabel": "0,57 · 46 %", "value": 0.565, "color": "neutral.2" },
+        { "label": "Custos diretos", "valueLabel": "0,26 · 21 %", "value": 0.26, "color": "neutral.3" },
+        { "label": "Cupão", "valueLabel": "0,05 · 4 %", "value": 0.048, "color": "neutral.1" },
+        { "label": "Margem Sprout", "valueLabel": "0,35 · 28 %", "value": 0.347, "color": "accent" }
+      ]}
+    }
+    </script></div>
+    <figcaption>Custos diretos: 3PL e picking, custódia por tranche, análises, armazenagem, perdas, pagamentos e provisão de crédito. A tese do documento-fonte pressupõe capturar 80–90 % da margem líquida do embalador, que vale 0,19–0,50 €/kg (0,15–0,45 €/kg capturados): menos do que os 0,57 €/kg que o desconto de 10 % custa. A referência de 5,65 €/kg é estimativa [E] até haver 20–30 cotações de cash &amp; carry. Fontes: <span class="ref">00 §1.4</span> <span class="ref">01 §2.2–2.3</span> <span class="ref">calculo_referencia.py</span></figcaption>
+  </figure>
+
+  <h2>Diagnóstico de risco: jurisdição, pagamentos e distribuição</h2>
+  <table class="risk compact">
+    <thead><tr><th>Mecanismo de bloqueio</th><th>Consequência</th><th>Raiz política e operacional</th></tr></thead>
+    <tbody>
+      <tr><td>Jurisdição errada (ex.: crypto-friendly sem ponte bancária segura para a UE)</td><td>«Dinheiro preso» e fricção de repatriação.</td><td rowspan="3">Urgência («monetizar em 12 horas») contra a realidade de compliance e de rails de pagamento: sem disciplina, a operação implode ao primeiro bloqueio bancário. A lição negativa dos combustíveis (múltiplos intermediários, comissões colossais, clube fechado) reforça a tese de desintermediação produtiva no agro.</td></tr>
+      <tr><td>Promoção inadequada de instrumentos de investimento a retalho</td><td>Risco regulatório: prospeto, MiFID, AIFMD e gestão de fundos.</td></tr>
+      <tr><td>Colheitas voláteis contra promessas de liquidez a 18 meses</td><td>Mismatch e quebra de confiança.</td></tr>
+    </tbody>
+  </table>
+  <p class="check"><span class="lbl">Verificação.</span> «Monetizar em 12 horas» só existe do lado B2B; do lado do investidor, o caminho mínimo é registo da SPV + 12 meses + parecer + contas. A analogia dos combustíveis é fraca: ali pesam o oligopólio integrado e a carga fiscal, não as comissões. <span class="ref">01 §8</span></p>
+</section>
+
+<!-- =============================== PÁGINA 3 =============================== -->
+<section class="sheet" id="p3">
+  <h1>Proposta de execução: piloto fechado com hedge e governança</h1>
+  <div class="grid-2">
+    <div class="col">
+      <h3>Desenho do piloto</h3>
+      <ul>
+        <li>Coorte limitada de produtores (ex.: azeite + água) e investidor-alvo qualificado, com contratos padronizados, cláusulas de força maior e política de descontos fixos.</li>
+        <li>Liquidação em 18 meses com regras de extensão condicionada.</li>
+        <li>Métricas: fill rate, variação de base face ao preço de mercado, SLA de pagamentos a produtor e a investidor.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>Infraestrutura crítica</h3>
+      <ul>
+        <li><b>Pagamentos e KYC/AML:</b> PSP e IME licenciados na UE; segregação de fundos; reconciliação diária; proibição de cash-in-transit.</li>
+        <li><b>Compliance:</b> classificação do produto financeiro (pré-check com advogado); marketing com disclaimers e distribuição restrita.</li>
+        <li><b>Risco:</b> parametrização do hedge (gatilhos, contrapartes, limites de custo) e playbook de refunding.</li>
+      </ul>
+    </div>
+  </div>
+
+  <figure>
+    <p class="fig-title">Calendário recomendado: o piloto corre em capital próprio enquanto a SPV cumpre os 12 meses</p>
+    <div data-chart="timeline"><script type="application/json">
+    {
+      "ariaLabel": "Calendário de out. 2026 a mar. 2028: fase 0, piloto, gate, fase 2; registo da SPV e 1.ª série; pré-seed",
+      "start": "2026-10-01", "end": "2028-03-31", "today": "2026-10-13", "todayLabel": "13/10",
+      "laneHeight": 25, "barHeight": 14,
+      "lanes": [
+        { "label": "Operação", "items": [
+          { "from": "2026-10-13", "to": "2027-01-31", "label": "Fase 0: preparação", "tone": "soft" },
+          { "from": "2027-02-01", "to": "2027-07-31", "label": "Piloto: 20 t + 60 paletes", "color": "accent" },
+          { "at": "2027-08-31", "label": "Gate 31/08", "kind": "milestone", "anchor": "middle", "labelPos": "above" },
+          { "from": "2027-09-01", "to": "2028-03-31", "label": "Fase 2: campanha 2027/28", "tone": "outline", "color": "accent" }
+        ]},
+        { "label": "Obrigações (SPV)", "items": [
+          { "at": "2026-11-20", "label": "", "kind": "milestone" },
+          { "from": "2026-11-20", "to": "2027-11-20", "label": "SPV registada; 12 meses sem emitir (CSC art. 348.º/2)", "tone": "outline", "color": "neutral.1" },
+          { "from": "2027-11-20", "to": "2028-01-31", "label": "1.ª série", "color": "series.azeite" }
+        ]},
+        { "label": "Capital próprio", "items": [
+          { "at": "2027-01-31", "label": "Pré-seed ~1,1 M€", "kind": "milestone", "anchor": "start" },
+          { "at": "2027-09-30", "label": "Seed só se o piloto mudar os pressupostos", "kind": "milestone", "anchor": "start" }
+        ]}
+      ]
+    }
+    </script></div>
+    <figcaption>1.ª série de 150 k€ (100 k€ sénior + 50 k€ de capital social da SPV), só para clientes profissionais, entre novembro de 2027 e janeiro de 2028; emitir antes exige garantia de instituição de crédito. Metas do gate: fill rate ≥ 95 %, produtor pago em ≤ 30 dias em 100 % dos casos, 0 breaks de reconciliação não explicados, ≥ 20 cotações com mediana ≥ 5,65 €/kg e margem HoReCa ≥ 0,30 €/kg. <span class="ref">01 §5.1–5.4</span></figcaption>
+  </figure>
+
+  <h2>Próximos passos por responsável</h2>
+  <table class="owners">
+    <thead><tr><th>Responsável</th><th>Entregáveis (documento-fonte; todos com prazo [TBD])</th><th>Foco</th><th>Nota do conselheiro</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="who">Gonçalo Almeida</span>Jurídico e compliance</td>
+        <td><ul class="todo">
+          <li>Estrutura jurídica (SPV ou plataforma de intermediação) e restrições de promoção a investidores na UE: nota de 2 páginas.</li>
+          <li>Jurisdição primária e rails compatíveis (PSP/IME UE), incluindo risco de repatriação.</li>
+          <li>Minutas Produtor↔Plataforma e Plataforma↔Investidor: 18 meses, extensão, força maior.</li>
+        </ul></td>
+        <td>Jurisdição e rails PSP</td>
+        <td class="advice">O parecer que bancos e investidores vão ler tem de vir de escritório independente. Primeiro as perguntas go/no-go: CSC art. 348.º/2 e PRIIPs.</td>
+      </tr>
+      <tr>
+        <td><span class="who">Pedro Marques</span>Operações e oferta</td>
+        <td><ul class="todo">
+          <li>Feed de stock (formato e frequência), curva de produção anual e SLA de expedição.</li>
+          <li>Capacidade mínima e máxima de lote; requisitos de qualidade e auditoria.</li>
+        </ul></td>
+        <td>Âncora: Lagar do Val</td>
+        <td class="advice">Conflito de interesses: ninguém ligado ao Lagar do Val aprova preço, qualidade ou libertação dos seus lotes; custódia por terceiro independente.</td>
+      </tr>
+      <tr>
+        <td><span class="who">Speaker 1</span>Produto e comercial</td>
+        <td><ul class="todo">
+          <li>Produtores iniciais (azeite, água, café) com volumes, preços e desconto-alvo de 10–15 %.</li>
+          <li>Coorte piloto de investidores qualificados: elegibilidade e processo KYC.</li>
+          <li>Deck de roadshow com métricas, estrutura de risco e disclaimers jurídicos aprovados.</li>
+        </ul></td>
+        <td>Investidores qualificados</td>
+        <td class="advice">Primeiro entregável real: 20–30 cotações de cash &amp; carry e foodservice. O deck não pode dizer «80–90 % da margem do embalador».</td>
+      </tr>
+      <tr>
+        <td><span class="who">Speaker 2</span>Tecnologia e sistemas</td>
+        <td><ul class="todo">
+          <li>Auditar o backoffice (segurança, conformidade, logs) e remover dependências de reverse engineering.</li>
+          <li>Integrar PSP e KYC/AML (UE), segregação de contas e reconciliação diária.</li>
+          <li>Dashboard de risco: preço de mercado contra contrato, gatilhos de hedge, PnL do lote.</li>
+        </ul></td>
+        <td>Segregação diária de contas</td>
+        <td class="advice">Backoffice em quarentena até à auditoria; ledger, pagamentos e KYC reescritos de raiz. Quatro olhos e acessos separados.</td>
+      </tr>
+      <tr>
+        <td><span class="who">Risco e Tesouraria</span><span class="st crit">Owner a designar</span></td>
+        <td><ul class="todo">
+          <li>Política de hedge (instrumentos permitidos, limites de custo, contrapartes, gatilhos) e playbook de refunding por lote.</li>
+        </ul></td>
+        <td>Coberturas</td>
+        <td class="advice">Sem esta pessoa nomeada, política aprovada e membro independente no Comité de Risco, não há 1.ª emissão.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Agenda e coordenação</h2>
+  <p>A janela de discussão operacional já está marcada (14h45–16h, aproximadamente). O foco, segundo o documento-fonte: validar os trilhos legais e de pagamentos e o escopo do piloto. Proposta de ordem de trabalhos, com a decisão que cada ponto tem de produzir:</p>
+  <table class="agenda compact">
+    <thead><tr><th>Hora</th><th>Ponto</th><th>Decisão a tomar</th><th>Quem</th></tr></thead>
+    <tbody>
+      <tr><td>14h45</td><td>Trilhos legais</td><td>OpCo e SPV em Portugal; SPV registada até novembro de 2026; escolher o escritório do parecer independente.</td><td>Gonçalo Almeida</td></tr>
+      <tr><td>15h05</td><td>Pagamentos</td><td>Bancos PT com SCT Inst, VoP e SDD B2B; PSP só com fundos de terceiros; Stripe e Treezor excluídos.</td><td>Speaker 2, Gonçalo Almeida</td></tr>
+      <tr><td>15h25</td><td>Escopo do piloto</td><td>1 lote de 20 t + 60 paletes; metas do gate; quem recolhe as 20–30 cotações e até quando.</td><td>Pedro Marques, Speaker 1</td></tr>
+      <tr><td>15h45</td><td>Fecho</td><td>Datas para todos os [TBD]; nomear o responsável de Risco e Tesouraria, ou abrir já o recrutamento.</td><td>Todos</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- =============================== PÁGINA 4 =============================== -->
+<section class="sheet" id="p4">
+  <h1>Leitura do conselheiro</h1>
+  <p class="dek">Oito conclusões da verificação de 13/10/2026 que mudam decisões. Números da base factual (00), do desenho do modelo (01) e do modelo de referência.</p>
+
+  <ol class="findings">
+    <li><span><b>O azeite está num regime de preços em queda e volátil.</b> AOVE na origem: 8,99 €/kg em janeiro de 2024 (máximo), 3,34 €/kg no início de outubro de 2026 (−63 %), 3,10 a 13/10; Espanha prevê +23 % de colheita em 2026/27. Volatilidade anualizada de 23–42 % [E].</span><span class="ref">00 §1.1, §1.2, §1.6</span></li>
+    <li><span><b>A aritmética da tese não fecha como está escrita.</b> Capturar 80–90 % da margem do embalador dá 0,15–0,45 €/kg; o desconto de 10 % sobre 5,65 €/kg custa 0,57. Margem possível na HoReCa: 0,35 €/kg (6,8 %) com 10 %, 1,4 % com 15 %; nos distribuidores, ~1,5 %, sem desconto.</span><span class="ref">00 §1.4; 01 §2.2–2.5</span></li>
+    <li><span><b>Não há hedge de azeite em bolsa.</b> O mercado de futuros de Jaén (MFAO) foi extinto em 2016–17. Cobertura real: back-to-back, compra indexada (SIMA + Poolred), offtake. Segurar stock 18 meses: carry de ~20 % e VaR 95 % de 37–57 % [E]; perda potencial de 50–70 % do lote.</span><span class="ref">00 §1.6, §7; 01 §2.6</span></li>
+    <li><span><b>Os 18 meses só existem do lado do capital.</b> O produtor é pago em 30 dias (perecíveis) ou 60 (Dir. 2019/633; DL 118/2010, alterado pelo DL 76/2021); o lote roda em 2–6 meses. «18 meses» passa a ser o vencimento legal das obrigações: esperado a 12, uma extensão até 18.</span><span class="ref">00 §5; 01 §1.2</span></li>
+    <li><span><b>Rota regulatória: obrigações de SPV portuguesa, só a profissionais.</b> Sem prospeto até 12 M€ (DL 171/2026) ou em ofertas só a qualificados ou com subscrição ≥ 100 000 € [L]; mas quem subscreve ≥ 100 000 € sem ser profissional é retalho para os PRIIPs (KID). A SPV só emite 12 meses após o registo [L]. Retalho só depois, via plataforma ECSP de terceiros (teto de 5 M€ por 12 meses).</span><span class="ref">00 §5; 01 §3</span></li>
+    <li><span><b>Pagamentos: bancos portugueses primeiro.</b> SCT Inst + VoP e SDD B2B (~0–2 € por lote de 50 000 €, contra 150 € na Lemonway). Lemonway (5 490 € de setup, 840 €/mês, 0,30 % + 0,40 €) e depois Mangopay só se houver fundos de terceiros. Nunca Stripe para dinheiro de investidores; Treezor excluída (coima ACPR de 1 M€; mudança de controlo em outubro de 2026).</span><span class="ref">00 §6; 01 §3.6</span></li>
+    <li><span><b>O negócio descrito não chega ao break-even até 2031.</b> Base: EBITDA de −1,22 M€ em 2031 e capital próprio ≥ 5,5 M€, ainda a subir; otimista −0,91 M€; pessimista: parar no gate. A margem média do azeite fica em 0,12 €/kg; a estrutura de 2031 pede ~0,68 €/kg.</span><span class="ref">01 §7; calculo_referencia.py</span></li>
+    <li><span><b>A linha da gamificação está certa; o simulador não cumpre o art. 21.º.</b> Jogo na colheita, no conhecimento e no simulador com dinheiro fictício; nunca em retornos (ESMA35-43-3682). A simulação de perdas do ECSP (capacidade de suportar perdas = 10 % do património líquido) cabe à plataforma ECSP, para não sofisticados; o simulador educa, não a substitui.</span><span class="ref">00 §5; 20 §2.3, §6</span></li>
+  </ol>
+
+  <div class="charts-2">
+    <figure>
+      <p class="fig-title">AOVE na origem, €/kg</p>
+      <p class="fig-sub">Observações de mercado, 2022–2026; faixa: custo de produção em Espanha</p>
+      <div data-chart="lineChart"><script type="application/json">
+      {
+        "ariaLabel": "Preço do azeite virgem extra na origem de abril de 2022 a 13 de outubro de 2026",
+        "heightMm": 46,
+        "x": { "type": "time", "min": "2022-01-01", "max": "2026-12-31", "ticks": ["2022-01-01", "2023-01-01", "2024-01-01", "2025-01-01", "2026-01-01"], "format": { "yearOnly": true } },
+        "y": { "min": 0, "max": 10, "ticks": [0, 2, 4, 6, 8, 10], "format": { "dec": 0 } },
+        "bands": [ { "y0": 2.81, "y1": 4.61, "label": "custo ES 2,81–4,61" } ],
+        "series": [ { "name": "AOVE na origem", "color": "series.azeite", "markers": true, "format": { "dec": 2, "suffix": " €/kg" },
+          "points": [
+            ["2022-04-07", 3.45, { "label": "3,45", "anchor": "middle", "dy": -9 }],
+            ["2024-01-24", 8.988, { "label": "8,99 · jan. 2024", "anchor": "start", "dx": 7, "dy": 3 }],
+            ["2025-02-15", 4.075],
+            ["2025-11-05", 4.62],
+            ["2026-04-09", 4.43],
+            ["2026-06-18", 3.785],
+            ["2026-07-15", 3.95],
+            ["2026-09-24", 3.50],
+            ["2026-10-02", 3.34],
+            ["2026-10-13", 3.10, { "label": "3,10", "anchor": "start", "dx": 7, "dy": 10 }]
+          ] } ]
+      }
+      </script></div>
+      <figcaption>A linha liga observações de fontes diferentes, não é uma série contínua: ES (MAPA, Poolred, COI-Jaén, Infaoliva) e PT (SIMA, Oleista). <span class="ref">00 §1.2</span></figcaption>
+    </figure>
+    <figure>
+      <p class="fig-title">Cenário base: a margem não paga a estrutura</p>
+      <p class="fig-sub">k€ por ano; margem de contribuição total contra pessoal e opex não salarial</p>
+      <div class="legend"><span class="key"><span class="sw" style="--sw: var(--accent)"></span>Margem de contribuição</span><span class="key"><span class="sw" style="--sw: var(--neutral-2)"></span>Pessoal + opex não salarial</span></div>
+      <div data-chart="groupedColumns"><script type="application/json">
+      {
+        "ariaLabel": "Margem de contribuição contra custos fixos, cenário base, 2027 a 2031",
+        "heightMm": 40.5,
+        "categories": ["2027", "2028", "2029", "2030", "2031"],
+        "y": { "min": 0, "max": 1800, "ticks": [0, 600, 1200, 1800], "format": { "dec": 0 } },
+        "barWidth": 13,
+        "series": [
+          { "name": "Margem de contribuição", "color": "accent", "values": [9, 29, 119, 237, 381], "labelAt": [0, 4] },
+          { "name": "Pessoal + opex não salarial", "color": "neutral.2", "values": [720, 831, 1089, 1331, 1601], "labelAt": [0, 4] }
+        ]
+      }
+      </script></div>
+      <figcaption>EBITDA = diferença: −711 k€ em 2027, −1 220 k€ em 2031. FTE: 7 → 17. <span class="ref">calculo_referencia.py, cenário base</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="path">
+    <h2>O caminho para a viabilidade que a investigação aponta</h2>
+    <ol>
+      <li><b>Back-to-back:</b> comprar só contra vendas contratadas a preço fixo; produtor pago em 30/60 dias.</li>
+      <li><b>Azeite de origem identificada</b> (DOP ou monovarietal, ficha analítica, lagar âncora) para HoReCa média e alta e retalho gourmet; o desconto de 10 % mede-se contra marcas portuguesas e cash &amp; carry, com cotações documentadas.</li>
+      <li><b>Escala a montante e na exportação:</b> trading de granel certificado e embalado para exportação (Portugal tem 62 % das importações de azeite do Brasil).</li>
+      <li><b>Água</b> só como produto de cabaz, em modelo de agente, ou sai; <b>café</b> adiado e redefinido como sourcing de café verde, com cobertura ICE e conformidade EUDR.</li>
+      <li><b>Investidores:</b> obrigações da SPV portuguesa a profissionais (≥ 100 000 € não profissionais só se o parecer afastar o KID); retalho mais tarde, via ECSP de terceiros.</li>
+      <li><b>Custos fixos magros</b> e contratações por etapas, presas aos gates do piloto.</li>
+    </ol>
+    <p class="check verdict"><span class="lbl crit">Ainda não demonstrado.</span> Se este desenho chega ao break-even tem de sair do modelo, não do texto. As alavancas de preço já medidas (prémio de origem de +0,20 €/kg nos distribuidores e referência HoReCa de 6,00 €/kg) levam o EBITDA de 2031 a −0,74 M€; o resto só fecha com uma estrutura 0,7–1,2 M€/ano mais leve ou com receita de serviços muito maior. Correr o cenário recomendado no modelo antes de falar com investidores. <span class="ref">01 §7.4</span></p>
+  </div>
+
+  <div class="closing">
+    <p>Protótipo da webapp (dados fictícios, só demonstração): jogo na colheita e no conhecimento, Simulador de campanha e Bastidores.<br>Fontes completas e etiquetas: <span class="mono">docs/research/00-base-factual.md</span>. Itens [L] aguardam parecer escrito.</p>
+    <p><a class="url" href="https://rgvduarte.github.io/Sprout/">rgvduarte.github.io/Sprout</a></p>
+  </div>
+</section>
+
+<script type="module">
+  import { renderAll } from '../tools/svg-charts.mjs';
+  try {
+    renderAll();
+  } finally {
+    document.documentElement.dataset.ready = '1';
+  }
+</script>
+</body>
+</html>
