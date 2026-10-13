@@ -130,6 +130,17 @@ function checksInPage() {
   for (const ch of text) if (!ok.test(ch)) bad.set(ch, (bad.get(ch) || 0) + 1);
   for (const [ch, c] of bad) warnings.push(`glifo fora das fontes da marca: "${ch}" U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} (${c}x)`);
 
+  // 1b. Fontes declaradas em @font-face mas nunca carregadas apesar de usadas (texto em fallback).
+  const declared = new Set([...document.fonts].map((f) => f.family.replace(/["']/g, '')));
+  const loaded = new Set([...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family.replace(/["']/g, '')));
+  const used = new Set();
+  for (const el of document.body.querySelectorAll('*')) {
+    if (!el.firstChild || ![...el.childNodes].some((c) => c.nodeType === 3 && c.nodeValue.trim())) continue;
+    const fam = getComputedStyle(el).fontFamily.split(',')[0].trim().replace(/["']/g, '');
+    used.add(fam);
+  }
+  for (const fam of used) if (declared.has(fam) && !loaded.has(fam)) warnings.push(`fonte "${fam}" declarada e usada mas nenhuma face carregou: o texto está numa fonte de recurso`);
+
   // 2. Geometria: largura e altura útil da página a partir de print.css.
   const probe = document.createElement('div');
   probe.style.cssText = 'position:absolute;visibility:hidden;width:var(--page-content-w);height:var(--page-content-h)';

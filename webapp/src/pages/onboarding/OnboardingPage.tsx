@@ -236,7 +236,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
       toast({
         tone: 'accent',
         title: `Missão de registo cumprida: ${STEPS[step].label}`,
-        description: `Segue-se: ${STEPS[ni].label.toLowerCase()}. ${left === 0 ? 'Tudo pronto: só falta assinar.' : left === 1 ? 'Falta 1 passo.' : `Faltam ${left} passos.`}`,
+        description: `Segue-se: ${STEPS[ni].title}. ${left === 0 ? 'Tudo pronto: só falta assinar.' : left === 1 ? 'Falta 1 passo.' : `Faltam ${left} passos.`}`,
         duration: 3800,
       });
     }

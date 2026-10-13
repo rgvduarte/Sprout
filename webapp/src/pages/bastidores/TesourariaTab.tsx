@@ -290,7 +290,12 @@ export default function TesourariaTab() {
       render: (p) => {
         const s = payoutStatus(p, st);
         if (s.id === 'aprovado') return <span className="text-sm text-muted">Aprovado</span>;
-        if (!p.ready) return <span className="text-sm text-muted">Sem ação até ao fecho</span>;
+        if (!p.ready)
+          return (
+            <span className="text-sm text-muted" title="Sem ação até ao fecho do financiamento">
+              —<span className="sr-only">Sem ação até ao fecho do financiamento</span>
+            </span>
+          );
         return (
           <Button size="sm" variant="secondary" onClick={() => setApproving(p)}>
             {s.id === 'falta-segunda' ? 'Segunda aprovação' : 'Aprovar'}

@@ -164,8 +164,7 @@ export function marginSplit(lot: Lot): MarginSplit {
   const investors = perUnit * e.investorShare;
   const reserve = perUnit * e.reserveShare;
   const operation = perUnit - investors - reserve;
-  const base = lot.world === 'agua' ? lot.quantityBase : lot.quantityBase;
-  return { perUnit, investors, operation, reserve, reserveTotal: reserve * base };
+  return { perUnit, investors, operation, reserve, reserveTotal: reserve * lot.quantityBase };
 }
 
 export function referenceChange(lot: Lot): number {
