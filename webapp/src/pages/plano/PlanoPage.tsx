@@ -46,28 +46,28 @@ function ActionRow({ item, st }: { item: ActionItem; st: PlanoState }) {
   const s = st.status[item.id];
   const reduce = useReducedMotion();
   return (
-    <li className="border-t border-border py-3 first:border-t-0 first:pt-0">
-      <div className="flex items-start gap-2">
+    <li className="grid items-center gap-x-4 gap-y-2 border-t border-border py-3 first:border-t-0 sm:grid-cols-[minmax(0,1fr)_10.5rem_5.5rem]">
+      <div className="flex min-w-0 items-start gap-2">
         <motion.span key={s} initial={reduce ? false : { scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.18, ease: EASE_OUT }} className="mt-0.5">
           <StatusIcon s={s} />
         </motion.span>
-        <p className={cn('min-w-0 text-[0.9375rem] leading-snug', s === 'concluido' ? 'text-muted' : 'text-fg')}>{item.text}</p>
-      </div>
-      <div className="mt-2 flex items-center gap-2 pl-6">
-        <div className="min-w-0 flex-1">
-          <Select aria-label={`Estado da ação: ${item.text}`} value={s} onChange={(e) => planoActions.setStatus(item.id, e.target.value as ItemStatus)} className="h-10 text-sm">
-            {ITEM_STATUSES.map((v) => (
-              <option key={v} value={v}>
-                {ITEM_STATUS_LABEL[v]}
-              </option>
-            ))}
-          </Select>
+        <div className="min-w-0">
+          <p className={cn('text-[0.9375rem] leading-snug', s === 'concluido' ? 'text-muted' : 'text-fg')}>{item.text}</p>
+          {st.changedAt[item.id] && <p className="mt-0.5 text-xs text-muted">alterado às {dateTime(st.changedAt[item.id]).slice(-5)}</p>}
         </div>
-        <span className="shrink-0 font-mono text-sm text-muted tnum" title="Prazo por definir">
-          Prazo: <span className="text-fg">{item.due}</span>
-        </span>
       </div>
-      {st.changedAt[item.id] && <p className="mt-1 pl-6 text-xs text-muted">alterado às {dateTime(st.changedAt[item.id]).slice(-5)}</p>}
+      <div className="min-w-0 pl-6 sm:pl-0">
+        <Select aria-label={`Estado da ação: ${item.text}`} value={s} onChange={(e) => planoActions.setStatus(item.id, e.target.value as ItemStatus)} className="h-10 text-sm">
+          {ITEM_STATUSES.map((v) => (
+            <option key={v} value={v}>
+              {ITEM_STATUS_LABEL[v]}
+            </option>
+          ))}
+        </Select>
+      </div>
+      <span className="pl-6 font-mono text-sm text-muted tnum sm:pl-0 sm:text-right" title="Prazo por definir">
+        Prazo: <span className="text-fg">{item.due}</span>
+      </span>
     </li>
   );
 }
@@ -78,18 +78,21 @@ function OwnerLane({ row, st }: { row: ExecutionPlanRow; st: PlanoState }) {
   const unassigned = row.responsavel === 'Tesouraria';
   const candidates = EXECUTION_PLAN.filter((r) => r.responsavel !== 'Tesouraria').map((r) => r.responsavel);
   return (
-    <section aria-labelledby={`lane-${row.responsavel}`} className={cn('flex min-w-0 flex-col rounded-md border bg-surface p-4', unassigned ? 'border-[color-mix(in_oklab,var(--warn)_50%,var(--border))]' : 'border-border')}>
-      <header>
-        <h3 id={`lane-${row.responsavel}`} className="text-[1.0625rem] leading-tight">
+    <li
+      aria-labelledby={`lane-${row.responsavel.replace(/\s+/g, '-')}`}
+      className={cn('grid gap-x-8 gap-y-3 p-4 sm:p-5 lg:grid-cols-[15rem_minmax(0,1fr)]', unassigned && 'bg-[color-mix(in_oklab,var(--warn)_6%,var(--surface))]')}
+    >
+      <header className="min-w-0">
+        <h3 id={`lane-${row.responsavel.replace(/\s+/g, '-')}`} className="text-[1.0625rem] leading-tight">
           {unassigned ? 'Risco & Tesouraria' : row.responsavel}
         </h3>
         <p className="mt-0.5 text-sm text-muted">{row.area}</p>
         {unassigned ? (
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col items-start gap-2">
             <Badge tone="warn" icon={<TriangleAlert aria-hidden className="size-3.5" strokeWidth={1.75} />}>
               {row.foco}
             </Badge>
-            <Field label="Propor responsável interino">
+            <Field label="Propor responsável interino" className="w-full">
               {({ id }) => (
                 <Select id={id} value={st.treasuryProposal ?? ''} onChange={(e) => planoActions.proposeTreasury(e.target.value || null)} className="h-10 text-sm">
                   <option value="">Sem proposta</option>
@@ -102,7 +105,7 @@ function OwnerLane({ row, st }: { row: ExecutionPlanRow; st: PlanoState }) {
                 </Select>
               )}
             </Field>
-            {st.treasuryProposal && <p className="text-xs text-muted">Proposta registada no registo de decisões, a confirmar.</p>}
+            {st.treasuryProposal && <p className="text-xs text-muted">Proposta no registo de decisões, a confirmar pelos fundadores.</p>}
           </div>
         ) : (
           <p className="mt-1 text-sm text-muted">
@@ -111,12 +114,12 @@ function OwnerLane({ row, st }: { row: ExecutionPlanRow; st: PlanoState }) {
         )}
         <Meter className="mt-3" size="sm" value={items.length ? done / items.length : 0} label="Ações concluídas" valueLabel={`${num(done)} de ${num(items.length)}`} tone={done === items.length ? 'ok' : 'accent'} />
       </header>
-      <ol className="mt-4 flex-1">
+      <ol className="min-w-0">
         {items.map((it) => (
           <ActionRow key={it.id} item={it} st={st} />
         ))}
       </ol>
-    </section>
+    </li>
   );
 }
 
@@ -399,11 +402,11 @@ export default function PlanoPage() {
           Responsáveis e próximos passos
         </h2>
         <p className="measure mt-1 text-muted">As 12 ações do documento, com o texto exato, agrupadas por responsável. Prazo de todas: TBD.</p>
-        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+        <ul className="mt-4 divide-y divide-border rounded-md border border-border bg-surface">
           {EXECUTION_PLAN.map((row) => (
             <OwnerLane key={row.responsavel} row={row} st={st} />
           ))}
-        </div>
+        </ul>
       </section>
 
       <section id="prioridade-zero" aria-labelledby="pz-t" className="mt-12 scroll-mt-20">
@@ -469,6 +472,7 @@ export default function PlanoPage() {
                   ))}
                 </ul>
                 <Gate phase={p} st={st} />
+                {!p.gate && <p className="mt-4 border-t border-border pt-3 text-sm text-muted">Sem go/no-go próprio: cada nova coorte abre só depois de cumpridos os critérios da Fase 2 e com o enquadramento aprovado.</p>}
               </Card>
             </li>
           ))}
@@ -560,7 +564,7 @@ export default function PlanoPage() {
         <h2 id="ambito-t" className="text-[1.375rem] leading-tight">
           Âmbito do piloto fechado
         </h2>
-        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div className="mt-4 grid items-start gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
           <Card>
             <CardHeader title="Dentro" level={3} />
             <dl className="divide-y divide-border">
