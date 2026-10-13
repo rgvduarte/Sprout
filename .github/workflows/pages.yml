@@ -1,8 +1,8 @@
 name: Publicar no GitHub Pages
 
 on:
-  push:
-    branches: [claude/eager-gates-3ekviq, main]
+  # Deploy automático suspenso durante a apresentação: o site fica congelado
+  # na versão atual. Para publicar, correr o workflow manualmente.
   workflow_dispatch:
 
 permissions:
