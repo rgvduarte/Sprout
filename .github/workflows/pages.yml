@@ -1,0 +1,65 @@
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches: [claude/eager-gates-3ekviq, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Construir a webapp
+        id: webapp
+        continue-on-error: true
+        working-directory: webapp
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npx vite build --base ./ --outDir ../_site --emptyOutDir
+
+      - name: Página provisória (se a webapp ainda não compila)
+        if: steps.webapp.outcome != 'success'
+        run: |
+          rm -rf _site && mkdir -p _site
+          cp .github/pages/index.html _site/index.html
+
+      - name: Documentos (PDF e Excel)
+        run: |
+          mkdir -p _site/documentos
+          for f in docs/resumo/*.pdf docs/business-plan/*.pdf docs/business-plan/*.xlsx; do
+            [ -f "$f" ] && cp "$f" _site/documentos/
+          done
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
