@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "build:artifact": "vite build --mode artifact && node scripts/make-artifact.mjs",
-    "shot": "node scripts/shot.mjs"
+    "shot": "node scripts/shot.mjs",
+    "detect": "npx -y impeccable@4.5.2 detect src"
   },
   "dependencies": {
     "lucide-react": "^1.56.0",
