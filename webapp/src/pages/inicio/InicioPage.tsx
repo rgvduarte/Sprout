@@ -1,7 +1,7 @@
 import { useContext, useMemo, useState } from 'react';
 import { ArrowRight, ServerCog } from 'lucide-react';
 import { CampaignFeed, HarvestBand, KnowledgeLevelBadge, OriginSeal } from '../../components/game';
-import { Button, ButtonLink, Card, CardHeader, Page, PageHeader, RiskNote, Section, SimulationLabel, TextLink } from '../../components/ui';
+import { Button, ButtonLink, Card, Page, PageHeader, RiskNote, Section, SimulationLabel, TextLink } from '../../components/ui';
 import { useData, useFeed, useGame, useRole } from '../../state';
 import { GameContext } from '../../state/AppProvider';
 import { CAMPAIGN, daysBetween, TODAY_DATE } from '../../lib/clock';
