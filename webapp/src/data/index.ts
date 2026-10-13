@@ -145,6 +145,5 @@ export const getEvents = (filter: { world?: WorldId; lotId?: string; producerId?
   return filter.limit ? list.slice(0, filter.limit) : list;
 };
 
-export { SEED_SEALS as DEMO_SEALS, DEMO_PROGRESS as DEMO_KNOWLEDGE };
 export const TOTAL_KNOWLEDGE_POINTS =
   MODULES.reduce((s, m) => s + m.points, 0) + QUESTS.reduce((s, q) => s + q.points, 0) + MINI_GAMES.reduce((s, g) => s + g.maxPoints, 0) + SIM_COMPLETE_POINTS;
