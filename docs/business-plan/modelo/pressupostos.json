@@ -1309,6 +1309,271 @@
    "2022_26": 0.42
   }
  },
+ "resultados_referencia": {
+  "nota": "Resultados de referência calculados com estes pressupostos (modelo simplificado usado em 01-desenho-do-modelo.md sec. 7). O modelo financeiro deve reproduzi-los com tolerancia de +-5%; diferencas maiores indicam erro de implementacao ou de pressuposto.",
+  "unidade": "EUR",
+  "pessimista": {
+   "gmv_total": [
+    329922,
+    739522,
+    1548980,
+    2349872,
+    3142200
+   ],
+   "margem_contribuicao_total": [
+    12774,
+    28288,
+    59061,
+    97776,
+    136906
+   ],
+   "margem_contribuicao_azeite_pct_gmv_azeite": [
+    0.0397,
+    0.0383,
+    0.038,
+    0.0365,
+    0.036
+   ],
+   "custos_pessoal": [
+    365932,
+    441672,
+    454922,
+    499487,
+    514471
+   ],
+   "opex_nao_salarial": [
+    294400,
+    219567,
+    238190,
+    263425,
+    280496
+   ],
+   "ebitda": [
+    -647559,
+    -632951,
+    -634051,
+    -665136,
+    -658061
+   ],
+   "capex": [
+    92000,
+    15000,
+    21000,
+    22000,
+    21000
+   ],
+   "capital_giro_liquido": [
+    80927,
+    199855,
+    404513,
+    604647,
+    800256
+   ],
+   "obrigacoes_em_circulacao_fim_ano": [
+    40463,
+    169877,
+    343836,
+    513950,
+    680218
+   ],
+   "fte": [
+    7.0,
+    7.0,
+    7.0,
+    7.5,
+    7.5
+   ],
+   "cash_flow_acionista_acumulado": [
+    -780022,
+    -1425982,
+    -2120429,
+    -2846091,
+    -3562807
+   ],
+   "necessidade_capital_proprio": 3808000.0
+  },
+  "base": {
+   "gmv_total": [
+    681600,
+    2205000,
+    4819250,
+    8160625,
+    12293000
+   ],
+   "margem_contribuicao_total": [
+    69208,
+    231343,
+    522194,
+    908119,
+    1372500
+   ],
+   "margem_contribuicao_azeite_pct_gmv_azeite": [
+    0.108,
+    0.1061,
+    0.1084,
+    0.1085,
+    0.1064
+   ],
+   "custos_pessoal": [
+    365932,
+    491538,
+    644361,
+    825150,
+    906517
+   ],
+   "opex_nao_salarial": [
+    309100,
+    285614,
+    376465,
+    419394,
+    488710
+   ],
+   "ebitda": [
+    -605825,
+    -545809,
+    -498633,
+    -336425,
+    -22727
+   ],
+   "capex": [
+    92000,
+    44000,
+    48000,
+    38000,
+    34000
+   ],
+   "capital_giro_liquido": [
+    130701,
+    429861,
+    929234,
+    1572714,
+    2363296
+   ],
+   "obrigacoes_em_circulacao_fim_ano": [
+    78420,
+    386875,
+    836310,
+    1415442,
+    2126967
+   ],
+   "fte": [
+    7.0,
+    8,
+    11,
+    14,
+    15
+   ],
+   "cash_flow_acionista_acumulado": [
+    -750105,
+    -1349964,
+    -1969005,
+    -2436735,
+    -2608096
+   ],
+   "necessidade_capital_proprio": 2853000.0
+  },
+  "otimista": {
+   "gmv_total": [
+    1149300,
+    3821250,
+    7646550,
+    12889400,
+    19211150
+   ],
+   "margem_contribuicao_total": [
+    174731,
+    595920,
+    1228671,
+    2094292,
+    3116176
+   ],
+   "margem_contribuicao_azeite_pct_gmv_azeite": [
+    0.1598,
+    0.1613,
+    0.1626,
+    0.1618,
+    0.1593
+   ],
+   "custos_pessoal": [
+    365932,
+    674812,
+    914513,
+    1136384,
+    1416035
+   ],
+   "opex_nao_salarial": [
+    324850,
+    367726,
+    431717,
+    531364,
+    647145
+   ],
+   "ebitda": [
+    -516052,
+    -446619,
+    -117559,
+    426544,
+    1052997
+   ],
+   "capex": [
+    92000,
+    73000,
+    66000,
+    56000,
+    58000
+   ],
+   "capital_giro_liquido": [
+    181826,
+    600716,
+    1193288,
+    2004003,
+    2970925
+   ],
+   "obrigacoes_em_circulacao_fim_ano": [
+    109096,
+    540645,
+    1073959,
+    1803602,
+    2673832
+   ],
+   "fte": [
+    7.0,
+    12,
+    16,
+    20,
+    25
+   ],
+   "cash_flow_acionista_acumulado": [
+    -680782,
+    -1214774,
+    -1484256,
+    -1254822,
+    -464304
+   ],
+   "necessidade_capital_proprio": 1729000.0
+  },
+  "rondas_recomendadas_base": [
+   {
+    "ronda": "pre-seed",
+    "valor_eur": 700000,
+    "data": "até 2027-01-31",
+    "cobre": "fase 0 + piloto até ao gate"
+   },
+   {
+    "ronda": "seed",
+    "valor_eur": 1500000,
+    "data": "Q4 2027, só com criterios do gate cumpridos",
+    "cobre": "resto de 2027, 2028 e 2029"
+   },
+   {
+    "ronda": "ponte ou série A",
+    "valor_eur": 700000,
+    "data": "2030",
+    "cobre": "2030-2031 até EBITDA ~0"
+   }
+  ],
+  "pessimista_recomendacao": "parar no gate de 2027-08-31 (gasto acumulado ~0,7 MEUR); não financiar o plano pessimista"
+ },
  "fontes": {
   "commodities.azeite.preco_indice_granel_eur_kg": "SIMA/GPP AOVE granel PT 3,40-3,80 EUR/kg início out. 2026 e 3,50 sem. 39/2026 (https://www.agroportal.pt/azeite-e-azeitona-21-a-27-de-setembro-de-2026/); Poolred 3,34 EUR/kg 29/09-05/10/2026 (https://wikifarmer.com/library/en/article/olive-oil-prices-spain-national-aforo-2026-27); Infaoliva 3,10 a 13/10/2026 (https://www.infobae.com/espana/2026/10/13/precio-del-aceite-de-oliva-en-espana-este-martes-13-de-octubre/). Constante: sem previsão de preço.",
   "commodities.azeite.premio_origem_pago_ao_lagar_eur_kg": "estimativa: prémio de origem/qualidade sobre o índice para lote individualizado com ficha analítica; diferencial AOVE-lampante de 0,24 EUR/kg em 2026 (https://navarraexports.com/en/market-intelligence/spanish-olive-oil-prices-september-2026-bulk-buyers) indica prémios de qualidade comprimidos",
@@ -1369,6 +1634,7 @@
   "impostos.derrama_estadual": "CIRC art. 87.º-A [L]: 3% / 5% / 9% acima de 1,5 / 7,5 / 35 MEUR",
   "impostos.reporte_prejuizos": "OE2023 [L]: sem limite temporal, dedução até 65% do lucro tributável",
   "stress_tests": "40-risco-coberturas.md sec. 1.3 (volatilidade, VaR) e sec. 5.2-5.4 (carry e stress tests); aplicação a série piloto em 01-desenho-do-modelo.md sec. 4",
-  "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7"
+  "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7",
+  "resultados_referencia": "estimativa: calculo deterministico a partir dos pressupostos deste ficheiro (volumes x preços x margens por canal; pessoal com TSU; opex com contingencia e inflação; capital de giro por dias; obrigações = % do capital de giro; reserva = 5% das obrigações; impostos com reporte de prejuizos a 65%)"
  }
 }
