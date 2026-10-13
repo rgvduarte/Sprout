@@ -429,22 +429,24 @@ Daí o capital social da SPV (€50k, que é também o mínimo legal) como subor
 
 | Fase | Datas | Entregáveis |
 |---|---|---|
-| **Fase 0 — preparação** | 13-10-2026 → 31-01-2027 | Constituição da OpCo e da SPV; parecer jurídico; auditoria do *backoffice* e *pentest*; *ledger* limpo; contas bancárias; contratos (produtor, depósito tripartido, comprador, obrigações); 20–30 cotações de referência; política de cobertura aprovada; telemetria em 3 locais; seguro do stock |
-| **Piloto fechado** | 01-02-2027 → 31-07-2027 | Lotes comprados de stock da campanha 2026/27 (fev.–abr.); 1.ª série em **abr. 2027** (até lá, stock financiado por capital próprio); reconciliação diária desde o dia 1 |
+| **Fase 0 — preparação** | 13-10-2026 → 31-01-2027 | Constituição da OpCo e da SPV, **com registo definitivo da SPV até nov. 2026** (capital social €50k; o prazo de 12 meses do CSC art. 348.º/2 conta a partir daqui); parecer jurídico (perguntas 2 e 10 são go/no-go da 1.ª emissão); auditoria do *backoffice* e *pentest*; *ledger* limpo; contas bancárias; contratos (produtor, depósito tripartido, 3PL, comprador, obrigações); 20–30 cotações de referência; política de cobertura aprovada; telemetria em 3 locais; seguro do stock |
+| **Piloto fechado** | 01-02-2027 → 31-07-2027 | 1 lote misto de 20 t comprado de stock da campanha 2026/27 (fev.–mar.), com ≥ 80% coberto por *offtake*; **sem obrigações: stock financiado por capital próprio** (capital social da SPV + OpCo) ou linha bancária; reconciliação diária desde o dia 1 |
 | **Gate** | 31-08-2027 | Decisão go/no-go com os critérios de 5.4 |
-| **Fase 2** | a partir de 01-09-2027 | Campanha 2027/28 (compras nov.–fev.); 2.ª série; RFP de banco parceiro (financiamento de terceiros) |
+| **Fase 2** | a partir de 01-09-2027 | Campanha 2027/28 (compras nov.–fev.); **1.ª série em nov. 2027–jan. 2028** (12 meses após o registo; só profissionais; €150k = €100k sénior + €50k de capital da SPV); RFP de banco parceiro (financiamento de terceiros). Alternativa: 1.ª série em abr. 2027 com garantia de instituição de crédito (CSC art. 348.º/2, al. c) [L]), custo NV a orçamentar |
 
 ### 5.2 Coorte e dimensões
 
 | Dimensão | Valor | Racional |
 |---|---|---|
 | Produtores | **3 lagares** (Lagar do Val + 2 contratados antes da 1.ª emissão) + **2 engarrafadores** | Concentração ≤ 50% no âncora |
-| Compradores | **~36**: 25 HoReCa média/alta, 8 lojas *gourmet*/retalho independente, 3 distribuidores ou exportadores com *offtake* | HoReCa: 150–300 L/ano por cliente [E] |
-| Investidores | **3–6**, ticket mínimo €25k (profissionais) ou €100k (restantes) | Série de €150k: €120k sénior + €30k subordinado |
-| Volume | **40 t de azeite** (2 lotes de 20 t) + **120 paletes de água** | Capital médio empregue ≈ €90–120k |
-| GMV alvo | **~€240k** em 6 meses (azeite ~€206k; água ~€32k) | 60/40 HoReCa/distribuidores |
-| Ticket médio por encomenda HoReCa | €400–900 | [E] |
-| Duração | 6 meses + 1 mês de avaliação | Cobre uma rotação completa de 2 lotes |
+| Compradores | **~36**: 25 HoReCa média/alta, 8 lojas *gourmet*/retalho independente, 3 distribuidores ou exportadores com *offtake* | HoReCa: 150–300 L/ano por cliente [E] ⇒ 33 clientes absorvem ~2,3–4,5 t em 6 meses |
+| Investidores | **0 no piloto**; 1.ª série após o gate com 2–4 profissionais (ticket mínimo €25k) | Série de €150k: €100k sénior + €50k de capital social da SPV |
+| Volume | **1 lote misto de 20 t** de azeite: **4 t HoReCa/*gourmet*** + **16 t para distribuidores/exportadores com *offtake*** (80% do lote) + **60 paletes de água** (45.000 L ≈ 1.800 L por cliente HoReCa no semestre) | Capital empregue: pico ≈ €82k (pagamento do lote a D30), médio ≈ €30–40k |
+| GMV alvo | **~€106k** em 6 meses (azeite HoReCa €20k; azeite distribuidores €70k; água €16k) | Margem do azeite ≈ €2,9k (3,2%): o piloto prova operação e preço, não lucro |
+| Ticket médio HoReCa | €150–300 por encomenda mensal (azeite + água) | ~4–5 garrafões de 5 L + 250–400 L de água por mês [E] |
+| Duração | 6 meses + 1 mês de avaliação | Cobre a rotação completa de 1 lote |
+
+Um lote de 40 t com 60% para HoReCa (o desenho anterior) exigiria 175–350 contas HoReCa a 150–300 L/ano, ou ~1.600 L/ano por conta (5 a 10 vezes o consumo assumido), e deixaria ~15–20 t por rodar.
 
 ### 5.3 KPIs e metas
 
@@ -452,42 +454,46 @@ Daí o capital social da SPV (€50k, que é também o mínimo legal) como subor
 |---|---|---|---|
 | ***Fill rate*** | Linhas entregues completas e no prazo ÷ linhas aceites | **≥ 95%** (≥ 97% no mês 6) | Diária |
 | **Variação de base (compra)** | Preço pago ao lagar − (índice SIMA+Poolred 2 semanas + prémio contratado) | **≤ 0,05 €/kg** em média; nunca > 0,15 €/kg | Por lote |
-| **Variação de base (venda)** | Desconto realizado vs. referência documentada | **8–12%** em ≥ 90% das encomendas | Semanal |
-| Margem de contribuição azeite | Após todos os custos diretos e cupão | **≥ 8%** do GMV e ≥ 0,40 €/kg | Por lote |
+| **Variação de base (venda)** | Desconto realizado vs. referência documentada (HoReCa/*gourmet*) | **8–12%** em ≥ 90% das encomendas | Semanal |
+| **Referência documentada** | Mediana de cotações cash & carry/*foodservice* de AOVE 5 L equivalente | **≥ 20 cotações; mediana ≥ 5,65 €/kg s/ IVA** | Antes de 31-01-2027 e no gate |
+| Margem de contribuição azeite, **por canal** | Após custos diretos (no piloto não há cupão) | **HoReCa/*gourmet* ≥ 0,30 €/kg e ≥ 6%; distribuidores ≥ 0 €/kg** (canal desenhado para *break-even*) | Por lote |
 | **SLA de pagamento ao produtor** | Dias entre fatura/entrega e SCT Inst | **≤ 30 dias em 100%**; 0 atrasos | Diária |
-| **SLA ao investidor** | Cupão na data; relatório mensal por lote | **0 dias de atraso**; relatório até D+10 | Mensal/trimestral |
+| **SLA ao investidor** (desde a 1.ª série) | Cupão na data; relatório mensal por lote | **0 dias de atraso**; relatório até D+10 | Mensal/trimestral |
 | ***Match* automático** | Linhas de extrato conciliadas automaticamente | **≥ 95%** a partir do mês 2 | Diária |
 | ***Breaks* não explicados** | Diferenças > €0,01 às 10h00 de D+1 | **0** | Diária |
 | *Breaks* > D+5 | Envelhecimento | **0** | Diária |
-| Verificação de segregação | Saldo da série = passivo da série ± movimentos documentados | **Diferença 0** (qualquer diferença bloqueia pagamentos) | Diária |
-| Reconciliação de stock | \|sensor − ERP − *ledger*\| ÷ stock | **≤ 0,5%** semanal | Semanal |
+| Verificação de segregação | Saldo da série (no piloto: conta do stock) = passivo ± movimentos documentados | **Diferença 0** (qualquer diferença bloqueia pagamentos) | Diária |
+| Reconciliação de stock | \|sensor − ERP − *ledger*\| ÷ stock (lagar e 3PL) | **≤ 0,5%** semanal | Semanal |
 | DSO | Prazo médio de recebimento | **≤ 35 dias** | Semanal |
 | R-transactions SDD | Devoluções ÷ cobranças | **< 1%** | Mensal |
 | Incumprimento | Perdas de crédito ÷ GMV | **≤ 0,5%** | Mensal |
 | Qualidade | Lotes desclassificados à entrega | **0** | Por lote |
 | Concentração | Volume do Lagar do Val ÷ total | **≤ 50%** | Mensal |
-| Recorrência | Compradores com ≥ 3 encomendas | **≥ 60%** | Mensal |
+| Recorrência | Compradores HoReCa/*gourmet* com ≥ 3 encomendas (mensais) | **≥ 60%** | Mensal |
 
 ### 5.4 Critérios go/no-go para a fase 2
 
 **Obrigatórios (todos):**
-1. Parecer jurídico escrito e favorável, de advogado independente, sobre a estrutura da SPV.
+1. Parecer jurídico escrito e favorável, de advogado independente, sobre a estrutura da SPV, com resposta às perguntas 2 (CSC art. 348.º/RGICSF art. 9.º) e 10 (PRIIPs).
 2. Auditoria do *backoffice* fechada: 0 vulnerabilidades críticas/altas; proveniência limpa de *ledger*, pagamentos e KYC.
 3. 60 dias seguidos com segregação = 0 e 0 *breaks* > D+5.
-4. 100% dos pagamentos a produtores ≤ 30 dias; 100% dos cupões na data.
+4. 100% dos pagamentos a produtores ≤ 30 dias.
 5. 0 incidentes AML/sanções; KYC completo antes de cada primeira transação.
 6. Responsável de Risco nomeado e política aprovada pelos órgãos da OpCo e da SPV.
-7. ≥ 2 lagares além do Lagar do Val com contrato; *collateral manager* contratado.
+7. ≥ 2 lagares além do Lagar do Val com contrato; *collateral manager* e 3PL contratados.
+8. SPV registada há ≥ 12 meses na data prevista da 1.ª emissão, ou garantia de instituição de crédito contratada.
 
-**Desempenho (pelo menos 5 de 7):** GMV ≥ €200k; margem de contribuição do azeite ≥ 8%; *fill rate* ≥ 95%; ≥ 25 compradores ativos com ≥ 60% de recorrência; DSO ≤ 35 dias; incumprimento ≤ 0,5%; ≥ 1 *offtake* ≥ 10 t assinado para 2027/28.
+**Desempenho (pelo menos 6 de 8):** GMV ≥ €90k; margem HoReCa/*gourmet* ≥ 0,30 €/kg; margem dos distribuidores ≥ 0; *fill rate* ≥ 95%; ≥ 25 compradores ativos com ≥ 60% de recorrência; DSO ≤ 35 dias; incumprimento ≤ 0,5%; ≥ 1 *offtake* ≥ 10 t assinado para 2027/28.
 
-**Paragem imediata (qualquer um):** margem do azeite < 4% em 2 meses seguidos; parecer desfavorável; banco recusa conta da SPV ou PSP congela fundos; falha de custódia ou fraude; Lagar do Val > 70% do volume sem alternativas.
+**Condição para a *seed* (além do gate):** evidência que mude os pressupostos que hoje impedem o *break-even* (secção 7.4): referência HoReCa documentada ≥ 6,00 €/kg, ou prémio de origem pago por distribuidores ≥ 0,10–0,20 €/kg sobre o preço de saída do embalador, ou uma estrutura de custos ~€0,7–1,2M/ano mais leve do que a deste plano.
 
-**Água — critério próprio:** sai no gate se o GMV de água for < €25k, se os engarrafadores recusarem preço direto a compradores Sprout ou se a comissão negociada for < 3%.
+**Paragem imediata (qualquer um):** margem HoReCa/*gourmet* < 0,15 €/kg ou margem dos distribuidores < −0,05 €/kg em 2 meses seguidos; mediana das cotações de referência < 5,40 €/kg; parecer desfavorável; banco recusa conta da SPV ou PSP congela fundos; falha de custódia ou fraude; Lagar do Val > 70% do volume sem alternativas.
+
+**Água — critério próprio:** sai no gate se o GMV de água for < €12k, se os engarrafadores recusarem preço direto a compradores Sprout ou se a comissão negociada for < 1,5%.
 
 ### 5.5 Orçamento até ao gate [E, base]
 
-Pré-arranque (Q4 2026) **€95k**; opex jan.–ago. 2027 ≈ **€450k** (8/12 de €675k: pessoal com fundadores a 60%, jurídico, tecnologia, SPV); capex 2027 **€92k** (telemetria €18k, plataforma €60k, equipamento €14k); capital próprio em stock antes da 1.ª série ≈ €50k. **Total até ao gate ≈ €0,7M.**
+Pré-arranque (Q4 2026) **€95k** + **capital social da SPV €50k** (realizado; financia o stock do piloto); opex jan.–ago. 2027 ≈ **€466k** (pessoal com fundadores a 60% ≈ €253k; opex não salarial ≈ €213k, incl. SPV e funções independentes); capex 2027 **€92k** (telemetria €18k, plataforma €60k, equipamento €14k); stock do piloto acima do capital da SPV ≈ €32k no pico (o lote de 20 t custa ~€82k a D30), sem obrigações. **Total até ao gate ≈ €0,74M.** Até 31-12-2027 (fundadores a 100% desde 01-09) ≈ €0,95M; com €150k de caixa mínima, **pré-*seed* ≈ €1,1M** (ou €0,8M + compromisso firme de *bridge* de €0,3M).
 
 ---
 
