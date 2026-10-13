@@ -5,13 +5,16 @@ import { LOTS } from '../data/lots';
 import { MINI_GAMES } from '../data/minigames';
 import { REGIONS } from '../data/worlds';
 import type {
+  CancelledCommitment,
   EarnedSeal,
+  LearningGoalState,
   Lot,
   MiniGameId,
   OnboardingState,
   Position,
   Quest,
   RegionState,
+  RewardRequest,
   SimRunResult,
   WorldId,
 } from '../data/types';
@@ -35,9 +38,18 @@ export interface ProfileState {
   simRuns: SimRunResult[];
   /** compromissos feitos nesta sessão (dinheiro real na demonstração) */
   commitments: Position[];
+  /** compromissos cancelados no período de reflexão */
+  cancelled: CancelledCommitment[];
   seals: EarnedSeal[];
   onboarding: OnboardingState;
+  /** pedidos de recompensas em espécie (amostras, sessões, visitas, relatórios) */
+  rewardRequests: RewardRequest[];
+  /** objetivo de aprendizagem (registo e Academia) */
+  learningGoal?: LearningGoalState;
 }
+
+/** Decisão da equipa de compliance sobre um registo. */
+export type KycDecisionKind = 'aprovar' | 'pedir-info' | 'rejeitar';
 
 export interface GameState {
   profiles: Record<ProfileId, ProfileState>;
@@ -54,6 +66,10 @@ export type GameAction =
   | { type: 'visitRegion'; profile: ProfileId; regionId: string }
   | { type: 'visitWorld'; profile: ProfileId; worldId: WorldId }
   | { type: 'commit'; profile: ProfileId; position: Position }
+  | { type: 'cancelCommitment'; profile: ProfileId; positionId: string }
+  | { type: 'requestReward'; profile: ProfileId; request: RewardRequest }
+  | { type: 'setLearningGoal'; profile: ProfileId; goal?: LearningGoalState }
+  | { type: 'decideKyc'; profile: ProfileId; decision: KycDecisionKind; note: string }
   | { type: 'recordSimRun'; profile: ProfileId; run: SimRunResult }
   | { type: 'updateOnboarding'; profile: ProfileId; patch: Partial<OnboardingState> }
   | { type: 'reset' };
@@ -71,8 +87,10 @@ function emptyProfile(): ProfileState {
     worldsVisited: [],
     simRuns: [],
     commitments: [],
+    cancelled: [],
     seals: [],
     onboarding: { status: 'nao-iniciado', step: 0, adequacao: {}, documentos: [] },
+    rewardRequests: [],
   };
 }
 
@@ -85,6 +103,8 @@ function demoProfile(): ProfileState {
     regionsVisited: [...DEMO_PROGRESS.regionsVisited],
     worldsVisited: [...DEMO_PROGRESS.worldsVisited],
     seals: SEED_SEALS.map((s) => ({ ...s })),
+    rewardRequests: DEMO_PROGRESS.rewardRequests.map((r) => ({ ...r })),
+    learningGoal: { ...DEMO_PROGRESS.learningGoal },
     onboarding: {
       status: 'aprovado',
       step: 5,
@@ -229,6 +249,56 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return updateProfile(state, action.profile, (p) => ({ ...p, simRuns: [action.run, ...p.simRuns].slice(0, 20) }));
     case 'updateOnboarding':
       return updateProfile(state, action.profile, (p) => ({ ...p, onboarding: { ...p.onboarding, ...action.patch, updatedAt: nowIso() } }));
+    case 'cancelCommitment': {
+      const p = state.profiles[action.profile];
+      const pos = p.commitments.find((x) => x.id === action.positionId);
+      if (!pos) return state;
+      const remaining = allPositions(p, action.profile).filter((x) => x.id !== pos.id);
+      const stillInLot = remaining.some((x) => x.lotId === pos.lotId);
+      const delta = state.lotDeltas[pos.lotId] ?? { raised: 0, coFinancers: 0 };
+      const lotDeltas = {
+        ...state.lotDeltas,
+        [pos.lotId]: { raised: Math.max(0, delta.raised - pos.amount), coFinancers: Math.max(0, delta.coFinancers - (stillInLot ? 0 : 1)) },
+      };
+      const lot = LOTS.find((l) => l.id === pos.lotId);
+      // o selo ganho por este compromisso sai, salvo se outra posição na mesma origem e campanha o sustentar
+      const sustains = (sealId: string) => {
+        const seal = SEALS.find((x) => x.id === sealId);
+        return Boolean(seal) && remaining.some((x) => {
+          const l = LOTS.find((y) => y.id === x.lotId);
+          return l && l.producerId === seal!.producerId && l.campanha === seal!.campanha;
+        });
+      };
+      const fromThisLot = (e: EarnedSeal) => {
+        if (e.by !== 'compromisso') return false;
+        const def = SEALS.find((x) => x.id === e.sealId);
+        return Boolean(lot && def && def.producerId === lot.producerId && def.campanha === lot.campanha);
+      };
+      const seals = p.seals.filter((e) => !(fromThisLot(e) && !sustains(e.sealId)));
+      const cancelled: CancelledCommitment = { positionId: pos.id, lotId: pos.lotId, amount: pos.amount, committedAt: pos.committedAt, at: nowIso() };
+      return updateProfile({ ...state, lotDeltas }, action.profile, (x) => ({
+        ...x,
+        commitments: x.commitments.filter((c) => c.id !== pos.id),
+        cancelled: [...x.cancelled, cancelled],
+        seals,
+      }));
+    }
+    case 'requestReward':
+      return updateProfile(state, action.profile, (p) =>
+        p.rewardRequests.some((r) => r.rewardId === action.request.rewardId && r.lotId === action.request.lotId && (r.rewardId === 'amostra' || r.rewardId === 'certificado'))
+          ? p
+          : { ...p, rewardRequests: [action.request, ...p.rewardRequests] },
+      );
+    case 'setLearningGoal':
+      return updateProfile(state, action.profile, (p) => ({ ...p, learningGoal: action.goal }));
+    case 'decideKyc':
+      return updateProfile(state, action.profile, (p) => {
+        const note = action.note.trim();
+        const review = { reviewDecision: action.decision, reviewNote: note || undefined, reviewedAt: nowIso() };
+        if (action.decision === 'aprovar') return { ...p, onboarding: { ...p.onboarding, ...review, status: 'aprovado', blockedReason: undefined, updatedAt: nowIso() } };
+        if (action.decision === 'rejeitar') return { ...p, onboarding: { ...p.onboarding, ...review, status: 'bloqueado', blockedReason: note || 'Registo recusado pela equipa de compliance.', updatedAt: nowIso() } };
+        return { ...p, onboarding: { ...p.onboarding, ...review, status: 'em-curso', updatedAt: nowIso() } };
+      });
     case 'commit': {
       const { position } = action;
       const delta = state.lotDeltas[position.lotId] ?? { raised: 0, coFinancers: 0 };

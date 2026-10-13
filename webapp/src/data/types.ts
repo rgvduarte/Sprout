@@ -675,4 +675,62 @@ export interface OnboardingState {
   documentos: string[];
   blockedReason?: string;
   updatedAt?: string;
+  /** última decisão da equipa de compliance (Bastidores) */
+  reviewDecision?: 'aprovar' | 'pedir-info' | 'rejeitar';
+  reviewNote?: string;
+  reviewedAt?: string;
+}
+
+/* ------------------------------------------------------------ recompensas e objetivos */
+
+export type RewardId = 'certificado' | 'prova-online' | 'amostra' | 'relatorio' | 'visita-lagar' | 'visita-nascente' | 'prova-cafe';
+
+export interface RewardDef {
+  id: RewardId;
+  title: string;
+  what: string;
+  /** condição de desbloqueio: nível mínimo, missões, ou participação num lote (qualquer montante) */
+  unlock: { level?: LevelId; quests?: string[]; participation?: boolean };
+  unlockText: string;
+  /** texto do botão */
+  action: string;
+  kind: 'certificado' | 'sessao' | 'amostra' | 'relatorio' | 'visita';
+  /** opções do pedido (datas, locais) */
+  slots?: { id: string; label: string }[];
+  places?: { id: string; label: string }[];
+  /** o que acontece depois do pedido */
+  after: string;
+}
+
+/** Pedido de recompensa em espécie (amostra, sessão, visita, relatório). Nunca dinheiro. */
+export interface RewardRequest {
+  id: string;
+  rewardId: RewardId;
+  /** data do pedido (ISO) */
+  at: string;
+  /** o que foi pedido: lote, sessão, local */
+  detail: string;
+  status: string;
+  lotId?: string;
+  /** opção escolhida (envio, levantamento, sessão, local) */
+  option?: string;
+}
+
+/** Foco do objetivo de aprendizagem: um mundo, ou perceber o risco antes do primeiro compromisso. */
+export type LearningFocus = 'risco' | WorldId;
+
+export interface LearningGoalState {
+  focus: LearningFocus;
+  /** nível de conhecimento a alcançar (opcional) */
+  level?: LevelId;
+  setAt: string;
+}
+
+/** Compromisso cancelado dentro do período de reflexão. */
+export interface CancelledCommitment {
+  positionId: string;
+  lotId: string;
+  amount: number;
+  committedAt: string;
+  at: string;
 }

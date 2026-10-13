@@ -1,12 +1,12 @@
 import { createContext, useCallback, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { getLot, getProducer, getQuest, getSeal, getSealForLot, isInvestable, levelForPoints, maxCommit } from '../data';
-import type { MiniGameId, OnboardingState, Position, SimRunResult, WorldId } from '../data/types';
-import { now } from '../lib/clock';
+import type { LearningGoalState, MiniGameId, OnboardingState, Position, RewardRequest, SimRunResult, WorldId } from '../data/types';
+import { daysBetween, now, TODAY_DATE } from '../lib/clock';
 import { eur } from '../lib/format';
 import { readStorage, STORAGE_KEYS, writeStorage } from '../lib/storage';
 import { useLiveFeed, type LiveFeed } from '../lib/useLiveFeed';
 import { useMediaQuery } from '../lib/useMediaQuery';
-import { allPositions, gameReducer, initialGameState, knowledgePoints, mergeLot, type GameState, type ProfileId, type ProfileState } from './gameStore';
+import { gameReducer, initialGameState, knowledgePoints, mergeLot, type GameState, type KycDecisionKind, type ProfileId, type ProfileState } from './gameStore';
 import { ToastProvider, useToast } from './toast';
 
 /* =====================================================================
@@ -30,6 +30,16 @@ export function applyTheme(theme: ThemePref) {
   const el = document.documentElement;
   if (theme === 'system') el.removeAttribute('data-theme');
   else el.setAttribute('data-theme', theme);
+}
+
+/** Dias do período de reflexão depois de um compromisso (política Sprout, à imagem dos 4 dias do ECSP). */
+export const REFLECTION_DAYS = 4;
+
+/** Último dia do período de reflexão ('YYYY-MM-DD'). */
+export function reflectionEndOf(committedAt: string): string {
+  const d = new Date(`${committedAt.slice(0, 10)}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + REFLECTION_DAYS);
+  return d.toISOString().slice(0, 10);
 }
 
 /* ------------------------------------------------------------ contextos */
@@ -69,6 +79,18 @@ export interface GameActions {
   commitToLot: (lotId: string, amount: number) => CommitResult;
   /** Valida sem comprometer (para desativar o botão com motivo). */
   checkCommit: (lotId: string, amount: number) => CommitResult | { ok: true; position?: undefined };
+  /**
+   * Cancela um compromisso desta sessão dentro do período de reflexão: a posição
+   * sai da carteira, o lote volta ao financiamento anterior e o selo ganho só por
+   * este compromisso sai do Caderno (o conhecimento e as missões ficam).
+   */
+  cancelCommitment: (positionId: string) => { ok: true } | { ok: false; message: string };
+  /** Pede uma recompensa em espécie (amostra, sessão, visita, relatório, certificado). */
+  requestReward: (request: Omit<RewardRequest, 'id' | 'at'> & { at?: string }) => RewardRequest;
+  /** Define (ou limpa) o objetivo de aprendizagem do perfil ativo. */
+  setLearningGoal: (goal: Omit<LearningGoalState, 'setAt'> | null) => void;
+  /** Decisão da equipa de compliance sobre o registo de um perfil (Bastidores). */
+  decideKyc: (profile: ProfileId, decision: KycDecisionKind, note: string) => void;
   resetDemo: () => void;
 }
 
@@ -179,6 +201,9 @@ function AppState({ children }: { children: ReactNode }) {
     [],
   );
 
+  const commitSeq = useRef(0);
+  const rewardSeq = useRef(0);
+
   const actions = useMemo<GameActions>(() => {
     const pid = () => profileRef.current;
     return {
@@ -202,8 +227,9 @@ function AppState({ children }: { children: ReactNode }) {
         const sealDef = getSealForLot(lot);
         const alreadyHasSeal = sealDef ? p.seals.some((s) => s.sealId === sealDef.id) : true;
         const at = now();
+        commitSeq.current += 1;
         const position: Position = {
-          id: `pos-s${allPositions(p, pid()).length + 1}-${lotId}`,
+          id: `pos-s${commitSeq.current}-${lotId}`,
           investorId: pid() === 'demo' ? 'inv-marta-calado' : 'visitante',
           lotId,
           amount: Math.round(amount),
@@ -214,6 +240,22 @@ function AppState({ children }: { children: ReactNode }) {
         dispatch({ type: 'commit', profile: pid(), position });
         return { ok: true, position, sealId: sealDef?.id, firstSealForOrigin: !alreadyHasSeal };
       },
+      cancelCommitment: (positionId) => {
+        const p = stateRef.current.profiles[pid()];
+        const pos = p.commitments.find((x) => x.id === positionId);
+        if (!pos) return { ok: false, message: 'Este compromisso já não está ativo.' };
+        if (daysBetween(TODAY_DATE, reflectionEndOf(pos.committedAt)) < 0) return { ok: false, message: 'O período de reflexão deste compromisso já terminou.' };
+        dispatch({ type: 'cancelCommitment', profile: pid(), positionId });
+        return { ok: true };
+      },
+      requestReward: (req) => {
+        rewardSeq.current += 1;
+        const request: RewardRequest = { ...req, id: `rq-s${rewardSeq.current}-${req.rewardId}`, at: req.at ?? now().toISOString() };
+        dispatch({ type: 'requestReward', profile: pid(), request });
+        return request;
+      },
+      setLearningGoal: (goal) => dispatch({ type: 'setLearningGoal', profile: pid(), goal: goal ? { ...goal, setAt: now().toISOString() } : undefined }),
+      decideKyc: (profile, decision, note) => dispatch({ type: 'decideKyc', profile, decision, note }),
     };
   }, [checkCommit]);
 

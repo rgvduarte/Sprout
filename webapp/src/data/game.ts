@@ -1,5 +1,5 @@
 import { tidyDeep } from '../lib/format';
-import type { KnowledgeLevel, KnowledgeModule, OriginSealDef, Quest } from './types';
+import type { KnowledgeLevel, KnowledgeModule, LearningGoalState, LevelId, OriginSealDef, Quest, RewardDef, RewardRequest } from './types';
 
 /* =====================================================================
    Sistema de jogo. Os níveis sobem SÓ com conhecimento e diligência
@@ -362,4 +362,132 @@ export const DEMO_PROGRESS = {
   miniGames: [{ id: 'painel-prova' as const, bestScore: 5, at: '2026-01-12' }],
   regionsVisited: ['alentejo'],
   worldsVisited: ['azeite', 'agua'] as const,
+  /** pedidos de recompensas já feitos (em espécie; a amostra não depende do montante) */
+  rewardRequests: [
+    { id: 'rq-2', rewardId: 'amostra', at: '2026-06-20', detail: 'Frasco de 250 ml do AZ-2026-014 · morada registada', status: 'Entregue a 02/07/2026', lotId: 'AZ-2026-014', option: 'morada' },
+    { id: 'rq-1', rewardId: 'certificado', at: '2026-01-12', detail: 'Nível Provador · 180 pontos', status: 'Emitido' },
+  ] satisfies RewardRequest[],
+  learningGoal: { focus: 'azeite', setAt: '2026-01-12' } satisfies LearningGoalState,
 };
+
+/* ------------------------------------------------------------ regalias e recompensas */
+
+/** Regalias de cada nível: conhecimento e acesso, nunca vantagens financeiras. */
+export const LEVEL_PERKS: Record<LevelId, { short: string; unlocks: string[] }> = tidyDeep({
+  aprendiz: {
+    short: 'Academia completa, Simulador de campanha e Diário de campanha',
+    unlocks: ['Todos os módulos e mini-jogos da Academia', 'Simulador de campanha, com dinheiro fictício', 'Diário de campanha com os eventos dos produtores'],
+  },
+  provador: {
+    short: 'certificado de Provador e prova guiada online com o mestre lagareiro',
+    unlocks: ['Certificado de Provador', 'Prova guiada online com o mestre lagareiro, em sessões mensais durante a campanha'],
+  },
+  lagareiro: {
+    short: 'relatório técnico completo dos lotes e visita ao lagar na campanha',
+    unlocks: ['Relatório técnico completo dos lotes: boletins integrais, atas do painel e inventários fotográficos', 'Visita ao lagar durante a colheita'],
+  },
+  mestre: {
+    short: 'sessão com a equipa de risco e prova de cafés de origem antes da Fase 2',
+    unlocks: ['Sessão trimestral com a equipa de risco e tesouraria: como se decidem coberturas e extensões', 'Prova de cafés de origem antes da abertura da Fase 2'],
+  },
+});
+
+/** Catálogo de recompensas da colheita: em espécie, por nível, missões ou participação (qualquer montante). */
+export const REWARDS: RewardDef[] = tidyDeep([
+  {
+    id: 'amostra',
+    title: 'Amostra do lote que acompanhas',
+    what: 'Um frasco de 250 ml de azeite, ou uma garrafa de água, do próprio lote, com o boletim de análises impresso.',
+    unlock: { participation: true },
+    unlockText: 'Para quem co-financia o lote, seja qual for o montante',
+    action: 'Pedir amostra',
+    kind: 'amostra',
+    places: [
+      { id: 'morada', label: 'Enviar para a morada registada' },
+      { id: 'produtor', label: 'Levantar no produtor' },
+    ],
+    after: 'Envio em até 10 dias úteis. Uma amostra por lote.',
+  },
+  {
+    id: 'certificado',
+    title: 'Certificado de Provador',
+    what: 'Certificado da Academia com o teu nível, os módulos concluídos e a data. Não é uma certificação profissional.',
+    unlock: { level: 'provador' },
+    unlockText: 'Nível Provador',
+    action: 'Emitir certificado',
+    kind: 'certificado',
+    after: 'Fica disponível para descarregar sempre que quiseres.',
+  },
+  {
+    id: 'prova-online',
+    title: 'Prova guiada online com o mestre lagareiro',
+    what: 'Sessão de 60 minutos por vídeo. Recebes antes um kit de quatro amostras de 30 ml: um verde, um maduro e dois com defeito.',
+    unlock: { level: 'provador', quests: ['q-painel-3'] },
+    unlockText: 'Nível Provador e a missão «Identifica 3 atributos no painel de prova»',
+    action: 'Escolher sessão',
+    kind: 'sessao',
+    slots: [
+      { id: '2026-11-05', label: 'Quinta, 05/11/2026, 18:30' },
+      { id: '2026-11-26', label: 'Quinta, 26/11/2026, 18:30' },
+      { id: '2026-12-10', label: 'Quinta, 10/12/2026, 18:30' },
+    ],
+    after: 'O kit segue 5 dias antes da sessão. Recebes a ligação por email na véspera.',
+  },
+  {
+    id: 'relatorio',
+    title: 'Relatório técnico completo dos lotes',
+    what: 'Boletins integrais do laboratório, atas do painel de prova e o inventário fotográfico de cada IBC ou palete.',
+    unlock: { level: 'lagareiro' },
+    unlockText: 'Nível Lagareiro',
+    action: 'Pedir relatório',
+    kind: 'relatorio',
+    after: 'Segue para o email registado em até 2 dias úteis.',
+  },
+  {
+    id: 'visita-lagar',
+    title: 'Visita ao lagar na campanha',
+    what: 'Uma manhã num lagar parceiro em plena colheita: receção da azeitona, moenda, decanter e a sala dos depósitos.',
+    unlock: { level: 'lagareiro' },
+    unlockText: 'Nível Lagareiro',
+    action: 'Marcar visita',
+    kind: 'visita',
+    places: [
+      { id: 'lagar-ribeira-alta', label: 'Lagar da Ribeira Alta · Mirandela' },
+      { id: 'lagar-serra-gardunha', label: 'Lagar Serra da Gardunha · Fundão' },
+    ],
+    slots: [
+      { id: '2026-11-07', label: 'Sábado, 07/11/2026' },
+      { id: '2026-11-21', label: 'Sábado, 21/11/2026' },
+      { id: '2026-12-05', label: 'Sábado, 05/12/2026' },
+      { id: '2027-01-09', label: 'Sábado, 09/01/2027' },
+    ],
+    after: 'A equipa confirma com o lagar e envia o ponto de encontro. Deslocação por tua conta.',
+  },
+  {
+    id: 'visita-nascente',
+    title: 'Visita à nascente e à linha de engarrafamento',
+    what: 'Captação, perímetro de proteção, laboratório de controlo e a linha que enche as paletes de 1,5 L.',
+    unlock: { quests: ['q-rotulo-3', 'q-analise-ag007'] },
+    unlockText: 'Missões «Classifica 3 águas no Lê o rótulo» e «Lê o boletim de análises do AG-2026-007»',
+    action: 'Marcar visita',
+    kind: 'visita',
+    places: [{ id: 'aguas-fonte-fria', label: 'Águas da Fonte Fria · Manteigas' }],
+    slots: [
+      { id: '2026-11-14', label: 'Sábado, 14/11/2026' },
+      { id: '2027-02-06', label: 'Sábado, 06/02/2027' },
+      { id: '2027-03-06', label: 'Sábado, 06/03/2027' },
+    ],
+    after: 'A equipa confirma com a nascente e envia o ponto de encontro. Deslocação por tua conta.',
+  },
+  {
+    id: 'prova-cafe',
+    title: 'Prova de cafés de origem antes da Fase 2',
+    what: 'Uma sessão de prova SCA com cinco cafés verdes torrados das origens em avaliação, em Lisboa.',
+    unlock: { level: 'mestre' },
+    unlockText: 'Nível Mestre de campanha',
+    action: 'Inscrever-me',
+    kind: 'sessao',
+    slots: [{ id: '2027-03-11', label: 'Quinta, 11/03/2027, 18:00 · Lisboa' }],
+    after: 'Recebes o local e a lista das origens uma semana antes.',
+  },
+] satisfies RewardDef[]);

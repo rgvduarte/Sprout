@@ -30,7 +30,7 @@ export { PRODUCERS } from './producers';
 export { LOTS, INVESTOR_SHARE, RESERVE_SHARE, SETTLEMENT_MONTHS, EXTENSION_MONTHS } from './lots';
 export { MARKET, MARKET_TODAY } from './market';
 export { INVESTORS, DEMO_INVESTOR_ID, SEED_POSITIONS, SEED_SEALS } from './investors';
-export { LEVELS, MODULES, QUESTS, SEALS, DEMO_PROGRESS, SIM_COMPLETE_POINTS } from './game';
+export { LEVELS, MODULES, QUESTS, SEALS, DEMO_PROGRESS, SIM_COMPLETE_POINTS, LEVEL_PERKS, REWARDS } from './game';
 export * from './minigames';
 export { SIM_RULES, SIM_LOTS, SIM_EVENTS } from './simulator';
 export { CAMPAIGN_EVENTS, EVENT_KIND_LABEL } from './events';
