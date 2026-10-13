@@ -734,3 +734,10 @@ export interface CancelledCommitment {
   committedAt: string;
   at: string;
 }
+
+/** Liga de campanha do Simulador: adesão voluntária, pseudónimo, dinheiro fictício. */
+export interface LeagueState {
+  optIn: boolean;
+  /** índice na lista de pseudónimos de campo */
+  pseudonymIndex: number;
+}

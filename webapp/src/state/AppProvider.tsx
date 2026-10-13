@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { getLot, getProducer, getQuest, getSeal, getSealForLot, isInvestable, levelForPoints, maxCommit } from '../data';
-import type { LearningGoalState, MiniGameId, OnboardingState, Position, RewardRequest, SimRunResult, WorldId } from '../data/types';
+import type { LeagueState, LearningGoalState, MiniGameId, OnboardingState, Position, RewardRequest, SimRunResult, WorldId } from '../data/types';
 import { daysBetween, now, TODAY_DATE } from '../lib/clock';
 import { eur } from '../lib/format';
 import { readStorage, STORAGE_KEYS, writeStorage } from '../lib/storage';
@@ -89,6 +89,8 @@ export interface GameActions {
   requestReward: (request: Omit<RewardRequest, 'id' | 'at'> & { at?: string }) => RewardRequest;
   /** Define (ou limpa) o objetivo de aprendizagem do perfil ativo. */
   setLearningGoal: (goal: Omit<LearningGoalState, 'setAt'> | null) => void;
+  /** Liga de campanha do Simulador: adesão e pseudónimo (dinheiro fictício, nunca real). */
+  setLeague: (patch: Partial<LeagueState>) => void;
   /** Decisão da equipa de compliance sobre o registo de um perfil (Bastidores). */
   decideKyc: (profile: ProfileId, decision: KycDecisionKind, note: string) => void;
   resetDemo: () => void;
@@ -256,6 +258,7 @@ function AppState({ children }: { children: ReactNode }) {
       },
       setLearningGoal: (goal) => dispatch({ type: 'setLearningGoal', profile: pid(), goal: goal ? { ...goal, setAt: now().toISOString() } : undefined }),
       decideKyc: (profile, decision, note) => dispatch({ type: 'decideKyc', profile, decision, note }),
+      setLeague: (patch) => dispatch({ type: 'setLeague', profile: pid(), patch }),
     };
   }, [checkCommit]);
 

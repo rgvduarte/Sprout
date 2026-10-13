@@ -172,11 +172,11 @@ export default function SimuladorPage() {
               label: 'Liga de campanha 2026/27',
               content: (
                 <LeaguePanel
-                  optIn={session.leagueOptIn}
-                  pseudonym={pseudonymFor(session.pseudonymIndex)}
+                  optIn={game.league.optIn}
+                  pseudonym={pseudonymFor(game.league.pseudonymIndex)}
                   runs={game.simRuns}
-                  onOptIn={(v) => update({ leagueOptIn: v })}
-                  onNextPseudonym={() => update((s) => ({ pseudonymIndex: s.pseudonymIndex + 1 }))}
+                  onOptIn={(v) => game.setLeague({ optIn: v })}
+                  onNextPseudonym={() => game.setLeague({ pseudonymIndex: game.league.pseudonymIndex + 1 })}
                 />
               ),
             },

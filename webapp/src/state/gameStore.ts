@@ -8,6 +8,7 @@ import type {
   CancelledCommitment,
   EarnedSeal,
   LearningGoalState,
+  LeagueState,
   Lot,
   MiniGameId,
   OnboardingState,
@@ -46,6 +47,8 @@ export interface ProfileState {
   rewardRequests: RewardRequest[];
   /** objetivo de aprendizagem (registo e Academia) */
   learningGoal?: LearningGoalState;
+  /** Liga de campanha (só no Simulador, dinheiro fictício) */
+  league: LeagueState;
 }
 
 /** Decisão da equipa de compliance sobre um registo. */
@@ -70,6 +73,7 @@ export type GameAction =
   | { type: 'requestReward'; profile: ProfileId; request: RewardRequest }
   | { type: 'setLearningGoal'; profile: ProfileId; goal?: LearningGoalState }
   | { type: 'decideKyc'; profile: ProfileId; decision: KycDecisionKind; note: string }
+  | { type: 'setLeague'; profile: ProfileId; patch: Partial<LeagueState> }
   | { type: 'recordSimRun'; profile: ProfileId; run: SimRunResult }
   | { type: 'updateOnboarding'; profile: ProfileId; patch: Partial<OnboardingState> }
   | { type: 'reset' };
@@ -91,6 +95,7 @@ function emptyProfile(): ProfileState {
     seals: [],
     onboarding: { status: 'nao-iniciado', step: 0, adequacao: {}, documentos: [] },
     rewardRequests: [],
+    league: { optIn: false, pseudonymIndex: 3 },
   };
 }
 
@@ -105,6 +110,7 @@ function demoProfile(): ProfileState {
     seals: SEED_SEALS.map((s) => ({ ...s })),
     rewardRequests: DEMO_PROGRESS.rewardRequests.map((r) => ({ ...r })),
     learningGoal: { ...DEMO_PROGRESS.learningGoal },
+    league: { optIn: false, pseudonymIndex: 0 },
     onboarding: {
       status: 'aprovado',
       step: 5,
@@ -289,6 +295,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           ? p
           : { ...p, rewardRequests: [action.request, ...p.rewardRequests] },
       );
+    case 'setLeague':
+      return updateProfile(state, action.profile, (p) => ({ ...p, league: { ...p.league, ...action.patch } }));
     case 'setLearningGoal':
       return updateProfile(state, action.profile, (p) => ({ ...p, learningGoal: action.goal }));
     case 'decideKyc':

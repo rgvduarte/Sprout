@@ -10,7 +10,7 @@ import {
   SEALS,
   CAMPAIGN_EVENTS,
 } from '../data';
-import type { CampaignEvent, CancelledCommitment, EarnedSeal, Investor, KnowledgeLevel, LearningGoalState, Lot, OriginSealDef, Position, Producer, Region, RegionState, RewardRequest, WorldId } from '../data/types';
+import type { CampaignEvent, CancelledCommitment, EarnedSeal, LeagueState, Investor, KnowledgeLevel, LearningGoalState, Lot, OriginSealDef, Position, Producer, Region, RegionState, RewardRequest, WorldId } from '../data/types';
 import type { TelemetryState } from '../lib/useLiveFeed';
 import { FeedContext, GameContext, RoleContext, ThemeContext, type CommitFailure, type GameActions } from './AppProvider';
 import { allPositions, knowledgePoints, mergeLot, regionStates } from './gameStore';
@@ -64,6 +64,8 @@ export interface GameView extends GameActions {
   learningGoal?: LearningGoalState;
   /** compromissos cancelados no período de reflexão */
   cancelled: CancelledCommitment[];
+  /** Liga de campanha (Simulador, dinheiro fictício) */
+  league: LeagueState;
   /** pode comprometer capital (onboarding aprovado) */
   canCommit: boolean;
   /** motivo genérico de bloqueio, independente do lote */
@@ -104,6 +106,7 @@ export function useGame(): GameView {
       sampleRequest: (lotId) => profile.rewardRequests.find((r) => r.rewardId === 'amostra' && r.lotId === lotId),
       learningGoal: profile.learningGoal,
       cancelled: profile.cancelled,
+      league: profile.league,
       canCommit: commitBlock === null,
       commitBlock,
       commitBlockMessage:

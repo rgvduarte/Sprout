@@ -536,7 +536,14 @@ export default function OnboardingPage() {
           }}
         />
       ) : (
-        <RegistrationFlow profileId={profileId} />
+        <>
+          {o.reviewDecision === 'pedir-info' && (
+            <Disclaimer kind="regulatorio" boxed title={`A equipa de compliance pediu mais informação${o.reviewedAt ? ` a ${fmtDate(o.reviewedAt)}` : ''}`} className="mb-6">
+              {o.reviewNote ? o.reviewNote.replace(/[.\s]*$/, '.') : 'Revê os passos e volta a submeter.'} O processo {caseLabel(VISITOR_KYC_ID)} continua aberto; corrige o que falta e submete de novo.
+            </Disclaimer>
+          )}
+          <RegistrationFlow profileId={profileId} />
+        </>
       )}
     </Page>
   );

@@ -23,14 +23,14 @@ Arquitetura (uma só definição do cálculo, duas disposições):
   caso de sensibilidade; Cenários, Unit economics e Sensibilidade leem daqui.
 """
 import json
-import math
 import os
-import shutil
 import subprocess
 import sys
 import tempfile
 import time
 from pathlib import Path
+
+sys.dont_write_bytecode = True   # não gerar __pycache__ ao importar calculo_referencia.py
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side

@@ -3,9 +3,10 @@ import type { ProfileId } from '../../state';
 import type { Allocation, Decisions } from './engine';
 
 /* =====================================================================
-   Estado da sessão do simulador (em memória, por perfil). Sobrevive à
-   navegação entre ecrãs; volta ao início ao recarregar, como o resto do
-   progresso de jogo da demonstração.
+   Estado da sessão do simulador (em memória, por perfil): fase, rascunho e
+   decisões da corrida. Sobrevive à navegação entre ecrãs; volta ao início
+   ao recarregar. A adesão à Liga e o pseudónimo vivem na loja partilhada
+   (useGame().league), com o resto do progresso de jogo.
    ===================================================================== */
 
 export type Phase = 'setup' | 'play' | 'debrief';
@@ -29,9 +30,6 @@ export interface SimSession {
   pointsAwarded: number;
   /** muda a cada corrida nova (reinicia o estado local do jogo) */
   runNonce: number;
-  /** Liga de campanha: adesão e pseudónimo */
-  leagueOptIn: boolean;
-  pseudonymIndex: number;
   /** corridas seguidas desde a última pausa (para o aviso de pausa) */
   streak: number;
   /** o aviso de pausa foi visto nesta série */
@@ -49,7 +47,7 @@ export const DEFAULT_DRAFT: Allocation[] = [
   { simLotId: 'sim-cf-a', amount: 0, hedged: false },
 ];
 
-function initial(profile: ProfileId): SimSession {
+function initial(): SimSession {
   return {
     phase: 'setup',
     draft: DEFAULT_DRAFT.map((a) => ({ ...a })),
@@ -60,14 +58,12 @@ function initial(profile: ProfileId): SimSession {
     month: 0,
     pointsAwarded: 0,
     runNonce: 0,
-    leagueOptIn: false,
-    pseudonymIndex: profile === 'demo' ? 0 : 3,
     streak: 0,
     pauseAcknowledgedAt: 0,
   };
 }
 
-const sessions: Record<ProfileId, SimSession> = { demo: initial('demo'), visitante: initial('visitante') };
+const sessions: Record<ProfileId, SimSession> = { demo: initial(), visitante: initial() };
 const listeners = new Set<() => void>();
 
 function subscribe(fn: () => void) {
