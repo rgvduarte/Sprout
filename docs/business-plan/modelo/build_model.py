@@ -486,7 +486,6 @@ class PRegistry:
     def __init__(self, params):
         self.by = {p.pid: p for p in params}
         self.params = params
-        self.sel = "Pressupostos!$E$4"
 
     def ref(self, pid, scen, y=0):
         p = self.by[pid]
@@ -628,9 +627,6 @@ def define_lines():
     def ln(lid, sheet, section, label, unit, fmt, fn, scalar=False, style=None, note=None):
         L.append(Line(lid, sheet, section, label, unit, fmt, fn, scalar, style, note))
 
-    def ssum(c, y, terms):
-        return "+".join(terms)
-
     # ---------------------------------------------------------------- Volumes
     V = "Volumes"
     ln("ano", V, "Calendário", "Ano", "", FMT_YEAR, lambda c, y: 2027 + y, style="year")
@@ -660,9 +656,6 @@ def define_lines():
     K = "Custos"
     for k, nm in CH:
         s = f"Economia por kg: {nm}"
-
-        def p_(c, name, y, k=k):
-            return c.p(f"{k}_{name}", y)
 
         ln(f"{k}_gr", K, s, "Preço ao produtor (índice + prémio de origem)", "€/kg", FMT_EKG,
            lambda c, y, k=k: f"{c.p('az_indice')}+{c.p(k + '_premio_lagar')}")
@@ -1699,7 +1692,7 @@ def fmt_val(v):
 
 
 def fmt_num(x, dec=None):
-    """Formatação pt-PT: espaço fino? Não: ponto de milhar e vírgula decimal."""
+    """Formatação pt-PT: ponto de milhar e vírgula decimal."""
     if isinstance(x, int) or (isinstance(x, float) and x.is_integer() and abs(x) >= 100):
         s = f"{int(round(x)):,}".replace(",", ".")
         return s

@@ -42,6 +42,7 @@ const ACTION_LABEL: Record<KycAction, string> = { aprovar: 'Aprovado', 'pedir-in
 function KycDrawer({ c, onClose }: { c: KycCase | null; onClose: () => void }) {
   const st = useBastidores();
   const { toast } = useToast();
+  const game = useContext(GameContext);
   const [action, setAction] = useState<KycAction | undefined>();
   const [note, setNote] = useState('');
   const [tried, setTried] = useState(false);
@@ -63,6 +64,8 @@ function KycDrawer({ c, onClose }: { c: KycCase | null; onClose: () => void }) {
     if (!action) return;
     if (needsNote && note.trim().length < 8) return;
     actions.decideKyc(c.id, action, note);
+    // o registo desta sessão é do perfil Visitante: a decisão muda o estado dele em /onboarding
+    if (c.id === SESSION_CASE_ID) game?.actions.decideKyc('visitante', action, note);
     toast({ tone: action === 'aprovar' ? 'ok' : action === 'rejeitar' ? 'crit' : 'warn', title: `${c.nome}: ${ACTION_LABEL[action].toLowerCase()}`, description: note.trim() || 'Decisão registada no processo.' });
     close();
   };
@@ -143,7 +146,7 @@ function KycDrawer({ c, onClose }: { c: KycCase | null; onClose: () => void }) {
         <Field label="Nota para o processo" hint={needsNote ? 'Obrigatória para esta decisão.' : 'Opcional.'} error={noteError}>
           {({ id, describedBy, invalid }) => <Textarea id={id} aria-describedby={describedBy} invalid={invalid} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex.: falta a certidão permanente atualizada" />}
         </Field>
-        {c.id === SESSION_CASE_ID && <p className="text-sm text-muted">Este caso veio do ecrã de onboarding. Nesta demonstração, a decisão fica registada aqui, no processo de Compliance.</p>}
+        {c.id === SESSION_CASE_ID && <p className="text-sm text-muted">Este caso veio do ecrã de onboarding. A decisão fica no processo e muda o estado do registo: em «Ver como» Visitante, /onboarding mostra o resultado.</p>}
       </div>
     </Drawer>
   );
