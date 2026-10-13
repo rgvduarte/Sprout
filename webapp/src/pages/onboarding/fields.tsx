@@ -4,7 +4,7 @@ import { Field, Input, Select } from '../../components/ui';
 import type { Draft } from './draft';
 import { Lbl, type StepProps } from './parts';
 
-type StringKey = { [K in keyof Draft]: Draft[K] extends string ? K : never }[keyof Draft];
+type StringKey = { [K in keyof Draft]-?: Draft[K] extends string ? K : never }[keyof Draft];
 
 /** Campo de texto ligado ao rascunho: rótulo com «exemplo», erro depois de tocado, confirmação quando válido. */
 export function TF({

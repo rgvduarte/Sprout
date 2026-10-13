@@ -17,7 +17,7 @@ const RULE = '-'.repeat(72);
 /** Descarrega texto como ficheiro .txt (UTF-8). */
 export function downloadText(filename: string, text: string): boolean {
   try {
-    const blob = new Blob([`﻿${text}`], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([`\ufeff${text}`], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -73,7 +73,7 @@ export function statementMonths(positions: PositionView[]): string[] {
 const pad = (s: string, n: number) => (s.length >= n ? s.slice(0, n) : s + ' '.repeat(n - s.length));
 const padL = (s: string, n: number) => (s.length >= n ? s : ' '.repeat(n - s.length) + s);
 /** espaços não separáveis → espaços normais (ficheiros de texto) */
-const plain = (s: string) => s.replace(/ /g, ' ');
+const plain = (s: string) => s.replace(/\u00a0/g, ' ');
 
 function stageAt(lot: Lot, isoDate: string): string {
   const labels = getWorld(lot.world).journeyLabels;

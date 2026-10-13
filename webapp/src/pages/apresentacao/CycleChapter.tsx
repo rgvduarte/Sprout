@@ -1,9 +1,9 @@
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { motion, useTransform, type MotionValue } from 'motion/react';
 import { Chapter, HarvestBand } from '../../components/game';
 import { getLot, REFUNDING_PLAYBOOKS } from '../../data';
 import { addMonths } from '../../lib/clock';
-import { date, lisbonParts, monthYear, pct } from '../../lib/format';
+import { date, kg, lisbonParts, monthYear, pct } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { CYCLE, FOCUS_LOT_ID } from './model';
 import { ChapterHead, Frame, useStep } from './parts';
@@ -14,8 +14,10 @@ import { ChapterHead, Frame, useStep } from './parts';
    no mês 18, desenha a bifurcação: liquidação, extensão ou refunding.
    ===================================================================== */
 
+const focus = getLot(FOCUS_LOT_ID)!;
+
 const PHASES = [
-  { n: 1, name: 'Compra', from: 0, to: 1, text: 'O financiamento fecha e a Sprout paga o lagar. Os 24 000 kg passam para 24 IBC selados com o número do lote.' },
+  { n: 1, name: 'Compra', from: 0, to: 1, text: `O financiamento fecha e a Sprout paga o lagar. Os ${kg(focus.quantity)} passam para ${focus.storage.containers} IBC selados com o número do lote.` },
   { n: 2, name: 'Armazenagem', from: 1, to: 3, text: 'IBC em nave fresca e sem luz, a 15–18 °C. Inventário mensal com fotografia e reanálise a cada 4 meses.' },
   { n: 3, name: 'Vendas B2B', from: 3, to: 11, text: CYCLE.forwardNote },
   { n: 4, name: 'Cobrança e liquidação', from: 11, to: 18, text: `Os compradores pagam para a conta segregada. Depois da reconciliação, a liquidação aos co-financiadores está prevista para ${date(CYCLE.end)}.` },
@@ -25,7 +27,7 @@ const PHASE_TONE = [34, 54, 76, 100];
 
 const extended = getLot('AZ-2025-017');
 const lossCase = getLot('AZ-2025-009');
-const playbook = REFUNDING_PLAYBOOKS.find((p) => p.id === getLot(FOCUS_LOT_ID)?.refundingPlaybookId);
+const playbook = REFUNDING_PLAYBOOKS.find((p) => p.id === focus.refundingPlaybookId);
 
 /* posição de uma data na faixa de meses da HarvestBand (mesmo cálculo do componente) */
 const FIRST = lisbonParts(`${CYCLE.start.slice(0, 7)}-01`);
@@ -94,8 +96,8 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
         </div>
         <HarvestBand world="azeite" start={CYCLE.start} months={CYCLE.months} extensionMonths={CYCLE.extensionMonths} progress={rich ? cursor : undefined} className="mt-2" />
 
-        <div className="mt-8 grid min-w-0 gap-x-6 gap-y-8 md:grid-cols-[minmax(0,var(--fork))_minmax(0,1fr)]" style={{ ['--fork' as string]: `${FORK_X * 100}%` }}>
-          <ol className="grid min-w-0 gap-x-5 gap-y-5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Fases da janela">
+        <div className="mt-8 grid min-w-0 gap-y-8 md:grid-cols-[minmax(0,var(--fork))_minmax(0,1fr)]" style={{ ['--fork' as string]: `${FORK_X * 100}%` }}>
+          <ol className="grid min-w-0 gap-x-5 gap-y-5 sm:grid-cols-2 md:pr-6 xl:grid-cols-4" aria-label="Fases da janela">
             {PHASES.map((p, i) => (
               <li key={p.n} className="min-w-0">
                 <p className={cn('font-semibold transition-colors duration-200', activePhase === -1 || activePhase === i ? 'text-fg' : 'text-muted')}>
@@ -167,7 +169,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
   );
 }
 
-function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index: number; progress: MotionValue<number>; drawn: boolean; title: string; when: string; body: string; swatch: React.ReactNode }) {
+function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index: number; progress: MotionValue<number>; drawn: boolean; title: string; when: string; body: string; swatch: ReactNode }) {
   const start = 0.2 + index * 0.22;
   const tick = useTransform(progress, [start, start + 0.3], [0, 1]);
   return (

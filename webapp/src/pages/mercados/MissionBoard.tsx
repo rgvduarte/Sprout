@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { fundedFraction, getWorld, stageLabel, unitLabel } from '../../data';
@@ -39,7 +40,7 @@ function stockFraction(lot: Lot) {
   return lot.quantity > 0 ? Math.min(1, lot.stock / lot.quantity) : 0;
 }
 
-function Term({ label, value, hint }: { label: string; value: React.ReactNode; hint?: React.ReactNode }) {
+function Term({ label, value, hint }: { label: string; value: ReactNode; hint?: ReactNode }) {
   return (
     <div className="min-w-0">
       <dt className="text-sm text-muted">{label}</dt>
@@ -117,8 +118,11 @@ function MissionRow({ lot }: { lot: Lot }) {
           <Term label="Desconto ao comprador" value={pct(lot.economics.discountPct, 0)} hint={`vende a ${unitPrice(world, lot.economics.buyerPrice)}`} />
           <Term label="Ticket mínimo" value={eur(lot.funding.minTicket)} hint={`≈ ${min.primary}`} />
           <Term label="Janela" value={`${lot.settlement.windowMonths} meses`} hint={`liquidação prevista ${preview ? 'em' : 'a'} ${preview ? monthYear(end) : fmtDate(end)}`} />
-          <Term label="Saída" value={`+${lot.extension.maxMonths} meses no máx.`} hint="extensão condicionada; sem mercado secundário" />
+          <Term label="Extensão" value={`até ${lot.extension.maxMonths} meses`} hint="condicionada, uma só vez" />
         </dl>
+        <p className="measure mt-3 text-sm text-muted">
+          Saída só na liquidação: não há mercado secundário no piloto. Extrato mensal do lote; a liquidação é única, quando o comprador paga na conta segregada.
+        </p>
       </div>
 
       <div className="flex flex-col gap-2 sm:col-start-2 xl:col-start-auto xl:self-start">
