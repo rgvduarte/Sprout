@@ -151,7 +151,7 @@ function IbcTank({ fill, highlight, scale, detail }: { fill: MotionValue<number>
         })}
       {scale &&
         [0.25, 0.5, 0.75].map((t) => (
-          <text key={t} x={TANK.x + 20} y={TANK.y + TANK.h * (1 - t) + 4} fontSize="11" fontFamily="var(--font-mono)" fill="var(--fg)" opacity="0.75">
+          <text key={t} x={TANK.x + 24} y={TANK.y + TANK.h * (1 - t) + 4} fontSize="11" fontFamily="var(--font-mono)" fill="var(--fg)" opacity="0.75">
             {Math.round(t * 100)}
           </text>
         ))}
