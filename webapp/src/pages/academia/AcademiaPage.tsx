@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Badge, Page, PageHeader, Section } from '../../components/ui';
 import { MODULES } from '../../data';
@@ -45,7 +45,7 @@ export default function AcademiaPage() {
     else if (MODULES.some((m) => m.id === id)) setOpenModule(id);
   }, [hash]);
 
-  const jump = (id: string) => (e: React.MouseEvent) => {
+  const jump = (id: string) => (e: MouseEvent) => {
     // a mesma âncora duas vezes não muda a rota: desce na mesma
     if (hash === `#${id}`) {
       e.preventDefault();
@@ -86,7 +86,7 @@ export default function AcademiaPage() {
 
       <LevelPanel />
 
-      <Section id="missoes" title="Missões de conhecimento" description="Pequenas tarefas de diligência. Cada uma tem um gatilho: o evento que a fecha no momento em que acontece." className="mt-14 scroll-mt-20">
+      <Section id="missoes" title="Missões de conhecimento" description="Pequenas tarefas de diligência. Cada uma tem um gatilho: o evento que a fecha no momento em que acontece." className="scroll-mt-20 pt-4">
         <div className="grid min-w-0 items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           <MissionsHub />
           <aside className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-20" aria-label="Objetivo e regras das missões">
@@ -102,19 +102,19 @@ export default function AcademiaPage() {
         </div>
       </Section>
 
-      <Section id="mini-jogos" title="Mini-jogos" description="Três jogos com conteúdo real: limites legais do azeite, rótulos de água e a prova de café. Os pontos guardam o melhor resultado de cada um." className="mt-14 scroll-mt-20">
+      <Section id="mini-jogos" title="Mini-jogos" description="Três jogos com conteúdo real: limites legais do azeite, rótulos de água e a prova de café. Os pontos guardam o melhor resultado de cada um." className="scroll-mt-20 pt-4">
         <MiniGames active={activeGame} onSelect={setActiveGame} />
       </Section>
 
-      <Section id="percurso" title="Percurso do investidor informado" description="Dez módulos curtos sobre os três mundos, o ciclo de 18 meses e o caminho do dinheiro. Abrem aqui mesmo." className="mt-14 scroll-mt-20">
+      <Section id="percurso" title="Percurso do investidor informado" description="Dez módulos curtos sobre os três mundos, o ciclo de 18 meses e o caminho do dinheiro. Abrem aqui mesmo." className="scroll-mt-20 pt-4">
         <ModulesPath openId={openModule} onToggle={setOpenModule} />
       </Section>
 
-      <Section id="simulador" title="Simulador de campanha" className="mt-14 scroll-mt-20">
+      <Section id="simulador" title="Simulador de campanha" className="scroll-mt-20 pt-4">
         <SimuladorBand />
       </Section>
 
-      <Section id="recompensas" title="Recompensas da colheita" description="Produto, acesso e conhecimento, desbloqueados por nível, por missões ou por participares num lote. Nunca dinheiro, nunca proporcional ao montante." className="mt-14 scroll-mt-20">
+      <Section id="recompensas" title="Recompensas da colheita" description="Produto, acesso e conhecimento, desbloqueados por nível, por missões ou por participares num lote. Nunca dinheiro, nunca proporcional ao montante." className="scroll-mt-20 pt-4">
         <Rewards />
       </Section>
     </Page>
