@@ -54,7 +54,11 @@ export function positionState(p: PositionView): PositionState {
     const pay = lot.milestones.find((m) => m.stage === 'liquidado');
     return { label: 'Expedido · aguarda pagamento', tone: 'info', detail: pay?.planned ? `Pagamento do comprador previsto até ${fmt(pay.planned)}.` : undefined };
   }
-  if (lot.stage === 'em-venda') return { label: `Em venda · ${pct(sold, 0)} vendido`, tone: 'accent', detail: `${stockLabel(lot)} ainda em armazém.` };
+  if (lot.stage === 'em-venda') {
+    const since = lot.milestones.find((m) => m.stage === 'em-venda')?.date;
+    const soldUnits = lot.quantity - lot.stock;
+    return { label: `Em venda · ${pct(sold, 0)} vendido`, tone: 'accent', detail: `${num(soldUnits)} ${unitWord(lot, soldUnits)} vendidos${since ? ` desde ${fmt(since)}` : ''}; o resto continua em armazém.` };
+  }
   return { label: stageLabel(lot.world, lot.stage), tone: 'neutral' };
 }
 

@@ -171,40 +171,41 @@ export default function CarteiraPage() {
         </Card>
       </Section>
 
-      <div className="mt-10 grid min-w-0 gap-x-6 gap-y-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        <Section id="diversificacao" title="Diversificação" description="Quanto do montante financiado depende de cada produtor, lote ou mercadoria." className="!mt-0 min-w-0">
-          <Card padding="md">
-            <Diversification positions={active} />
-          </Card>
-        </Section>
-        <Section id="saida" title="Regras de saída" description="O que acontece ao teu capital, em linguagem simples." className="!mt-0 min-w-0">
-          <Card padding="md">
-            <ExitTerms />
-          </Card>
-        </Section>
-      </div>
-
-      <div className="mt-10 grid min-w-0 gap-x-6 gap-y-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-        <Section id="documentos" title="Extratos e documentos" description={`Extrato mensal no dia 5; resumo das condições de cada lote. Gerados a partir dos dados de demonstração.`} className="!mt-0 min-w-0">
-          <Card padding="md">
-            <Documents investor={data.investor} positions={positions} />
-          </Card>
-        </Section>
-        <Section id="elegibilidade" title="Elegibilidade" className="!mt-0 min-w-0">
-          <Card padding="md">
-            <KeyValue
-              columns={1}
-              dense
-              items={[
-                { label: 'Titular', value: data.investor.nome, hint: data.investor.tipo === 'pessoa-coletiva' ? 'Pessoa coletiva' : 'Pessoa singular' },
-                { label: 'Classificação', value: data.investor.classe === 'profissional' ? 'Investidor profissional' : 'Investidor qualificado', hint: 'O piloto está fechado a investidores qualificados.' },
-                { label: 'Verificação', value: data.investor.kyc === 'aprovado' ? `KYB aprovado${data.investor.since ? ` a ${fmtDate(data.investor.since)}` : ''}` : 'Em curso' },
-                { label: 'Documentos na ficha', value: game.onboarding.documentos.length ? game.onboarding.documentos.join(', ') : '—' },
-                { label: 'Pagamentos', value: 'Só transferências SEPA identificadas, de e para a conta segregada num PSP licenciado na UE. Sem numerário.' },
-              ]}
-            />
-          </Card>
-        </Section>
+      <div className="mt-10 flex min-w-0 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-x-6">
+        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
+          <Section id="diversificacao" title="Diversificação" description="Quanto do montante financiado depende de cada produtor, lote ou mercadoria." className="order-1 !mt-0 min-w-0 lg:order-none">
+            <Card padding="md">
+              <Diversification positions={active} />
+            </Card>
+          </Section>
+          <Section id="documentos" title="Extratos e documentos" description={`Extrato mensal no dia 5; resumo das condições de cada lote. Gerados a partir dos dados de demonstração.`} className="order-3 !mt-0 min-w-0 lg:order-none">
+            <Card padding="md">
+              <Documents investor={data.investor} positions={positions} />
+            </Card>
+          </Section>
+        </div>
+        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
+          <Section id="saida" title="Regras de saída" description="O que acontece ao teu capital, em linguagem simples." className="order-2 !mt-0 min-w-0 lg:order-none">
+            <Card padding="md">
+              <ExitTerms />
+            </Card>
+          </Section>
+          <Section id="elegibilidade" title="Elegibilidade" className="order-4 !mt-0 min-w-0 lg:order-none">
+            <Card padding="md">
+              <KeyValue
+                columns={1}
+                dense
+                items={[
+                  { label: 'Titular', value: data.investor.nome, hint: data.investor.tipo === 'pessoa-coletiva' ? 'Pessoa coletiva' : 'Pessoa singular' },
+                  { label: 'Classificação', value: data.investor.classe === 'profissional' ? 'Investidor profissional' : 'Investidor qualificado', hint: 'O piloto está fechado a investidores qualificados.' },
+                  { label: 'Verificação', value: data.investor.kyc === 'aprovado' ? `KYB aprovado${data.investor.since ? ` a ${fmtDate(data.investor.since)}` : ''}` : 'Em curso' },
+                  { label: 'Documentos na ficha', value: game.onboarding.documentos.length ? game.onboarding.documentos.join(', ') : '—' },
+                  { label: 'Pagamentos', value: 'Só transferências SEPA identificadas, de e para a conta segregada num PSP licenciado na UE. Sem numerário.' },
+                ]}
+              />
+            </Card>
+          </Section>
+        </div>
       </div>
 
       <RiskNote className="mt-10 max-w-[80ch]" />

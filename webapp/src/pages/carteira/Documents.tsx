@@ -51,9 +51,18 @@ export function Documents({ investor, positions }: { investor: Investor; positio
   };
 
   const columns: Column<DocRow>[] = [
-    { key: 'title', header: 'Documento', render: (r) => <span className="font-medium text-fg">{r.title}</span>, sortValue: (r) => r.title, minWidth: 220 },
-    { key: 'kind', header: 'Tipo', render: (r) => <span className="text-muted">{r.kind}</span>, sortValue: (r) => r.kind },
-    { key: 'ref', header: 'Referência', render: (r) => r.ref, mono: true },
+    {
+      key: 'title',
+      header: 'Documento',
+      render: (r) => (
+        <span className="block min-w-0">
+          <span className="block font-medium text-fg">{r.title}</span>
+          <span className="block font-mono text-xs text-muted tnum">{r.ref}</span>
+        </span>
+      ),
+      sortValue: (r) => r.title,
+      minWidth: 200,
+    },
     { key: 'date', header: 'Data', render: (r) => fmtDate(r.date), sortValue: (r) => r.date, mono: true, align: 'right' },
     {
       key: 'dl',

@@ -49,6 +49,16 @@ function Hatch({ id }: { id: string }) {
   );
 }
 
+function PhaseSwatch({ strong }: { strong?: boolean }) {
+  return (
+    <span aria-hidden className="inline-flex gap-0.5">
+      {(['azeite', 'agua'] as const).map((w) => (
+        <span key={w} data-world={w} className="inline-block h-3 w-3 rounded-[2px] border border-border" style={{ background: strong ? BG_STRONG : BG_LIGHT }} />
+      ))}
+    </span>
+  );
+}
+
 export function SettlementCalendar({ positions, onOpen }: { positions: PositionView[]; onOpen: (p: PositionView) => void }) {
   const uid = useId().replace(/:/g, '');
   const rows = positions
@@ -150,7 +160,7 @@ export function SettlementCalendar({ positions, onOpen }: { positions: PositionV
           return (
             <span key={i} className="min-w-0 flex-1 overflow-visible whitespace-nowrap font-mono text-[11px] leading-4 text-muted">
               <span className={cn('block', !show && 'invisible')}>{MONTHS_SHORT[cell.m - 1]}</span>
-              {(cell.m === 1 || i === 0) && <span className="block text-fg">{cell.y}</span>}
+              {(cell.m === 1 || (i === 0 && cell.m <= 10)) && <span className="block text-fg">{cell.y}</span>}
             </span>
           );
         })}
@@ -170,12 +180,12 @@ export function SettlementCalendar({ positions, onOpen }: { positions: PositionV
           Liquidação prevista
         </li>
         <li className="inline-flex items-center gap-2">
-          <span aria-hidden className="inline-block h-3 w-4 rounded-[2px] border border-border" style={{ background: BG_STRONG }} />
-          Colheita ou engarrafamento
+          <PhaseSwatch strong />
+          Colheita (azeite) ou engarrafamento (água)
         </li>
         <li className="inline-flex items-center gap-2">
-          <span aria-hidden className="inline-block h-3 w-4 rounded-[2px] border border-border" style={{ background: BG_LIGHT }} />
-          Armazenagem e vendas
+          <PhaseSwatch />
+          Armazenagem, vendas e época alta
         </li>
       </ul>
     </div>

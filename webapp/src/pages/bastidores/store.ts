@@ -73,6 +73,7 @@ const initial = (): BastidoresState => ({
 });
 
 let state: BastidoresState = initial();
+let probeSeq = 0;
 const listeners = new Set<() => void>();
 
 function set(fn: (s: BastidoresState) => BastidoresState) {
@@ -124,8 +125,11 @@ export const actions = {
   recordGamReview() {
     set((s) => ({ ...s, gamReviewAt: stamp() }));
   },
-  probe(p: Omit<EngineProbe, 'id' | 'at'>) {
-    set((s) => ({ ...s, probes: [{ ...p, id: `probe-${s.probes.length + 1}`, at: stamp() }, ...s.probes].slice(0, 12) }));
+  /** Regista um ensaio do motor e devolve o id. */
+  probe(p: Omit<EngineProbe, 'id' | 'at'>): string {
+    const id = `probe-${++probeSeq}`;
+    set((s) => ({ ...s, probes: [{ ...p, id, at: stamp() }, ...s.probes].slice(0, 12) }));
+    return id;
   },
 };
 

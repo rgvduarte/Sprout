@@ -39,7 +39,7 @@ function useAgenda(limit = 5, horizonDays = 50): AgendaItem[] {
       if (d >= 0 && d <= horizonDays) items.push({ date: lot.funding.opensPlanned, lot, text: 'abre a financiamento', mine: false });
     }
   }
-  return items.sort((a, b) => a.date.localeCompare(b.date) || a.lot.id.localeCompare(b.lot.id)).slice(0, limit);
+  return items.sort((a, b) => a.date.localeCompare(b.date) || Number(b.mine) - Number(a.mine) || a.lot.id.localeCompare(b.lot.id)).slice(0, limit);
 }
 
 function Agenda() {

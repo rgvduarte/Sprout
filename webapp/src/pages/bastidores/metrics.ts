@@ -175,7 +175,7 @@ export interface ParsedTrigger {
   executedAt?: number;
 }
 
-const parseNum = (s: string) => Number(s.replace(/[\s ]/g, '').replace(',', '.'));
+const parseNum = (s: string) => Number(s.replace(/\s/g, '').replace(',', '.'));
 
 function parseTrigger(def: HedgeTrigger): ParsedTrigger {
   const th = def.threshold.match(/<\s*([\d,.]+)/);

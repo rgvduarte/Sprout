@@ -67,20 +67,23 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
             <div className="min-w-0">
               <dt className="text-sm text-muted">A tua parte do lote</dt>
               <dd className="mt-0.5 font-mono text-fg tnum">{share.primary}</dd>
-              <dd className="text-sm text-muted">
-                {share.secondary} · {pct(share.shareOfLot, 1)} do lote
-              </dd>
+              <dd className="text-sm text-muted">{share.secondary}</dd>
+              <dd className="text-sm text-muted">{pct(share.shareOfLot, 1)} do lote</dd>
             </div>
             <div className="min-w-0">
               <dt className="text-sm text-muted">Próximo marco</dt>
-              <dd className="mt-0.5 text-fg">{next ? stageLabel(lot.world, next.stage) : 'Jornada concluída'}</dd>
+              <dd className="mt-0.5 text-fg">{next ? (next.stage === 'liquidado' ? 'Liquidação' : stageLabel(lot.world, next.stage)) : 'Jornada concluída'}</dd>
               <dd className="font-mono text-sm text-muted tnum">{next?.planned ? `prev. ${fmtDate(next.planned)}` : '—'}</dd>
             </div>
             <div className="min-w-0">
               <dt className="text-sm text-muted">Liquidação prevista</dt>
               <dd className="mt-0.5 font-mono text-fg tnum">{settle ? fmtDate(settle) : 'a definir'}</dd>
               <dd className="text-sm text-muted">
-                {w.projected ? 'janela começa no fecho do financiamento' : `mês ${month} de 18 · fim da janela ${fmtDate(w.extEnd ?? w.end)}`}
+                {w.projected
+                  ? 'a janela começa no fecho do financiamento'
+                  : settle === (w.extEnd ?? w.end)
+                    ? `mês ${month} de 18 · no fim da janela`
+                    : `mês ${month} de 18 · janela até ${fmtDate(w.extEnd ?? w.end)}`}
               </dd>
             </div>
           </dl>
@@ -94,8 +97,9 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
 
           <div className="mt-5 grid gap-x-6 gap-y-2 border-t border-border pt-4 text-sm text-muted lg:grid-cols-2">
             <p>
-              Referência de mercado hoje <span className="font-mono text-fg tnum">{price(ref.today, u)}</span>, na entrada <span className="font-mono text-fg tnum">{price(ref.entry, u)}</span> (
-              <span className="font-mono text-fg tnum">{pct(ref.change, 1, { sign: true })}</span>). {lot.hedge.coverage > 0 ? `${pct(lot.hedge.coverage, 0)} do volume com ${lot.hedge.label.toLowerCase()}.` : 'Sem cobertura de preço: o risco da água é de prazo, não de preço.'}
+              Referência de mercado hoje <span className="font-mono text-fg tnum">{price(ref.today, u)}</span>, na entrada <span className="font-mono text-fg tnum">{price(ref.entry, u)}</span>
+              {Math.abs(ref.change) < 0.0005 ? ' (sem variação). ' : <> (<span className="font-mono text-fg tnum">{pct(ref.change, 1, { sign: true })}</span>). </>}
+              {lot.hedge.coverage > 0 ? `${pct(lot.hedge.coverage, 0)} do volume com ${lot.hedge.label.toLowerCase()}.` : 'Sem cobertura de preço: o risco da água é de prazo, não de preço.'}
             </p>
             <p>
               Intervalo estimado na abertura do lote: <span className="font-mono text-fg tnum">{pct(low, 1, { sign: true })}</span> a <span className="font-mono text-fg tnum">{pct(high, 1, { sign: true })}</span> do capital em 18 meses. Estimativa, não garantida; pode haver perda.

@@ -1,6 +1,9 @@
 import { useEffect, useMemo } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
+import { getProducer } from '../../data';
 import type { WorldId } from '../../data/types';
+import { num } from '../../lib/format';
+import { useData } from '../../state';
 import { cn } from '../../lib/cn';
 import { EASE_OUT } from '../../components/game';
 
@@ -538,3 +541,36 @@ export function WorldScene({ world, ...props }: SceneProps & { world: WorldId })
     </div>
   );
 }
+
+/* ------------------------------------------------------------ telemetria da cena */
+
+/** Produtor cuja telemetria aparece na paisagem do mundo. */
+const SCENE_PRODUCER: Record<WorldId, string> = {
+  azeite: 'lagar-ribeira-alta',
+  agua: 'aguas-fonte-fria',
+  cafe: 'fazenda-alto-mogiana',
+};
+
+export function useSceneLevels(world: WorldId) {
+  const { telemetry } = useData();
+  const producer = getProducer(SCENE_PRODUCER[world])!;
+  const units = telemetry[producer.id] ?? producer.telemetry.units;
+  const levels = units.map((u) => (u.capacity ? u.level / u.capacity : 0));
+  const total = units.reduce((s, u) => s + u.level, 0);
+  const cap = units.reduce((s, u) => s + u.capacity, 0);
+  const unit = producer.telemetry.unitLabel;
+  const caption =
+    world === 'azeite'
+      ? `${producer.nome}, ${producer.localidade}: ${units.length} depósitos com ${num(total)} de ${num(cap)} ${unit}, lidos em direto.`
+      : world === 'agua'
+        ? `${producer.nome}, ${producer.localidade}: armazém com ${num(total)} de ${num(cap)} ${unit}, lido em direto.`
+        : `${producer.nome}, ${producer.localidade}: floração da safra 2027/28. A tulha enche com a colheita, de maio a setembro de 2027.`;
+  const label =
+    world === 'azeite'
+      ? `Paisagem do Olival: olival em socalcos, lagar, ${units.length} depósitos de inox com o azeite à vista e IBC de 1 000 kg prontos a expedir.`
+      : world === 'agua'
+        ? 'Paisagem da Nascente: bloco em corte com o aquífero sob o granito, a captação, a nave de engarrafamento e o armazém de paletes.'
+        : 'Paisagem da Plantação: socalcos de cafeeiros em floração, terreiro de secagem vazio, casa da fazenda e sacas por encher.';
+  return { levels, caption, label, producer };
+}
+

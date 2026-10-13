@@ -1,17 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { getLot, getProducer, getProducersByWorld, getWorld, isWorldId } from '../../data';
+import { getLot, getProducersByWorld, getWorld, isWorldId } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
 import { Badge, ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
 import { CampaignFeed, SeasonTrack } from '../../components/game';
-import { num } from '../../lib/format';
 import { useData, useFeed, useGame } from '../../state';
 import { ReferenceChart } from './MarketChart';
 import { MissionList, RunningLotsTable } from './MissionBoard';
 import { LearnWorld } from './Learn';
 import { OriginsExplorer, regionsFor } from './Origins';
-import { WorldScene } from './scenes';
+import { useSceneLevels, WorldScene } from './scenes';
 import { ValueChain } from './ValueChain';
 import { CHAIN, chainFor, miniGameFor, openLots, upcomingLots, WORLD_ORDER } from './model';
 
@@ -24,36 +23,6 @@ export default function MundoPage() {
   const { mundo } = useParams();
   if (!isWorldId(mundo)) return <UnknownWorld slug={mundo ?? ''} />;
   return <World key={mundo} world={mundo} />;
-}
-
-/** Produtor cuja telemetria aparece na paisagem do mundo. */
-const SCENE_PRODUCER: Record<WorldId, string> = {
-  azeite: 'lagar-ribeira-alta',
-  agua: 'aguas-fonte-fria',
-  cafe: 'fazenda-alto-mogiana',
-};
-
-export function useSceneLevels(world: WorldId) {
-  const { telemetry } = useData();
-  const producer = getProducer(SCENE_PRODUCER[world])!;
-  const units = telemetry[producer.id] ?? producer.telemetry.units;
-  const levels = units.map((u) => (u.capacity ? u.level / u.capacity : 0));
-  const total = units.reduce((s, u) => s + u.level, 0);
-  const cap = units.reduce((s, u) => s + u.capacity, 0);
-  const unit = producer.telemetry.unitLabel;
-  const caption =
-    world === 'azeite'
-      ? `${producer.nome}, ${producer.localidade}: ${units.length} depósitos com ${num(total)} de ${num(cap)} ${unit}, lidos em direto.`
-      : world === 'agua'
-        ? `${producer.nome}, ${producer.localidade}: armazém com ${num(total)} de ${num(cap)} ${unit}, lido em direto.`
-        : `${producer.nome}, ${producer.localidade}: floração da safra 2027/28. A tulha enche com a colheita, de maio a setembro de 2027.`;
-  const label =
-    world === 'azeite'
-      ? `Paisagem do Olival: olival em socalcos, lagar, ${units.length} depósitos de inox com o azeite à vista e IBC de 1 000 kg prontos a expedir.`
-      : world === 'agua'
-        ? 'Paisagem da Nascente: bloco em corte com o aquífero sob o granito, a captação, a nave de engarrafamento e o armazém de paletes.'
-        : 'Paisagem da Plantação: socalcos de cafeeiros em floração, terreiro de secagem vazio, casa da fazenda e sacas por encher.';
-  return { levels, caption, label, producer };
 }
 
 const PREP: Record<WorldId, string> = { azeite: 'no Olival', agua: 'na Nascente', cafe: 'na Plantação' };

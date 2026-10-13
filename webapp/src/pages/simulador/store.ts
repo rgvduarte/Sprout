@@ -25,6 +25,10 @@ export interface SimSession {
   recordedRunId?: string;
   /** a rever um balanço antigo (não grava) */
   reviewing?: boolean;
+  /** pontos de conhecimento dados ao abrir este balanço */
+  pointsAwarded: number;
+  /** muda a cada corrida nova (reinicia o estado local do jogo) */
+  runNonce: number;
   /** Liga de campanha: adesão e pseudónimo */
   leagueOptIn: boolean;
   pseudonymIndex: number;
@@ -54,6 +58,8 @@ function initial(profile: ProfileId): SimSession {
     allocations: [],
     decisions: {},
     month: 0,
+    pointsAwarded: 0,
+    runNonce: 0,
     leagueOptIn: false,
     pseudonymIndex: profile === 'demo' ? 0 : 3,
     streak: 0,
