@@ -9,10 +9,10 @@ import { CampaignFeed, LotGauge, SeasonTrack } from '../../components/game';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, plural } from '../../lib/format';
 import { useMediaQuery } from '../../lib/useMediaQuery';
-import { useData, useFeed } from '../../state';
+import { useCampaignEvents, useData } from '../../state';
 import { MiniReferenceChart } from './MarketChart';
 import { OriginsAtlas } from './Origins';
-import { useSceneLevels, WorldScene } from './scenes';
+import { LiveWorldFigure } from './scenes';
 import { CHAIN, chainFor, marginSentence, miniGameFor, openLots, upcomingLots } from './model';
 
 /* =====================================================================
@@ -125,15 +125,9 @@ function Margin({ world, sentence }: { world: WorldId; sentence: string }) {
 
 function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: WorldId; layout: Layout; onMap: (w: WorldId) => void; fillOnMount?: boolean; className?: string }) {
   const w = getWorld(world);
-  const scene = useSceneLevels(world);
   const { chainLot, chain, open, upcoming } = useWorldNumbers(world);
   const sentence = marginSentence(world, chain);
-  const art = (
-    <figure className="m-0 min-w-0">
-      <WorldScene world={world} variant="band" levels={scene.levels} label={scene.label} fillOnMount={fillOnMount} />
-      <figcaption className="px-4 pb-3 text-sm text-world-ink">{scene.caption}</figcaption>
-    </figure>
-  );
+  const art = <LiveWorldFigure world={world} variant="band" fillOnMount={fillOnMount} captionClassName="px-4 pb-3 text-sm text-world-ink" />;
 
   if (layout === 'lead') {
     return (
@@ -200,10 +194,14 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
   );
 }
 
+/** Diário dos três mundos: só este bloco re-renderiza a cada leitura ao vivo. */
+function MarketDiary({ limit }: { limit: number }) {
+  const events = useCampaignEvents();
+  return <CampaignFeed events={events} live limit={limit} compact />;
+}
+
 export default function MercadosPage() {
   const reduce = useReducedMotion();
-  const { events } = useData();
-  const feed = useFeed();
   const [atlasWorld, setAtlasWorld] = useState<WorldId>('azeite');
   // ao lado dos mundos (≥ 1280 px) o diário acompanha a altura da coluna; empilhado, fica curto
   const besideWorlds = useMediaQuery('(min-width: 1280px)', true);
@@ -249,7 +247,7 @@ export default function MercadosPage() {
           </aside>
           <Card as="section" aria-labelledby="diario-t">
             <CardHeader id="diario-t" title="Diário de campanha" description="Telemetria e eventos dos produtores dos três mundos." />
-            <CampaignFeed events={events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={besideWorlds ? 12 : 6} compact />
+            <MarketDiary limit={besideWorlds ? 12 : 6} />
           </Card>
         </div>
 

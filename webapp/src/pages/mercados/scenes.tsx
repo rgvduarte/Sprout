@@ -3,7 +3,7 @@ import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion,
 import { getProducer } from '../../data';
 import type { WorldId } from '../../data/types';
 import { num } from '../../lib/format';
-import { useData } from '../../state';
+import { useTelemetry } from '../../state';
 import { cn } from '../../lib/cn';
 import { EASE_OUT } from '../../components/game';
 
@@ -553,7 +553,7 @@ const SCENE_PRODUCER: Record<WorldId, string> = {
 };
 
 export function useSceneLevels(world: WorldId) {
-  const { telemetry } = useData();
+  const telemetry = useTelemetry();
   const producer = getProducer(SCENE_PRODUCER[world])!;
   const units = telemetry[producer.id] ?? producer.telemetry.units;
   const levels = units.map((u) => (u.capacity ? u.level / u.capacity : 0));
@@ -575,3 +575,17 @@ export function useSceneLevels(world: WorldId) {
   return { levels, caption, label, producer };
 }
 
+
+/**
+ * Cena do mundo com os níveis da telemetria ao vivo e a legenda. Só este
+ * bloco re-renderiza a cada leitura do Diário (a página não).
+ */
+export function LiveWorldFigure({ world, variant, fillOnMount, captionClassName }: { world: WorldId; variant: SceneProps['variant']; fillOnMount?: boolean; captionClassName?: string }) {
+  const scene = useSceneLevels(world);
+  return (
+    <figure className="m-0 min-w-0">
+      <WorldScene world={world} variant={variant} levels={scene.levels} label={scene.label} fillOnMount={fillOnMount} />
+      <figcaption className={captionClassName}>{scene.caption}</figcaption>
+    </figure>
+  );
+}

@@ -1,10 +1,11 @@
+import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { fundedFraction, stageLabel } from '../../data';
 import { CampaignFeed, JourneyTrack, LotGauge } from '../../components/game';
 import { ButtonLink, RiskNote, StatusPill } from '../../components/ui';
 import { date as fmtDate, eur, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
-import { useData, useFeed } from '../../state';
+import { useCampaignEvents } from '../../state';
 import { SampleRequest } from './CommitDone';
 import { containersFor, stockLabel, type ChapterId } from './model';
 import { ChapterHeading, useJourney, Wrap } from './shared';
@@ -60,11 +61,15 @@ function YourPosition() {
   );
 }
 
+/** Diário do lote: só este bloco re-renderiza a cada leitura ao vivo. */
+function LotDiary({ lotId, live }: { lotId: string; live: boolean }) {
+  const all = useCampaignEvents();
+  const events = useMemo(() => all.filter((e) => e.lotId === lotId), [all, lotId]);
+  return <CampaignFeed className="mt-2" events={events} limit={6} live={live} linkLots={false} emptyText="Ainda sem eventos registados para este lote." />;
+}
+
 export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
   const { lot, ctx, win } = useJourney();
-  const data = useData();
-  const feed = useFeed();
-  const events = data.events.filter((e) => e.lotId === lot.id);
   const next = lot.milestones.find((m) => !m.done);
   const stockFrac = lot.quantity > 0 ? Math.min(1, lot.stock / lot.quantity) : 0;
   const settled = lot.status === 'liquidado';
@@ -73,7 +78,7 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
     ? `Ciclo fechado a ${fmtDate(lot.settlement.settledAt ?? win.end)}. O resultado é o que foi pago aos co-financiadores, depois de custos e reserva.`
     : prep
       ? `O lote ainda não abriu a financiamento. Abre a ${fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}, depois de publicado o boletim de análises e contratada a cobertura.`
-      : `Missão concluída · financiamento completo. O lote está ${stageLabel(lot.world, lot.stage).toLowerCase()}; os marcos acendem quando o produtor regista o evento.`;
+      : `Financiamento completo. O lote está ${stageLabel(lot.world, lot.stage).toLowerCase()}; os marcos acendem quando o produtor regista o evento.`;
   const lastNote = lot.milestones.filter((m) => m.done).slice(-1)[0];
 
   return (
@@ -116,7 +121,7 @@ export function ChapterFim({ id, label }: { id: ChapterId; label: string }) {
             )}
             <div className="mt-10">
               <h3 className="text-[1.1875rem]">Diário do lote</h3>
-              <CampaignFeed className="mt-2" events={events} limit={6} live={settled ? undefined : { paused: feed.paused, reason: feed.pauseReason }} linkLots={false} emptyText="Ainda sem eventos registados para este lote." />
+              <LotDiary lotId={lot.id} live={!settled} />
             </div>
           </div>
 

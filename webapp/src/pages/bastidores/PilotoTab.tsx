@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { fundedFraction, getProducer, PRODUCERS, stageLabel, type Lot } from '../../data';
 import { CampaignFeed, LotGauge } from '../../components/game';
 import { Card, CardHeader, DataTable, StatusPill, type Column } from '../../components/ui';
-import { useData, useFeed } from '../../state';
+import { useCampaignEvents, useData, useTelemetry } from '../../state';
 import { daysBetween, TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, eur, kg, num, pct, plural } from '../../lib/format';
 import {
@@ -68,8 +68,9 @@ function physicalStock(lot: Lot) {
 }
 
 export default function PilotoTab() {
-  const { lots, events, telemetry } = useData();
-  const feed = useFeed();
+  const { lots } = useData();
+  const events = useCampaignEvents();
+  const telemetry = useTelemetry();
   const st = useBastidores();
   const cases = useKycCases();
 
@@ -278,7 +279,7 @@ export default function PilotoTab() {
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <Card>
           <CardHeader title="Diário operacional" description="Eventos dos produtores do piloto, mais recentes primeiro." />
-          <CampaignFeed events={pilotEvents} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={8} />
+          <CampaignFeed events={pilotEvents} live limit={8} />
         </Card>
         <Card>
           <CardHeader title="Telemetria dos produtores" description="Nível dos depósitos e armazéns, atualizado a cada leitura." />

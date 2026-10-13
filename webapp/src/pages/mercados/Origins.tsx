@@ -9,7 +9,7 @@ import { cn } from '../../lib/cn';
 import { monthYear, num, relative } from '../../lib/format';
 import { useNow } from '../../lib/clock';
 import { useMediaQuery } from '../../lib/useMediaQuery';
-import { useData, useFeed, useGame } from '../../state';
+import { useCampaignEvents, useData, useFeed, useGame, useTelemetry } from '../../state';
 import { WORLD_ORDER } from './model';
 
 /* =====================================================================
@@ -210,7 +210,9 @@ function sinceLabel(since: string) {
 }
 
 function ProducerSheet({ producer, world }: { producer: Producer; world: WorldId }) {
-  const { telemetry, events, lots } = useData();
+  const { lots } = useData();
+  const telemetry = useTelemetry();
+  const events = useCampaignEvents();
   const feed = useFeed();
   const now = useNow(20_000);
   const units = telemetry[producer.id] ?? producer.telemetry.units;

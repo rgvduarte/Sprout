@@ -5,12 +5,12 @@ import { getLot, getProducersByWorld, getWorld, isWorldId } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
 import { ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
 import { CampaignFeed, SeasonTrack } from '../../components/game';
-import { useData, useFeed, useGame } from '../../state';
+import { useCampaignEvents, useData, useGame } from '../../state';
 import { ReferenceChart } from './MarketChart';
 import { HedgePill, MissionList, RunningLotsTable } from './MissionBoard';
 import { LearnWorld } from './Learn';
 import { OriginsExplorer, regionsFor } from './Origins';
-import { useSceneLevels, WorldScene } from './scenes';
+import { LiveWorldFigure } from './scenes';
 import { ValueChain } from './ValueChain';
 import { CHAIN, chainFor, miniGameFor, openLots, upcomingLots, WORLD_ORDER } from './model';
 
@@ -27,11 +27,17 @@ export default function MundoPage() {
 
 const PREP: Record<WorldId, string> = { azeite: 'no Olival', agua: 'na Nascente', cafe: 'na Plantação' };
 
+/** Diário do mundo: só este bloco re-renderiza a cada leitura ao vivo. */
+function WorldDiary({ world }: { world: WorldId }) {
+  const events = useCampaignEvents();
+  const worldEvents = useMemo(() => events.filter((e) => e.world === world), [events, world]);
+  return <CampaignFeed events={worldEvents} live={world !== 'cafe'} limit={3} compact />;
+}
+
 function World({ world }: { world: WorldId }) {
   const w = getWorld(world);
-  const { lots, events } = useData();
+  const { lots } = useData();
   const game = useGame();
-  const feed = useFeed();
   const [params] = useSearchParams();
   const { visitWorld, visitRegion, completeQuest } = game;
 
@@ -40,11 +46,9 @@ function World({ world }: { world: WorldId }) {
     visitWorld(world);
   }, [world, visitWorld]);
 
-  const scene = useSceneLevels(world);
   const missions = useMemo(() => [...openLots(lots, world), ...upcomingLots(lots, world)], [lots, world]);
   const open = openLots(lots, world);
   const running = lots.filter((l) => l.world === world && ['financiado', 'em-extensao', 'liquidado'].includes(l.status)).sort((a, b) => b.id.localeCompare(a.id));
-  const worldEvents = events.filter((e) => e.world === world);
   const chainLot = lots.find((l) => l.id === CHAIN[world].lotId) ?? (getLot(CHAIN[world].lotId) as Lot);
   const chain = chainFor(world, chainLot);
   const mg = miniGameFor(world);
@@ -110,13 +114,10 @@ function World({ world }: { world: WorldId }) {
               </div>
             </div>
             <div className="min-w-0 px-3 pb-5 lg:px-5 lg:py-6">
-              <figure className="m-0">
-                <WorldScene world={world} variant="hero" levels={scene.levels} label={scene.label} />
-                <figcaption className="mt-1 px-2 text-sm text-world-ink">{scene.caption}</figcaption>
-              </figure>
+              <LiveWorldFigure world={world} variant="hero" captionClassName="mt-1 px-2 text-sm text-world-ink" />
               <div className="mx-2 mt-4 border-t border-world-line pt-3">
                 <p className="text-sm font-medium text-fg">Diário {w.nome.startsWith('O ') ? 'do' : 'da'} {w.nome.replace(/^(O|A) /, '')}</p>
-                <CampaignFeed events={worldEvents} live={world === 'cafe' ? undefined : { paused: feed.paused, reason: feed.pauseReason }} limit={3} compact />
+                <WorldDiary world={world} />
               </div>
             </div>
           </div>

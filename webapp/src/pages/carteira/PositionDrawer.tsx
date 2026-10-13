@@ -4,7 +4,7 @@ import { getRegion, RESERVE_SHARE } from '../../data';
 import type { QualityAnalysis } from '../../data';
 import { CampaignFeed, HarvestBand, JourneyTrack } from '../../components/game';
 import { Button, Drawer, KeyValue, RiskNote, StatusPill, Tabs } from '../../components/ui';
-import { useData, useGame, useToast, type PositionView } from '../../state';
+import { useCampaignEvents, useData, useGame, useToast, type PositionView } from '../../state';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, num, pct } from '../../lib/format';
 import { analysisReport, contractSummary, downloadText, fileDate } from './docs';
@@ -99,7 +99,8 @@ export function PositionDrawer({ p, onClose }: { p: PositionView | null; onClose
 function DrawerBody({ p }: { p: PositionView }) {
   const lot = p.lot;
   const game = useGame();
-  const { investor, events } = useData();
+  const { investor } = useData();
+  const events = useCampaignEvents();
   const { toast } = useToast();
   const [tab, setTab] = useState<TabId>('rastreabilidade');
   const st = positionState(p);
