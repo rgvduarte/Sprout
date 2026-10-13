@@ -52,7 +52,7 @@ function MissionItem({ mission }: { mission: Mission }) {
       </ul>
       {mission.reward && (
         <p className="mt-2 text-sm text-muted">
-          <span className="font-medium text-fg">{mission.kind === 'diligencia' && !mission.reward.startsWith('+') ? 'Porquê: ' : 'Ganhas: '}</span>
+          <span className="font-medium text-fg">{mission.rewardLabel ?? 'Ganhas'}: </span>
           {mission.reward}
         </p>
       )}

@@ -6,7 +6,7 @@ import { ButtonLink, SimulationLabel } from '../../components/ui';
 import { CommodityGlyph } from '../../components/ui/Commodity';
 import { getProducersByRegion, getRegion, LEVELS, SEALS, SIM_EVENTS, SIM_RULES, WORLDS } from '../../data';
 import { useData, useGame } from '../../state';
-import { eur, num } from '../../lib/format';
+import { eur, num, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { ChapterHead, Frame } from './parts';
 
@@ -166,7 +166,7 @@ function RuleList({ title, items, kind }: { title: string; items: string[]; kind
         {items.map((it) => (
           <li key={it} className="flex gap-2.5 text-[0.9375rem] leading-relaxed text-fg">
             <Icon aria-hidden className={cn('mt-[0.3em] size-4 shrink-0', kind === 'yes' ? 'text-accent' : 'text-crit-ink')} strokeWidth={2} />
-            <span className="min-w-0">{it}</span>
+            <span className="min-w-0">{tidyText(it)}</span>
           </li>
         ))}
       </ul>

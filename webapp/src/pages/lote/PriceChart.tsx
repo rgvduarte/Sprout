@@ -55,7 +55,7 @@ export function PriceChart({ lot, end, progress, today = '2026-10-13' }: { lot: 
   const rows: Row[] = series.monthly.map((p) => ({ t: p.t, ref: p.value }));
   const color = seriesColor(tokens, lot.world);
 
-  const H = 300;
+  const H = 340;
   const M = { top: 20, right: wide ? 168 : 12, bottom: 30, left: dec === 3 ? 48 : 40 };
   const pw = Math.max(120, width - M.left - M.right);
   const ph = H - M.top - M.bottom;
@@ -76,6 +76,8 @@ export function PriceChart({ lot, end, progress, today = '2026-10-13' }: { lot: 
   const levelsP = useTransform(progress, [0.45, 0.72], [0, 1], { clamp: true });
   const bandW = useTransform(progress, [0.5, 0.8], [0, X(xEnd) - X(x0)], { clamp: true });
   const labelsO = useTransform(progress, [0.7, 0.86], [0, 1], { clamp: true });
+  const histO = useTransform(histP, (v) => (v > 0.005 ? 1 : 0));
+  const levelsO = useTransform(levelsP, (v) => (v > 0.005 ? 1 : 0));
 
   // ticks do eixo x: janeiros (e julhos em ecrãs largos)
   const xTicks: { m: number; label: string; major: boolean }[] = [];
@@ -192,12 +194,16 @@ export function PriceChart({ lot, end, progress, today = '2026-10-13' }: { lot: 
             hoje
           </text>
           {/* referência histórica */}
-          <DrawPath d={histPath} progress={histP} stroke={color} strokeWidth={2} />
+          <motion.g style={{ opacity: histO }}>
+            <DrawPath d={histPath} progress={histP} stroke={color} strokeWidth={2} />
+          </motion.g>
           {/* níveis do lote */}
           <motion.path d={lineAt(e.refPrice)} stroke={color} strokeWidth={1.5} strokeDasharray="5 4" fill="none" style={{ opacity: levelsP }} />
-          <DrawPath d={lineAt(e.buyerPrice)} progress={levelsP} stroke={tokens.fg} strokeWidth={2} />
-          <DrawPath d={lineAt(e.fundingPrice)} progress={levelsP} stroke={tokens.chartAxis} strokeWidth={2} />
-          <circle cx={X(x0)} cy={Y(e.refPrice)} r={4} fill={color} stroke={tokens.surface} strokeWidth={2} />
+          <motion.g style={{ opacity: levelsO }}>
+            <DrawPath d={lineAt(e.buyerPrice)} progress={levelsP} stroke={tokens.fg} strokeWidth={2} />
+            <DrawPath d={lineAt(e.fundingPrice)} progress={levelsP} stroke={tokens.chartAxis} strokeWidth={2} />
+            <circle cx={X(x0)} cy={Y(e.refPrice)} r={4} fill={color} stroke={tokens.surface} strokeWidth={2} />
+          </motion.g>
           {/* rótulos diretos */}
           <motion.g style={{ opacity: labelsO }}>
             {wide && (

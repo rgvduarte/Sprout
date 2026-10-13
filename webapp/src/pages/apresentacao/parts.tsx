@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useMotionValueEvent, type MotionValue } from 'motion/react';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
+import { tidyText } from '../../lib/format';
 
 /* =====================================================================
    Peças partilhadas da apresentação: tokens locais (gráfico da cadeia),
@@ -64,7 +65,7 @@ export function ChapterHead({ title, lead, className, id }: { title: ReactNode; 
       <h2 id={id} className="text-[clamp(1.875rem,1.25rem+1.8vw,2.75rem)] leading-[1.06] tracking-[-0.02em]">
         {title}
       </h2>
-      {lead && <p className="measure mt-3 text-[1.0625rem] leading-relaxed text-muted sm:text-lg">{lead}</p>}
+      {lead && <p className="measure mt-3 text-[1.0625rem] leading-relaxed text-muted sm:text-lg">{typeof lead === 'string' ? tidyText(lead) : lead}</p>}
     </div>
   );
 }

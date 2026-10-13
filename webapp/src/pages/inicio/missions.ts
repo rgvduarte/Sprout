@@ -40,6 +40,8 @@ export interface Mission {
   total: number;
   /** o que se ganha (conhecimento, selos, acesso; nunca dinheiro) */
   reward?: string;
+  /** rótulo da linha de recompensa ("Ganhas", "Porquê", "Nota") */
+  rewardLabel?: string;
   /** passo seguinte */
   href: string;
   /** texto do valor da barra */
@@ -88,6 +90,7 @@ function lotDiligence(lot: Lot, game: GameView): Mission {
     world: lot.world,
     steps,
     reward: rewardParts.length ? rewardParts.join(' e ') : 'Os fatores de risco lidos são obrigatórios antes de qualquer compromisso neste lote.',
+    rewardLabel: rewardParts.length ? 'Ganhas' : 'Porquê',
   });
 }
 
@@ -153,13 +156,17 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
       world: 'azeite',
       live: true,
       steps: [{ id: 'leituras', label: `${CAMPAIGN_READINGS} leituras de telemetria em direto`, done: readings >= CAMPAIGN_READINGS, count: [readings, CAMPAIGN_READINGS], href: '/#diario' }],
-      reward: 'Sem pontos: as missões de campanha registam o que acompanhaste nesta sessão.',
+      reward: 'As missões de campanha não dão pontos: registam o que acompanhaste nesta sessão.',
+      rewardLabel: 'Nota',
     }),
   );
 
   /* diligência dos lotes abertos (onde ainda não há compromisso) */
   const held = new Set(positions.map((p) => p.lotId));
-  for (const lot of lots.filter((l) => isInvestable(l) && !held.has(l.id))) out.push(lotDiligence(lot, game));
+  const open = lots
+    .filter((l) => isInvestable(l) && !held.has(l.id))
+    .sort((a, b) => getQuestsByLot(b.id).length - getQuestsByLot(a.id).length || b.funding.raised / b.funding.goal - a.funding.raised / a.funding.goal);
+  for (const lot of open) out.push(lotDiligence(lot, game));
 
   /* selos por diligência */
   for (const sealId of ['seal-serraverde-2627', 'seal-altomogiana-2728']) {

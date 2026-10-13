@@ -2,6 +2,7 @@ import { motion, useTransform, type MotionValue } from 'motion/react';
 import { Chapter } from '../../components/game';
 import { useIsDesktop } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
+import { tidyText } from '../../lib/format';
 import { RECON } from './model';
 import { ChapterHead, Frame, useStep } from './parts';
 
@@ -64,7 +65,7 @@ function TrustScene({ progress, rich }: { progress: MotionValue<number>; rich: b
                 <span className="pt-px font-mono text-xs text-muted tnum">{i + 1}</span>
                 <span className="min-w-0">
                   <span className={cn('font-semibold', i === active && 'underline decoration-accent decoration-2 underline-offset-[0.25em]')}>{l.name}</span>
-                  <span className="text-muted"> · {l.detail}</span>
+                  <span className="text-muted"> · {tidyText(l.detail)}</span>
                 </span>
               </li>
             ))}

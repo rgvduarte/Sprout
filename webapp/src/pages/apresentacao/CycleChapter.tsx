@@ -106,7 +106,7 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
                 <p className="mt-0.5 font-mono text-xs text-muted tnum">
                   {monthYear(addMonths(CYCLE.start, p.from))} – {monthYear(addMonths(CYCLE.start, p.to))}
                 </p>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{p.text}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{tidyText(p.text)}</p>
               </li>
             ))}
           </ol>
@@ -179,7 +179,7 @@ function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index
         {title}
         <span className="font-mono text-xs font-normal text-muted tnum">{when}</span>
       </p>
-      <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
+      <p className="mt-1 text-sm leading-relaxed text-muted">{tidyText(body)}</p>
     </li>
   );
 }

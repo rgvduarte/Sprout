@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarRange } from 'lucide-react';
 import { ButtonLink } from '../../components/ui';
+import { tidyText } from '../../lib/format';
 import { Frame } from './parts';
 
 /* =====================================================================
@@ -51,7 +52,7 @@ export function Resolution() {
                   <span className="font-mono text-sm text-rail-muted tnum">{i + 1}</span>
                   <span className="min-w-0">
                     <span className="block font-semibold text-rail-fg">{s.title}</span>
-                    <span className="mt-0.5 block text-[0.9375rem] leading-relaxed text-rail-muted">{s.body}</span>
+                    <span className="mt-0.5 block text-[0.9375rem] leading-relaxed text-rail-muted">{tidyText(s.body)}</span>
                   </span>
                 </li>
               ))}

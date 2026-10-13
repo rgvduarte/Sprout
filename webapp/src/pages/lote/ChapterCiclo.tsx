@@ -98,7 +98,7 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
   const xExt = X(win.extEnd);
   const branchPath = (y: number) => `M${xd.toFixed(1)},${base} C${(xd + 30).toFixed(1)},${base} ${(xd + 20).toFixed(1)},${y} ${(xd + 56).toFixed(1)},${y} L${xExt.toFixed(1)},${y}`;
   const today = '2026-10-13';
-  const showToday = pos(today) > 0 && pos(today) < 1;
+  const showToday = toDate(today) > toDate(win.start) && toDate(today) < toDate(win.extEnd);
 
   return (
     <Wrap>
@@ -133,7 +133,7 @@ function CicloBody({ progress, rich }: { progress: MotionValue<number>; rich: bo
             return (
               <g key={v}>
                 <line x1={0} x2={xEnd} y1={y} y2={y} stroke={tokens.chartGrid} strokeWidth={1} />
-                <text x={2} y={y - 4} fontSize="11" fontFamily={tokens.fontMono} fill={tokens.chartAxis}>
+                <text x={xEnd + 8} y={y + 4} fontSize="11" fontFamily={tokens.fontMono} fill={tokens.chartAxis}>
                   {v === 1 ? '100 % vendido' : `${Math.round(v * 100)} %`}
                 </text>
               </g>
