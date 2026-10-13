@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CartesianGrid, ComposedChart, Line, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, ComposedChart, Line, ReferenceArea, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from 'recharts';
 import { getMarketSeries, getWorld, MARKET_TODAY } from '../../data';
 import type { Lot, MarketPoint, WorldId } from '../../data/types';
 import { ChartFrame, ChartTooltipContent, SegmentedControl } from '../../components/ui';
@@ -108,6 +108,9 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
   const low = buyers.length ? Math.min(...buyers) : undefined;
   const high = buyers.length ? Math.max(...buyers) : undefined;
   const isPreview = lots.some((l) => l.status === 'fase-2');
+  // Faixa só quando os lotes partilham a mesma referência de entrada (±2 %); se não, uma linha por lote.
+  const refs = lots.map((l) => l.economics.refPrice);
+  const isBand = lots.length > 1 && (Math.max(...refs) - Math.min(...refs)) / Math.max(...refs) <= 0.02 && high! - low! > 1e-9;
   const compare = lots.find((l) => l.id === compareId);
 
   const { domain, ticks } = useMemo(() => {
@@ -122,7 +125,12 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
   const bandName = isPreview ? 'Preço indicativo dos lotes da Fase 2' : 'Preço ao comprador nos lotes abertos';
 
   const legend: LegendItem[] = [{ label: 'Referência de mercado', color, kind: 'line' }];
-  if (low !== undefined) legend.push({ label: `${bandName} (${lots.map((l) => priceNumber(world, l.economics.buyerPrice)).join(' e ')})`, color, kind: 'line', dashed: true });
+  if (low !== undefined)
+    legend.push(
+      isBand
+        ? { label: `${bandName} (${priceNumber(world, low)}–${priceNumber(world, high!)})`, color: `color-mix(in oklab, ${color} 55%, ${tokens.surface})`, kind: 'rect' }
+        : { label: `${bandName} (${lots.map((l) => priceNumber(world, l.economics.buyerPrice)).join(' e ')})`, color, kind: 'line', dashed: true },
+    );
   if (compare) legend.push({ label: `${compare.id} · venda a ${priceNumber(world, compare.economics.buyerPrice)}`, color: tokens.fg, kind: 'line', dashed: true });
 
   const pick = (lot: Lot) => {
@@ -154,7 +162,7 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
         legend={legend}
         height={wide ? 272 : 236}
         table={{ caption: `${series.label}, ${range === '24m' ? '24 meses' : '60 dias'}`, rows: data, getRowId: (r) => r.t, columns: priceColumns(world) }}
-        footnote={`${series.note} ${low !== undefined ? `${lots.length > 1 ? 'As linhas tracejadas marcam' : 'A linha tracejada marca'} ${isPreview ? 'o preço indicativo' : 'o preço de venda ao comprador'} ${lots.length > 1 ? 'dos lotes' : 'do lote'} de hoje: o espaço até à linha da referência é o desconto.` : ''}`}
+        footnote={`${series.note} ${low !== undefined ? `${isBand ? 'A faixa marca' : lots.length > 1 ? 'As linhas tracejadas marcam' : 'A linha tracejada marca'} ${isPreview ? 'o preço indicativo' : 'o preço de venda ao comprador'} ${lots.length > 1 ? 'dos lotes' : 'do lote'} de hoje: o espaço até à linha da referência é o desconto.` : ''}`}
       >
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 20, right: 28, bottom: 0, left: 0 }}>
@@ -162,7 +170,9 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
             <XAxis dataKey="t" ticks={xTicks} tickFormatter={range === '24m' ? tickMonth : tickDay} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={{ stroke: tokens.chartGrid }} tickLine={false} />
             <YAxis domain={domain} ticks={ticks} width={unit === 'L' ? 46 : 40} tickFormatter={(v: number) => priceNumber(world, v)} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={false} tickLine={false} />
             <RTooltip cursor={{ stroke: tokens.chartAxis, strokeWidth: 1 }} content={<ChartTooltipContent valueFormatter={(v) => unitPrice(world, v)} labelFormatter={(l) => longLabel(String(l))} />} />
-            {lots
+            {isBand && <ReferenceArea y1={low} y2={high} fill={color} fillOpacity={0.45} stroke={color} strokeOpacity={0.9} strokeWidth={1} ifOverflow="extendDomain" />}
+            {!isBand &&
+              lots
               .filter((l) => l.id !== compareId)
               .map((l) => (
                 <ReferenceLine key={l.id} y={l.economics.buyerPrice} stroke={color} strokeWidth={1.5} strokeDasharray="4 3" />

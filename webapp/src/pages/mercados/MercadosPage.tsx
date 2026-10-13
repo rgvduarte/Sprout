@@ -157,7 +157,7 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
   if (layout === 'split') {
     return (
       <Card as="article" padding="none" data-world={world} className={cn('overflow-hidden', className)} aria-label={w.nome}>
-        <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+        <div className="grid md:grid-cols-[minmax(0,6fr)_minmax(0,6fr)]">
           <div className="flex flex-col justify-center border-b border-world-line bg-world-soft pt-3 md:border-b-0 md:border-r">{art}</div>
           <div className="min-w-0 p-5 sm:p-6">
             <WorldHeading world={world} onMap={onMap} />
