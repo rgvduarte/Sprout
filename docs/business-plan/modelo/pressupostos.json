@@ -1310,7 +1310,7 @@
   }
  },
  "resultados_referencia": {
-  "nota": "Resultados de referência calculados com estes pressupostos (modelo simplificado usado em 01-desenho-do-modelo.md sec. 7). O modelo financeiro deve reproduzi-los com tolerancia de +-5%; diferencas maiores indicam erro de implementacao ou de pressuposto.",
+  "nota": "Resultados de referência calculados com estes pressupostos (modelo simplificado usado em 01-desenho-do-modelo.md sec. 7). O modelo financeiro deve reproduzi-los com tolerância de +-5%; diferenças maiores indicam erro de implementação ou de pressuposto.",
   "unidade": "EUR",
   "pessimista": {
    "gmv_total": [
@@ -1390,7 +1390,7 @@
     -2846091,
     -3562807
    ],
-   "necessidade_capital_proprio": 3808000.0
+   "necessidade_capital_proprio": 3808000
   },
   "base": {
    "gmv_total": [
@@ -1470,7 +1470,7 @@
     -2436735,
     -2608096
    ],
-   "necessidade_capital_proprio": 2853000.0
+   "necessidade_capital_proprio": 2853000
   },
   "otimista": {
    "gmv_total": [
@@ -1550,7 +1550,7 @@
     -1254822,
     -464304
    ],
-   "necessidade_capital_proprio": 1729000.0
+   "necessidade_capital_proprio": 1729000
   },
   "rondas_recomendadas_base": [
    {
@@ -1635,6 +1635,6 @@
   "impostos.reporte_prejuizos": "OE2023 [L]: sem limite temporal, dedução até 65% do lucro tributável",
   "stress_tests": "40-risco-coberturas.md sec. 1.3 (volatilidade, VaR) e sec. 5.2-5.4 (carry e stress tests); aplicação a série piloto em 01-desenho-do-modelo.md sec. 4",
   "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7",
-  "resultados_referencia": "estimativa: calculo deterministico a partir dos pressupostos deste ficheiro (volumes x preços x margens por canal; pessoal com TSU; opex com contingencia e inflação; capital de giro por dias; obrigações = % do capital de giro; reserva = 5% das obrigações; impostos com reporte de prejuizos a 65%)"
+  "resultados_referencia": "estimativa: cálculo determinístico a partir dos pressupostos deste ficheiro (volumes x preços x margens por canal; pessoal com TSU; opex com contingência e inflação; capital de giro por dias; obrigações = % do capital de giro; reserva = 5% das obrigações; impostos com reporte de prejuízos a 65%)"
  }
 }
