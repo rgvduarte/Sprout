@@ -318,7 +318,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
     <>
       {draft.example && (
         <section aria-label="Exemplo fictício" className="mb-5 flex flex-col gap-3 rounded-md border border-border bg-surface-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="measure text-sm text-fg">
+          <p className="max-w-[60ch] text-sm text-fg">
             <Badge tone="neutral" className="mr-2 align-[1px]">
               exemplo
             </Badge>

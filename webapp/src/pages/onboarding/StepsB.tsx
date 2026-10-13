@@ -187,7 +187,7 @@ export function StepBeneficiario(p: StepProps) {
                 <Textarea id={id} aria-describedby={describedBy} invalid={invalid} value={d.pepDetalhe} onChange={(e) => set({ pepDetalhe: e.target.value })} onBlur={() => p.touch('pepDetalhe')} />
               )}
             </Field>
-            <p className="measure flex items-start gap-2 text-sm text-muted">
+            <p className="max-w-[60ch] flex items-start gap-2 text-sm text-muted">
               <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-warn-ink" strokeWidth={1.75} />
               Não impede o registo. Obriga a diligência reforçada: pedimos a origem do património e a aprovação de um responsável de compliance, o que acrescenta cerca de 3 dias úteis à análise.
             </p>
@@ -284,7 +284,7 @@ function QuizQuestion({ q, value, onAnswer, error }: { q: (typeof QUIZ)[number];
       )}
       {answered && (
         <Appear className="mt-2 pl-8">
-          <p className={cn('measure text-sm', right ? 'text-ok-ink' : 'text-warn-ink')}>
+          <p className={cn('max-w-[60ch] text-sm', right ? 'text-ok-ink' : 'text-warn-ink')}>
             <span className="font-semibold">{right ? 'Certo. ' : 'Não é bem assim. '}</span>
             <span className="text-fg">{q.explanation}</span>
           </p>
@@ -350,7 +350,7 @@ export function StepAdequacao(p: StepProps & { blockPanel: ReactNode }) {
           ))}
           {answeredAll && correct < 2 && (
             <Appear>
-              <p className="measure flex items-start gap-2 text-sm text-fg">
+              <p className="max-w-[60ch] flex items-start gap-2 text-sm text-fg">
                 <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-warn-ink" strokeWidth={1.75} />
                 <span>
                   {correct} de 3 certas. Não impede o registo, mas recomendamos os módulos{' '}

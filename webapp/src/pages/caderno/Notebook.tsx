@@ -224,7 +224,7 @@ export function SealsPage({
         ))}
       </ul>
       {children}
-      <p className="measure mt-auto pt-8 text-sm text-muted">
+      <p className="max-w-[60ch] mt-auto pt-8 text-sm text-muted">
         {c.state === 'concluida'
           ? 'Campanha encerrada a 30/09/2026. Os selos desta página já não se podem ganhar.'
           : c.state === 'fase-2'

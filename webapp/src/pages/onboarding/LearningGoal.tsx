@@ -85,7 +85,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
           <H id={`lg-${hid}`} className="text-[1.1875rem] leading-tight">
             {showForm ? 'Define o teu objetivo de aprendizagem' : `Objetivo: ${target!.nome}, a começar ${POR[goal!.world]}`}
           </H>
-          <p className="measure mt-1 text-sm text-muted">
+          <p className="max-w-[60ch] mt-1 text-sm text-muted">
             {showForm
               ? 'A última missão do registo. Escolhe por onde começas e até onde queres chegar. Medimos só pontos de conhecimento, nunca dinheiro.'
               : `Definido a ${fmtDate(goal!.setAt)}. Medimos só pontos de conhecimento, nunca dinheiro.`}

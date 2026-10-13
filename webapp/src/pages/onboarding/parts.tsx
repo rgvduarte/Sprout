@@ -254,7 +254,7 @@ export function FieldGroup({ title, description, children, className }: { title:
   return (
     <fieldset className={cn('min-w-0 border-0 p-0', className)}>
       <legend className="mb-1 font-display text-[1.0625rem] font-semibold text-fg">{title}</legend>
-      {description && <p className="measure mb-4 text-sm text-muted">{description}</p>}
+      {description && <p className="max-w-[60ch] mb-4 text-sm text-muted">{description}</p>}
       {!description && <div className="mb-3" />}
       {children}
     </fieldset>

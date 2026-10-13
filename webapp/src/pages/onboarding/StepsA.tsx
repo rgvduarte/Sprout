@@ -175,7 +175,7 @@ export function StepDocumentos(p: StepProps) {
           }}
         />
       ))}
-      <p className="measure text-sm text-muted">
+      <p className="max-w-[60ch] text-sm text-muted">
         Nesta demonstração os ficheiros não saem do teu browser: confirmamos só o formato e o tamanho. Na operação real, seguem cifrados para o fornecedor de verificação de identidade e
         ficam guardados 7 anos depois do fim da relação, como exige a lei.
       </p>

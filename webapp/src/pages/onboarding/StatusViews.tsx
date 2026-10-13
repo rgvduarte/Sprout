@@ -124,7 +124,7 @@ export function ReviewView({ c, profileId, onApprove, onRestart }: { c: CaseView
             actions={<StatusPill tone="warn" label="Em análise" />}
           />
           <Timeline items={items} />
-          <p className="measure mt-6 border-t border-border pt-4 text-sm text-muted">
+          <p className="max-w-[60ch] mt-6 border-t border-border pt-4 text-sm text-muted">
             Depois da aprovação, cada compromisso faz-se por transferência SEPA a partir da conta que indicaste. Não aceitamos numerário, e o dinheiro fica numa conta segregada, conciliada todos os dias.
           </p>
         </Card>
