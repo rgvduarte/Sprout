@@ -364,11 +364,11 @@ function ZoomSegment({ seg, index, split, bind }: { seg: Seg; index: number; spl
 /** Chave da ampliação: valor e nome de cada parte, pela ordem da barra. */
 function ZoomLabels({ split }: { split: MotionValue<number> }) {
   return (
-    <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
+    <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4" aria-label="Partes da margem do embalador">
       {ZOOM.map((s, i) => (
         <ZoomKey key={s.id} seg={s} index={i} split={split} />
       ))}
-    </dl>
+    </ul>
   );
 }
 
@@ -376,15 +376,15 @@ function ZoomKey({ seg, index, split }: { seg: Seg; index: number; split: Motion
   const start = index * 0.16;
   const on = useTransform(split, [start, start + 0.46], [0.25, 1]);
   return (
-    <div className="flex min-w-0 items-start gap-2">
+    <li className="flex min-w-0 items-start gap-2">
       <motion.span className="mt-[3px] inline-flex" style={{ opacity: on }}>
         <Swatch id={seg.id} />
       </motion.span>
-      <div className="min-w-0">
-        <dd className="font-mono font-semibold text-fg tnum">{kgEur(value(seg))}</dd>
-        <dt className="leading-snug text-muted">{SEG[seg.id].name}</dt>
-      </div>
-    </div>
+      <span className="min-w-0">
+        <span className="block font-mono font-semibold text-fg tnum">{kgEur(value(seg))}</span>
+        <span className="block leading-snug text-muted">{SEG[seg.id].name}</span>
+      </span>
+    </li>
   );
 }
 

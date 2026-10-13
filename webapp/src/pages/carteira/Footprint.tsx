@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { LotGauge, EASE_OUT } from '../../components/game';
 import { Card } from '../../components/ui';
@@ -71,7 +71,7 @@ function PaleteRow({ paletes }: { paletes: number }) {
   );
 }
 
-export function Footprint({ positions, aside }: { positions: PositionView[]; aside: React.ReactNode }) {
+export function Footprint({ positions, aside }: { positions: PositionView[]; aside: ReactNode }) {
   const fp = footprint(positions);
   return (
     <Card padding="lg" className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-0">

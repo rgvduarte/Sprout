@@ -1,13 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRight, CircleAlert, Info } from 'lucide-react';
 import { KYC_QUEUE, type Lot } from '../../data';
 import { Badge, ButtonLink, Page, PageHeader, Tabs, type TabItem } from '../../components/ui';
 import { useData } from '../../state';
-import { daysBetween, TODAY_DATE } from '../../lib/clock';
+import { daysBetween, TODAY, TODAY_DATE } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { dateTime, eur, kg, num, pct, plural } from '../../lib/format';
-import { TODAY } from '../../lib/clock';
 import { capital, kpi, OPEN_KYC, KYC_SLA_DAYS } from './metrics';
 import { useBastidores, lastDecision, type BastidoresState } from './store';
 import { useVisitorCase, kycStatusAfter } from './useCases';
@@ -84,9 +83,11 @@ export default function BastidoresPage() {
   }, [st, visitorCase]);
 
   const items = attentionItems(lots, st, openKyc, oldest);
-  const go = (s: SectionId) => {
-    setParams(s === 'piloto' ? {} : { sec: s }, { replace: false });
-    window.scrollTo({ top: 0 });
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const select = (s: SectionId) => setParams(s === 'piloto' ? {} : { sec: s });
+  const jump = (s: SectionId) => {
+    select(s);
+    requestAnimationFrame(() => tabsRef.current?.scrollIntoView({ block: 'start' }));
   };
 
   const tabs: TabItem<SectionId>[] = [
@@ -132,7 +133,7 @@ export default function BastidoresPage() {
               <p className="min-w-0 flex-1 text-[0.9375rem] leading-snug text-fg">{it.text}</p>
               <button
                 type="button"
-                onClick={() => go(it.section)}
+                onClick={() => jump(it.section)}
                 className="-my-1 inline-flex min-h-11 shrink-0 items-center gap-1 rounded-sm px-2 text-sm font-medium text-accent hover:bg-surface-2"
               >
                 {it.action}
@@ -143,7 +144,9 @@ export default function BastidoresPage() {
         </ul>
       </section>
 
-      <Tabs<SectionId> label="Áreas dos bastidores" items={tabs} value={section} onChange={go} />
+      <div ref={tabsRef} className="scroll-mt-20">
+        <Tabs<SectionId> label="Áreas dos bastidores" items={tabs} value={section} onChange={select} />
+      </div>
     </Page>
   );
 }
