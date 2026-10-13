@@ -89,13 +89,14 @@ export function PhaseTwoLot({ lot }: { lot: Lot }) {
             <h2 className="mt-8 text-[1.25rem]">Porque ainda não se pode financiar</h2>
             <ul className="max-w-[62ch] mt-2 list-disc space-y-1.5 pl-5 text-[0.9375rem] text-muted marker:text-world-ink">
               <li>O piloto da fase 1 financia só lotes de azeite (a água entra como cesto, sem financiamento), com investidores qualificados.</li>
-              <li>A cobertura com futuros ICE KC e câmbio EUR/USD precisa de um corretor de futuros, a selecionar na Fase 2.</li>
+              <li>O café só abre depois de um go/no-go próprio da Fase 2; o business plan recomendado não o prevê antes de 2030.</li>
+              <li>Abaixo de 50–100 t por ano não compensa cobrir com futuros ICE KC: o plano é comprar o grão verde em EUR, a preço fixo, a um importador da UE que cumpra o regulamento da desflorestação (EUDR).</li>
               <li>
                 A due diligence do produtor está em curso: amostra de pré-safra com{' '}
                 <span className="font-mono text-fg tnum">{analysis ? num(analysis.params.find((p) => p.id === 'sca')?.value ?? 0, 2) : '—'}</span> pontos SCA.
               </li>
               <li>
-                Abertura prevista a partir de <span className="font-mono text-fg tnum">{fmtDate(lot.funding.opensPlanned ?? lot.funding.opensAt)}</span>. Referência ilustrativa de hoje: {tidyText(price(lot.economics.refPrice, 'kg'))}.
+                Sem data de abertura: depende do go/no-go. Referência ilustrativa de hoje: {tidyText(price(lot.economics.refPrice, 'kg'))}.
               </li>
             </ul>
             <div className="mt-6 flex flex-wrap gap-2">

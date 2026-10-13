@@ -193,7 +193,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
         <Link to="/" className="no-underline rail:hidden" aria-label="Sprout, início">
           <BrandMark />
         </Link>
-        {/* pílulas: formas curtas até 1280/1536 px, para nunca passarem por baixo do "Ver como" */}
+        {/* pílulas: formas curtas até 1280/1536 px e a estação só a partir de 1120 px, para nunca passarem por baixo do "Ver como" */}
         <div className="hidden min-w-0 items-center gap-2 overflow-hidden md:flex">
           <span className="xl:hidden">
             <DemoBadge short />
@@ -201,7 +201,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
           <span className="hidden xl:inline-flex">
             <DemoBadge />
           </span>
-          <span className="hidden lg:inline-flex 2xl:hidden">
+          <span className="hidden min-[1120px]:inline-flex 2xl:hidden">
             <SeasonPill short />
           </span>
           <span className="hidden 2xl:inline-flex">

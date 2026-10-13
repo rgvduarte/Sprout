@@ -67,7 +67,7 @@ export const GOALS: LearningGoal[] = tidyDeep([
   {
     id: 'cafe',
     title: 'Preparar a Fase 2: café verde',
-    why: 'O café abre em 2027. Origens, processos e o contrato KC antes de haver lotes.',
+    why: 'O café é Fase 2, com go/no-go próprio. Origens, processos e o contrato KC antes de haver lotes.',
     items: [
       { kind: 'module', id: 'm-cafe-verde' },
       { kind: 'quest', id: 'q-cereja' },
@@ -177,9 +177,9 @@ export const WATER_QUESTION: Record<WaterLabel['id'], WaterQuestion> = tidyDeep(
   },
   w4: {
     prompt: 'CO₂ livre de 2 100 mg/L vindo da origem e bicarbonato de 1 985 mg/L. Como se descreve esta água?',
-    options: ['Gaseificada com gás industrial e hipossalina', 'Naturalmente gaseificada, bicarbonatada e sódica', 'Água de nascente com gás adicionado', 'Pouco mineralizada e pobre em sódio'],
+    options: ['Gaseificada com gás industrial e hipossalina', 'Acídula (gasocarbónica), bicarbonatada e sódica', 'Água de nascente com gás adicionado', 'Pouco mineralizada e pobre em sódio'],
     correct: 1,
-    explanation: 'O gás vem do próprio aquífero (gasocarbónica), o bicarbonato passa os 600 mg/L e o sódio os 200 mg/L. Águas assim nascem em falhas graníticas de Trás-os-Montes.',
+    explanation: 'O CO₂ livre vem do próprio aquífero e passa os 250 mg/L: é acídula (gasocarbónica). «Naturalmente gaseificada» é outra menção, que pede o mesmo teor de CO₂ depois de engarrafar. O bicarbonato passa os 600 mg/L e o sódio os 200 mg/L. Águas assim nascem em falhas graníticas de Trás-os-Montes.',
     fields: ['co2', 'bicarbonato', 'sodio'],
   },
   w5: {

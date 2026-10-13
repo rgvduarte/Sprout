@@ -109,7 +109,7 @@ export function SeasonCard({ className }: { className?: string }) {
               <CommodityGlyph world="cafe" className="size-4 text-world-ink" />
               {getWorld('cafe').nome}
             </span>
-            <span className="text-muted">Fase 2 · abre em 2027. A safra brasileira colhe-se de maio a setembro.</span>
+            <span className="text-muted">Fase 2 · ainda não investível, com go/no-go próprio. A safra brasileira colhe-se de maio a setembro.</span>
             <TextLink to="/mercados/cafe" className="text-sm">
               Explorar as origens
             </TextLink>

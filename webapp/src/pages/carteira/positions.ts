@@ -2,7 +2,7 @@ import { getRegion, getWorld, marketVsEntry, REFUNDING_PLAYBOOKS, stageIndex, st
 import type { JourneyStage, Lot, Milestone, Tone, WorldId } from '../../data';
 import type { PositionView } from '../../state';
 import { addMonths, daysBetween, TODAY_DATE, toDate } from '../../lib/clock';
-import { date as fmt, kgToBottles, num, PALETE, pct } from '../../lib/format';
+import { date as fmt, kgToJugs, num, PALETE, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 
 /* =====================================================================
@@ -112,7 +112,7 @@ export function windowMonth(lot: Lot): number {
 export interface PhysicalShare {
   /** "3 750 kg" */
   primary: string;
-  /** "≈ 5 458 garrafas de 0,75 L" */
+  /** "≈ 818 garrafões de 5 L" */
   secondary: string;
   shareOfLot: number;
   /** quantidade base (kg ou L) */
@@ -135,7 +135,7 @@ export function footprint(positions: PositionView[]) {
   const sacas = by('cafe').reduce((s, p) => s + physicalForAmount(p.lot, p.amount).units, 0);
   return {
     oliveKg,
-    oliveBottles: kgToBottles(oliveKg),
+    oliveJugs: kgToJugs(oliveKg),
     oliveLots: by('azeite').length,
     paletes,
     waterBottles: Math.floor(paletes * PALETE.garrafas),

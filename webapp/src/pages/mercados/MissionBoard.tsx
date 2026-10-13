@@ -159,7 +159,7 @@ function MissionRow({ lot }: { lot: Lot }) {
               Financiar
             </Button>
             <p id={reasonId} className="text-sm text-muted">
-              Abre na Fase 2, em 2027. Até lá, joga-o no <TextLink to="/academia/simulador">simulador</TextLink>.
+              Só abre na Fase 2, depois de um go/no-go próprio. Até lá, joga-o no <TextLink to="/academia/simulador">simulador</TextLink>.
             </p>
           </>
         )}

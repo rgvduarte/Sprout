@@ -1,9 +1,9 @@
 import type { Lot } from '../data/types';
-import { eurToKg, eurToPaletes, eurToSacas, kgToBottles, num, PALETE, SACA_KG } from './format';
+import { eurToKg, eurToPaletes, eurToSacas, kgToJugs, num, PALETE, SACA_KG } from './format';
 
 /**
  * Traduz um montante em mercadoria física do lote.
- * physicalForAmount(AZ-2026-021, 5000) → "1 416 kg", "≈ 2 061 garrafas de 0,75 L".
+ * physicalForAmount(AZ-2026-021, 5000) → "1 041 kg", "≈ 227 garrafões de 5 L".
  */
 export interface Physical {
   /** quantidade na unidade base (kg ou L) */
@@ -12,7 +12,7 @@ export interface Physical {
   units: number;
   /** texto principal, p.ex. "1 416 kg" ou "29,8 paletes" */
   primary: string;
-  /** equivalência legível, p.ex. "≈ 2 061 garrafas de 0,75 L" */
+  /** equivalência legível, p.ex. "≈ 227 garrafões de 5 L" */
   secondary: string;
   /** fração do lote */
   shareOfLot: number;
@@ -23,7 +23,7 @@ export function physicalForAmount(lot: Lot, amount: number): Physical {
   const shareOfLot = lot.funding.goal > 0 ? amount / lot.funding.goal : 0;
   if (lot.world === 'azeite') {
     const kgv = eurToKg(amount, price);
-    return { base: kgv, units: kgv, primary: `${num(kgv)} kg`, secondary: `≈ ${num(kgToBottles(kgv))} garrafas de 0,75 L`, shareOfLot };
+    return { base: kgv, units: kgv, primary: `${num(kgv)} kg`, secondary: `≈ ${num(kgToJugs(kgv))} garrafões de 5 L`, shareOfLot };
   }
   if (lot.world === 'agua') {
     const paletes = eurToPaletes(amount, price);

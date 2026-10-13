@@ -103,7 +103,7 @@ function World({ world }: { world: WorldId }) {
               <SeasonTrack world={world} className="mt-6" />
               {preview && (
                 <p className="measure mt-5 text-[0.9375rem] text-fg">
-                  <strong className="font-semibold">O financiamento abre na Fase 2, em 2027.</strong> Até lá podes percorrer as origens, jogar {mg.title} e simular uma campanha de café com dinheiro fictício.
+                  <strong className="font-semibold">O financiamento só abre na Fase 2, depois de um go/no-go próprio.</strong> Até lá podes percorrer as origens, jogar {mg.title} e simular uma campanha de café com dinheiro fictício.
                 </p>
               )}
               <div className="mt-6 flex flex-wrap gap-2">

@@ -135,6 +135,10 @@ export const eurToKg = (amount: number, pricePerKg: number) => (pricePerKg > 0 ?
 export const kgToLitres = (kgValue: number, density = OLIVE_DENSITY) => kgValue / density;
 /** kgToBottles(1240) → garrafas de 0,75 L de azeite. */
 export const kgToBottles = (kgValue: number, bottleL = 0.75, density = OLIVE_DENSITY) => Math.floor(kgToLitres(kgValue, density) / bottleL);
+/** Garrafão de azeite do produto (o co-packer embala o lote em garrafões de 5 L). */
+export const OLIVE_JUG_L = 5;
+/** kgToJugs(1000) → 218 garrafões de 5 L. */
+export const kgToJugs = (kgValue: number, density = OLIVE_DENSITY) => Math.floor(kgToLitres(kgValue, density) / OLIVE_JUG_L);
 /** Paletes de água financiadas por um montante, a um preço por litro tudo incluído. */
 export const eurToPaletes = (amount: number, pricePerLitre: number) => (pricePerLitre > 0 ? amount / (pricePerLitre * PALETE.litros) : 0);
 /** Sacas de 60 kg financiadas por um montante, a um preço por kg tudo incluído. */
@@ -148,7 +152,7 @@ export function plural(n: number, singular: string, pluralForm: string, decimals
 /* ------------------------------------------------- tipografia de números */
 
 const NBSP = ' ';
-const UNIT_AFTER = /(\d) (?=(?:kg|t|L|g|mg\/L|meq|paletes|palete|IBC|sacas|saca|garrafas|packs|ha|h|min|dias|meses|anos|pts|pontos|m|USD|€|°C|%|p\.p\.)(?![\p{L}]))/gu;
+const UNIT_AFTER = /(\d) (?=(?:kg|t|L|g|mg\/L|meq|paletes|palete|IBC|sacas|saca|garrafões|garrafão|garrafas|packs|ha|h|min|dias|meses|anos|pts|pontos|m|USD|€|°C|%|p\.p\.)(?![\p{L}]))/gu;
 
 /**
  * Espaços não separáveis em números de texto escrito à mão:

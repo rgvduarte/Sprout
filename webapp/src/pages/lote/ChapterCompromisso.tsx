@@ -8,6 +8,7 @@ import { now } from '../../lib/clock';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, num, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
+import { afterRelease } from '../../lib/pointerRelease';
 import { TEAM_VIEW_MESSAGE, useData, useGame, useRole, useToast } from '../../state';
 import { CommitDone, type CommitMoment } from './CommitDone';
 import { concentrationAfter, containersFor, priceDecimals, reflectionEnd } from './model';
@@ -190,7 +191,8 @@ function CommitForm({ onCommitting, onCommitted }: { onCommitting: () => void; o
     }
     // sem aviso flutuante: a confirmação aparece no próprio ecrã (estado do botão, título e região viva)
     const moment: CommitMoment = { position: r.position, prevFunded, sealId: r.sealId, firstSeal: r.firstSealForOrigin, fresh: true };
-    window.setTimeout(() => onCommitted(moment), DONE_HOLD_MS);
+    // o ecrã final só entra com o dedo levantado: nada muda debaixo dele (e o toque ao levantar não cai num controlo novo)
+    afterRelease(() => onCommitted(moment), DONE_HOLD_MS);
   };
 
   const view = (

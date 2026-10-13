@@ -16,7 +16,7 @@ const GROUPS: { id: WorldId | 'geral'; title: string; note?: string }[] = [
   { id: 'geral', title: 'Fundamentos' },
   { id: 'azeite', title: 'O Olival' },
   { id: 'agua', title: 'A Nascente' },
-  { id: 'cafe', title: 'A Plantação', note: 'Fase 2 · abre em 2027. Os módulos já contam pontos.' },
+  { id: 'cafe', title: 'A Plantação', note: 'Fase 2 · ainda não investível. Os módulos já contam pontos.' },
 ];
 
 export function ModulesPath({ openId, onToggle }: { openId: string | null; onToggle: (id: string | null) => void }) {

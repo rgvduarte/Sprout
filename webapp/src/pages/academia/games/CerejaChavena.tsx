@@ -61,7 +61,7 @@ function CafeGame({ round, onReplay }: { round: number; onReplay: () => void }) 
             </div>
           ))}
         </dl>
-        <p className="mt-4 max-w-[68ch] text-sm text-muted">O café abre em 2027 (Fase 2). Até lá podes explorar as origens e jogar; não há lotes de café para financiar.</p>
+        <p className="mt-4 max-w-[68ch] text-sm text-muted">O café é Fase 2 e só abre depois de um go/no-go próprio. Até lá podes explorar as origens e jogar; não há lotes de café para financiar.</p>
       </ResultPanel>
     );
   }

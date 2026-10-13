@@ -100,7 +100,7 @@ function UpcomingRow({ lot }: { lot: Lot }) {
           </span>
           <span className="block text-sm text-muted">
             {fase2 ? (
-              'Fase 2 · abre em 2027. Explorável e jogável na Academia; ainda não investível.'
+              'Fase 2 · não investível. Explora-se e joga-se na Academia; o financiamento depende de um go/no-go próprio.'
             ) : (
               <>
                 {lot.world === 'agua' ? 'Engarrafamento' : 'Extração'} em curso: <span className="font-mono tnum">{num(lot.stock)}</span> de{' '}
@@ -145,9 +145,19 @@ export function NovasMissoes({ lots }: { lots: Lot[] }) {
           {upcoming.map((l) => (
             <UpcomingRow key={l.id} lot={l} />
           ))}
-          {fase2 && <UpcomingRow lot={fase2} />}
         </ul>
       </div>
+      {fase2 && (
+        <div className="mt-6">
+          <h3 className="text-[1.0625rem]">Fase 2 · ainda não investível</h3>
+          <p className="measure mt-0.5 text-sm text-muted">
+            O café ainda não tem mercadoria nem data de abertura: só abre a financiamento se passar o seu próprio go/no-go, que o business plan recomendado não prevê antes de 2030.
+          </p>
+          <ul className="mt-2 grid min-w-0 gap-x-6 sm:grid-cols-2 xl:grid-cols-3">
+            <UpcomingRow lot={fase2} />
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

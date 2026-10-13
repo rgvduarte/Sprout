@@ -87,7 +87,7 @@ export function Footprint({ positions, aside }: { positions: PositionView[]; asi
                 <CommodityGlyph world="azeite" className="size-4 self-center text-world-ink" />
                 <span className="font-display text-[1.375rem] font-bold leading-none text-fg pnum">{tonnes(fp.oliveKg)} de azeite</span>
                 <span className="text-muted">
-                  ≈ <span className="font-mono text-fg tnum">{num(fp.oliveBottles)}</span> garrafas de 0,75 L · {fp.oliveLots} {fp.oliveLots === 1 ? 'lote' : 'lotes'}
+                  ≈ <span className="font-mono text-fg tnum">{num(fp.oliveJugs)}</span> garrafões de 5 L · {fp.oliveLots} {fp.oliveLots === 1 ? 'lote' : 'lotes'}
                 </span>
               </p>
               <IbcRow kg={fp.oliveKg} />

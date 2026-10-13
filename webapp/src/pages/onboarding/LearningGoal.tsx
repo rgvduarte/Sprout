@@ -47,7 +47,7 @@ const EM: Record<LearningFocus, string> = { azeite: 'no Olival', agua: 'na Nasce
 const WORLD_HINT: Record<WorldId, string> = {
   azeite: 'Lagares, depósitos, painel de prova e cobertura por venda a prazo.',
   agua: 'Tipos de água, rótulos, paletes e prazos de venda.',
-  cafe: 'Fase 2 · abre em 2027. Origens, processos e futuros ICE KC, por agora só na Academia.',
+  cafe: 'Fase 2 · ainda não investível. Origens, processos e futuros ICE KC, por agora só na Academia.',
 };
 
 export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { profileId: ProfileId; className?: string; headingLevel?: 2 | 3 }) {
