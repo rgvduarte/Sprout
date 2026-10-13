@@ -33,38 +33,32 @@ export function certificateSvg({ name, level, points, date, standalone }: { name
   const display = "Archivo, 'Archivo Narrow', 'Arial Narrow', sans-serif";
   const sans = "'Public Sans', 'Segoe UI', Arial, sans-serif";
   const mono = "'IBM Plex Mono', Menlo, Consolas, monospace";
-  // ramo de oliveira em coroa (o glifo de Mestre, desenhado grande)
-  const leaves = [
-    [118, 250, -60],
-    [112, 222, -40],
-    [114, 194, -20],
-    [122, 168, 0],
-  ]
-    .map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="13" ry="4.5" transform="rotate(${r} ${x} ${y})" fill="none" stroke="${c.accent}" stroke-width="1.5"/>`)
-    .join('');
-  const leavesR = [
-    [482, 250, 60],
-    [488, 222, 40],
-    [486, 194, 20],
-    [478, 168, 0],
-  ]
-    .map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="13" ry="4.5" transform="rotate(${r} ${x} ${y})" fill="none" stroke="${c.accent}" stroke-width="1.5"/>`)
-    .join('');
+  // coroa de oliveira à volta da data (o glifo de Mestre, desenhado grande)
+  const leaf = (x: number, y: number, r: number) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="3.2" transform="rotate(${r} ${x} ${y})" fill="none" stroke="${c.accent}" stroke-width="1.25"/>`;
+  const wreath = [
+    `<path d="M262 338 C236 330 230 300 246 282" fill="none" stroke="${c.accent}" stroke-width="1.25"/>`,
+    `<path d="M338 338 C364 330 370 300 354 282" fill="none" stroke="${c.accent}" stroke-width="1.25"/>`,
+    leaf(244, 322, -70),
+    leaf(238, 304, -95),
+    leaf(244, 288, -120),
+    leaf(356, 322, 70),
+    leaf(362, 304, 95),
+    leaf(356, 288, 120),
+  ].join('');
   return `<svg ${standalone ? 'xmlns="http://www.w3.org/2000/svg" ' : ''}viewBox="0 0 600 400" width="100%" style="display:block" font-family="${sans}">
 <rect width="600" height="400" fill="${c.paper}"/>
 <rect x="16" y="16" width="568" height="368" fill="${c.bg}" stroke="${c.border}"/>
 <rect x="26" y="26" width="548" height="348" fill="none" stroke="${c.accent}" stroke-width="1.5"/>
-<path d="M132 280 C100 240 104 176 140 146" fill="none" stroke="${c.accent}" stroke-width="1.5"/>
-<path d="M468 280 C500 240 496 176 460 146" fill="none" stroke="${c.accent}" stroke-width="1.5"/>
-${leaves}${leavesR}
-<text x="300" y="70" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="700" font-size="15" letter-spacing="1.5" fill="${c.muted}">SPROUT · ACADEMIA</text>
-<text x="300" y="128" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="700" font-size="34" fill="${c.fg}">Certificado de ${esc(level)}</text>
-<text x="300" y="172" text-anchor="middle" font-size="14" fill="${c.muted}">atribuído a</text>
-<text x="300" y="206" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="600" font-size="24" fill="${c.fg}">${esc(name)}</text>
-<line x1="170" x2="430" y1="222" y2="222" stroke="${c.border}"/>
-<text x="300" y="250" text-anchor="middle" font-size="13" fill="${c.fg}">por <tspan font-family="${mono}">${points}</tspan> pontos de conhecimento em módulos, missões de diligência</text>
-<text x="300" y="268" text-anchor="middle" font-size="13" fill="${c.fg}">e mini-jogos da Academia: azeite, água e café.</text>
-<text x="300" y="318" text-anchor="middle" font-family="${mono}" font-size="13" fill="${c.fg}">${esc(date)}</text>
-<text x="300" y="352" text-anchor="middle" font-size="10.5" fill="${c.muted}">Atesta conteúdos concluídos na Academia. Não é uma certificação profissional nem uma qualificação de investidor.</text>
+<text x="300" y="72" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="700" font-size="14" letter-spacing="1.5" fill="${c.muted}">SPROUT · ACADEMIA</text>
+<text x="300" y="124" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="700" font-size="32" fill="${c.fg}">Certificado de ${esc(level)}</text>
+<text x="300" y="162" text-anchor="middle" font-size="13" fill="${c.muted}">atribuído a</text>
+<text x="300" y="194" text-anchor="middle" font-family="${display}" font-stretch="87.5%" font-weight="600" font-size="23" fill="${c.fg}">${esc(name)}</text>
+<line x1="180" x2="420" y1="210" y2="210" stroke="${c.border}"/>
+<text x="300" y="236" text-anchor="middle" font-size="13" fill="${c.fg}">por <tspan font-family="${mono}">${points}</tspan> pontos de conhecimento em módulos,</text>
+<text x="300" y="254" text-anchor="middle" font-size="13" fill="${c.fg}">missões de diligência e mini-jogos sobre azeite, água e café</text>
+${wreath}
+<text x="300" y="314" text-anchor="middle" font-family="${mono}" font-size="13" fill="${c.fg}">${esc(date)}</text>
+<text x="300" y="352" text-anchor="middle" font-size="10" fill="${c.muted}">Atesta conteúdos concluídos na Academia Sprout.</text>
+<text x="300" y="365" text-anchor="middle" font-size="10" fill="${c.muted}">Não é uma certificação profissional nem uma qualificação de investidor.</text>
 </svg>`;
 }

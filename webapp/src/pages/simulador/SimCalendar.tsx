@@ -32,7 +32,7 @@ export function SimCalendar({ run, month, className }: { run: SimRun; month: num
   return (
     <div className={cn('min-w-0', className)}>
       {/* cabeçalho dos meses */}
-      <div className="grid grid-cols-1 gap-x-3 md:grid-cols-[148px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-x-3 md:grid-cols-[184px_minmax(0,1fr)]">
         <div className="hidden md:block" />
         <div className="relative">
           <div className="grid" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }} aria-hidden>
@@ -184,7 +184,7 @@ function Lane({ children, cursorX, month, uid, reduce, extended }: { children: R
 
 function Row({ label, world, hedged, children }: { label: string; world: WorldId; hedged?: boolean; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-x-3 gap-y-1 md:grid-cols-[148px_minmax(0,1fr)] md:items-center" data-world={world}>
+    <div className="grid grid-cols-1 gap-x-3 gap-y-1 md:grid-cols-[184px_minmax(0,1fr)] md:items-center" data-world={world}>
       <div className="min-w-0 truncate text-sm text-fg">
         {label}
         {hedged && <span className="text-muted"> · coberto</span>}
@@ -216,6 +216,38 @@ function PhaseBand({ world }: { world: WorldId }) {
           <span className="truncate text-xs font-medium text-world-ink max-sm:hidden">{g.to - g.from >= 2 ? g.label : ''}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** Fita fina da estação no painel fixo: os meses passados enchem-se sobre as bandas da colheita. */
+export function SeasonStrip({ month, extended, className }: { month: number; extended: boolean; className?: string }) {
+  const months = Array.from({ length: COLS }, (_, i) => i + 1);
+  return (
+    <div className={cn('min-w-0', className)} data-world="azeite">
+      <div className="flex h-2.5 gap-[2px]" role="img" aria-label={`Mês ${month} de ${WINDOW}${extended ? ', com extensão até ao mês 24' : ''}. Colheita do azeite de outubro a janeiro.`}>
+        {months.map((m) => {
+          const strong = phaseOf('azeite', calendarMonth(m)).strong;
+          const past = m <= month;
+          const outside = m > WINDOW && !extended;
+          return (
+            <span
+              key={m}
+              className={cn('h-full flex-1 rounded-[1px] transition-colors duration-300 ease-out', m === WINDOW + 1 && 'ml-1.5', outside && 'opacity-40')}
+              style={{
+                background: past ? 'var(--accent)' : strong ? 'color-mix(in oklab, var(--world) 30%, var(--surface))' : 'color-mix(in oklab, var(--fg) 9%, var(--surface))',
+              }}
+            />
+          );
+        })}
+      </div>
+      <div className="mt-1 flex justify-between font-mono text-[11px] leading-4 text-muted" aria-hidden>
+        <span>{monthLabel(1)}</span>
+        <span className="max-sm:hidden">colheita: banda mais escura</span>
+        <span>
+          {monthLabel(WINDOW)} · mês 18{extended ? ` → ${monthLabel(MAX_MONTH)}` : ''}
+        </span>
+      </div>
     </div>
   );
 }

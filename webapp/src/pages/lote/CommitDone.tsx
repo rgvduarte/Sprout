@@ -132,7 +132,7 @@ export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCa
   const sealView = seal ? data.seals.find((s) => s.def.id === seal.id) : undefined;
   const reflEnd = reflectionEnd(p.committedAt);
   const inReflection = daysBetween(TODAY_DATE, reflEnd) >= 0;
-  const ref = `${lot.id}-${p.id.replace(/^pos-/, '').toUpperCase()}`;
+  const ref = `SPR-${lot.id.replace(/-/g, '')}-${(p.id.match(/s(\d+)/)?.[1] ?? '1').padStart(3, '0')}`;
 
 
   return (

@@ -38,8 +38,9 @@ export function ValueChart({ run, counterfactual, month, title = 'Liquidação e
   const seen = rows.flatMap((r) => [r.value, r.cf]).filter((v): v is number => v !== null);
   const lo = Math.min(run.invested * 0.82, ...seen);
   const hi = Math.max(run.invested * 1.14, ...seen);
-  const step = run.invested >= 20000 ? 2500 : 1000;
+  const step = run.invested >= 20000 ? 5000 : 2000;
   const domain: [number, number] = [Math.floor(lo / step) * step, Math.ceil(hi / step) * step];
+  const yTicks = Array.from({ length: Math.round((domain[1] - domain[0]) / step) + 1 }, (_, i) => domain[0] + i * step);
   const current = rows[month]?.value;
   const tableRows = rows.filter((r) => r.value !== null);
 
@@ -81,7 +82,7 @@ export function ValueChart({ run, counterfactual, month, title = 'Liquidação e
             axisLine={{ stroke: t.chartGrid }}
             tickLine={false}
           />
-          <YAxis width={52} domain={domain} tickCount={5} tick={{ fill: t.chartAxis, fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => eur(v, { compact: true })} />
+          <YAxis width={52} domain={domain} ticks={yTicks} interval={0} tick={{ fill: t.chartAxis, fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => eur(v, { compact: true })} />
           <ReferenceLine y={run.invested} stroke={t.chartRef} strokeDasharray="4 4" strokeWidth={1} ifOverflow="extendDomain" />
           <ReferenceLine x={WINDOW} stroke={t.chartGrid} strokeWidth={1} />
           <RTooltip

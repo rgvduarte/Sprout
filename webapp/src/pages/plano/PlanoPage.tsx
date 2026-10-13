@@ -19,7 +19,6 @@ import { ITEM_STATUS_LABEL, ITEM_STATUSES, planoActions, usePlano, type ItemStat
    Pessoas reais do documento-fonte só aparecem aqui.
    ===================================================================== */
 
-const STATUS_TONE: Record<ItemStatus, 'neutral' | 'info' | 'crit' | 'ok'> = { 'por-iniciar': 'neutral', 'em-curso': 'info', bloqueado: 'crit', concluido: 'ok' };
 
 function StatusIcon({ s, className }: { s: ItemStatus; className?: string }) {
   const cls = cn('size-4 shrink-0', className);

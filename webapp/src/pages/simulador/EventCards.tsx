@@ -90,7 +90,7 @@ export function DecisionCard({ pending, run, onDecide }: { pending: Pending; run
         { choice: 'recusar', title: 'Recusar e continuar a vender', body: 'Sem custo extra. O lote vende ao preço de mercado, mesmo em baixo.' },
       ]
     : [
-        { choice: 'aprovar', title: `Aceitar ${ext} meses de extensão`, body: `Vende o resto até ${monthLabel(18 + ext)}. Custa ${pct(SIM_RULES.extension.monthlyCostPct, 1)} do montante por mês (${fe(SIM_RULES.extension.monthlyCostPct * amount * ext)} no total, se durar tudo).` },
+        { choice: 'aprovar', title: `Aceitar até ${ext} meses de extensão`, body: `Vende o resto até ${monthLabel(18 + ext)}. Custa ${pct(SIM_RULES.extension.monthlyCostPct, 1)} do montante por mês (${fe(SIM_RULES.extension.monthlyCostPct * amount * ext)} no total, se durar tudo).` },
         { choice: 'recusar', title: 'Vender tudo no mês 18', body: `Venda de fecho de ${unitsText(lot, snap.units)} com 3 % de desconto. O lote liquida já.` },
       ];
   return (
@@ -104,7 +104,7 @@ export function DecisionCard({ pending, run, onDecide }: { pending: Pending; run
       </h3>
       <p className="mt-2 text-[0.9375rem] text-fg">
         {isRefunding
-          ? `O choque deixou a referência ${refChange(pending.priceIndex)} face à entrada. A liquidação estimada do lote está em ${fpct(pending.projected)}: a perda prevista já passa a reserva de primeira perda (${pct(SIM_RULES.firstLossReservePct, 0)}).`
+          ? `O choque deixou a referência ${refChange(pending.priceIndex)} face à entrada. O resultado bruto previsto do lote é ${fpct(pending.gross)}, mais do que a reserva de primeira perda absorve (${pct(SIM_RULES.firstLossReservePct, 0)}): mesmo com a reserva, ficas em ${fpct(pending.projected)}.`
           : `Chegou o fim da janela de 18 meses com ${pct(pending.rem, 0)} do stock por vender (${unitsText(lot, snap.units)}) e a referência ${refChange(pending.priceIndex)} face à entrada.`}
       </p>
       <p className="mt-1.5 text-sm text-muted">Na operação real, quem decide é a Tesouraria com o Comité de risco, e os co-financiadores são avisados. Aqui decides tu, para veres o efeito no balanço.</p>

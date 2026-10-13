@@ -93,7 +93,8 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
             );
           })}
         </div>
-        <HarvestBand world="azeite" start={CYCLE.start} months={CYCLE.months} extensionMonths={CYCLE.extensionMonths} progress={rich ? cursor : undefined} className="mt-6" />
+        <HarvestBand world="azeite" start={CYCLE.start} months={CYCLE.months} extensionMonths={CYCLE.extensionMonths} progress={rich ? cursor : undefined} legend={false} className="mt-6" />
+        <BandLegend />
 
         <div className="mt-7 grid min-w-0 gap-y-8 md:grid-cols-[minmax(0,var(--fork))_minmax(0,1fr)]" style={{ ['--fork' as string]: `${FORK_X * 100}%` }}>
           <ol className="grid min-w-0 gap-x-5 gap-y-5 sm:grid-cols-2 md:pr-6 xl:grid-cols-4" aria-label="Fases da janela">
@@ -106,7 +107,7 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
                 <p className="mt-0.5 font-mono text-xs text-muted tnum">
                   {monthYear(addMonths(CYCLE.start, p.from))} – {monthYear(addMonths(CYCLE.start, p.to))}
                 </p>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">{tidyText(p.text)}</p>
+                <p className="mt-1.5 text-sm leading-snug text-muted">{tidyText(p.text)}</p>
               </li>
             ))}
           </ol>
@@ -114,7 +115,7 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
         </div>
 
         {lossCase?.settlement.settledResult !== undefined && (
-          <p className="measure mt-8 text-sm leading-relaxed text-muted">
+          <p className="measure mt-6 text-sm leading-relaxed text-muted">
             <strong className="font-semibold text-fg">Nenhum caminho garante o capital.</strong> O {lossCase.id} liquidou a {date(lossCase.settlement.settledAt!)} com {pct(lossCase.settlement.settledResult, 1, { sign: true })}, depois de a reserva de primeira perda absorver 5 % do valor do lote.
           </p>
         )}
@@ -136,7 +137,17 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
     {
       title: 'Extensão condicionada',
       when: `até ${date(CYCLE.extendedEnd)}`,
-      body: `Uma vez, até ${CYCLE.extensionMonths} meses: referência 15 % abaixo da entrada ou mais de 30 % do stock por vender.${extended?.settlement.extendedTo ? ` Em curso: ${extended.id}, até ${date(extended.settlement.extendedTo)}.` : ''}`,
+      body: (
+        <>
+          {tidyText(`Uma vez, até ${CYCLE.extensionMonths} meses, se a referência cair 15 % abaixo da entrada ou ficar mais de 30 % do stock por vender.`)}
+          {extended?.settlement.extendedTo && (
+            <>
+              {' '}
+              Em curso: <span className="whitespace-nowrap">{extended.id}</span>, até {date(extended.settlement.extendedTo)}.
+            </>
+          )}
+        </>
+      ),
       swatch: (
         <svg aria-hidden className="h-2.5 w-4 shrink-0 overflow-hidden rounded-[2px] border border-world-ink">
           <defs>
@@ -151,7 +162,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
     {
       title: 'Refunding',
       when: 'playbook do lote',
-      body: tidyText(`Se a referência ficar 15 % ou mais abaixo da entrada durante 10 dias úteis: cobertura seguinte e, se preciso, nova ronda que refinancia a armazenagem. Custa ${pct(CYCLE.refundingCostPct, 1)} do lote e pode não recuperar a perda.`),
+      body: tidyText(`Se a referência ficar 15 % abaixo da entrada durante 10 dias úteis: nova ronda que refinancia a armazenagem, a ${pct(CYCLE.refundingCostPct, 1)} do lote. Pode não recuperar a perda.`),
       swatch: <span aria-hidden className="inline-block h-2.5 w-4 rounded-[2px] border border-world-ink" />,
     },
   ];
@@ -168,7 +179,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
   );
 }
 
-function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index: number; progress: MotionValue<number>; drawn: boolean; title: string; when: string; body: string; swatch: ReactNode }) {
+function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index: number; progress: MotionValue<number>; drawn: boolean; title: string; when: string; body: ReactNode; swatch: ReactNode }) {
   const start = 0.2 + index * 0.22;
   const tick = useTransform(progress, [start, start + 0.3], [0, 1]);
   return (
@@ -179,7 +190,39 @@ function ForkItem({ index, progress, drawn, title, when, body, swatch }: { index
         {title}
         <span className="font-mono text-xs font-normal text-muted tnum">{when}</span>
       </p>
-      <p className="mt-1 text-sm leading-relaxed text-muted">{tidyText(body)}</p>
+      <p className="mt-1 text-sm leading-snug text-muted">{typeof body === 'string' ? tidyText(body) : body}</p>
     </li>
+  );
+}
+
+/** Legenda da faixa: as mesmas amostras da HarvestBand, numa linha. */
+function BandLegend() {
+  const hatchId = useId().replace(/:/g, '');
+  return (
+    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted">
+      <li className="inline-flex items-center gap-1.5">
+        <span aria-hidden className="inline-block h-3 w-4 rounded-[2px] border border-border" style={{ background: 'color-mix(in oklab, var(--world) 26%, var(--surface))' }} />
+        Colheita e extração
+      </li>
+      <li className="inline-flex items-center gap-1.5">
+        <span aria-hidden className="inline-block h-3 w-4 rounded-[2px] border border-border" style={{ background: 'color-mix(in oklab, var(--world) 9%, var(--surface))' }} />
+        Armazenagem e vendas
+      </li>
+      <li className="inline-flex items-center gap-1.5">
+        <span aria-hidden className="inline-block h-2 w-4 rounded-[2px] bg-world-ink" />
+        Janela de {CYCLE.months} meses
+      </li>
+      <li className="inline-flex items-center gap-1.5">
+        <svg aria-hidden className="h-2.5 w-4 overflow-hidden rounded-[2px] border border-world-ink">
+          <defs>
+            <pattern id={hatchId} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--world-ink)" strokeWidth="1.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill={`url(#${hatchId})`} />
+        </svg>
+        Extensão de {CYCLE.extensionMonths} meses
+      </li>
+    </ul>
   );
 }

@@ -1411,7 +1411,7 @@
    "lotes": 1,
    "agua_paletes": 60
   },
-  "gmv_alvo_eur": "preenchido por calculo_referencia.py",
+  "gmv_alvo_eur": 106000,
   "metas": {
    "fill_rate_min": 0.95,
    "variacao_base_compra_vs_indice_max_eur_kg": 0.15,
@@ -1419,7 +1419,7 @@
     0.08,
     0.12
    ],
-   "margem_contribuicao_horeca_gourmet_min_eur_kg": "preenchido por calculo_referencia.py",
+   "margem_contribuicao_horeca_gourmet_min_eur_kg": 0.3,
    "margem_contribuicao_distribuidores_min_eur_kg": 0.0,
    "pagamento_produtor_max_dias": 30,
    "pagamento_cupao_atraso_max_dias": 0,
@@ -1435,12 +1435,21 @@
    "concentracao_lagar_ancora_max": 0.5,
    "compradores_horeca_recorrentes_min_3_encomendas": 0.6,
    "gmv_gate_min_eur": 90000,
-   "offtake_cobertura_min_lote": 0.8
+   "offtake_cobertura_min_lote": 0.8,
+   "margem_contribuicao_horeca_gourmet_min_pct": 0.06,
+   "paragem_horeca_margem_eur_kg_2_meses": 0.15,
+   "referencia_horeca_documentada_min_eur_kg": 5.65,
+   "n_cotacoes_referencia_min": 20
   },
   "ticket_medio_horeca_eur": [
    150,
    300
-  ]
+  ],
+  "gmv_alvo_detalhe": {
+   "azeite_horeca_gourmet": 20340,
+   "azeite_distribuidores": 69600,
+   "agua": 16200
+  }
  },
  "stress_tests": {
   "descricao": "parâmetros para o modelo financeiro; aplicação à 1.ª série (book de 150k EUR; almofada 33% = capital social da SPV) em 01-desenho-do-modelo.md sec. 4.4",
@@ -1828,78 +1837,71 @@
   "rondas_recomendadas_base": [
    {
     "ronda": "pre-seed",
-    "valor_eur": 700000,
+    "valor_eur": 1100000,
     "data": "até 2027-01-31",
-    "cobre": "fase 0 + piloto até ao gate"
+    "cobre": "pré-arranque 95k + capital social da SPV 50k + fase 0 e piloto até ao gate (~0,59M jan.-ago. 2027) + set.-dez. 2027 (~0,25M) + caixa mínima 150k",
+    "alternativa": "0,8M + compromisso firme de bridge de 0,3M"
    },
    {
     "ronda": "seed",
-    "valor_eur": 1500000,
-    "data": "Q4 2027, só com criterios do gate cumpridos",
-    "cobre": "resto de 2027, 2028 e 2029"
-   },
-   {
-    "ronda": "ponte ou série A",
-    "valor_eur": 700000,
-    "data": "2030",
-    "cobre": "2030-2031 até EBITDA ~0"
+    "valor_eur": null,
+    "data": "só depois do gate de 2027-08-31",
+    "cobre": "não dimensionada: com os pressupostos corrigidos o caso base não chega ao break-even no horizonte (necessidade >= 5,5M e a crescer); só se o piloto alterar os pressupostos (ver leitura)"
    }
   ],
-  "pessimista_recomendacao": "parar no gate de 2027-08-31 (gasto acumulado ~0,7 MEUR); não financiar o plano pessimista"
+  "pessimista_recomendacao": "parar no gate de 2027-08-31 (gasto acumulado ~0,74M incl. pré-arranque e capital da SPV); não financiar o plano pessimista",
+  "leitura": "Com os pressupostos corrigidos (referência HoReCa 5,65; distribuidores ao preço de saída do embalador; HoReCa limitada ao SOM; custódia por tranche e 3PL; seguro de crédito; funções independentes da SPV; sem obrigações em 2027), nenhum cenário chega ao break-even até 2031. Base: EBITDA 2031 = -1,22M; margem média do azeite 0,12 EUR/kg contra ~0,68 EUR/kg necessária para pagar a estrutura de 2031. Sensibilidades (EBITDA 2031, base): distribuidores +0,10 EUR/kg = +178k; referência HoReCa 6,00 = +128k; ambos (+0,20 distribuidores) = -0,74M; gestores a 250-300 contas = -102k; 3PL +0,05 EUR/kg = -20k."
  },
  "fontes": {
-  "commodities.azeite.preco_indice_granel_eur_kg": "SIMA/GPP AOVE granel PT 3,40-3,80 EUR/kg início out. 2026 e 3,50 sem. 39/2026 (https://www.agroportal.pt/azeite-e-azeitona-21-a-27-de-setembro-de-2026/); Poolred 3,34 EUR/kg 29/09-05/10/2026 (https://wikifarmer.com/library/en/article/olive-oil-prices-spain-national-aforo-2026-27); Infaoliva 3,10 a 13/10/2026 (https://www.infobae.com/espana/2026/10/13/precio-del-aceite-de-oliva-en-espana-este-martes-13-de-octubre/). Constante: sem previsão de preço.",
+  "commodities.azeite.preco_indice_granel_eur_kg": "SIMA/GPP AOVE granel PT intervalo 3,40-3,80 EUR/kg início out. 2026 (https://www.agroportal.pt/azeite-e-azeitona-21-a-27-de-setembro-de-2026/); 3,50 EUR/kg sem. 39/2026 é cotação Oleista, não SIMA (10-mercado.md sec. 1.3; confirmar no boletim SIMA da sem. 39); Poolred 3,34 EUR/kg 29/09-05/10/2026 (https://wikifarmer.com/library/en/article/olive-oil-prices-spain-national-aforo-2026-27); Infaoliva 3,10 a 13/10/2026 (https://www.infobae.com/espana/2026/10/13/precio-del-aceite-de-oliva-en-espana-este-martes-13-de-octubre/). Índice tal como definido (média SIMA + Poolred) a out. 2026 = 3,42-3,47 (3,3-3,4 com as cotações ES de 13-10); o modelo usa 3,50, arredondado para cima (conservador para a margem). Constante: sem previsão de preço.",
   "commodities.azeite.premio_origem_pago_ao_lagar_eur_kg": "estimativa: prémio de origem/qualidade sobre o índice para lote individualizado com ficha analítica; diferencial AOVE-lampante de 0,24 EUR/kg em 2026 (https://navarraexports.com/en/market-intelligence/spanish-olive-oil-prices-september-2026-bulk-buyers) indica prémios de qualidade comprimidos",
-  "commodities.azeite.volume_t": "estimativa: piloto 40 t (2 lotes de 20 t) + rampa; base 2031 = 2.200 t (~1,3% da produção PT de ~175 kt, INE via https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/); coerente com SOM a 36 meses de 1,7-8 MEUR GMV (10-mercado.md, sec. 5)",
-  "commodities.azeite.mix_horeca_gourmet": "estimativa: HoReCa (74.524 empresas, 91% micro; https://tnews.pt/ahresp-setor-da-restauracao-revela-se-instavel-em-2024-devido-a-localizacao-dos-negocios/) consome 150-300 L/ano por cliente; volume acima de ~400 t exige distribuidores/exportadores",
-  "commodities.azeite.canais.horeca_gourmet.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO no terreno): retalho PT AOVE 6,48 EUR/L c/ IVA mar-abr 2026 = 6,67 EUR/kg s/ IVA com granel a 4,43 (https://observatorioagroalimentar.gov.pt/wp-content/uploads/2026/05/Observatorio_Resumo_Periodo-042026.pdf); rácio granel/prateleira 0,60-0,66 aplicado a granel 3,50-3,60 => 5,4-6,0 standard; +prémio de origem identificada; preço à porta do lagar 5 L 6,08 EUR/L mar. 2026 (https://www.agroportal.pt/wp-content/uploads/2026/03/azei_News12.pdf). Validar com 20-30 cotações cash & carry/foodservice.",
+  "commodities.azeite.volume_t": "estimativa: piloto 20 t (1 lote misto: 4 t HoReCa/gourmet + 16 t distribuidores com offtake) + rampa; base 2031 = 2.200 t (~1,3% de ~175 kt [E, ponto médio de 160 (Olivum, https://observador.pt/2026/09/23/producao-de-azeite-em-portugal-pode-crescer-10-em-2026-2027-e-aproximar-se-das-177-mil-toneladas-da-campanha-anterior/) e 179 (Governo, https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/)]); a parte HoReCa está limitada ao SOM (10-mercado.md sec. 5: 1.000-2.000 clientes no ano 3); o resto vai para distribuidores/exportadores com offtake",
+  "commodities.azeite.mix_horeca_gourmet": "derivado de clientes_horeca_gourmet_ativos_medios x 0,205 t/ano (ponto médio de 150-300 L/ano = 137-275 kg; 10-mercado.md sec. 5); HoReCa: 74.524 empresas, 91% micro (https://tnews.pt/ahresp-setor-da-restauracao-revela-se-instavel-em-2024-devido-a-localizacao-dos-negocios/); 2.000 contas em 2031 = 2,7% das empresas",
+  "commodities.azeite.canais.horeca_gourmet.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO no terreno): retalho PT AOVE 6,48 EUR/L c/ IVA mar-abr 2026 = 6,67 EUR/kg s/ IVA com granel a 4,43 (https://observatorioagroalimentar.gov.pt/wp-content/uploads/2026/05/Observatorio_Resumo_Periodo-042026.pdf); ajustado à descida do granel para 3,50-3,60: rácio 0,664 => 5,27-5,42; diferencial constante de 2,24 => 5,74-5,84; intervalo 5,3-6,0 (equivalente de retalho standard a out. 2026); base = 5,65 (ponto médio); 6,00 só no otimista, condicionado a cotações documentadas de AOVE de origem identificada; porta do lagar 5 L 6,08 EUR/L mar. 2026 (https://www.agroportal.pt/wp-content/uploads/2026/03/azei_News12.pdf). Validar com 20-30 cotações cash & carry/foodservice.",
   "commodities.azeite.canais.horeca_gourmet.desconto_efetivo": "documento-fonte (10-15%); base no limite inferior porque 15% leva a margem de contribuição a ~7% (01-desenho-do-modelo.md sec. 2)",
   "commodities.azeite.canais.horeca_gourmet.embalamento_eur_kg": "Observatorio de la Cadena Alimentaria: 0,470 (2019/20) e 0,514 EUR/kg (2020/21), intervalo 0,293-1,589 (https://www.mapa.gob.es/dam/mapa/contenido/alimentacion/temas/consumo-y-tendencias-en-alimentacion/observatorio-cadena-alimentaria-abril-2016/estudios-e-informes/estudiodelacadenadevalordelaove2019-202008062021.pdf; https://www.interempresas.net/Produccion-Aceite/474711-Actualizado-el-estudio-de-la-cadena-de-valor-del-aceite-de-oliva-virgen-extra.html); +0,05 pelo mix com vidro",
   "commodities.azeite.canais.horeca_gourmet.logistica_eur_kg": "estimativa 10-mercado.md sec. 1.7 (0,15-0,30 EUR/kg até à HoReCa); ANTRAM camião Lisboa-Porto 250-270 EUR em 2021 e 'emergência' de combustíveis em mai. 2026 (https://rr.pt/noticia/pais/2026/05/24/transportadoras-a-beira-do-limite-o-setor-esta-completamente-asfixiado/471894/)",
   "commodities.azeite.canais.horeca_gourmet.dias_recebimento": "Informa D&B mai. 2026: alojamento e restauração com atraso médio de 30 dias e 11% a pagar a horas (https://blog.informadb.pt/2026/07/empresas-portuguesas-estao-entre-as-que-mais-se-atrasam-nos-pagamentos-em-todo-o-mundo/); base 35 dias assume SDD B2B",
   "commodities.azeite.canais.horeca_gourmet.provisao_credito_pct_vendas": "estimativa: SDD B2B sem direito a reembolso (https://europeanpaymentscouncil.eu/sites/default/files/kb/file/2024-11/EPC222-07%202025%20SDD%20B2B%20Rulebook%20version%201.0.pdf) + limites por cliente; ~66 mil empresas em risco de atraso >90 dias (https://jornaleconomico.sapo.pt/noticias/empresas-portuguesas-em-risco-de-atrasos-graves-disparam-para-66-mil-diz-informa-db/)",
-  "commodities.azeite.canais.distribuidores_export.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO): preço de compra de distribuidor para AOVE de origem em paletes; entre marca branca ES 5 L 3,99 EUR/kg s/ IVA (https://radarsuper.com/mercadona/p/aceite-oliva-virgen-extra-hacendado-garrafa-14727) e referência HoReCa 6,00",
-  "commodities.azeite.canais.distribuidores_export.desconto_efetivo": "estimativa: compradores profissionais negociam sobre o índice; desconto de 5% é o máximo compatível com margem positiva (01-desenho-do-modelo.md sec. 2)",
+  "commodities.azeite.canais.distribuidores_export.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO): preço de saída do embalador pela decomposição do Observatorio de la Cadena Alimentaria: granel 3,50 + embalamento 0,47-0,51 + margem líquida do embalador 0,19-0,50 = 4,16-4,51 EUR/kg (https://www.mapa.gob.es/dam/mapa/contenido/alimentacion/temas/consumo-y-tendencias-en-alimentacion/observatorio-cadena-alimentaria-abril-2016/estudios-e-informes/estudiodelacadenadevalordelaove2019-202008062021.pdf); marca branca ES 5 L 3,99 EUR/kg s/ IVA na prateleira (https://radarsuper.com/mercadona/p/aceite-oliva-virgen-extra-hacendado-garrafa-14727). Break-even do canal em regime: 4,29 EUR/kg; cada 0,10 EUR/kg vale ~178k EUR de EBITDA em 2031 (base, 1.790 t)",
+  "commodities.azeite.canais.distribuidores_export.desconto_efetivo": "0%: a referência já é o preço de saída do embalador; qualquer desconto põe o canal abaixo do break-even",
   "commodities.azeite.custos_fisicos_e_custodia.armazenagem_eur_t_mes": "estimativa pelo método de custo (inox amortizado + N2 + energia), intervalo 2-8 EUR/t/mês (40-risco-coberturas.md sec. 1.5); pedir cotação ao Lagar do Val",
   "commodities.azeite.custos_fisicos_e_custodia.seguro_stock_pct_ano": "estimativa 0,1-0,3%/ano (40-risco-coberturas.md sec. 4.5); NÃO VERIFICADO",
   "commodities.azeite.custos_fisicos_e_custodia.analise_fisico_quimica_painel_eur": "estimativa 300 EUR por análise completa + painel (40-risco-coberturas.md sec. 5.2); NÃO VERIFICADO",
   "commodities.azeite.custos_fisicos_e_custodia.desclassificacao_prob_por_trimestre": "estimativa 3%/5%/15%/30% a 3/6/12/18 meses x 0,30 EUR/kg (40-risco-coberturas.md sec. 5.2); diferencial AOVE-lampante 0,24 EUR/kg em 2026",
-  "commodities.azeite.custos_fisicos_e_custodia.inspecao_collateral_manager_eur_por_lote": "estimativa 300-1.500 EUR por inspeção (30-pagamentos-infra.md sec. 7.4); 1.200 EUR por lote = entrada + libertação",
-  "commodities.azeite.custos_fisicos_e_custodia.pagamentos_kyc_faturacao_eur_kg": "estimativa: rails bancários SEPA ~0-2 EUR por operação + KYC 300-1.200 EUR/mês no arranque (30-pagamentos-infra.md sec. 4.4 e 10.1) diluído no volume do piloto",
   "commodities.azeite.custos_fisicos_e_custodia.dias_pagamento_produtor": "Diretiva (UE) 2019/633 (https://eur-lex.europa.eu/eli/dir/2019/633/oj) e DL 76/2021 (https://sima.gpp.pt/images/Producao_e_Mercados/OrgProducao_CadeiaAlimentar/PARCA/DL_76_2021.pdf): máximo 30 dias perecíveis / 60 dias restantes; política Sprout 30 dias como vantagem comercial",
   "commodities.agua.litros_por_palete": "estimativa: palete de 500 garrafas de 1,5 L (formato varia por engarrafador)",
   "commodities.agua.preco_ex_fabrica_medio_eur_l": "inferência DGEG 2025: 479 MEUR / ~2.000 M L (https://www.dgeg.gov.pt/pt/destaques/aguas-em-numeros-estatisticas-dos-recursos-hidrogeologicos-e-geotermicos/)",
   "commodities.agua.preco_b2b_referencia_eur_l": "estimativa NÃO VERIFICADA (hipótese 0,30-0,60 EUR/L a saída do distribuidor; 10-mercado.md sec. 2.3)",
-  "commodities.agua.comissao_agente_pct_gmv": "estimativa: banda 0,5-3% de marketplace agente em commodity e 3-5% para serviço com logística do produtor (50-concorrencia.md sec. 8); sem verificação de mercado",
+  "commodities.agua.comissao_agente_pct_gmv": "estimativa [E]: base 2%, intervalo 0,5-3% (marketplace B2B agente em commodity, 50-concorrencia.md sec. 8, não verificado); 4-5% só com cotação real de um engarrafador",
   "commodities.agua.deposito_sdr_eur_por_embalagem": "SDR em vigor desde 10/04/2026, 0,10 EUR por embalagem < 3 L (https://www.ambienteonline.pt/destaques/sistema-de-deposito-e-reembolso-arranca-a-10-de-abril-de-2026)",
-  "commodities.agua.volume_paletes": "estimativa: piloto 20 paletes/mês; pessimista = descontinuar no gate (água sem margem de embalador a capturar: Diretiva 2009/54/CE, https://eur-lex.europa.eu/eli/dir/2009/54/oj)",
+  "commodities.agua.volume_paletes": "estimativa: piloto 60 paletes (25 HoReCa x 1.500-2.500 L por semestre = 37.500-62.500 L; 3.000-5.000 L/ano por cliente, 10-mercado.md sec. 5); pessimista = descontinuar no gate (água sem margem de embalador a capturar: Diretiva 2009/54/CE, https://eur-lex.europa.eu/eli/dir/2009/54/oj)",
   "commodities.cafe.ano_inicio": "EUDR aplicável a 30/12/2026 (grandes/médios) e 30/06/2027 (micro/pequenos) (https://www.hqts.com/eudr-postponed/); HoReCa presa a comodato/exclusividade (https://jurisprudencia.pt/acordao/220334/)",
   "commodities.cafe.preco_compra_eur_kg": "estimativa: KC 2,85 USD/lb a 09/10/2026 (https://www.macrotrends.net/2535/coffee-prices-historical-chart-data) = 6,28 USD/kg = 5,46 EUR/kg a 1,15 + diferencial, importação e logística ~1,5 EUR/kg (NÃO VERIFICADO)",
-  "commodities.cafe.preco_venda_eur_kg": "estimativa: margem bruta ~11% sobre a venda a microtorrefatores (modelo Algrano; 50-concorrencia.md sec. 2.1); NÃO VERIFICADO",
+  "commodities.cafe.preco_venda_eur_kg": "[E] NV, sem comparável verificado: margem bruta ~11% sobre a venda a microtorrefatores; as taxas e margens da Algrano estão como NV em 50-concorrencia.md sec. 2.1 e 8; hipótese a validar com 2-3 importadores da UE",
   "commodities.cafe.eurusd_trabalho": "BCE 1,1401 a 26/06/2026 (https://www.ecb.europa.eu/stats/exchange/eurofxref/shared/pdf/2026/06/20260626.pdf); valor de out. 2026 NÃO VERIFICADO",
   "commodities.cafe.volume_t": "estimativa: 92 empresas de torrefação em PT (https://blog.informadb.pt/2025/05/faturacao-do-setor-do-cafe-aumenta-69-em-2024-e-atinge-os-695-milhoes-de-euros/); 30-100 t/ano = 10-20 microtorrefatores",
-  "receitas.financiamento_stock_terceiros": "estimativa: comissão de estruturação/verificação de 1-2% do lote financiado (50-concorrencia.md sec. 12.2); banco parceiro como mutuante por causa da reserva de atividade de crédito (RGICSF; 40-risco-coberturas.md sec. 5.3)",
+  "receitas.financiamento_stock_terceiros": "estimativa: comissão de estruturação/verificação de 1-2% do lote financiado (50-concorrencia.md sec. 12.2); banco parceiro como mutuante por causa da reserva de atividade de crédito (RGICSF; 40-risco-coberturas.md sec. 5.3); custos diretos de verificação de 0,018 EUR/kg verificado (collateral manager 1.200 + análises 600 EUR por lote de 100 t) a LTV 60-65% (40-risco-coberturas.md sec. 5.3): margem líquida 2031 base ~18k EUR, não 100k",
   "receitas.dados_e_indice_eur": "estimativa conservadora; Mintec/Expana e Poolred já publicam preços (50-concorrencia.md sec. 2.1)",
   "financiamento.cupao_anual": "estimativa: custo de capital do investidor de 8%/ano usado no modelo de carry (40-risco-coberturas.md sec. 5.2); custo ECSP de retalho 10-13%/ano (50-concorrencia.md sec. 3.3); descida com historial",
   "financiamento.utilizacao_media_capital": "estimativa: capital levantado a 12-18 meses vs. rotação de stock de 2-4 meses (40-risco-coberturas.md sec. 5.1); cash sweep reduz capital parado",
-  "financiamento.capital_subordinado_patrocinador_pct": "40-risco-coberturas.md sec. 5.3 (P3: 10% skin in the game); piloto 20% porque a reserva começa vazia (stress test em 01-desenho-do-modelo.md sec. 4)",
+  "financiamento.capital_subordinado_patrocinador_pct": "40-risco-coberturas.md sec. 5.3 (P3: 10% skin in the game) em regime; 1.ª série 33% porque o subordinado é o capital social da SPV (50k) e a reserva começa vazia (stress test em 01-desenho-do-modelo.md sec. 4.4)",
   "financiamento.reserva_primeira_perda": "40-risco-coberturas.md sec. 5.3 (P3: 30% da margem bruta do lote, teto 5% do saldo vivo)",
   "financiamento.extensao": "40-risco-coberturas.md sec. 5.3 (P5) e sec. 8 (playbook): uma extensão de 6 meses, step-up +200-300 p.b., cash sweep 100%",
-  "financiamento.piloto": "Reg. (UE) 2017/1129 art. 1.º(4)(a)/(d) (https://eur-lex.europa.eu/eli/reg/2017/1129/oj/eng); MiFID II Anexo II (https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/mifid-ii/annex-ii); dimensão 100-150k EUR (40-risco-coberturas.md sec. 9.10)",
   "financiamento.retorno_investidor": "taxa liberatória de 28% sobre juros (singulares) e retenção de 25% (coletivas): conhecimento de referência [L], NÃO VERIFICADO online",
-  "financiamento.custos_spv": "estimativa: SA PT emitente com custo anual de 10-30k EUR e constituição de 15-40k EUR (20-regulatorio.md sec. 7.1)",
+  "financiamento.custos_spv": "estimativa: SA PT emitente com custo anual de 10-30k EUR e constituição de 15-40k EUR (20-regulatorio.md sec. 7.1); funções independentes (administrador, membro do Comité de Risco, representante comum) ~15-30k EUR/ano [E, NV]",
   "custos.transacao": "Lemonway preçário público (https://lemonway.com/en/pricing-marketplace); rails SEPA e SDD B2B (30-pagamentos-infra.md sec. 3.3-3.4); preços bancários PT NÃO VERIFICADOS",
   "custos.kyc": "estimativa [L/NV]: Sumsub ~1,35-1,85 USD, Veriff ~0,80-1,89 USD por verificação; KYB 3-10 EUR; screening 100-500 EUR/mês (30-pagamentos-infra.md sec. 4.2 e 4.4)",
-  "custos.seguro_credito": "estimativa 0,1-0,6% do volume seguro, prémio mínimo de alguns milhares de EUR (40-risco-coberturas.md sec. 4.2); NÃO VERIFICADO",
+  "custos.seguro_credito": "estimativa 0,1-0,6% do volume seguro, prémio mínimo de alguns milhares de EUR (40-risco-coberturas.md sec. 4.2); NÃO VERIFICADO; incluído no opex desde 2028 sobre todas as vendas de azeite (o stress test S3 de regime conta com ele)",
   "custos.hedge": "MFAO extinto, MIC XSRM expirado em jan. 2017 (https://www.tradinghours.com/mic/s/xsrm; https://www.einforma.com/informacion-empresa/mfao-rectora-mercado-futuros-aceite-oliva); ICE KC 37.500 lb (https://www.ice.com/products/15/Coffee-C-Futures); limite de 30% da margem bruta (40-risco-coberturas.md sec. 7)",
   "custos.pessoal.tsu_entidade_empregadora": "Código Contributivo, taxa contributiva global 34,75% (23,75% entidade empregadora): conhecimento de referência [L], NÃO reconfirmado online nesta sessão",
-  "custos.pessoal.outros_encargos_pct": "estimativa: seguro de acidentes de trabalho + medicina do trabalho + FGCT",
+  "custos.pessoal.outros_encargos_pct": "estimativa: seguro de acidentes de trabalho + medicina do trabalho + FGCT; subsídio de refeição à parte (custos.pessoal.subsidio_refeicao_eur_fte_ano; limites de isenção [L], https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/cirs_rep/Pages/irs2.aspx)",
   "custos.pessoal.funcoes": "estimativa de mercado PT 2026-27 (Lisboa/Porto), salário bruto anual com 14 meses; NÃO VERIFICADO contra guias salariais (pesquisa web indisponível). Responsável de Risco obrigatório antes da 1.ª emissão (40-risco-coberturas.md sec. 9.16)",
   "custos.opex_nao_salarial_eur": "estimativa: jurídico Y1 inclui parecer escrito, SPV e minutas (20-regulatorio.md sec. 11.14); segurança inclui pentest 5-15k e ISO 27001 15-50k no 1.º ano (30-pagamentos-infra.md sec. 8.4 e 10.1); restantes por custo de mercado",
   "custos.pre_arranque_2026_eur": "30-pagamentos-infra.md sec. 10.1 (auditoria do backoffice + pentest 10-25k; AIPD 3-8k) e 20-regulatorio.md sec. 7.1 (constituição PT SA 15-40k)",
   "capex.telemetria_eur_por_local": "estimativa 3.000-9.000 EUR por 4-6 sensores radar + gateway (30-pagamentos-infra.md sec. 10.1)",
   "capex.plataforma_desenvolvimento_capitalizavel_eur": "estimativa: reescrita clean-room de ledger, pagamentos e KYC (30-pagamentos-infra.md sec. 8.6) + portais",
-  "capital_de_giro.caixa_minima_operacional_eur": "estimativa: ~1,5 meses de opex do ano 1",
+  "capital_de_giro.caixa_minima_operacional_eur": "estimativa: ~2,5 meses de opex de 2027 (pessoal 401k + opex não salarial 319k = 60k/mês)",
   "capital_de_giro.iva": "AT: azeite 6% (https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/informacoes_vinculativas/despesa/civa/Documents/PIV_29955.pdf); água 13% (informação vinculativa 10884, http://www.fa-cont.com/INFORMACAO%20VINCULATIVA%2010884%20IVA%20AGUA%20GAS%20NATURAL%2013%25.pdf); café 23% inferido (20-regulatorio.md sec. 8.6)",
   "impostos.irc_taxa_geral": "conhecimento de referência [L]: redução de 1 p.p./ano aprovada em 2025 (19% 2026, 18% 2027, 17% 2028); NÃO reconfirmado online a 2026-10-13",
   "impostos.irc_taxa_pme_primeiros_50k": "conhecimento de referência [L]; NÃO reconfirmado",
@@ -1907,7 +1909,15 @@
   "impostos.derrama_estadual": "CIRC art. 87.º-A [L]: 3% / 5% / 9% acima de 1,5 / 7,5 / 35 MEUR",
   "impostos.reporte_prejuizos": "OE2023 [L]: sem limite temporal, dedução até 65% do lucro tributável",
   "stress_tests": "40-risco-coberturas.md sec. 1.3 (volatilidade, VaR) e sec. 5.2-5.4 (carry e stress tests); aplicação a série piloto em 01-desenho-do-modelo.md sec. 4",
-  "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7",
-  "resultados_referencia": "estimativa: cálculo determinístico a partir dos pressupostos deste ficheiro (volumes x preços x margens por canal; pessoal com TSU; opex com contingência e inflação; capital de giro por dias; obrigações = % do capital de giro; reserva = 5% das obrigações; impostos com reporte de prejuízos a 65%)"
+  "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7; volume dimensionado pelo consumo por cliente (150-300 L/ano azeite; 3.000-5.000 L/ano água; 10-mercado.md sec. 5); margens por canal de calculo_referencia.py",
+  "resultados_referencia": "estimativa: cálculo determinístico em docs/business-plan/modelo/calculo_referencia.py a partir dos pressupostos deste ficheiro (volumes por canal x preços x custos por kg; pessoal com TSU, subsídio de refeição e fundadores a 60% até ao gate; opex com contingência e inflação, custos da SPV e seguro de crédito; capital de giro por dias de stock médio; obrigações = % do capital de giro / utilização; capital próprio no capital de giro >= capital social da SPV; reserva = 5% das obrigações; impostos com reporte de prejuízos a 65%)",
+  "commodities.azeite.clientes_horeca_gourmet_ativos_medios": "estimativa [E]: piloto 33 clientes (fev.-jul. 2027); base dentro do SOM do ano 3 (1.000-2.000 clientes, 10-mercado.md sec. 5); otimista 3.000 em 2031 (4% das empresas)",
+  "commodities.azeite.canais.horeca_gourmet.dias_stock": "stock médio; 180 dias com < 300 clientes ativos (lote ou tranche HoReCa escoado em ~6 meses), 45 dias com >= 300 (escoamento uniforme em ~90 dias)",
+  "commodities.azeite.canais.horeca_gourmet.armazem_logistico_picking_eur_kg": "estimativa [E, NV]: armazenagem e picking em 3PL de encomendas de 20-50 kg (~2-4 EUR por encomenda); sensibilidade: cada +0,05 EUR/kg = -20,5k EUR de EBITDA em 2031 (base, 410 t)",
+  "commodities.azeite.canais.horeca_gourmet.inspecao_collateral_manager_eur_por_lote": "estimativa [E, NV]: 300-500 EUR por visita (30-pagamentos-infra.md sec. 7.4); entrada + ~3 libertações de tranche para o 3PL + fecho = 2.000 EUR por lote de 20 t",
+  "commodities.azeite.canais.distribuidores_export.dias_stock": "stock médio de 30 dias (paletes levantadas em ~60 dias)",
+  "commodities.azeite.canais.horeca_gourmet.pagamentos_bancarios_eur_kg": "estimativa: só comissões bancárias por operação SEPA (~0-2 EUR por operação; 30-pagamentos-infra.md sec. 4.4); KYC e faturação no fixo de tecnologia",
+  "financiamento.pct_capital_giro_azeite_financiado_por_notes": "CSC art. 348.º/2 [L, redação a reconfirmar no DRE: https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975]: só emitem obrigações sociedades registadas há mais de 1 ano, salvo fusão/cisão com sociedade registada há mais de 1 ano, maioria de capital público ou garantia de instituição de crédito ou do Estado; RGICSF art. 9.º só cobre obrigações \"nos termos e limites do CSC\" => 2027 = 0%",
+  "financiamento.primeira_serie": "Reg. (UE) 2017/1129 art. 1.º(4)(a)/(d) e art. 2.º al. e) (https://eur-lex.europa.eu/eli/reg/2017/1129/oj/eng): investidor qualificado a pedido = tratado como profissional por empresa de investimento ou instituição de crédito (MiFID II Anexo II, Secção II, https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/mifid-ii/annex-ii), que comunica a classificação ao emitente; a SPV e a OpCo não fazem opt-up. Subscritores >= 100k não profissionais são retalho para os PRIIPs (Reg. 1286/2014 art. 4.º(6), https://eur-lex.europa.eu/eli/reg/2014/1286/oj/eng). Capital social mínimo de SA 50.000 EUR (CSC art. 276.º/5) e realização mínima de 30% (art. 277.º/2) [L]. Dimensão 100-150k EUR (40-risco-coberturas.md sec. 9.10)"
  }
 }

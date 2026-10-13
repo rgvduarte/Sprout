@@ -118,7 +118,7 @@ function Tank({ unit, x, progress, inLot }: { unit: TelemetryUnit; x: number; pr
   return (
     <g>
       <rect x={x} y={top} width={w} height={h} rx={6} fill="color-mix(in oklab, var(--fg) 5%, var(--surface))" stroke={inLot ? 'var(--world-ink)' : line} strokeWidth={inLot ? 1.75 : 1.25} />
-      <motion.rect x={x + 3} y={top + 3} width={w - 6} height={h - 6} rx={4} fill="var(--world)" opacity={0.9} style={{ scaleY: fill, transformBox: 'fill-box', transformOrigin: '50% 100%' }} />
+      <motion.rect x={x + 3} y={top + 3} width={w - 6} height={h - 6} rx={4} fill="var(--world)" opacity={0.9} style={{ scaleY: fill, originX: 0.5, originY: 1 }} />
       {/* graduações a cada 25 % */}
       {[0.25, 0.5, 0.75].map((t) => (
         <line key={t} x1={x + 4} x2={x + 12} y1={top + h * (1 - t)} y2={top + h * (1 - t)} stroke={line} strokeWidth="1.25" />

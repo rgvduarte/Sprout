@@ -214,7 +214,8 @@ function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; 
   };
 
   const name = data.investor.nome;
-  const certDate = issued ? reqs[0].at : today;
+  const certDate = today;
+  const firstIssued = issued ? reqs[reqs.length - 1].at : undefined;
   const svg = def.kind === 'certificado' ? certificateSvg({ name, level: game.level.nome, points: game.points, date: fmtDate(certDate) }) : '';
   const download = () => {
     const blob = new Blob([certificateSvg({ name, level: game.level.nome, points: game.points, date: fmtDate(certDate), standalone: true })], { type: 'image/svg+xml' });
@@ -256,7 +257,7 @@ function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; 
         {def.kind === 'certificado' && (
           <>
             <div className="overflow-hidden rounded-sm border border-border" role="img" aria-label={`Certificado de ${game.level.nome} atribuído a ${name}, ${num(game.points)} pontos de conhecimento, ${fmtDate(certDate)}.`} dangerouslySetInnerHTML={{ __html: svg }} />
-            <p className="text-sm text-muted">{issued ? `Emitido a ${fmtDate(reqs[0].at)}. Descarregas a versão atualizada com os teus pontos de hoje.` : 'Atesta os conteúdos concluídos na Academia. Não é uma certificação profissional nem uma qualificação de investidor.'}</p>
+            <p className="text-sm text-muted">{firstIssued ? `Emitido pela primeira vez a ${fmtDate(firstIssued)}. Esta versão leva os teus pontos e a data de hoje.` : 'Atesta os conteúdos concluídos na Academia. Não é uma certificação profissional nem uma qualificação de investidor.'}</p>
           </>
         )}
 

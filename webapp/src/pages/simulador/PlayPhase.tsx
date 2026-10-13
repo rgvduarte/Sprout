@@ -9,7 +9,7 @@ import { pct, price } from '../../lib/format';
 import { MAX_MONTH, SEASON_NOTE, WINDOW, calendarMonth, getSimLot, monthLabel, shortName, unitsText } from './deck';
 import { simulateFull, type DecisionChoice, type LotSnap, type LotStatus, type MonthState, type SimRun } from './engine';
 import { DecisionCard, EndCard, EventCard, FlipIn, NoticeList, QuietMonth, StartCard } from './EventCards';
-import { SimCalendar } from './SimCalendar';
+import { SeasonStrip, SimCalendar } from './SimCalendar';
 import { ValueChart } from './ValueChart';
 import { fe, fes, fpct, refChange, SimBand } from './parts';
 
@@ -39,6 +39,7 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
   const finished = atStop && run.complete && !run.pending;
   const state = run.months.find((m) => m.month === month) ?? run.months[0];
   const pendingNow = run.pending && run.pending.month === month ? run.pending : undefined;
+  const anyExtended = state.lots.some((l) => l.extended);
 
   // a mesma campanha sem coberturas (linha de contexto no gráfico)
   const noHedge = useMemo(() => (run.allocations.some((a) => a.hedged) ? simulateFull(run.seed, run.allocations.map((a) => ({ ...a, hedged: false })), run.decisions) : undefined), [run.seed, run.allocations, run.decisions]);
@@ -77,7 +78,9 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
                   Avançar mês
                 </Button>
                 <Button variant="secondary" size="lg" onClick={() => advance(6)} disabled={atStop} title={blockedReason} iconRight={<ChevronsRight aria-hidden className="size-4" strokeWidth={1.75} />} className="max-sm:px-3">
-                  <span className="max-sm:hidden">Avançar </span>6 meses
+                  <span>
+                    <span className="max-sm:hidden">Avançar </span>6 meses
+                  </span>
                 </Button>
                 <Button variant="ghost" size="lg" onClick={() => advance(MAX_MONTH)} disabled={atStop} title={blockedReason} iconLeft={<FastForward aria-hidden className="size-4" strokeWidth={1.75} />} className="max-md:hidden">
                   Até ao fim
@@ -91,25 +94,12 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
             Há uma proposta por decidir em {monthLabel(month)}: escolhe uma opção em baixo para continuar.
           </p>
         )}
+        <SeasonStrip month={month} extended={anyExtended} className="mt-3" />
         <SimBand compact className="mt-2 md:hidden" />
         <p className="sr-only" aria-live="polite">
           {`Mês ${month}, ${monthLabel(month)}. ${spanEvents.map((e) => e.event.title).join('. ')}${pendingNow ? '. Há uma decisão por tomar.' : ''}${finished ? '. Campanha terminada.' : ''}`}
         </p>
       </div>
-
-      {/* ---------------- calendário ---------------- */}
-      <Card padding="md" aria-labelledby="cal-title">
-        <CardHeader
-          title={<span id="cal-title">Calendário da campanha</span>}
-          description={`Mês ${month} de ${WINDOW}${run.months.some((m) => m.lots.some((l) => l.extended)) ? ' (com extensão até ao mês 24)' : ''}. Bandas da estação, janela de 18 meses e o que cada lote já vendeu.`}
-          actions={
-            <Button variant="ghost" size="sm" onClick={onAbandon} iconLeft={<Undo2 aria-hidden className="size-4" strokeWidth={1.75} />}>
-              Voltar à preparação
-            </Button>
-          }
-        />
-        <SimCalendar run={run} month={month} />
-      </Card>
 
       {/* ---------------- este mês + lotes ---------------- */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
@@ -151,6 +141,20 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
 
         <LotsPanel state={state} budget={budget} invested={run.invested} />
       </div>
+
+      {/* ---------------- calendário ---------------- */}
+      <Card padding="md" aria-labelledby="cal-title">
+        <CardHeader
+          title={<span id="cal-title">Calendário da campanha</span>}
+          description={`Mês ${month} de ${WINDOW}${anyExtended ? ' (com extensão até ao mês 24)' : ''}. Bandas da estação, janela de 18 meses e o que cada lote já vendeu.`}
+          actions={
+            <Button variant="ghost" size="sm" onClick={onAbandon} iconLeft={<Undo2 aria-hidden className="size-4" strokeWidth={1.75} />}>
+              Voltar à preparação
+            </Button>
+          }
+        />
+        <SimCalendar run={run} month={month} />
+      </Card>
 
       {/* ---------------- gráfico + diário ---------------- */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
@@ -251,21 +255,18 @@ function LotRow({ snap }: { snap: LotSnap }) {
         <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-2 text-sm min-[480px]:grid-cols-3">
           <div className="min-w-0">
             <dt className="text-muted">Por vender</dt>
-            <dd className="font-mono text-fg tnum">
-              {unitsText(lot, snap.units)} <span className="text-muted">de {unitsText(lot, snap.totalUnits)}</span>
-            </dd>
+            <dd className="font-mono text-fg tnum">{unitsText(lot, snap.units)}</dd>
+            <dd className="font-mono text-muted tnum">de {unitsText(lot, snap.totalUnits)}</dd>
           </div>
           <div className="min-w-0">
             <dt className="text-muted">Referência</dt>
-            <dd className="font-mono text-fg tnum">
-              {refChange(snap.priceIndex)} <span className="text-muted">· {price(snap.price, lot.priceUnit)}</span>
-            </dd>
+            <dd className="font-mono text-fg tnum">{refChange(snap.priceIndex)}</dd>
+            <dd className="font-mono text-muted tnum">{price(snap.price, lot.priceUnit)}</dd>
           </div>
           <div className="min-w-0">
             <dt className="text-muted">Liquidação estimada</dt>
-            <dd className="font-mono text-fg tnum">
-              {fe(snap.value)} <span className="text-muted">({fpct(snap.result)})</span>
-            </dd>
+            <dd className="font-mono text-fg tnum">{fe(snap.value)}</dd>
+            <dd className="font-mono text-muted tnum">{fpct(snap.result)}</dd>
           </div>
         </dl>
         {flags.length > 0 && (

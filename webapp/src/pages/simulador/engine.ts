@@ -123,8 +123,10 @@ export interface Pending {
   month: number;
   simLotId: string;
   kind: DecisionKind;
-  /** resultado previsto do lote (fração) no momento da proposta */
+  /** resultado previsto do lote para os co-financiadores (fração), já com a reserva */
   projected: number;
+  /** resultado bruto previsto do lote (fração), antes da partilha e da reserva */
+  gross: number;
   priceIndex: number;
   rem: number;
   /** meses de extensão propostos */
@@ -468,7 +470,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
       if (G >= -RESERVE) continue;
       const choice = decide(l, 'refunding');
       if (!choice && stopAtPending) {
-        pending = { month: t, simLotId: l.lot.id, kind: 'refunding', projected: investorPerEur(G, reserve).value - 1, priceIndex: priceIdx(l), rem: l.rem };
+        pending = { month: t, simLotId: l.lot.id, kind: 'refunding', projected: investorPerEur(G, reserve).value - 1, gross: G, priceIndex: priceIdx(l), rem: l.rem };
         break;
       }
       if ((choice ?? 'aprovar') === 'aprovar') {
@@ -528,7 +530,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
           const extMonths = priceTrig ? SIM_RULES.extension.maxMonths : Math.min(SIM_RULES.extension.maxMonths, Math.max(2, Math.ceil(l.rem * 10)));
           const choice = decide(l, 'extensao');
           if (!choice && stopAtPending) {
-            pending = { month: t, simLotId: l.lot.id, kind: 'extensao', projected: lotValue(l, reserve).result, priceIndex: P, rem: l.rem, extMonths };
+            pending = { month: t, simLotId: l.lot.id, kind: 'extensao', projected: lotValue(l, reserve).result, gross: grossPerEur(l) - 1, priceIndex: P, rem: l.rem, extMonths };
             break;
           }
           if ((choice ?? 'aprovar') === 'aprovar') {

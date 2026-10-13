@@ -290,7 +290,7 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
           <LotGauge kind={lot.world} value={alloc.amount / SIM_RULES.maxPerLot} size="md" showScale={false} className="w-[72px] sm:w-[112px]" label={`${shortName(lot.id)}: parte do teto por lote`} valueText={`${fe(alloc.amount)} de ${fe(SIM_RULES.maxPerLot)}`} />
         </div>
         <div className="min-w-0">
-          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
             <div className="min-w-0">
               <h4 id={titleId} className="text-[1.0625rem] leading-snug">
                 {lot.nome}
@@ -372,7 +372,7 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
               checked={alloc.hedged && lot.hedge.available}
               onChange={onHedge}
               disabled={!lot.hedge.available || !selected}
-              label={lot.hedge.available ? `Cobertura: ${lot.hedge.label.toLowerCase()}` : 'Sem cobertura disponível'}
+              label={lot.hedge.available ? `Cobertura: ${lot.hedge.label.charAt(0).toLowerCase()}${lot.hedge.label.slice(1)}` : 'Sem cobertura disponível'}
               description={`Fixa o preço de ${pct(lot.hedge.coverage, 0)} do volume. Custa ${pct(lot.hedge.costPct, 1)} do montante, haja choque ou não.`}
               disabledReason={lot.hedge.available ? 'Junta o lote à carteira para escolher a cobertura.' : `O preço da água oscila cerca de ± ${pct(lot.monthlyVolatility, 1)} ao mês: não há instrumento nem razão para cobrir.`}
             />

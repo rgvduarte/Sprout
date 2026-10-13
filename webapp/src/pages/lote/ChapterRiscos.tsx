@@ -6,7 +6,7 @@ import type { RiskFactor } from '../../data/types';
 import { EASE_OUT } from '../../components/game';
 import { Badge, Button, ButtonLink, TextLink } from '../../components/ui';
 import { cn } from '../../lib/cn';
-import { kg, num, pct } from '../../lib/format';
+import { kg, num, pct, tidyText } from '../../lib/format';
 import { useGame, useRole } from '../../state';
 import { marginSplit, priceDecimals, simLotFor } from './model';
 import { ChapterHeading, CheckMark, useDwell, useJourney, Wrap } from './shared';
@@ -162,7 +162,7 @@ function Hedge() {
           <p className="mt-3 text-sm font-semibold text-fg">O que está coberto</p>
           <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted marker:text-world-ink">
             {covered.map((c) => (
-              <li key={c}>{c}</li>
+              <li key={c}>{tidyText(c)}</li>
             ))}
           </ul>
         </>
@@ -170,7 +170,7 @@ function Hedge() {
       <p className="mt-3 text-sm font-semibold text-fg">O que não está coberto</p>
       <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted marker:text-muted">
         {notCovered.map((c) => (
-          <li key={c}>{c}</li>
+          <li key={c}>{tidyText(c)}</li>
         ))}
       </ul>
     </div>
