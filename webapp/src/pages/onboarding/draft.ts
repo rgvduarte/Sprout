@@ -241,7 +241,7 @@ export const EXAMPLE: Record<Tipo, Partial<Draft>> = {
     tipo: 'pessoa-singular',
     nome: 'Rita Pacheco Lemos',
     nif: '238 471 055',
-    nascimento: '1979-04-17',
+    nascimento: '17/04/1979',
     nacionalidade: 'Portuguesa',
     email: 'rita.lemos@example.com',
     telefone: '+351 913 408 271',

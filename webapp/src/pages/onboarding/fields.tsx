@@ -34,8 +34,12 @@ export function TF({
   return (
     <Field
       id={`ob-${k}`}
-      label={<Lbl ex={p.isEx(k)}>{label}</Lbl>}
-      required={required}
+      label={
+        <>
+          <Lbl ex={p.isEx(k)}>{label}</Lbl>
+          {!required && <span className="text-muted"> (opcional)</span>}
+        </>
+      }
       error={error}
       hint={
         valid ? (
@@ -85,7 +89,7 @@ export function SF({
 }) {
   const opts = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o));
   return (
-    <Field id={`ob-${k}`} label={<Lbl ex={p.isEx(k)}>{label}</Lbl>} required error={p.err(k)} hint={hint} className={className}>
+    <Field id={`ob-${k}`} label={<Lbl ex={p.isEx(k)}>{label}</Lbl>} error={p.err(k)} hint={hint} className={className}>
       {({ id, describedBy, invalid }) => (
         <Select
           id={id}

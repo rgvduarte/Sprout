@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { getLot, getProducersByWorld, getWorld, isWorldId } from '../../data';
 import type { Lot, WorldId } from '../../data/types';
 import { ButtonLink, Card, CardHeader, CommodityChip, CommodityGlyph, Page, PageHeader, RiskNote, Section, StatusPill } from '../../components/ui';
@@ -209,7 +209,7 @@ function UnknownWorld({ slug }: { slug: string }) {
                   <span className="block font-display text-[1.1875rem] font-bold text-fg">{w.nome}</span>
                   <span className="block text-sm text-muted">{w.tagline}</span>
                 </span>
-                <ArrowUpRight aria-hidden className="size-5 shrink-0 text-muted group-hover:text-fg" strokeWidth={1.75} />
+                <ArrowRight aria-hidden className="size-5 shrink-0 text-muted group-hover:text-fg" strokeWidth={1.75} />
               </Link>
             </li>
           );

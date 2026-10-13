@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { ArrowUpRight, BookOpen, CalendarRange, CircleCheck, Puzzle } from 'lucide-react';
 import { Button, TextLink } from '../../components/ui';
-import { LevelGlyph, OriginSeal, QuestList, WaxSealStamp, EASE_OUT, useRichMotion } from '../../components/game';
+import { LevelGlyph, OriginSeal, QuestList, WaxSealStamp, DUR, EASE_OUT, useRichMotion } from '../../components/game';
 import type { SealView } from '../../state';
 import { useGame } from '../../state';
 import { hashString } from '../../lib/prng';
@@ -99,12 +99,12 @@ export function Spread({ campaign, dir, render }: { campaign: CampaignId; dir: n
   useEffect(() => {
     if (!prev) return;
     progress.set(0);
-    const ctl = animate(progress, 1, { duration: 0.64, ease: EASE_OUT, onComplete: () => setPrev(null) });
+    const ctl = animate(progress, 1, { duration: DUR.focal + 0.1, ease: EASE_OUT, onComplete: () => setPrev(null) });
     return () => ctl.stop();
   }, [prev, shown, progress]);
   const clip = useTransform(progress, (v) => (dir >= 0 ? `inset(0% 0% 0% ${((1 - v) * 100).toFixed(2)}%)` : `inset(0% ${((1 - v) * 100).toFixed(2)}% 0% 0%)`));
   const edgeX = useTransform(progress, (v) => `${(dir >= 0 ? 1 - v : v) * 100}%`);
-  const edgeOpacity = useTransform(progress, [0, 0.85, 1], [1, 1, 0]);
+  const edgeOpacity = useTransform(progress, [0, 0.9, 1], [1, 1, 0]);
   const idx = CAMPAIGNS.findIndex((c) => c.id === shown);
   const frame = 'rounded-md border border-border bg-surface';
 

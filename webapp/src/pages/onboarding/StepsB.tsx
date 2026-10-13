@@ -181,7 +181,7 @@ export function StepBeneficiario(p: StepProps) {
         )}
         {d.pep && d.pep !== 'nao' && (
           <Appear className="mt-4 flex flex-col gap-3">
-            <Field id="ob-pepDetalhe" label="Cargo, país e período, ou relação com a pessoa exposta" required error={err('pepDetalhe')}>
+            <Field id="ob-pepDetalhe" label="Cargo, país e período, ou relação com a pessoa exposta" error={err('pepDetalhe')}>
               {({ id, describedBy, invalid }) => (
                 <Textarea id={id} aria-describedby={describedBy} invalid={invalid} value={d.pepDetalhe} onChange={(e) => set({ pepDetalhe: e.target.value })} onBlur={() => p.touch('pepDetalhe')} />
               )}
@@ -195,7 +195,7 @@ export function StepBeneficiario(p: StepProps) {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field id="ob-origemFundos" label={<Lbl ex={isEx('origemFundos')}>Origem principal dos fundos</Lbl>} required error={err('origemFundos')} hint="De onde vem o dinheiro que vais transferir para a conta segregada.">
+        <Field id="ob-origemFundos" label={<Lbl ex={isEx('origemFundos')}>Origem principal dos fundos</Lbl>} error={err('origemFundos')} hint="De onde vem o dinheiro que vais transferir para a conta segregada.">
           {({ id, describedBy, invalid }) => (
             <Select
               id={id}

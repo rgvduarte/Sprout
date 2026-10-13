@@ -1,7 +1,7 @@
 import { INVESTOR_SHARE, SIM_RULES } from '../../data';
 import type { SimEvent, SimLot, WorldId } from '../../data/types';
 import { createRng, type Rng } from '../../lib/prng';
-import { eur, num, pct } from '../../lib/format';
+import { eur, num, pct, tidyText } from '../../lib/format';
 import { DECK_EVENTS, EVENT_SCOPE, EXCLUSIVE, MAX_MONTH, SCENARIO_LOTS, WINDOW, buyerPriceOf, getSimLot, monthLabel, shortName, unitsText, amountToUnits } from './deck';
 
 /* =====================================================================
@@ -303,7 +303,7 @@ function effectNote(ev: SimEvent, l: LotSim, t: number, extra: { lost?: number; 
   if (fx.demand) parts.push(`Vende ${fx.demand.monthsFaster} meses mais cedo, com prémio de ${pct(fx.demand.premium, 0)}.`);
   if (fx.extraCost) parts.push(`Custo extra de ${pct(fx.extraCost, 1)} do montante (${eur(fx.extraCost * l.amount, { decimals: 0 })}).`);
   void t;
-  return parts.join(' ');
+  return tidyText(parts.join(' '));
 }
 
 /* ------------------------------------------------------------ simulação */
@@ -377,7 +377,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
         l.rem = 0;
         l.settledAt = t;
         const v = lotValue(l, reserve);
-        notices.push({ kind: 'liquidado', simLotId: l.lot.id, month: t, text: `Lote liquidado: ${eur(v.value, { decimals: 0 })} fictícios (${pct(v.result, 1, { sign: true })}).` });
+        notices.push({ kind: 'liquidado', simLotId: l.lot.id, month: t, text: tidyText(`Lote liquidado: ${eur(v.value, { decimals: 0 })} fictícios (${pct(v.result, 1, { sign: true })}).`) });
       }
     }
   };
@@ -493,7 +493,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
         l.s = newS;
         l.e = Math.min(MAX_MONTH, Math.max(l.e + shift, l.s));
         l.pausedUntil = t + REFUNDING_PAUSE;
-        notices.push({ kind: 'refunding', simLotId: l.lot.id, month: t, text: `Ronda de refunding aprovada: a armazenagem fica refinanciada ${REFUNDING_PAUSE} meses à espera de melhor preço. Custo de ${eur(REFUNDING_COST * l.amount, { decimals: 0 })}.` });
+        notices.push({ kind: 'refunding', simLotId: l.lot.id, month: t, text: tidyText(`Ronda de refunding aprovada: a armazenagem fica refinanciada ${REFUNDING_PAUSE} meses à espera de melhor preço. Custo de ${eur(REFUNDING_COST * l.amount, { decimals: 0 })}.`) });
       } else {
         l.refundingDeclined = true;
         notices.push({ kind: 'refunding-recusado', simLotId: l.lot.id, month: t, text: 'Refunding recusado: o lote continua a vender ao preço de mercado.' });
@@ -524,10 +524,10 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
           kind: 'vendas',
           simLotId: l.lot.id,
           month: t,
-          text: `Primeiras vendas: ${unitsText(l.lot, f * amountToUnits(l.lot, l.amount))} a ${num(buyerPriceOf(l.lot, INVESTOR_SHARE) * priceIdx(l), l.lot.priceUnit === 'L' ? 3 : 2)} €/${l.lot.priceUnit}.`,
+          text: tidyText(`Primeiras vendas: ${unitsText(l.lot, f * amountToUnits(l.lot, l.amount))} a ${num(buyerPriceOf(l.lot, INVESTOR_SHARE) * priceIdx(l), l.lot.priceUnit === 'L' ? 3 : 2)} €/${l.lot.priceUnit}.`),
         });
       } else if (l.pausedUntil > 0 && t === l.pausedUntil + 1) {
-        notices.push({ kind: 'retoma', simLotId: l.lot.id, month: t, text: `Fim da pausa do refunding: as vendas retomam com a referência ${pct(priceIdx(l) - 1, 0, { sign: true })} face à entrada.` });
+        notices.push({ kind: 'retoma', simLotId: l.lot.id, month: t, text: tidyText(`Fim da pausa do refunding: as vendas retomam com a referência ${pct(priceIdx(l) - 1, 0, { sign: true })} face à entrada.`) });
       }
     }
 
@@ -554,7 +554,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
               kind: 'extensao',
               simLotId: l.lot.id,
               month: t,
-              text: `Extensão de ${extMonths} meses: ${priceTrig ? `a referência está ${pct(1 - P, 0)} abaixo da entrada` : `faltam vender ${pct(l.rem, 0)} do stock`}. Custa 0,3 % do montante por mês.`,
+              text: tidyText(`Extensão de ${extMonths} meses: ${priceTrig ? `a referência está ${pct(1 - P, 0)} abaixo da entrada` : `faltam vender ${pct(l.rem, 0)} do stock`}. Custa 0,3 % do montante por mês.`),
             });
             continue;
           }
@@ -564,7 +564,7 @@ export function simulate(seed: number, allocations: Allocation[], decisions: Dec
         sold.set(l.lot.id, (sold.get(l.lot.id) ?? 0) + l.rem);
         l.rem = 0;
         l.fireSale = true;
-        notices.push({ kind: 'venda-fecho', simLotId: l.lot.id, month: t, text: `Venda de fecho no mês 18: ${unitsText(l.lot, units)} vendidos com ${pct(FIRE_SALE_DISCOUNT, 0)} de desconto.` });
+        notices.push({ kind: 'venda-fecho', simLotId: l.lot.id, month: t, text: tidyText(`Venda de fecho no mês 18: ${unitsText(l.lot, units)} vendidos com ${pct(FIRE_SALE_DISCOUNT, 0)} de desconto.`) });
       }
       if (pending) {
         settle(t, notices);

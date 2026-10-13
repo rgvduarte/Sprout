@@ -146,21 +146,21 @@ export interface SimPhysical {
 export function simPhysical(lot: SimLot, amount: number): SimPhysical {
   if (lot.world === 'azeite') {
     const kgv = eurToKg(amount, lot.fundingPrice);
-    return { units: kgv, unitLabel: 'kg', primary: `${num(kgv)} kg`, secondary: `≈ ${num(kgToBottles(kgv))} garrafas de 0,75 L` };
+    return { units: kgv, unitLabel: 'kg', primary: `${num(kgv)}\u00a0kg`, secondary: `≈\u00a0${num(kgToBottles(kgv))}\u00a0garrafas de 0,75\u00a0L` };
   }
   if (lot.world === 'agua') {
     const paletes = eurToPaletes(amount, lot.fundingPrice);
-    return { units: paletes, unitLabel: 'paletes', primary: `${num(paletes, 1)} paletes`, secondary: `≈ ${num(Math.floor(paletes * PALETE.garrafas))} garrafas de 1,5 L` };
+    return { units: paletes, unitLabel: 'paletes', primary: `${num(paletes, 1)}\u00a0paletes`, secondary: `≈\u00a0${num(Math.floor(paletes * PALETE.garrafas))}\u00a0garrafas de 1,5\u00a0L` };
   }
   const sacas = eurToSacas(amount, lot.fundingPrice);
-  return { units: sacas, unitLabel: 'sacas', primary: `${num(sacas, 1)} sacas`, secondary: `≈ ${num(sacas * SACA_KG)} kg de café verde` };
+  return { units: sacas, unitLabel: 'sacas', primary: `${num(sacas, 1)}\u00a0sacas`, secondary: `≈\u00a0${num(sacas * SACA_KG)}\u00a0kg de café verde` };
 }
 
 /** Quantidade física em texto curto, na unidade do lote. */
 export function unitsText(lot: SimLot, units: number): string {
-  if (lot.world === 'azeite') return `${num(units)} kg`;
-  if (lot.world === 'agua') return `${num(units, 1)} paletes`;
-  return `${num(units, 1)} sacas`;
+  if (lot.world === 'azeite') return `${num(units)}\u00a0kg`;
+  if (lot.world === 'agua') return `${num(units, 1)}\u00a0paletes`;
+  return `${num(units, 1)}\u00a0sacas`;
 }
 
 /** Montante → unidades do lote. */

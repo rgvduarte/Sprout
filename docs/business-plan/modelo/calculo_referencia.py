@@ -180,14 +180,13 @@ def run(P, s):
     cmin = P["capital_de_giro"]["caixa_minima_operacional_eur"]
     vale = -min(0.0, min(o["cash_flow_acionista_acumulado"]))
     o["necessidade_capital_proprio"] = pre + k_spv + cmin + vale
-    o["vale_no_horizonte"] = min(o["cash_flow_acionista_acumulado"]) > o["cash_flow_acionista_acumulado"][-1] - 1  # True se o mínimo é o último ano
     return o
 
 
 def lote_tipo(P, s="base", y=2):
     """Lote de 20 t HoReCa/gourmet: piloto (2027, sem obrigações) e regime (ano y, com obrigações)."""
     out = {}
-    for tag, yy, pct in [("piloto_2027", 0, 0.0), ("regime", y, P["financiamento"]["pct_capital_giro_azeite_financiado_por_notes"][s][y])]:
+    for tag, yy, pct in [("piloto_2027", 0, 0.0), (f"regime_{YEARS[y]}", y, P["financiamento"]["pct_capital_giro_azeite_financiado_por_notes"][s][y])]:
         out[tag] = {"horeca_gourmet": channel_kg(P, "horeca_gourmet", s, yy, pct),
                     "distribuidores_export": channel_kg(P, "distribuidores_export", s, yy, pct)}
     return out

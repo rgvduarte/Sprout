@@ -2,7 +2,7 @@ import { RadioGroup } from '../../components/ui';
 import { CARGOS, docSlotsFor, ENTIDADES, EXAMPLE, isColetiva, NACIONALIDADES, PAISES, type Tipo } from './draft';
 import { SF, TF } from './fields';
 import { FieldGroup, FileDrop, Lbl, type StepProps } from './parts';
-import { formatCertidao, formatIban, formatNif, formatPostal } from './validation';
+import { formatCertidao, formatDateInput, formatIban, formatNif, formatPostal } from './validation';
 
 /* ------------------------------------------------------------ 1 · Perfil */
 
@@ -74,7 +74,7 @@ export function StepDados(p: StepProps) {
             <>
               <TF k="nome" label="Nome completo" p={p} autoComplete="name" className="sm:col-span-2" />
               <TF k="nif" label="NIF" p={p} inputMode="numeric" format={formatNif} okHint="Algarismo de controlo confirmado" maxLength={11} />
-              <TF k="nascimento" label="Data de nascimento" p={p} type="date" autoComplete="bday" max="2008-10-13" />
+              <TF k="nascimento" label="Data de nascimento" p={p} inputMode="numeric" autoComplete="bday" placeholder="dd/mm/aaaa" maxLength={10} format={formatDateInput} />
               <SF k="nacionalidade" label="Nacionalidade" p={p} options={NACIONALIDADES} />
             </>
           )}

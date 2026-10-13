@@ -87,7 +87,7 @@ export function PlayPhase({ run, month, budget, onAdvance, onDecide, onOpenDebri
           <p className="min-w-0 text-sm">
             <span className="block font-semibold text-fg">Mês {month} de {WINDOW}</span>
             <span className="block truncate text-muted">
-              <span className="font-mono tnum">{month === 0 ? 'out. 2026' : monthLabel(month)}</span> · dinheiro fictício
+              <span className="font-mono tnum">{month === 0 ? 'out. 2026' : monthLabel(month)}</span> · fictício
             </span>
           </p>
           <Controls finished={finished} atStop={atStop} blockedReason={blockedReason} onAdvance={advance} onOpenDebrief={onOpenDebrief} compact />

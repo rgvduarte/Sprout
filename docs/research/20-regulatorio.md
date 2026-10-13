@@ -129,14 +129,15 @@
   - carteira **> €500.000**;
   - ≥1 ano no setor financeiro.
 
-  A Sprout deve documentar esta avaliação, não presumi-la.
+  Esse tratamento (pedido escrito, aviso escrito e avaliação) é concedido por uma **empresa de investimento ou instituição de crédito**, não pelo emitente. O Reg. 2017/1129, art. 2.º, al. e), 2.ª frase, prevê que estas entidades comuniquem ao emitente, a pedido, a classificação dos seus clientes [L]. A Sprout (SPV ou OpCo) não é intermediário: **não faz o *opt-up***. Aceita como qualificado só quem seja profissional *per se* ou já esteja classificado como profissional por um banco ou empresa de investimento, com a declaração escrita dessa entidade guardada.
 
 ### 2.5 PRIIPs (Reg. 1286/2014)
 
 - O regulamento abrange produtos cujo montante reembolsável varia com valores de referência ou com o desempenho de ativos **"que não são diretamente adquiridos pelo investidor de retalho"**. Ativos detidos diretamente ficam fora [F] [S23].
 - **Implicação [I]:**
   - notes ou empréstimos com retorno ligado ao preço do azeite, vendidos a retalho → **KID obrigatório**;
-  - propriedade direta do lote pelo investidor → em princípio fora dos PRIIPs, mas com os problemas fiscais e de OIC descritos em 2.2 e 8.6.
+  - propriedade direta do lote pelo investidor → em princípio fora dos PRIIPs, mas com os problemas fiscais e de OIC descritos em 2.2 e 8.6;
+  - **as isenções de prospeto do art. 1.º(4) afastam o prospeto, não os PRIIPs** [L]. O investidor de retalho dos PRIIPs é o cliente não profissional da MiFID (art. 4.º(6) → MiFID II, art. 4.º(1)(11)). Quem subscreve ≥ €100k sem ser profissional (al. d)) e os até 149 não qualificados por Estado-Membro (al. b)) são retalho. *Notes* de *limited recourse* reembolsadas pelo resultado dos lotes da SPV são provavelmente PRIIP (montante reembolsável exposto a ativos que o investidor não adquire diretamente): KID devido a esses subscritores, salvo parecer em contrário.
 
 ### 2.6 Reserva bancária: receção de depósitos ou outros fundos reembolsáveis
 
@@ -223,8 +224,8 @@
   - proíbe pagar ou receber em numerário valores **≥ €3.000**, em qualquer transação;
   - o limite é **€10.000** para não residentes que não atuem como empresários;
   - pagamentos fracionados agregam-se;
-  - faturas **≥ €1.000** de sujeitos passivos com contabilidade organizada pagam-se por meio que identifique o destinatário;
   - coima: €180–€4.500 (RGIT, art. 129.º(3)).
+- **LGT, art. 63.º-C, n.º 3** (contas bancárias afetas à atividade dos sujeitos passivos com contabilidade organizada) [L]: faturas **≥ €1.000** de sujeitos passivos com contabilidade organizada pagam-se por meio que identifique o destinatário (transferência, cheque nominativo ou débito direto).
 - **AMLR, art. 80.º:** teto UE de **€10.000** a partir de 10-07-2027. Os Estados-Membros podem fixar valores inferiores, e Portugal mantém €3.000 [F/L] [S43].
 - **Política Sprout [I]:** **zero numerário.** É coerente com a "proibição de cash-in-transit" do documento-fonte.
 
@@ -305,7 +306,7 @@
 1. Promover junto de retalho ("jogadores") lotes com "retorno de 10–15%", "capital protegido" ou "refunding", sem a via ECSP, prospeto ou intermediário autorizado.
 2. Rankings de rentabilidade, *streaks*, *badges* associados a investimento, notificações de "oportunidade a expirar", confetti em retornos.
 3. Finfluenciadores pagos para falar do produto de investimento.
-4. Usar "investidor qualificado" como etiqueta de marketing, sem a avaliação do Anexo II.
+4. Usar "investidor qualificado" como etiqueta de marketing, sem a categoria *per se* documentada ou a classificação de profissional feita por banco ou empresa de investimento.
 5. Contar com *reverse solicitation* para investidores fora de Portugal.
 
 ---
@@ -318,13 +319,13 @@
 |---|---|---|---|---|
 | Veículo-tipo | SA emitente de obrigações (CSC); **STC/FTC** (DL 453/99, alterado pelo DL 77/2026), mas só para **créditos** | **Veículo de titularização** (Lei de 22-03-2004, alterada em 2022, em vigor desde 8-03-2022): compartimentos; risco de quaisquer ativos [F/L] [S62] | **Sec. 110 TCA 1997**: ativos qualificados incluem *commodities*; mínimo de **€10M** de ativos na primeira aquisição [F] [S63] | *Offshore* SPV / emissor de *tokens* |
 | Licença | SA: nenhuma, se a colocação for privada; STC: autorização CMVM | Só precisa de autorização CSSF se emitir **ao público** e **de forma contínua**: público = não profissionais + denominação < €100k + sem colocação privada; contínuo = **> 3 emissões por exercício** [F] [S62] | Notificação à Revenue; sem licença para colocação privada | Licença local (por ex., VARA). **Sem passaporte UE**; MiCA (ART) se oferecer *tokens* na UE [F/L] [S67] |
-| Investidores possíveis | Qualificados / ≥€100k / <150 por Estado-Membro; retalho com prospeto ou abaixo de €12M e intermediário | Profissionais ou colocação privada sem autorização; retalho exige autorização CSSF | Profissionais / colocação privada | **Na UE, os mesmos limites** (a lei aplica-se onde está o investidor) |
+| Investidores possíveis | Qualificados / ≥€100k (retalho para os PRIIPs) / <150 por Estado-Membro; retalho com prospeto ou abaixo de €12M e intermediário | Profissionais ou colocação privada sem autorização; retalho exige autorização CSSF | Profissionais / colocação privada | **Na UE, os mesmos limites** (a lei aplica-se onde está o investidor) |
 | Encaixe com *commodities* | Bom para OpCo e SA; STC não serve para stock físico, só para recebíveis | Muito bom (desenhado para risco de ativos diversos) [I] | Uma fonte diz que só valem *commodities* negociadas em **bolsa reconhecida**; o azeite não é [F/NV] [S63] | — |
 | Bancos e rails UE | Ótimo | Ótimo | Ótimo | **Risco elevado**: *de-risking*, diligência reforçada; as **BVI estão na lista UE de alto risco desde 29-01-2026** [F] [S44] |
 | Repatriação de fundos | Nula | Nula | Nula | **Alta**: "dinheiro preso", origem de fundos, VoP e IBAN de PSP fora da UE [I] |
 | Custo de constituição | €15–40k [E] | €40–100k; €15–30k por compartimento em plataformas multi-emissão [E/NV] | €40–80k [E] | Baixo no arranque, alto no custo bancário e reputacional [E] |
 | Custo anual | €10–30k [E] | €40–80k [E] | €40–80k [E] | — |
-| Prazo | 1–2 meses [E] | 2–4 meses [E] | 2–3 meses [E] | 1–2 meses, mas meses ou anos para conseguir banco UE [E] |
+| Prazo | Constituição 1–2 meses [E]; **1.ª emissão de obrigações só 12 meses após o registo definitivo**, salvo garantia de instituição de crédito (CSC art. 348.º/2 [L]) | 2–4 meses [E] | 2–3 meses [E] | 1–2 meses, mas meses ou anos para conseguir banco UE [E] |
 
 ### 7.2 Notas de estrutura
 
@@ -447,10 +448,14 @@ P2. O retorno está prometido/fixo e o capital é "reembolsável" (incl. "refund
 P3. Quem são os investidores?
  ├─ Só QUALIFICADOS, ou ticket ≥ €100k, ou <150 não-qualificados por Estado-Membro
  │     → C. SPV NOTES / PRIVATE PLACEMENT
- │        • Sem prospeto (art. 1.º(4)(a)/(b)/(c)/(d)); sem KID (não-retalho)
+ │        • Sem prospeto (art. 1.º(4)). Sem KID só se TODOS os subscritores forem profissionais/qualificados;
+ │          nas vias ≥ €100k (al. d)) e < 150 (al. b)) os não profissionais são retalho → KID PRIIPs
+ │          se as notes forem PRIIP (provável com limited recourse aos lotes): pergunta obrigatória do parecer.
+ │          Alternativa limpa para o piloto/1.ª série: só profissionais
  │        • Colocação: emitente vende diretamente OU intermediário autorizado (o Sprout não pode "colocar" sem licença MiFID)
  │        • AIF? Não, se a SPV/OpCo for empresa comercial real; risco se for veículo passivo com mutualização
- │        • Custo [E] €15–40k; prazo [E] 1–2 meses (PT SA). Escala: Lux SV
+ │        • Custo [E] €15–40k + capital social ≥ €50k; constituição 1–2 meses (PT SA); 1.ª emissão ≥ 12 meses
+ │          após o registo (CSC art. 348.º/2), salvo garantia bancária. Escala: Lux SV
  ├─ RETALHO até €5M/12m por promotor
  │     → D. PARCERIA COM PLATAFORMA ECSP (ex.: Raize — confirmar)
  │        • Licença: do parceiro (CMVM); Sprout = promotor
@@ -499,7 +504,7 @@ P6. Tokenizar lotes numa jurisdição não-UE?
    - **sem garantia de capital**;
    - "refunding" passa a ser uma **reserva de liquidez/contingência da SPV**, descrita como tal e nunca como "reembolso garantido".
 4. **Pague aos produtores em 30/60 dias (UTP).** O prazo de 18 meses é do financiamento do inventário, não do produtor. Mostre ao produtor o pagamento rápido como vantagem comercial: é o melhor argumento de *sourcing*.
-5. **Piloto = azeite (com investidores) + água (só marketplace).**
+5. **Piloto = azeite (com capital próprio; investidores só a partir da 1.ª série, 12 meses após o registo da SPV) + água (só marketplace).**
    - A água tem margem e valor unitário baixos, IVA a 13% e oferta só de engarrafadores licenciados.
    - **Adie o café** até ter capacidade EUDR (aplicável a 30-12-2026). Em alternativa, compre só a importadores que sejam "operadores" EUDR.
 6. **Rails de pagamento:**
@@ -512,7 +517,7 @@ P6. Tokenizar lotes numa jurisdição não-UE?
    - piloto com **OpCo e SPV em Portugal**;
    - **Luxemburgo** (veículo de titularização por compartimentos) só quando houver investidores internacionais e mais de €5–10M;
    - **rejeite estruturas não-UE ou *crypto***: as BVI estão na lista UE de alto risco desde 01-2026, o MiCA/MiFID aplica-se na mesma aos investidores da UE e o risco de repatriação é real.
-8. **Qualificação de investidores:** "HNWI" não chega. Implemente o teste do **Anexo II MiFID** (pedido escrito + 2 de 3 critérios, incl. carteira > €500k) ou o ticket mínimo de €100k. Guarde a evidência.
+8. **Qualificação de investidores:** "HNWI" não chega. Aceitar como qualificado só quem seja profissional *per se* ou já tenha sido classificado como profissional por um banco ou empresa de investimento, com declaração escrita guardada (Reg. 2017/1129, art. 2.º, al. e)). Os restantes entram só com ticket ≥ €100k, e esses são retalho para os PRIIPs (ver 2.5).
 9. **Marketing:**
    - um único *deck* para qualificados, rotulado "comunicação publicitária", com riscos e benefícios com o mesmo destaque, cenários adversos (quebra de colheita, desclassificação do azeite, preço −30%) e sem "garantido";
    - nada em redes sociais sobre o produto de investimento;
@@ -540,12 +545,15 @@ P6. Tokenizar lotes numa jurisdição não-UE?
     2. RGICSF, arts. 8.º/9.º (exceção das obrigações);
     3. MiFID C(1)/C(5);
     4. isenção de prospeto aplicável;
-    5. quem pode colocar as obrigações.
+    5. quem pode colocar as obrigações;
+    6. **CSC art. 348.º/2** (1 ano de registo definitivo antes de emitir obrigações, salvo fusão/cisão, maioria pública ou garantia de instituição de crédito ou do Estado) e realização do capital antes da emissão: sem isso, a emissão sai da exceção do RGICSF art. 9.º;
+    7. **PRIIPs**: as obrigações são PRIIP? KID para subscritores não profissionais (≥ €100k e < 150);
+    8. garantia sobre a conta da reserva: penhor de direitos de crédito (CC arts. 679.º ss.) ou penhor financeiro (DL 105/2004, só com instituição financeira como parte).
 
-    É a "nota de 2 páginas" do Gonçalo, mas com estas cinco perguntas.
+    É a "nota de 2 páginas" do Gonçalo, mas com estas oito perguntas.
 15. **Calendário realista [E]:**
     - marketplace B2B em 1–3 meses;
-    - primeira emissão da SPV para qualificados em 2–3 meses;
+    - constituição da SPV em 1–2 meses; **1.ª emissão de obrigações só 12 meses após o registo definitivo**, salvo garantia de instituição de crédito (CSC art. 348.º/2 [L]); é a 6.ª pergunta obrigatória do parecer;
     - parceria ECSP em 3–6 meses;
     - FIA em 6–9 meses;
     - licenças próprias em 9–18 meses.
@@ -556,6 +564,7 @@ P6. Tokenizar lotes numa jurisdição não-UE?
 
 ## 12. Itens não verificados / a confirmar com advogado
 
+- Redação em vigor do **CSC, arts. 276.º, 277.º e 348.º** (capital mínimo, realização e prazo de 1 ano para emitir obrigações): verificada só contra texto de referência; DRE inacessível a 13-10-2026 — https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/1986-34443975
 - Redação exata do novo **art. 109.º(4) CVM** (DL 171/2026); data de produção de efeitos dessa norma (1-09-2026, inferida do consolidado); se a CMVM exige documento informativo abaixo de €12M.
 - **Publicação no JO da DSP3/PSR** (não confirmada a 13-10-2026).
 - **Votação final da RIS** no plenário do PE (não confirmada).
@@ -618,7 +627,7 @@ P6. Tokenizar lotes numa jurisdição não-UE?
 - [S39] Adyen, PSD3 Explained (atualizado em 12-10-2026) — https://www.adyen.com/knowledge-hub/psd3
 - [S40] Open Banking Tracker, PSD3/PSR readiness — https://www.openbankingtracker.com/guides/psd3-psr-readiness
 - [S41] Bird & Bird, Instant Payments Regulation — https://twobirds.com/en/insights/2024/global/instant-payments-regulation ; MHC — https://mhc.ie/latest/insights/instant-payments-regulation-update ; Reg. 2024/886 — https://eur-lex.europa.eu/eli/reg/2024/886/oj/eng
-- [S42] LGT, art. 63.º-E (Portal das Finanças) — https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/lgt/Pages/lgt63e.aspx ; OCC — https://www.occ.pt/noticias/pagamentos-em-numerario ; APCMC — https://apcmc.pt/legislacao/pagar-receber-numerario-permitido-apenas-ate-3-000/
+- [S42] LGT, art. 63.º-E (Portal das Finanças) — https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/lgt/Pages/lgt63e.aspx ; LGT, art. 63.º-C (Portal das Finanças) — https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/lgt/Pages/lgt63c.aspx ; OCC — https://www.occ.pt/noticias/pagamentos-em-numerario ; APCMC — https://apcmc.pt/legislacao/pagar-receber-numerario-permitido-apenas-ate-3-000/
 - [S43] CSSF, AMLR/AMLD6/AMLA — https://www.cssf.lu/en/2024/06/the-new-aml-cft-regulation-the-sixth-aml-cft-directive-and-the-future-eu-aml-cft-supervisor/ ; DLA Piper — https://www.dlapiper.com/en/insights/publications/global-anti-corruption-perspective/new-eu-anti-money-laundering-rules-what-to-know ; Persona (08-2026) — https://withpersona.com/blog/what-is-amlr ; Reg. 2024/1624 — https://eur-lex.europa.eu/eli/reg/2024/1624/oj/eng
 - [S44] Bird & Bird, lista UE de alto risco (2025) — https://www.twobirds.com/en/insights/2025/germany/eu-liste-der-lnder-und-gebiete-mit-hohem-risiko-fr-geldwsche-und-terrorismusfinanzierung-gendert ; (2026) — https://cm.twobirds.com/en/insights/2026/eu-list-of-highrisk-countries-and-jurisdictions-for-money-laundering-and-terrorism-financing-amended
 - [S45] Lei 97/2017 (DR) — https://diariodarepublica.pt/dr/detalhe/lei/97-2017-108041476 ; BdP, boas práticas sobre medidas restritivas — https://www.bportugal.pt/sites/default/files/anexos/documentos-relacionados/boas_praticas_relativas_a_execucao_de_medidas_restritivas.pdf

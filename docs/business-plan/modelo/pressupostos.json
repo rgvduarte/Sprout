@@ -24,7 +24,8 @@
   },
   "documentos_relacionados": [
    "docs/research/00-base-factual.md",
-   "docs/research/01-desenho-do-modelo.md"
+   "docs/research/01-desenho-do-modelo.md",
+   "docs/business-plan/modelo/calculo_referencia.py"
   ]
  },
  "commodities": {
@@ -322,7 +323,7 @@
       "margem_pct": 0.0222
      }
     },
-    "regime": {
+    "regime_2029": {
      "horeca_gourmet": {
       "preco_eur_kg": 5.085,
       "custo_direto_eur_kg": 4.738,
@@ -1858,7 +1859,7 @@
   "commodities.azeite.volume_t": "estimativa: piloto 20 t (1 lote misto: 4 t HoReCa/gourmet + 16 t distribuidores com offtake) + rampa; base 2031 = 2.200 t (~1,3% de ~175 kt [E, ponto médio de 160 (Olivum, https://observador.pt/2026/09/23/producao-de-azeite-em-portugal-pode-crescer-10-em-2026-2027-e-aproximar-se-das-177-mil-toneladas-da-campanha-anterior/) e 179 (Governo, https://www.vejaportugal.pt/2026/07/03/producao-nacional-de-azeite-devera-atingir-179-mil-toneladas-na-campanha-2025-2026/)]); a parte HoReCa está limitada ao SOM (10-mercado.md sec. 5: 1.000-2.000 clientes no ano 3); o resto vai para distribuidores/exportadores com offtake",
   "commodities.azeite.mix_horeca_gourmet": "derivado de clientes_horeca_gourmet_ativos_medios x 0,205 t/ano (ponto médio de 150-300 L/ano = 137-275 kg; 10-mercado.md sec. 5); HoReCa: 74.524 empresas, 91% micro (https://tnews.pt/ahresp-setor-da-restauracao-revela-se-instavel-em-2024-devido-a-localizacao-dos-negocios/); 2.000 contas em 2031 = 2,7% das empresas",
   "commodities.azeite.canais.horeca_gourmet.preco_referencia_eur_kg": "estimativa (NÃO VERIFICADO no terreno): retalho PT AOVE 6,48 EUR/L c/ IVA mar-abr 2026 = 6,67 EUR/kg s/ IVA com granel a 4,43 (https://observatorioagroalimentar.gov.pt/wp-content/uploads/2026/05/Observatorio_Resumo_Periodo-042026.pdf); ajustado à descida do granel para 3,50-3,60: rácio 0,664 => 5,27-5,42; diferencial constante de 2,24 => 5,74-5,84; intervalo 5,3-6,0 (equivalente de retalho standard a out. 2026); base = 5,65 (ponto médio); 6,00 só no otimista, condicionado a cotações documentadas de AOVE de origem identificada; porta do lagar 5 L 6,08 EUR/L mar. 2026 (https://www.agroportal.pt/wp-content/uploads/2026/03/azei_News12.pdf). Validar com 20-30 cotações cash & carry/foodservice.",
-  "commodities.azeite.canais.horeca_gourmet.desconto_efetivo": "documento-fonte (10-15%); base no limite inferior porque 15% leva a margem de contribuição a ~7% (01-desenho-do-modelo.md sec. 2)",
+  "commodities.azeite.canais.horeca_gourmet.desconto_efetivo": "documento-fonte (10-15%); base no limite inferior porque, com referência 5,65, 15% leva a margem de contribuição HoReCa a ~1,4% (01-desenho-do-modelo.md sec. 2.5)",
   "commodities.azeite.canais.horeca_gourmet.embalamento_eur_kg": "Observatorio de la Cadena Alimentaria: 0,470 (2019/20) e 0,514 EUR/kg (2020/21), intervalo 0,293-1,589 (https://www.mapa.gob.es/dam/mapa/contenido/alimentacion/temas/consumo-y-tendencias-en-alimentacion/observatorio-cadena-alimentaria-abril-2016/estudios-e-informes/estudiodelacadenadevalordelaove2019-202008062021.pdf; https://www.interempresas.net/Produccion-Aceite/474711-Actualizado-el-estudio-de-la-cadena-de-valor-del-aceite-de-oliva-virgen-extra.html); +0,05 pelo mix com vidro",
   "commodities.azeite.canais.horeca_gourmet.logistica_eur_kg": "estimativa 10-mercado.md sec. 1.7 (0,15-0,30 EUR/kg até à HoReCa); ANTRAM camião Lisboa-Porto 250-270 EUR em 2021 e 'emergência' de combustíveis em mai. 2026 (https://rr.pt/noticia/pais/2026/05/24/transportadoras-a-beira-do-limite-o-setor-esta-completamente-asfixiado/471894/)",
   "commodities.azeite.canais.horeca_gourmet.dias_recebimento": "Informa D&B mai. 2026: alojamento e restauração com atraso médio de 30 dias e 11% a pagar a horas (https://blog.informadb.pt/2026/07/empresas-portuguesas-estao-entre-as-que-mais-se-atrasam-nos-pagamentos-em-todo-o-mundo/); base 35 dias assume SDD B2B",
@@ -1908,7 +1909,7 @@
   "impostos.derrama_municipal_max": "Regime Financeiro das Autarquias Locais, até 1,5% do lucro tributável [L]",
   "impostos.derrama_estadual": "CIRC art. 87.º-A [L]: 3% / 5% / 9% acima de 1,5 / 7,5 / 35 MEUR",
   "impostos.reporte_prejuizos": "OE2023 [L]: sem limite temporal, dedução até 65% do lucro tributável",
-  "stress_tests": "40-risco-coberturas.md sec. 1.3 (volatilidade, VaR) e sec. 5.2-5.4 (carry e stress tests); aplicação a série piloto em 01-desenho-do-modelo.md sec. 4",
+  "stress_tests": "40-risco-coberturas.md sec. 1.3 (volatilidade, VaR) e sec. 5.2-5.4 (carry e stress tests); aplicação à 1.ª série em 01-desenho-do-modelo.md sec. 4.4",
   "kpis_piloto": "documento-fonte (fill rate, variação de base, SLA de pagamentos, reconciliação diária); metas de reconciliação de 30-pagamentos-infra.md sec. 5.5; limites de 40-risco-coberturas.md sec. 7; volume dimensionado pelo consumo por cliente (150-300 L/ano azeite; 3.000-5.000 L/ano água; 10-mercado.md sec. 5); margens por canal de calculo_referencia.py",
   "resultados_referencia": "estimativa: cálculo determinístico em docs/business-plan/modelo/calculo_referencia.py a partir dos pressupostos deste ficheiro (volumes por canal x preços x custos por kg; pessoal com TSU, subsídio de refeição e fundadores a 60% até ao gate; opex com contingência e inflação, custos da SPV e seguro de crédito; capital de giro por dias de stock médio; obrigações = % do capital de giro / utilização; capital próprio no capital de giro >= capital social da SPV; reserva = 5% das obrigações; impostos com reporte de prejuízos a 65%)",
   "commodities.azeite.clientes_horeca_gourmet_ativos_medios": "estimativa [E]: piloto 33 clientes (fev.-jul. 2027); base dentro do SOM do ano 3 (1.000-2.000 clientes, 10-mercado.md sec. 5); otimista 3.000 em 2031 (4% das empresas)",

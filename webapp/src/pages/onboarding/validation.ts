@@ -118,10 +118,30 @@ export function validateRequired(raw: string, message: string): string | null {
   return raw.trim() ? null : message;
 }
 
+/** "17041979" → "17/04/1979" enquanto se escreve. */
+export function formatDateInput(raw: string): string {
+  const d = onlyDigits(raw).slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
+/** "17/04/1979" → "1979-04-17" (ou null se não for uma data real). */
+export function parseDateInput(raw: string): string | null {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(raw.trim());
+  if (!m) return null;
+  const [, dd, mm, yyyy] = m;
+  const iso = `${yyyy}-${mm}-${dd}`;
+  const d = new Date(`${iso}T12:00:00Z`);
+  if (Number.isNaN(d.getTime()) || d.getUTCDate() !== Number(dd) || d.getUTCMonth() + 1 !== Number(mm)) return null;
+  return iso;
+}
+
 export function validateBirth(raw: string): string | null {
   if (!raw) return 'Indica a data de nascimento.';
-  const d = toDate(raw);
-  if (Number.isNaN(d.getTime())) return 'Esta data não é válida.';
+  const iso = parseDateInput(raw);
+  if (!iso) return 'Escreve a data no formato dd/mm/aaaa, por exemplo 17/04/1979.';
+  const d = toDate(iso);
   const today = toDate(TODAY_DATE);
   const adult = new Date(d);
   adult.setUTCFullYear(adult.getUTCFullYear() + 18);

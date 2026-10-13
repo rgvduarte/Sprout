@@ -171,7 +171,7 @@ export function FileDrop({
     <div className="min-w-0" data-field={id.replace(/^ob-/, '')}>
       <p className="mb-1.5 text-sm font-medium text-fg">
         {label}
-        {required ? <span className="text-muted"> (obrigatório)</span> : <span className="text-muted"> (se aplicável)</span>}
+        {!required && <span className="text-muted"> (se aplicável)</span>}
         <ExampleTag show={Boolean(ex && file?.example)} />
       </p>
       <input

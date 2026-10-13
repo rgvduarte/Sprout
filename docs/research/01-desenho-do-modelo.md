@@ -64,7 +64,7 @@ flowchart LR
   CM["Collateral manager<br/>(SGS / Bureau Veritas / Control Union)"] -.->|"inspeção na entrada, em cada tranche e no fecho<br/>análise acreditada a cada 4 meses"| T
 ```
 
-Libertar o lote encomenda a encomenda sob custódia de terceiro (120–270 libertações por lote de 20 t com tickets de €400–900) não cabe em €1.200 por lote. Por isso a parte HoReCa é embalada por tranches e passa para um 3PL com conta de custódia: €2.000 de *collateral manager* por lote (entrada, ~3 tranches, fecho) e 0,06 €/kg de armazenagem e *picking* no 3PL [E, NV]. Cada +0,05 €/kg nestes custos = −€20,5k de EBITDA em 2031 (base, 410 t).
+Libertar o lote encomenda a encomenda sob custódia de terceiro (centenas de libertações por lote: a parte HoReCa sai em encomendas de 20–50 kg) não cabe em €1.200 por lote. Por isso a parte HoReCa é embalada por tranches e passa para um 3PL com conta de custódia: €2.000 de *collateral manager* por lote (entrada, ~3 tranches, fecho) e 0,06 €/kg de armazenagem e *picking* no 3PL [E, NV]. Cada +0,05 €/kg nestes custos = −€20,5k de EBITDA em 2031 (base, 410 t).
 
 **Dinheiro**
 

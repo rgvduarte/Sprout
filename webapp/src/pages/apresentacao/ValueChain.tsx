@@ -229,8 +229,6 @@ type Tip = { row: 'a' | 'b' | 'z'; seg: Seg } | null;
 
 function ChainChart({ progress }: { progress: MotionValue<number> }) {
   const [tip, setTip] = useState<Tip>(null);
-  const dimProducer = useTransform(progress, [0.04, 0.22], [1, 0.5]);
-  const ring = useTransform(progress, [0.04, 0.22], [0, 1]);
   const beam = useTransform(progress, [0.12, 0.3], [0, 1]);
   const split = useTransform(progress, [0.3, 0.66], [0, 1]);
   const oneBlockLabel = useTransform(split, [0, 0.3], [1, 0]);
@@ -252,12 +250,7 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
         {/* linha: hoje */}
         <RowLabel title="Hoje" sub={`comprador paga ${num(C.ref, 2)} €`} />
         <Track tip={tip?.row === 'a' ? tip.seg : null} total={C.ref}>
-          {ROW_TODAY.map((s, i) => (
-            <motion.div key={s.id} className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', i === ROW_TODAY.length - 1 && 'rounded-r-[4px]')} style={{ left: pct(s.from, C.ref), width: pct(value(s), C.ref), background: SEG[s.id].color, opacity: s.id === 'producer' ? dimProducer : 1 }} {...bind('a', s)}>
-              {i > 0 && <Gap />}
-            </motion.div>
-          ))}
-          <motion.span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px] rounded-[6px] border-2 border-fg" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)`, opacity: ring }} />
+          <TodaySegments progress={progress} bind={bind} />
         </Track>
 
         {/* linha: com a Sprout */}
@@ -299,6 +292,27 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Linha "Hoje": o preço ao produtor esbate-se e a margem do embalador ganha um contorno. */
+function TodaySegments({ progress, bind }: { progress: MotionValue<number>; bind: (row: 'a', seg: Seg) => Record<string, unknown> }) {
+  const dimProducer = useTransform(progress, [0.04, 0.22], [1, 0.5]);
+  const ring = useTransform(progress, [0.04, 0.22], [0, 1]);
+  return (
+    <>
+      {ROW_TODAY.map((s, i) => (
+        <div key={s.id} className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', i === ROW_TODAY.length - 1 && 'rounded-r-[4px]')} style={{ left: pct(s.from, C.ref), width: pct(value(s), C.ref) }} {...bind('a', s)}>
+          <motion.div className="absolute inset-0" style={{ opacity: s.id === 'producer' ? dimProducer : 1 }}>
+            <div className="h-full w-full" style={{ background: SEG[s.id].color }} />
+          </motion.div>
+          {i > 0 && <Gap />}
+        </div>
+      ))}
+      <span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px]" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)` }}>
+        <motion.span className="absolute inset-0 rounded-[6px] border-2 border-fg" style={{ opacity: ring }} />
+      </span>
+    </>
   );
 }
 

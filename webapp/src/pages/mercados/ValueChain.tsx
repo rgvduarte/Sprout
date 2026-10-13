@@ -199,8 +199,8 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
           {/* bloco único da cadeia habitual */}
           <div
             aria-hidden
-            className={cn('pointer-events-none absolute inset-0 flex items-center justify-center px-3 text-center text-sm font-medium motion-safe:transition-opacity motion-safe:duration-200', sprout ? 'opacity-0' : 'opacity-100')}
-            style={{ color: FILL.custos.ink }}
+            className={cn('pointer-events-none absolute inset-0 flex items-center justify-center rounded-xs px-3 text-center text-sm font-medium motion-safe:transition-opacity motion-safe:duration-300', sprout ? 'opacity-0' : 'opacity-100')}
+            style={{ color: FILL.custos.ink, background: 'var(--muted)', transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
           >
             Margem do {model.middleman}: {unitPrice(world, pool)}
           </div>

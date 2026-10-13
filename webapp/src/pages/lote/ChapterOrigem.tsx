@@ -172,8 +172,8 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
   const d = priceDecimals(lot);
   const colhido = lot.milestones.find((m) => m.stage === 'colhido');
   const mine = positions.reduce((s, p) => s + p.amount, 0);
-  // o IBC tem o interior opaco e pode pousar sobre a paisagem; paletes e sacas ficam ao lado
-  const overlap = lot.world === 'azeite';
+  // o medidor fica ao lado da paisagem (nada do desenho fica escondido)
+  const overlap = false;
 
   return (
     <section id="origem" data-chapter="Origem" aria-labelledby="origem-titulo" className="relative scroll-mt-6 overflow-hidden border-b border-world-line" style={{ background: 'color-mix(in oklab, var(--world) 8%, var(--bg))' }}>

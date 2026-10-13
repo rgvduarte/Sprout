@@ -350,6 +350,7 @@ function RegistrationFlow({ profileId }: { profileId: ProfileId }) {
               {STEPS[step].title}
             </h2>
             <p className="measure mt-1.5 text-muted">{STEP_INTRO[step]}</p>
+            {step < STEPS.length - 1 && <p className="mt-1 text-sm text-muted">Todos os campos são obrigatórios, salvo indicação.</p>}
           </header>
           {attempted && <ErrorSummary errors={check.errors} labels={FIELD_LABELS} />}
           <AnimatePresence mode="wait" initial={false}>
