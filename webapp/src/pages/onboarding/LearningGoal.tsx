@@ -39,6 +39,11 @@ function useNextSteps(world: WorldId, limit = 4): NextStep[] {
   return [...own, ...games, ...quests, ...general].slice(0, limit);
 }
 
+/** «pelo Olival», «pela Nascente», «pela Plantação». */
+const POR: Record<WorldId, string> = { azeite: 'pelo Olival', agua: 'pela Nascente', cafe: 'pela Plantação' };
+/** «no Olival», «na Nascente», «na Plantação». */
+const EM: Record<WorldId, string> = { azeite: 'no Olival', agua: 'na Nascente', cafe: 'na Plantação' };
+
 const WORLD_HINT: Record<WorldId, string> = {
   azeite: 'Lagares, depósitos, painel de prova e cobertura por venda a prazo.',
   agua: 'Tipos de água, rótulos, paletes e prazos de venda.',
@@ -68,7 +73,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
     setEditing(false);
     toast({
       tone: 'accent',
-      title: `Objetivo definido: ${lv.nome} por ${getWorld(world).nome}`,
+      title: `Objetivo definido: ${lv.nome}, a começar ${POR[world]}`,
       description: `Faltam ${num(Math.max(0, lv.minPoints - game.points))} pontos de conhecimento. Os pontos vêm de módulos, missões e mini-jogos.`,
     });
   };
@@ -78,7 +83,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
       <div>
         <div className="min-w-0">
           <H id={`lg-${hid}`} className="text-[1.1875rem] leading-tight">
-            {showForm ? 'Define o teu objetivo de aprendizagem' : `Objetivo: ${target!.nome} por ${getWorld(goal!.world).nome}`}
+            {showForm ? 'Define o teu objetivo de aprendizagem' : `Objetivo: ${target!.nome}, a começar ${POR[goal!.world]}`}
           </H>
           <p className="measure mt-1 text-sm text-muted">
             {showForm
@@ -156,7 +161,7 @@ export function LearningGoalPanel({ profileId, className, headingLevel = 2 }: { 
           )}
           {steps.length > 0 && (
             <>
-              <p className="mt-5 text-sm font-medium text-fg">Próximos passos em {getWorld(goal!.world).nome}</p>
+              <p className="mt-5 text-sm font-medium text-fg">Próximos passos {EM[goal!.world]}</p>
               <ul className="mt-1 divide-y divide-border">
                 {steps.map((s) => (
                   <li key={s.id} className="flex min-w-0 items-center gap-3 py-2">
