@@ -100,7 +100,7 @@ function HatchDefs({ id }: { id: string }) {
   return (
     <pattern id={id} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="7" height="7" fill={BODY} />
-      <line x1="0" y1="0" x2="0" y2="7" stroke={INK} strokeWidth="3" />
+      <line x1="0" y1="0" x2="0" y2="7" stroke="color-mix(in oklab, var(--world) 42%, var(--bg))" strokeWidth="3" />
     </pattern>
   );
 }

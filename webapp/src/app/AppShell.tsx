@@ -206,11 +206,17 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2 px-4 pb-2.5 md:hidden">
-        <DemoBadge short />
-        <SeasonPill />
-      </div>
     </header>
+  );
+}
+
+/** No telemóvel o aviso de demonstração e a estação ficam por baixo da barra (sem ocupar a zona fixa). */
+function MobileContextRow() {
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5 md:hidden">
+      <DemoBadge short />
+      <SeasonPill />
+    </div>
   );
 }
 
@@ -308,6 +314,7 @@ export function AppShell({ children, layout }: { children: ReactNode; layout: 'a
       </Drawer>
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar onMenu={() => setMenuOpen(true)} />
+        <MobileContextRow />
         <main id="conteudo" tabIndex={-1} className="min-w-0 flex-1 outline-none">
           <Suspense fallback={<PageFallback />}>{children}</Suspense>
         </main>

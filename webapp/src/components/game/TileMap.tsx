@@ -76,7 +76,9 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
         const group = geo
           .filter((g) => (side === 'left') === westOf(g.region))
           .map((g) => {
-            const edge = side === 'left' ? g.tiles.reduce((a, b) => (b.cx < a.cx ? b : a)) : g.tiles.reduce((a, b) => (b.cx > a.cx ? b : a));
+            // o mosaico mais exterior e mais perto do centro da região ancora o rótulo
+            const score = (t: { cx: number; cy: number }) => (side === 'left' ? -t.cx : t.cx) - Math.abs(t.cy - g.cy) * 0.9;
+            const edge = g.tiles.reduce((a, b) => (score(b) > score(a) ? b : a));
             return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W / 2 + 3 : W / 2 - 3), ay: edge.cy, y: edge.cy, text: g.region.nome };
           })
           .sort((a, b) => a.ay - b.ay);
@@ -89,7 +91,7 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
       }
     }
     const rightW = map === 'pt' && labels ? Math.max(...labs.filter((l) => l.side === 'right').map((l) => l.text.length)) * CHAR + 24 : 6;
-    const width = Math.ceil(mapRight + rightW);
+    const width = Math.ceil(mapRight + rightW + (map === 'cafe' && labels ? 24 : 0));
     const height = Math.ceil(Math.max(mapBottom + 6, ...labs.map((l) => l.y + 10)) + (map === 'cafe' && labels ? 28 : 0));
     return { geo, labs, mapLeft, mapRight, mapBottom, width, height };
   }, [map, W, R, VS, world, labels]);
