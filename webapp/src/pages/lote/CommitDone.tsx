@@ -56,7 +56,7 @@ function ReflectionBand({ committedAt }: { committedAt: string }) {
   );
 }
 
-function SampleRequest() {
+export function SampleRequest() {
   const { lot, ctx } = useJourney();
   const { profileId } = useRole();
   const { toast } = useToast();

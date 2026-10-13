@@ -1,0 +1,559 @@
+/* ==========================================================================
+   Sprout · print.css — folha de estilos partilhada dos documentos em PDF
+   A4, Chromium (Playwright). Fontes servidas localmente a partir de
+   node_modules (@fontsource) e de fonts/ (subconjunto de símbolos).
+   Ligar a partir de um documento em docs/<pasta>/:  ../tools/print.css
+   ========================================================================== */
+
+/* ---------- Fontes (offline) ------------------------------------------- */
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: block;
+  src: url(node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2) format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: block;
+  src: url(node_modules/@fontsource-variable/archivo/files/archivo-latin-ext-wdth-normal.woff2) format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-400-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Public Sans"; font-style: italic; font-weight: 400; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-400-italic.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 500; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-500-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 600; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-600-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 700; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-700-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: block;
+  src: url(node_modules/@fontsource/public-sans/files/public-sans-latin-ext-400-normal.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: block;
+  src: url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: block;
+  src: url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: block;
+  src: url(node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+/* Glifos que as fontes da marca não têm: ≤ ≥ ≈ ≠, setas, espaço fino e
+   espaço estreito inseparável (separador de milhares). Ver fonts/README.md. */
+@font-face { font-family: "Sprout Symbols"; font-weight: 100 500; font-display: block;
+  src: url(fonts/sprout-symbols-Regular.woff2) format("woff2");
+  unicode-range: U+2009, U+202F, U+2190-2199, U+2248, U+2260, U+2264-2265; }
+@font-face { font-family: "Sprout Symbols"; font-weight: 501 900; font-display: block;
+  src: url(fonts/sprout-symbols-SemiBold.woff2) format("woff2");
+  unicode-range: U+2009, U+202F, U+2190-2199, U+2248, U+2260, U+2264-2265; }
+
+/* ---------- Tokens da marca --------------------------------------------- */
+
+:root {
+  /* tinta e papel */
+  --ink: #1A1E16;
+  --muted: #5B6352;
+  --rule: #D7DBCC;
+  --rule-strong: #AEB49F;
+  --paper: #FFFFFF;
+  --panel: #F4F5EF;
+  --accent: #3F5A1E;          /* oliva profundo */
+  --accent-soft: #E1E8CF;
+
+  /* mundos (identidade; usar em amostras e texto grande) */
+  --azeite: #8C8A16;
+  --agua: #2D6E8E;
+  --cafe: #6E4A2C;
+  /* séries de gráfico validadas (validate_palette.js: todas as verificações passam em branco) */
+  --series-azeite: #8C8A16;
+  --series-agua: #17709F;
+  --series-cafe: #8A4816;
+
+  /* estado (só quando a cor significa estado; sempre com rótulo) */
+  --ok: #2E7D4F;
+  --warn: #A86A12;
+  --warn-ink: #8A560E;        /* texto pequeno sobre branco ou painel: ≥ 5,6:1 */
+  --crit: #B42318;
+
+  /* gráficos */
+  --chart-grid: #E6E9DD;
+  --chart-axis: #AEB49F;
+  --neutral-1: #7D846F;
+  --neutral-2: #A9AF9B;
+  --neutral-3: #CDD1C1;
+
+  /* tipo */
+  --f-display: "Archivo", "Sprout Symbols", "Public Sans", sans-serif;
+  --f-body: "Public Sans", "Sprout Symbols", sans-serif;
+  --f-mono: "IBM Plex Mono", "Sprout Symbols", ui-monospace, monospace;
+
+  --fs-display: 25pt;
+  --fs-h1: 16pt;
+  --fs-h2: 11.5pt;
+  --fs-h3: 9.4pt;
+  --fs-body: 8.9pt;
+  --fs-small: 8pt;
+  --fs-micro: 6.9pt;
+  --lh-body: 1.42;
+
+  /* geometria da página (lida por render-pdf.mjs para verificar transbordos) */
+  --page-w: 210mm;
+  --page-h: 297mm;
+  --m-top: 19mm;
+  --m-right: 16mm;
+  --m-bottom: 17mm;
+  --m-left: 16mm;
+  --page-content-w: 178mm;    /* 210 − 16 − 16 */
+  --page-content-h: 261mm;    /* 297 − 19 − 17 */
+}
+
+/* ---------- Página, cabeçalho e rodapé correntes ------------------------- */
+/* Os documentos substituem o conteúdo das caixas de margem com as suas
+   próprias regras @page (var() não funciona dentro de @page). */
+
+@page {
+  size: A4;
+  margin: 19mm 16mm 17mm 16mm;
+
+  @top-left {
+    content: "Sprout";
+    font-family: "Archivo", sans-serif;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: 8pt;
+    letter-spacing: -0.005em;
+    color: #1A1E16;
+    vertical-align: bottom;
+    padding-bottom: 3.2mm;
+    border-bottom: 0.5pt solid #D7DBCC;
+  }
+  @top-center {
+    content: "";
+    vertical-align: bottom;
+    padding-bottom: 3.2mm;
+    border-bottom: 0.5pt solid #D7DBCC;
+  }
+  @top-right {
+    content: "Documento de trabalho";
+    font-family: "Public Sans", sans-serif;
+    font-size: 7pt;
+    color: #5B6352;
+    vertical-align: bottom;
+    padding-bottom: 3.2mm;
+    border-bottom: 0.5pt solid #D7DBCC;
+  }
+  @bottom-left {
+    content: "Nome de trabalho. Documento interno; não constitui oferta nem recomendação de investimento.";
+    font-family: "Public Sans", sans-serif;
+    font-size: 6.6pt;
+    color: #5B6352;
+    vertical-align: top;
+    padding-top: 3mm;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 7pt;
+    color: #1A1E16;
+    vertical-align: top;
+    padding-top: 3mm;
+  }
+}
+
+/* ---------- Base --------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  background: var(--paper);
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-variant-numeric: lining-nums proportional-nums;
+  font-kerning: normal;
+  text-rendering: geometricPrecision;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Pré-visualização no ecrã: página A4 em cinzento claro. Não afeta o PDF. */
+@media screen {
+  html { background: #E9EBE2; }
+  body {
+    width: var(--page-w);
+    margin: 10mm auto;
+    padding: var(--m-top) var(--m-right) var(--m-bottom) var(--m-left);
+    background: var(--paper);
+    box-shadow: 0 1px 3px rgba(26, 30, 22, 0.12);
+  }
+  .sheet { min-height: var(--page-content-h); border-bottom: 1px dashed var(--rule); margin-bottom: 8mm; }
+}
+
+p { margin: 0 0 2.2mm; text-wrap: pretty; }
+p:last-child { margin-bottom: 0; }
+strong, b { font-weight: 600; }
+em, i { font-style: italic; }
+small { font-size: var(--fs-small); }
+
+a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 0.5pt; text-underline-offset: 1.6pt; }
+
+hr { border: 0; border-top: 0.5pt solid var(--rule); margin: 4mm 0; }
+
+/* ---------- Títulos ------------------------------------------------------ */
+
+h1, h2, h3, h4, .display {
+  font-family: var(--f-display);
+  font-stretch: 87.5%;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+  break-after: avoid;
+  page-break-after: avoid;
+  break-inside: avoid;
+}
+
+.display {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  margin: 0 0 3mm;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.006em;
+  margin: 5.5mm 0 2mm;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 650;
+  line-height: 1.25;
+  margin: 3.5mm 0 1.2mm;
+}
+
+h4 {
+  font-family: var(--f-body);
+  font-stretch: 100%;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 2.5mm 0 0.8mm;
+}
+
+h1 + h2, h2 + h3, h3 + h4 { margin-top: 1.5mm; }
+.sheet > :first-child, .col > :first-child, .cell > :first-child { margin-top: 0; }
+
+/* Linha de abertura sob um título (subtítulo). Nunca acima do título. */
+.standfirst {
+  font-size: 10.5pt;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 2mm 0 0;
+  max-width: 150mm;
+  text-wrap: balance;
+}
+.dek {
+  font-size: var(--fs-small);
+  color: var(--muted);
+  margin: 0 0 2mm;
+}
+.meta {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+/* ---------- Texto auxiliar ---------------------------------------------- */
+
+.muted { color: var(--muted); }
+.small { font-size: var(--fs-small); }
+.micro { font-size: var(--fs-micro); line-height: 1.35; }
+.mono, .num, code, .fig {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+}
+.mono, code { font-size: 0.94em; }
+.tnum { font-variant-numeric: tabular-nums; }
+.nowrap { white-space: nowrap; }
+.caps { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.86em; }
+
+/* Referência de fonte: "00 §1.2", "Dir. 2019/633" */
+.ref {
+  font-family: var(--f-mono);
+  font-size: 6.6pt;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* Etiquetas de evidência da base factual: [F] [L] [E] [I] NV */
+.tag-ev {
+  font-family: var(--f-mono);
+  font-size: 6.4pt;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tag-ev.l { color: var(--warn-ink); }
+
+/* ---------- Listas ------------------------------------------------------- */
+
+ul, ol { margin: 0 0 2.2mm; padding: 0; }
+li { margin: 0 0 1.1mm; text-wrap: pretty; }
+li:last-child { margin-bottom: 0; }
+
+ul { list-style: none; }
+ul > li { position: relative; padding-left: 3.4mm; }
+ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.4mm;
+  top: 0.62em;
+  width: 1.5mm;
+  height: 0.5pt;
+  background: var(--ink);
+}
+
+ol { list-style: none; counter-reset: li; }
+ol > li { position: relative; padding-left: 5.5mm; counter-increment: li; }
+ol > li::before {
+  content: counter(li);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 0.92em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lista de entregáveis (caixas de verificação desenhadas) */
+ul.todo > li { padding-left: 4.2mm; }
+ul.todo > li::before {
+  width: 2.1mm;
+  height: 2.1mm;
+  top: 0.32em;
+  left: 0;
+  background: transparent;
+  border: 0.6pt solid var(--ink);
+  border-radius: 0.4mm;
+}
+
+/* Lista de definição em duas colunas: termo | descrição */
+dl.defs { display: grid; grid-template-columns: max-content 1fr; column-gap: 3mm; row-gap: 1.4mm; margin: 0; }
+dl.defs dt { font-weight: 600; }
+dl.defs dd { margin: 0; }
+
+/* ---------- Grelhas ------------------------------------------------------ */
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 7mm; row-gap: 4mm; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 6mm; row-gap: 4mm; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; column-gap: 7mm; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; column-gap: 7mm; }
+.span-all { grid-column: 1 / -1; }
+.cols-2 { column-count: 2; column-gap: 7mm; }
+
+/* Separação por fio fino (em vez de cartões) */
+.ruled-top { border-top: 0.5pt solid var(--rule); padding-top: 2.6mm; }
+.ruled-top-strong { border-top: 0.9pt solid var(--ink); padding-top: 2.4mm; }
+.ruled-bottom { border-bottom: 0.5pt solid var(--rule); padding-bottom: 2.6mm; }
+
+/* ---------- Paginação --------------------------------------------------- */
+
+.sheet { break-before: page; page-break-before: always; }
+.sheet:first-of-type { break-before: auto; page-break-before: auto; }
+.page-break { break-before: page; page-break-before: always; }
+.keep, figure, table, .note, .callout, .no-split { break-inside: avoid; page-break-inside: avoid; }
+.allow-split { break-inside: auto; page-break-inside: auto; }
+
+/* ---------- Tabelas ------------------------------------------------------ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  line-height: 1.32;
+  margin: 0 0 3mm;
+}
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+th {
+  text-align: left;
+  vertical-align: bottom;
+  font-weight: 600;
+  font-size: 7.4pt;
+  color: var(--ink);
+  padding: 0 2.2mm 1.4mm 0;
+  border-bottom: 0.9pt solid var(--ink);
+}
+td {
+  vertical-align: top;
+  padding: 1.5mm 2.2mm 1.5mm 0;
+  border-bottom: 0.5pt solid var(--rule);
+}
+th:last-child, td:last-child { padding-right: 0; }
+tbody tr:last-child td { border-bottom: 0.9pt solid var(--ink); }
+td.num, th.num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.num { font-size: 7.6pt; }
+tr.total td { font-weight: 600; border-top: 0.9pt solid var(--ink); }
+table.compact td { padding-top: 1.1mm; padding-bottom: 1.1mm; }
+td .sub, th .sub { display: block; font-weight: 400; color: var(--muted); font-size: 7pt; margin-top: 0.4mm; }
+
+/* ---------- Figuras ------------------------------------------------------ */
+
+figure { margin: 3mm 0 3.5mm; }
+figure .fig-title {
+  font-family: var(--f-display);
+  font-stretch: 87.5%;
+  font-weight: 650;
+  font-size: 9pt;
+  line-height: 1.25;
+  margin: 0 0 0.6mm;
+  text-wrap: balance;
+}
+figure .fig-sub { font-size: 7.4pt; color: var(--muted); margin: 0 0 1.6mm; }
+figure svg { display: block; width: 100%; height: auto; overflow: visible; }
+figcaption {
+  font-size: var(--fs-micro);
+  line-height: 1.38;
+  color: var(--muted);
+  margin-top: 1.4mm;
+  text-wrap: pretty;
+}
+figcaption strong { color: var(--ink); font-weight: 600; }
+
+/* Legenda de gráfico: amostra de cor + texto em tinta (nunca texto colorido) */
+.legend { display: flex; flex-wrap: wrap; gap: 1mm 4mm; font-size: 7pt; color: var(--ink); margin: 0 0 1.4mm; }
+.legend .key { display: inline-flex; align-items: center; gap: 1.3mm; }
+.legend .sw { display: inline-block; width: 2.6mm; height: 2.6mm; border-radius: 0.5mm; background: var(--sw, var(--ink)); }
+.legend .ln { display: inline-block; width: 4mm; height: 0; border-top: 1.5pt solid var(--sw, var(--ink)); }
+
+/* ---------- Notas e chamadas (sem barras coloridas à esquerda) ---------- */
+
+.note {
+  background: var(--panel);
+  border-radius: 1mm;
+  padding: 2.4mm 3mm;
+  font-size: var(--fs-small);
+  line-height: 1.38;
+  margin: 2mm 0 3mm;
+}
+.note > :last-child { margin-bottom: 0; }
+
+/* Nota de verificação: rótulo em linha ("Verificação."), texto pequeno */
+.check {
+  font-size: 7.5pt;
+  line-height: 1.36;
+  color: var(--ink);
+  margin: 1.6mm 0 0;
+  text-wrap: pretty;
+}
+.check .lbl, .note .lbl {
+  font-weight: 600;
+  color: var(--warn-ink);
+}
+.check .lbl.ok, .note .lbl.ok { color: var(--ok); }
+.check .lbl.crit, .note .lbl.crit { color: var(--crit); }
+.check .lbl.accent, .note .lbl.accent { color: var(--accent); }
+
+/* Citação do documento-fonte */
+blockquote, .quote {
+  margin: 0 0 2.2mm;
+  padding: 0;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ---------- Estado (com rótulo; a cor nunca é o único canal) ------------- */
+
+.st {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1.2mm;
+  font-weight: 600;
+  font-size: 7.4pt;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.st::before {
+  content: "";
+  display: inline-block;
+  width: 1.9mm;
+  height: 1.9mm;
+  border-radius: 50%;
+  background: var(--st, var(--muted));
+  transform: translateY(0.1mm);
+}
+.st.ok   { --st: var(--ok); }
+.st.warn { --st: var(--warn); }
+.st.crit { --st: var(--crit); }
+.st.todo { --st: transparent; }
+.st.todo::before { border: 0.7pt solid var(--muted); }
+
+/* Marca de mercadoria: amostra + nome */
+.cm { display: inline-flex; align-items: baseline; gap: 1mm; white-space: nowrap; }
+.cm::before { content: ""; width: 1.8mm; height: 1.8mm; border-radius: 0.3mm; background: var(--cm, var(--muted)); transform: translateY(0.05mm); }
+.cm.azeite { --cm: var(--azeite); }
+.cm.agua   { --cm: var(--agua); }
+.cm.cafe   { --cm: var(--cafe); }
+
+/* Valor em destaque dentro de texto corrido (não é um "hero metric") */
+.fig-inline {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Linha de "livro-razão": valor | descrição */
+.ledger { display: grid; grid-template-columns: 19mm 1fr; column-gap: 3mm; row-gap: 0; margin: 0 0 1.5mm; }
+.ledger > .v {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 10.5pt;
+  line-height: 1.25;
+  white-space: nowrap;
+  padding: 1.3mm 0;
+  border-top: 0.5pt solid var(--rule);
+}
+.ledger > .d {
+  padding: 1.55mm 0 1.3mm;
+  border-top: 0.5pt solid var(--rule);
+  line-height: 1.3;
+}
+.ledger > .v:first-child, .ledger > .v:first-child + .d { border-top: 0.9pt solid var(--ink); }

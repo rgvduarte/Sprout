@@ -238,7 +238,7 @@ export const ADOPTED: Pattern[] = tidyDeep([
     id: 'protecao',
     name: 'Mecânicas de proteção',
     refs: 'ECSP, Reg. (UE) 2020/1503 (período de reflexão)',
-    original: 'Período de reflexão de 4 dias de calendário após uma oferta de investimento.',
+    original: 'Período de reflexão pré-contratual de 4 dias de calendário, em que o investidor não sofisticado pode revogar a oferta ou a manifestação de interesse sem penalização.',
     sprout: 'Período de reflexão depois de cada compromisso (cancelamento sem custos durante 4 dias), mostrado como uma faixa calma, nunca como pressão; pausa sugerida depois de muitas simulações seguidas; avisos de concentração.',
     why: 'A Sprout aplica-o como política própria no piloto, mesmo sem licença ECSP.',
     where: [{ label: 'Simulador', href: '/academia/simulador' }],
@@ -395,7 +395,7 @@ export const FRAMEWORKS: Framework[] = tidyDeep([
     ref: 'Reg. (UE) 2020/1503',
     question: 'A Sprout é um prestador de serviços de financiamento colaborativo? Se sim, aplica-se a licença e, para não sofisticados, o teste de conhecimentos e a simulação da capacidade de suportar perdas.',
     hypothesis: 'Piloto só com investidores qualificados; licença avaliada antes da abertura progressiva (Fase 3). O Simulador já cumpre a função de simulação de perdas.',
-    ifYes: 'Licença da CMVM, ficha de informação por oferta, período de reflexão de 4 dias e limites para não sofisticados.',
+    ifYes: 'Licença junto da CMVM, ficha de informação fundamental por oferta, período de reflexão de 4 dias e avisos para investidores não sofisticados.',
   },
   {
     id: 'prospetos',

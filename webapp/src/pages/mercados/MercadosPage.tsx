@@ -8,6 +8,7 @@ import { Badge, Button, ButtonLink, Card, CardHeader, CommodityChip, Page, PageH
 import { CampaignFeed, LotGauge, SeasonTrack } from '../../components/game';
 import { cn } from '../../lib/cn';
 import { date as fmtDate, plural } from '../../lib/format';
+import { useMediaQuery } from '../../lib/useMediaQuery';
 import { useData, useFeed } from '../../state';
 import { MiniReferenceChart } from './MarketChart';
 import { OriginsAtlas } from './Origins';
@@ -204,6 +205,8 @@ export default function MercadosPage() {
   const { events } = useData();
   const feed = useFeed();
   const [atlasWorld, setAtlasWorld] = useState<WorldId>('azeite');
+  // ao lado dos mundos (≥ 1280 px) o diário acompanha a altura da coluna; empilhado, fica curto
+  const besideWorlds = useMediaQuery('(min-width: 1280px)', true);
   const atlasRef = useRef<HTMLElement>(null);
 
   const showOnMap = (world: WorldId) => {
@@ -246,7 +249,7 @@ export default function MercadosPage() {
           </aside>
           <Card as="section" aria-labelledby="diario-t">
             <CardHeader id="diario-t" title="Diário de campanha" description="Telemetria e eventos dos produtores dos três mundos." />
-            <CampaignFeed events={events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={12} compact />
+            <CampaignFeed events={events} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={besideWorlds ? 12 : 6} compact />
           </Card>
         </div>
 

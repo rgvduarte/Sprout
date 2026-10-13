@@ -5,6 +5,7 @@ import { ButtonLink, RiskNote, StatusPill } from '../../components/ui';
 import { date as fmtDate, eur, pct } from '../../lib/format';
 import { physicalForAmount } from '../../lib/physical';
 import { useData, useFeed } from '../../state';
+import { SampleRequest } from './CommitDone';
 import { containersFor, stockLabel, type ChapterId } from './model';
 import { ChapterHeading, useJourney, Wrap } from './shared';
 
@@ -50,6 +51,11 @@ function YourPosition() {
       <ButtonLink to="/carteira" variant="secondary" size="sm" className="mt-3" iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
         Ver na Carteira
       </ButtonLink>
+      {lot.status !== 'liquidado' && lot.stock > 0 && (
+        <div className="mt-8 border-t border-border pt-6">
+          <SampleRequest />
+        </div>
+      )}
     </div>
   );
 }
