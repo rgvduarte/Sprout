@@ -15,8 +15,7 @@ interface Cell {
   key: string;
   label: string;
   long: string;
-  kind: 'antes' | 'mes' | 'depois';
-  month?: number;
+  month: number;
 }
 
 const SERIES: Record<WorldId, string> = { azeite: 'var(--series-azeite)', agua: 'var(--series-agua)', cafe: 'var(--series-cafe)' };
@@ -41,21 +40,19 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
     const ym = first + i;
     const y = Math.floor(ym / 12);
     const m = (ym % 12) + 1;
-    return { key: String(ym), label: MONTHS_SHORT[m - 1], long: `${MONTHS_LONG[m - 1]} de ${y}`, kind: 'mes', month: m };
+    return { key: String(ym), label: MONTHS_SHORT[m - 1], long: `${MONTHS_LONG[m - 1]} de ${y}`, month: m };
   });
-  const cells: Cell[] = [
-    ...(buckets.has('antes') ? [{ key: 'antes', label: 'ant.', long: 'antes da campanha', kind: 'antes' as const }] : []),
-    ...months,
-    ...(buckets.has('depois') ? [{ key: 'depois', label: 'dep.', long: 'depois da campanha', kind: 'depois' as const }] : []),
-  ];
-  const lead = buckets.has('antes') ? 1 : 0;
+  // só os 12 meses da campanha; notas fora da janela ficam numa linha por baixo
+  const cells: Cell[] = months;
+  const before = buckets.get('antes')?.length ?? 0;
+  const after = buckets.get('depois')?.length ?? 0;
 
   // fases do mundo que desenha a faixa
   const phases = getWorld(c.strip).season.phases;
   const phaseOf = (m: number) => phases.find((ph) => (ph.startMonth <= ph.endMonth ? m >= ph.startMonth && m <= ph.endMonth : m >= ph.startMonth || m <= ph.endMonth));
   const groups: { label: string; strong: boolean; from: number; span: number }[] = [];
   months.forEach((cell, i) => {
-    const ph = phaseOf(cell.month!);
+    const ph = phaseOf(cell.month);
     const strong = ph?.kind === 'colheita';
     const g = groups[groups.length - 1];
     if (g && g.label === ph?.label) g.span++;
@@ -67,7 +64,7 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
   const tYm = today.year * 12 + (today.month - 1);
   const showToday = c.state !== 'concluida' && tYm >= first && tYm <= last;
   const daysIn = new Date(Date.UTC(today.year, today.month, 0)).getUTCDate();
-  const todayLeft = ((lead + (tYm - first) + (today.day - 0.5) / daysIn) / cells.length) * 100;
+  const todayLeft = (((tYm - first) + (today.day - 0.5) / daysIn) / cells.length) * 100;
 
   const worlds = Array.from(new Set(notes.map((n) => n.world)));
   const summary = cells
@@ -78,10 +75,13 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
 
   return (
     <figure className={cn('min-w-0', className)} data-world={c.strip}>
-      <div role="img" aria-label={`${c.label}, de outubro a setembro. ${summary || 'Ainda sem notas.'}`} className="relative">
+      <div
+        role="img"
+        aria-label={`${c.label}, de outubro a setembro. ${summary || 'Ainda sem notas nestes meses.'}${before ? ` ${before} antes de outubro.` : ''}${after ? ` ${after} depois de setembro.` : ''}`}
+        className="relative"
+      >
         {/* fases */}
         <div className="grid h-7 overflow-hidden rounded-sm border border-border" style={cols}>
-          {lead === 1 && <div className="border-r border-border bg-surface-2" />}
           {groups.map((g) => (
             <div
               key={g.from}
@@ -91,7 +91,6 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
               <span className="truncate text-xs font-medium text-world-ink">{g.label}</span>
             </div>
           ))}
-          {buckets.has('depois') && <div className="border-l border-border bg-surface-2" />}
         </div>
         {/* notas por mês */}
         <div className="mt-1.5 grid" style={cols} aria-hidden>
@@ -110,28 +109,30 @@ export function CampaignStrip({ c, notes, className }: { c: CampaignDef; notes: 
         </div>
         <div className="grid" style={cols} aria-hidden>
           {cells.map((cell) => (
-            <div key={cell.key} className={cn('truncate text-center font-mono text-[11px] text-muted', cell.kind !== 'mes' && 'italic')}>
+            <div key={cell.key} className="truncate text-center font-mono text-[11px] text-muted">
               {cell.label}
             </div>
           ))}
         </div>
         {showToday && (
           <div className="pointer-events-none absolute top-0 h-0 w-0" style={{ left: `${todayLeft}%` }} aria-hidden>
-            {/* marca de hoje: entalhe sobre a faixa e fio pelas notas, sem tapar o nome da fase */}
+            {/* marca de hoje: entalhe sobre a faixa, sem tapar o nome da fase nem as notas */}
             <span className="absolute -left-[5px] -top-[7px] size-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-fg" />
-            <span className="absolute -left-px top-7 h-[46px] w-0.5 bg-fg" />
             <span className="absolute -top-[22px] left-1.5 whitespace-nowrap text-[11px] font-medium text-fg">hoje</span>
           </div>
         )}
       </div>
-      {worlds.length > 1 && (
+      {(worlds.length > 1 || before > 0 || after > 0) && (
         <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
-          {worlds.map((w) => (
-            <span key={w} className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="size-2 rounded-full" style={{ background: SERIES[w] }} />
-              Notas de {getWorld(w).commodity.toLowerCase()}
-            </span>
-          ))}
+          {worlds.length > 1 &&
+            worlds.map((w) => (
+              <span key={w} className="inline-flex items-center gap-1.5">
+                <span aria-hidden className="size-2 rounded-full" style={{ background: SERIES[w] }} />
+                Notas de {getWorld(w).commodity.toLowerCase()}
+              </span>
+            ))}
+          {before > 0 && <span>{before === 1 ? '1 nota de antes de outubro' : `${before} notas de antes de outubro`}</span>}
+          {after > 0 && <span>{after === 1 ? '1 nota já depois de setembro' : `${after} notas já depois de setembro`}</span>}
         </figcaption>
       )}
     </figure>

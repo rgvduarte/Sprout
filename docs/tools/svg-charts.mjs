@@ -60,10 +60,11 @@ export function fmt(v, { dec = 0, prefix = '', suffix = '', sign = false, group 
   if (v == null || Number.isNaN(v)) return '';
   const neg = v < 0;
   const abs = Math.abs(v);
-  let [int, frac] = abs.toFixed(dec).split('.');
+  const k = 10 ** dec;
+  let [int, frac] = (Math.round((abs + Number.EPSILON) * k) / k).toFixed(dec).split('.');
   if (group && int.length > 3) int = int.replace(/\B(?=(\d{3})+(?!\d))/g, NNBSP);
   const body = frac ? `${int},${frac}` : int;
-  const isZero = Number(abs.toFixed(dec)) === 0;
+  const isZero = Number(int.replace(/\D/g, '')) === 0 && !/[1-9]/.test(frac || '');
   const s = neg && !isZero ? MINUS : sign && v > 0 && !isZero ? '+' : '';
   return `${s}${prefix}${body}${suffix}`;
 }
@@ -184,7 +185,7 @@ export function lineChart(o) {
 
   const yLabW = Math.max(...yTicks.map((t) => textW(fy(t), THEME.fs.tick, 'mono'))) + 6;
   const endLabW = Math.max(0, ...series.filter((s) => s.endLabel).map((s) => textW(s.endLabel === true ? s.name : s.endLabel, THEME.fs.label) + 10));
-  const m = { t: 8, r: Math.max(8, endLabW), b: 18, l: yLabW, ...(o.margin || {}) };
+  const m = { t: o.y?.unit ? 16 : 8, r: Math.max(8, endLabW), b: 18, l: yLabW, ...(o.margin || {}) };
   const sx = linear(xmin, xmax, m.l, W - m.r);
   const sy = linear(ymin, ymax, H - m.b, m.t);
 
@@ -206,7 +207,7 @@ export function lineChart(o) {
     g += `<line x1="${r2(m.l)}" x2="${r2(W - m.r)}" y1="${r2(y)}" y2="${r2(y)}" stroke="${base ? THEME.axis : THEME.grid}" stroke-width="${base ? 1 : 0.75}"/>`;
     g += text(m.l - 6, y, fy(t), { size: THEME.fs.tick, fill: THEME.muted, anchor: 'end', mono: true, baseline: 'middle' });
   }
-  if (o.y?.unit) g += text(m.l - 6, m.t - 9, o.y.unit, { size: THEME.fs.tick, fill: THEME.muted, anchor: 'end' });
+  if (o.y?.unit) g += text(m.l - 6, m.t - 8, o.y.unit, { size: THEME.fs.tick, fill: THEME.muted, anchor: 'end' });
   // linhas de referência
   for (const rl of o.refLines || []) {
     const y = sy(rl.y);
@@ -292,7 +293,19 @@ export function barChart(o) {
   const th = Math.min(o.thickness ?? 12, 24);
   const rowH = th + (o.rowGap ?? 12) + (data.some((d) => d.sub) ? 8 : 0);
   const fx = makeFmt(o.x?.format, { dec: 2 });
-  const labW = o.labelWidth ?? Math.min(W * 0.38, Math.max(...data.map((d) => textW(d.label, THEME.fs.label))) + 10);
+  const labW = o.labelWidth ?? Math.min(W * 0.42, Math.max(...data.map((d) => textW(d.label, THEME.fs.label, 'body', d.emphasis ? 600 : 400))) + 10);
+  // rótulos compridos partem em duas linhas (nunca são cortados)
+  const wrap = (s, max, weight) => {
+    if (textW(s, THEME.fs.label, 'body', weight) <= max) return [s];
+    const words = s.split(' ');
+    let best = [s], bestW = Infinity;
+    for (let i = 1; i < words.length; i++) {
+      const a = words.slice(0, i).join(' '), b = words.slice(i).join(' ');
+      const w = Math.max(textW(a, THEME.fs.label, 'body', weight), textW(b, THEME.fs.label, 'body', weight));
+      if (w < bestW) { bestW = w; best = [a, b]; }
+    }
+    return best;
+  };
   const vals = data.flatMap((d) => [d.value, d.from ?? 0]);
   const ticks = o.x?.ticks ?? niceTicks(Math.min(0, ...vals), Math.max(...vals), 4);
   const xmin = o.x?.min ?? Math.min(ticks[0], ...vals);
@@ -320,7 +333,10 @@ export function barChart(o) {
       ? `M${r2(x0)},${r2(yc - th / 2)}h${r2(w)}v${r2(th)}h${r2(-w)}Z`
       : barPath(x0, yc - th / 2, w, th, dir, 4);
     g += `<path d="${path}" fill="${d.color || THEME.accent}"${floating ? ' rx="2"' : ''}><title>${esc(`${d.label}: ${d.valueLabel ?? fx(d.value)}`)}</title></path>`;
-    g += text(m.l - 8, yc, d.label, { size: THEME.fs.label, anchor: 'end', baseline: 'middle', weight: d.emphasis ? 600 : 400 });
+    const lines = wrap(d.label, labW - 10, d.emphasis ? 600 : 400);
+    lines.forEach((ln, k) => {
+      g += text(m.l - 8, yc + (k - (lines.length - 1) / 2) * 9.5, ln, { size: THEME.fs.label, anchor: 'end', baseline: 'middle', weight: d.emphasis ? 600 : 400 });
+    });
     if (d.sub) g += text(m.l - 8, yc + 9.5, d.sub, { size: THEME.fs.tick, anchor: 'end', baseline: 'middle', fill: THEME.muted });
     const vx = Math.max(a, b) + 5;
     g += text(vx, yc, d.valueLabel ?? fx(d.value), { size: THEME.fs.value, baseline: 'middle', mono: true, weight: d.emphasis ? 600 : 400 });
@@ -390,7 +406,10 @@ function segLabelColor(hex) {
   const h = hex.replace('#', '');
   const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
   const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return L > 0.3 ? THEME.ink : '#FFFFFF';
+  // escolhe a tinta com mais contraste (tinta #1A1E16 tem luminância ~0,012)
+  const cInk = (L + 0.05) / (0.0118 + 0.05);
+  const cWhite = 1.05 / (L + 0.05);
+  return cInk >= cWhite ? THEME.ink : '#FFFFFF';
 }
 
 /**

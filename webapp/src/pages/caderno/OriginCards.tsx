@@ -170,8 +170,8 @@ function Back({ card }: { card: CardView }) {
   return (
     <div className="flex h-full flex-col rounded-md border border-world-line bg-world-soft px-3 py-2.5">
       <p className="flex items-center justify-between gap-2 text-xs text-world-ink">
-        <span className="font-mono tnum">{card.lot.id}</span>
-        <span className="font-medium">Ficha da carta</span>
+        <span className="whitespace-nowrap font-mono tnum">{card.lot.id}</span>
+        <span className="font-medium">Ficha</span>
       </p>
       <dl className="mt-2 flex flex-col gap-1.5">
         {card.stats.map((s) => (

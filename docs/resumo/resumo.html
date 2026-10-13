@@ -47,7 +47,9 @@
   .pilot { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 4.5mm; }
   .pilot div { font-size: 8pt; line-height: 1.34; border-top: 0.5pt solid var(--rule); padding-top: 1.3mm; }
   .pilot strong { display: block; font-size: 8.4pt; }
-  .after-board { margin-top: 3.5mm; display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  .after-board { margin-top: auto; padding-top: 4mm; display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  #p1 { display: flex; flex-direction: column; min-height: calc(var(--page-content-h) - 3mm); }
+  #p1 .board { row-gap: 7mm; }
 
   /* ---- Página 2 ---- */
   .synopsis p { margin-bottom: 1.4mm; }
@@ -375,7 +377,7 @@
     <li><span><b>A aritmética da tese não fecha.</b> Capturar 80–90 % da margem do embalador dá 0,15–0,45 €/kg; o desconto de 10 % sobre 5,65 €/kg custa 0,57. Margem HoReCa: 0,35 €/kg (6,8 %) com 10 % de desconto, 1,4 % com 15 %; distribuidores ~1,5 %, sem desconto.</span><span class="ref">00 §1.4; 01 §2.2–2.5</span></li>
     <li><span><b>Não há hedge de azeite em bolsa.</b> O MFAO (Jaén) foi extinto em 2016–17; cobre-se com back-to-back, compra indexada (SIMA + Poolred) e offtake. Stock parado 18 meses: carry de ~20 % e VaR 95 % de 37–57 % [E]; perda potencial de 50–70 % do lote.</span><span class="ref">00 §1.6, §7; 01 §2.6</span></li>
     <li><span><b>Os 18 meses só existem do lado do capital.</b> O produtor recebe em 30/60 dias (Dir. 2019/633; DL 118/2010) e o lote roda em 2–6 meses: «18 meses» é só o vencimento legal das obrigações (esperado a 12, extensão até 18).</span><span class="ref">00 §5; 01 §1.2</span></li>
-    <li><span><b>Obrigações de SPV portuguesa, só a profissionais.</b> Sem prospeto até 12 M€ (DL 171/2026) ou só a qualificados ou a partir de 100 000 € [L], mas 100 000 € sem estatuto profissional é retalho PRIIPs (KID). A SPV só emite 12 meses após o registo [L]; retalho depois, via ECSP de terceiros (5 M€/ano).</span><span class="ref">00 §5; 01 §3</span></li>
+    <li><span><b>Obrigações de SPV portuguesa, só a profissionais.</b> Sem prospeto até 12 M€ (DL 171/2026) ou só a qualificados ou a partir de 100 000 € [L], mas quem subscreve 100 000 € sem ser profissional é retalho para os PRIIPs (KID). A SPV só emite 12 meses após o registo [L]; retalho depois, via ECSP de terceiros (5 M€/ano).</span><span class="ref">00 §5; 01 §3</span></li>
     <li><span><b>Pagamentos: bancos portugueses primeiro.</b> SCT Inst + VoP e SDD B2B: ~0–2 € por lote de 50 000 € (Lemonway: 150 €). Lemonway, depois Mangopay, só com fundos de terceiros; Stripe nunca para investidores; Treezor excluída (coima ACPR de 1 M€; mudança de controlo).</span><span class="ref">00 §6; 01 §3.6</span></li>
     <li><span><b>O negócio descrito não chega ao break-even até 2031.</b> Base: EBITDA de −1,22 M€ em 2031 e capital próprio ≥ 5,5 M€, ainda a subir; otimista −0,91 M€; pessimista: parar no gate. A margem média do azeite fica em 0,12 €/kg; a estrutura de 2031 pede ~0,68.</span><span class="ref">01 §7; modelo, base</span></li>
     <li><span><b>Gamificação: a linha está certa.</b> Jogo na colheita, no saber e no simulador com dinheiro fictício; nunca em retornos (ESMA35-43-3682). A simulação de perdas do art. 21.º do ECSP (capacidade de suportar perdas = 10 % do património líquido) cabe à plataforma ECSP; o simulador educa, não a substitui.</span><span class="ref">00 §5; 20 §2.3, §6</span></li>
