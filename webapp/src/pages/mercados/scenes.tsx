@@ -421,6 +421,8 @@ function PalletGrid({ P, ordered, level }: { P: Proj; ordered: { s: Pt; i: numbe
   const n = ordered.length;
   const toCount = (v: number) => ordered.filter(({ i }) => v >= (i + 0.5) / n).length;
   const [count, setCount] = useState(() => toCount(level.get()));
+  // as paletes já arrumadas ao montar aparecem sem transição; só as novas entram
+  const [atMount] = useState(count);
   useMotionValueEvent(level, 'change', (v) => {
     const next = toCount(v);
     setCount((c) => (c === next ? c : next));
@@ -429,7 +431,7 @@ function PalletGrid({ P, ordered, level }: { P: Proj; ordered: { s: Pt; i: numbe
     <g>
       {ordered.map(({ s, i }) =>
         i < count ? (
-          <motion.g key={`f${i}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22 }}>
+          <motion.g key={`f${i}`} initial={i < atMount ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.22 }}>
             <WaterPallet P={P} x={s[0]} y={s[1]} filled />
           </motion.g>
         ) : (

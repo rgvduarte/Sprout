@@ -205,8 +205,8 @@ export function SealsPage({
   const complete = seals.length > 0 && earned === seals.length;
   return (
     <section aria-labelledby={`selos-${c.short}`} className="flex min-w-0 flex-col p-5 sm:p-7">
-      <header className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
+      <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-[12rem] flex-1">
           <h2 id={`selos-${c.short}`} className="text-[1.375rem] leading-tight">
             Selos de origem
           </h2>

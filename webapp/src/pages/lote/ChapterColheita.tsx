@@ -279,7 +279,8 @@ export function ChapterColheita({ label }: { label: string }) {
   const { rich } = useJourney();
   return (
     <div className="relative">
-      {rich && <span id="analises" aria-hidden className="pointer-events-none absolute left-0 h-px w-px" style={{ top: '64%' }} />}
+      {/* âncora #analises: com capítulo fixo, leva ao fim do capítulo (boletim completo à vista) */}
+      {rich && <span id="analises" aria-hidden className="pointer-events-none absolute left-0 h-px w-px" style={{ top: 'calc(123vh + 80px)' }} />}
       <Chapter id="colheita" label={label} heightVh={230} static={!rich} className={cn(!rich && 'scroll-mt-6 border-b border-border')} stickyClassName="justify-center" >
         {(progress, isRich) => (
           <div style={isRich ? { paddingTop: CHROME_H } : undefined} className="min-w-0">

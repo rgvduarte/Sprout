@@ -36,7 +36,8 @@ function YourPosition() {
         <div className="sm:col-span-2">
           <dt className="text-muted">Em mercadoria</dt>
           <dd className="text-fg">
-            {phys.primary} · {containersFor(lot, phys.base)} · {phys.secondary}
+            {phys.primary}
+            {lot.world === 'azeite' && ` · ${containersFor(lot, phys.base)}`} · {phys.secondary}
           </dd>
         </div>
         {first?.fundedAt && (

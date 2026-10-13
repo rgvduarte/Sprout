@@ -46,10 +46,8 @@ function ReflectionBand({ committedAt }: { committedAt: string }) {
         {days.map((d, i) => (
           <div key={d} className="min-w-0">
             <div className={cn('h-2.5', i === 0 && 'rounded-l-xs', i === days.length - 1 && 'rounded-r-xs', i <= elapsed ? 'bg-accent' : 'bg-[color-mix(in_oklab,var(--accent)_16%,var(--surface-2))]')} />
-            <p className={cn('mt-1 font-mono text-xs tnum', i === elapsed ? 'text-fg' : 'text-muted')}>
-              {fmtDate(d).slice(0, 5)}
-              {i === elapsed && ' · hoje'}
-            </p>
+            <p className={cn('mt-1 font-mono text-xs tnum', i === elapsed ? 'text-fg' : 'text-muted')}>{fmtDate(d).slice(0, 5)}</p>
+            {i === elapsed && <p className="text-xs font-medium text-fg">hoje</p>}
           </div>
         ))}
       </div>
@@ -152,10 +150,11 @@ export function CommitDone({ moment, onCancelled }: { moment: CommitMoment; onCa
             <StatusPill label="Aguarda transferência" tone="info" />
             <h3 className="mt-2 text-[1.5rem] leading-tight">Compromisso registado</h3>
             <p className="mt-1 text-[1.0625rem] text-fg">
-              <span className="font-mono tnum">{eur(p.amount)}</span> no lote <span className="font-mono tnum">{lot.id}</span>
+              <span className="font-mono tnum">{eur(p.amount)}</span> no lote <span className="whitespace-nowrap font-mono tnum">{lot.id}</span>
             </p>
             <p className="text-sm text-muted">
-              A tua fração: {phys.primary} ({containersFor(lot, phys.base)}) · {phys.secondary} · {pct(phys.shareOfLot, 1)} do lote
+              A tua fração: {phys.primary}
+              {lot.world === 'azeite' && ` (${containersFor(lot, phys.base)})`} · {phys.secondary} · {pct(phys.shareOfLot, 1)} do lote
             </p>
           </div>
         </div>

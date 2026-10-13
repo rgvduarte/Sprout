@@ -173,10 +173,8 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
             {isBand && <ReferenceArea y1={low} y2={high} fill={color} fillOpacity={0.45} stroke={color} strokeOpacity={0.9} strokeWidth={1} ifOverflow="extendDomain" />}
             {!isBand &&
               lots
-              .filter((l) => l.id !== compareId)
-              .map((l) => (
-                <ReferenceLine key={l.id} y={l.economics.buyerPrice} stroke={color} strokeWidth={1.5} strokeDasharray="4 3" />
-              ))}
+                .filter((l) => l.id !== compareId)
+                .map((l) => <ReferenceLine key={l.id} y={l.economics.buyerPrice} stroke={color} strokeWidth={1.5} strokeDasharray="4 3" />)}
             {compare && (
               <ReferenceLine
                 y={compare.economics.buyerPrice}

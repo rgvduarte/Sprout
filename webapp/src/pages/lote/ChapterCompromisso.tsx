@@ -230,7 +230,8 @@ function CommitForm({ onCommitted }: { onCommitted: (m: CommitMoment) => void })
             {lot.world === 'azeite' ? 'de azeite' : lot.world === 'agua' ? 'de água' : 'de café verde'} {phys.secondary}
           </p>
           <p className="mt-0.5 text-sm text-world-ink">
-            {containersFor(lot, phys.base)} · {pct(phys.shareOfLot, 1)} do lote · liquidado com o lote inteiro
+            {lot.world === 'azeite' && `${containersFor(lot, phys.base)} · `}
+            {pct(phys.shareOfLot, 1)} do lote · liquidado com o lote inteiro
           </p>
           </div>
         </div>
