@@ -31,7 +31,7 @@ let state: Record<ProfileKey, AcademiaLocal> = {
     goal: 'azeite',
     goalSetAt: '2026-01-12',
     requests: [
-      { id: 'rq-1', rewardId: 'certificado', at: '2026-01-12', detail: 'Certificado de Provador', status: 'Emitido' },
+      { id: 'rq-1', rewardId: 'certificado', at: '2026-01-12', detail: 'Nível Provador · 180 pontos', status: 'Emitido' },
       { id: 'rq-2', rewardId: 'amostra', at: '2026-06-20', detail: 'Frasco de 250 ml do AZ-2026-014 · morada registada', status: 'Entregue a 02/07/2026', lotId: 'AZ-2026-014' },
     ],
   },

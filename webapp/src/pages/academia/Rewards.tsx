@@ -84,7 +84,7 @@ export function Rewards() {
                 )}
               </div>
               <div className="col-start-2 mt-3 sm:col-start-3 sm:row-start-1 sm:mt-0">
-                <Button variant={st.unlocked && !exhausted ? 'secondary' : 'ghost'} size="sm" disabled={!st.unlocked || exhausted} onClick={() => openReward(r.id)}>
+                <Button variant="secondary" size="sm" disabled={!st.unlocked || exhausted} onClick={() => openReward(r.id)}>
                   {issued ? 'Ver certificado' : exhausted ? 'Amostras pedidas' : r.action}
                 </Button>
               </div>
@@ -125,32 +125,26 @@ export function Rewards() {
         <h3 id="niveis-title" className="text-[1.0625rem]">
           O que cada nível desbloqueia
         </h3>
-        <div className="-mx-4 mt-3 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          <table className="w-full min-w-[560px] border-collapse text-[0.9375rem]">
-            <thead>
-              <tr className="border-b border-border text-left text-sm text-muted">
-                <th scope="col" className="py-2 pr-4 font-medium">Nível</th>
-                <th scope="col" className="py-2 pr-4 text-right font-medium">A partir de</th>
-                <th scope="col" className="py-2 font-medium">Desbloqueia</th>
-              </tr>
-            </thead>
-            <tbody>
-              {LEVELS.map((l) => {
-                const reached = game.points >= l.minPoints;
-                return (
-                  <tr key={l.id} className="border-b border-border align-top last:border-b-0">
-                    <th scope="row" className={cn('py-2.5 pr-4 text-left font-medium', reached ? 'text-fg' : 'text-muted')}>
-                      {l.nome}
-                      {l.id === game.level.id && <span className="ml-2 rounded-xs bg-accent-soft px-1.5 text-xs font-medium text-accent">o teu nível</span>}
-                    </th>
-                    <td className="py-2.5 pr-4 text-right font-mono text-fg tnum">{num(l.minPoints)} pts</td>
-                    <td className={cn('py-2.5', reached ? 'text-fg' : 'text-muted')}>{LEVEL_PERKS[l.id].unlocks.join(' · ')}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <ol className="mt-3 divide-y divide-border border-y border-border">
+          {LEVELS.map((l) => {
+            const reached = game.points >= l.minPoints;
+            const mine = l.id === game.level.id;
+            return (
+              <li key={l.id} className="grid min-w-0 gap-x-6 gap-y-1 py-3 sm:grid-cols-[200px_minmax(0,1fr)]">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className={cn('font-medium', reached ? 'text-fg' : 'text-muted')}>{l.nome}</span>
+                  <span className="font-mono text-sm text-muted tnum">{num(l.minPoints)} pts</span>
+                  {mine && <span className="rounded-xs bg-accent-soft px-1.5 text-xs font-medium leading-5 text-accent">o teu nível</span>}
+                </div>
+                <ul className={cn('flex flex-col gap-0.5 text-[0.9375rem]', reached ? 'text-fg' : 'text-muted')}>
+                  {LEVEL_PERKS[l.id].unlocks.map((u) => (
+                    <li key={u}>{u}</li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })}
+        </ol>
       </section>
 
       {openDef && drawer && <RequestDrawer key={drawer.n} def={openDef} open={drawer.open} onClose={() => setDrawer((d) => (d ? { ...d, open: false } : d))} participating={participating} />}
@@ -198,7 +192,7 @@ function RequestDrawer({ def, open, onClose, participating }: { def: RewardDef; 
     let detail = def.title;
     let status = 'Pedido registado';
     if (def.kind === 'certificado') {
-      detail = `Certificado de Provador · ${num(game.points)} pontos`;
+      detail = `Nível ${game.level.nome} · ${num(game.points)} pontos`;
       status = 'Emitido';
     } else if (def.kind === 'amostra') {
       const pos = sampleLots.find((p) => p.lotId === lot);

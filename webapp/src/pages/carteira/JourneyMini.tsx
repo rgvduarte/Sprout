@@ -48,7 +48,7 @@ export function JourneyMini({ lot, className, showNext = true }: { lot: Pick<Lot
           {next && (
             <>
               {last ? ' · a seguir: ' : 'A seguir: '}
-              {labels[next.stage].toLowerCase()}
+              {next.stage === 'liquidado' ? 'liquidação' : labels[next.stage].toLowerCase()}
               {next.planned && <span className="font-mono tnum"> prev. {fmtDate(next.planned)}</span>}
             </>
           )}

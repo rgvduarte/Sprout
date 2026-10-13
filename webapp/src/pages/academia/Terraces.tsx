@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { LEVELS, TOTAL_KNOWLEDGE_POINTS } from '../../data';
-import { LevelGlyph } from '../../components/game';
 import { cn } from '../../lib/cn';
 import { num } from '../../lib/format';
 
@@ -116,7 +115,7 @@ export function Terraces({ points, className }: { points: number; className?: st
             ) : (
               <g key={`${l.id}-${k}-off`}>
                 <circle cx={p.x} cy={p.y + p.r - 1.5} r={1.6} fill="color-mix(in oklab, var(--fg) 30%, var(--surface))" />
-                <circle cx={p.x} cy={p.y} r={p.r - 1} fill="none" stroke="color-mix(in oklab, var(--fg) 24%, var(--surface))" strokeWidth="1" strokeDasharray="2 2.4" />
+                <circle cx={p.x} cy={p.y} r={p.r - 1} fill="none" stroke="color-mix(in oklab, var(--fg) 34%, var(--surface))" strokeWidth="1" strokeDasharray="2 2.4" />
               </g>
             );
           }),
@@ -137,10 +136,7 @@ export function Terraces({ points, className }: { points: number; className?: st
           const state = i < levelIdx ? 'feito' : i === levelIdx ? 'atual' : 'por-alcancar';
           return (
             <li key={l.id} className="min-w-0" aria-current={state === 'atual' ? 'step' : undefined}>
-              <span className={cn('flex items-center gap-1.5 text-sm font-medium leading-tight', state === 'por-alcancar' ? 'text-muted' : 'text-fg')}>
-                <LevelGlyph level={l.id} className={cn('hidden size-4 sm:block', state === 'por-alcancar' ? 'text-muted' : 'text-accent')} />
-                {l.nome}
-              </span>
+              <span className={cn('block text-sm font-medium leading-tight', state === 'por-alcancar' ? 'text-muted' : 'text-fg')}>{l.nome}</span>
               <span className="mt-0.5 block font-mono text-xs text-muted tnum">
                 {num(l.minPoints)} pts{state === 'feito' && ' · feito'}
                 {state === 'atual' && ' · aqui'}

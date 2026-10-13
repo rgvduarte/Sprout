@@ -32,7 +32,7 @@
    "unidade": "kg",
    "conversao_kg_por_l": 0.916,
    "ano_inicio": 2027,
-   "modelo_operacional": "principal: compra ao lagar (título para a Sprout Capital SPV), embalamento no lagar, venda a compradores B2B back-to-back ou com offtake",
+   "modelo_operacional": "principal: compra ao lagar (título para a Sprout Capital SPV), lote misto de 20-30 t (custódia por lote), embalamento no lagar; distribuidores/exportadores levantam paletes com offtake; a parte HoReCa/gourmet é embalada por tranches e libertada para armazém logístico (3PL) com conta de custódia",
    "indice_referencia": "média de 2 semanas de SIMA Alentejo AOVE e Poolred AOVE",
    "preco_indice_granel_eur_kg": {
     "pessimista": 3.5,
@@ -44,59 +44,130 @@
     "base": 0.1,
     "otimista": 0.05
    },
+   "clientes_horeca_gourmet_ativos_medios": {
+    "pessimista": [
+     30,
+     100,
+     250,
+     400,
+     500
+    ],
+    "base": [
+     40,
+     180,
+     650,
+     1300,
+     2000
+    ],
+    "otimista": [
+     50,
+     300,
+     1000,
+     2000,
+     3000
+    ]
+   },
+   "consumo_por_cliente_horeca_gourmet_t_ano": 0.205,
    "volume_t": {
     "pessimista": [
-     60,
+     40,
      150,
      300,
      450,
      600
     ],
     "base": [
-     120,
+     60,
      400,
      850,
      1450,
      2200
     ],
     "otimista": [
-     200,
+     80,
      650,
      1300,
      2200,
      3300
     ]
    },
-   "mix_horeca_gourmet": {
+   "volume_horeca_gourmet_t": {
     "pessimista": [
-     0.7,
-     0.65,
-     0.6,
-     0.55,
-     0.5
+     6,
+     21,
+     51,
+     82,
+     103
     ],
     "base": [
-     0.6,
-     0.55,
-     0.5,
-     0.45,
-     0.4
+     8,
+     37,
+     133,
+     267,
+     410
     ],
     "otimista": [
-     0.55,
-     0.5,
-     0.45,
-     0.4,
-     0.35
+     10,
+     62,
+     205,
+     410,
+     615
     ]
    },
+   "volume_distribuidores_export_t": {
+    "pessimista": [
+     34,
+     129,
+     249,
+     368,
+     497
+    ],
+    "base": [
+     52,
+     363,
+     717,
+     1183,
+     1790
+    ],
+    "otimista": [
+     70,
+     588,
+     1095,
+     1790,
+     2685
+    ]
+   },
+   "mix_horeca_gourmet": {
+    "pessimista": [
+     0.15,
+     0.14,
+     0.17,
+     0.1822,
+     0.1717
+    ],
+    "base": [
+     0.1333,
+     0.0925,
+     0.1565,
+     0.1841,
+     0.1864
+    ],
+    "otimista": [
+     0.125,
+     0.0954,
+     0.1577,
+     0.1864,
+     0.1864
+    ]
+   },
+   "nota_mix": "derivado: volume_horeca_gourmet_t / volume_t; o modelo usa os volumes por canal",
    "canais": {
     "horeca_gourmet": {
-     "descricao": "HoReCa média/alta e lojas gourmet; 5 L PET/BIB e algum vidro; entrega fracionada",
+     "descricao": "HoReCa média/alta e lojas gourmet; 5 L PET/BIB e algum vidro; entrega fracionada a partir de armazém logístico (3PL); ticket mensal de 150-300 EUR (azeite + água)",
      "preco_referencia_eur_kg": {
-      "pessimista": 5.7,
-      "base": 6.0,
-      "otimista": 6.3
+      "pessimista": 5.4,
+      "base": 5.65,
+      "otimista": 6.0
      },
      "desconto_efetivo": {
       "pessimista": 0.1,
@@ -127,11 +198,31 @@
        0.25
       ]
      },
+     "armazem_logistico_picking_eur_kg": 0.06,
      "dias_stock": {
-      "pessimista": 100,
-      "base": 90,
-      "otimista": 80
+      "pessimista": [
+       180,
+       180,
+       180,
+       90,
+       60
+      ],
+      "base": [
+       180,
+       180,
+       45,
+       45,
+       45
+      ],
+      "otimista": [
+       180,
+       90,
+       45,
+       45,
+       45
+      ]
      },
+     "nota_dias_stock": "stock médio (não o prazo de escoamento do lote): 180 dias enquanto houver < 300 clientes ativos; 45 dias (lote escoado uniformemente em ~90 dias) com >= 300 clientes",
      "dias_recebimento": {
       "pessimista": 45,
       "base": 35,
@@ -139,6 +230,8 @@
      },
      "lote_medio_t": 20,
      "analises_por_lote": 2,
+     "inspecao_collateral_manager_eur_por_lote": 2000,
+     "pagamentos_bancarios_eur_kg": 0.01,
      "provisao_credito_pct_vendas": {
       "pessimista": 0.008,
       "base": 0.006,
@@ -146,16 +239,17 @@
      }
     },
     "distribuidores_export": {
-     "descricao": "distribuidores foodservice, retalho independente e exportadores com offtake; paletes de 5 L ou granel em IBC",
+     "descricao": "distribuidores foodservice, retalho independente e exportadores com offtake; paletes de 5 L. Granel em IBC fora do modelo de principal (seria corretagem ao índice + <= 0,15 EUR/kg, sem embalamento, margem 0-0,10 EUR/kg)",
      "preco_referencia_eur_kg": {
-      "pessimista": 4.85,
-      "base": 5.0,
-      "otimista": 5.2
+      "pessimista": 4.2,
+      "base": 4.35,
+      "otimista": 4.5
      },
+     "nota_preco": "referência = preço de saída do embalador (granel 3,50 + embalamento 0,47-0,51 + margem líquida do embalador 0,19-0,50 = 4,16-4,51 EUR/kg); sem desconto adicional: o argumento para o distribuidor é origem verificada, lote e prazo, não preço",
      "desconto_efetivo": {
-      "pessimista": 0.06,
-      "base": 0.05,
-      "otimista": 0.05
+      "pessimista": 0.0,
+      "base": 0.0,
+      "otimista": 0.0
      },
      "embalamento_eur_kg": 0.45,
      "logistica_eur_kg": {
@@ -181,10 +275,11 @@
        0.08
       ]
      },
+     "armazem_logistico_picking_eur_kg": 0.0,
      "dias_stock": {
-      "pessimista": 70,
-      "base": 60,
-      "otimista": 50
+      "pessimista": 35,
+      "base": 30,
+      "otimista": 25
      },
      "dias_recebimento": {
       "pessimista": 55,
@@ -193,6 +288,8 @@
      },
      "lote_medio_t": 30,
      "analises_por_lote": 2,
+     "inspecao_collateral_manager_eur_por_lote": 1200,
+     "pagamentos_bancarios_eur_kg": 0.005,
      "provisao_credito_pct_vendas": {
       "pessimista": 0.005,
       "base": 0.003,
@@ -207,14 +304,10 @@
     "perdas_fisicas_pct_valor": 0.005,
     "desclassificacao_prob_por_trimestre": 0.03,
     "desclassificacao_penalizacao_eur_kg": 0.3,
-    "inspecao_collateral_manager_eur_por_lote": 1200,
-    "pagamentos_kyc_faturacao_eur_kg": 0.02,
-    "dias_pagamento_produtor": 30
+    "dias_pagamento_produtor": 30,
+    "nota": "custódia (collateral manager) e pagamentos bancários por kg estão por canal em commodities.azeite.canais; KYC e faturação certificada ficam só no custo fixo de tecnologia (sem dupla contagem)"
    },
-   "check_margem_contribuicao_2027_base_eur_kg": {
-    "horeca_gourmet": 0.659,
-    "distribuidores_export": 0.399
-   }
+   "check_margem_contribuicao_base_eur_kg": "preenchido por calculo_referencia.py"
   },
   "agua": {
    "unidade": "palete",
@@ -224,21 +317,21 @@
    "modelo_operacional": "agente com faturação direta: o engarrafador fatura e entrega ao comprador; o comprador paga ao engarrafador; a Sprout fatura comissão ao engarrafador (sem fundos de terceiros, sem stock, sem SDR na Sprout)",
    "volume_paletes": {
     "pessimista": [
-     120,
+     60,
      0,
      0,
      0,
      0
     ],
     "base": [
-     240,
+     150,
      600,
      1000,
      1400,
      1800
     ],
     "otimista": [
-     300,
+     180,
      800,
      1500,
      2200,
@@ -249,12 +342,12 @@
    "preco_ex_fabrica_medio_eur_l": 0.24,
    "desconto_efetivo": 0.1,
    "comissao_agente_pct_gmv": {
-    "pessimista": 0.03,
-    "base": 0.04,
-    "otimista": 0.05
+    "pessimista": 0.01,
+    "base": 0.02,
+    "otimista": 0.03
    },
    "deposito_sdr_eur_por_embalagem": 0.1,
-   "nota": "pessimista: linha descontinuada no gate de 31/08/2027"
+   "nota": "piloto: 60 paletes (45.000 L, ~1.800 L por cliente HoReCa no semestre); pessimista: linha descontinuada no gate de 31/08/2027; comissão de 4-5% só com cotação real de um engarrafador"
   },
   "cafe": {
    "unidade": "kg café verde",
@@ -302,9 +395,9 @@
  "receitas": {
   "margem_principal_azeite": "receita = volume x preco_referencia x (1 - desconto); margem = receita - custos diretos por canal (ver commodities.azeite)",
   "comissao_agente_agua_pct_gmv": {
-   "pessimista": 0.03,
-   "base": 0.04,
-   "otimista": 0.05
+   "pessimista": 0.01,
+   "base": 0.02,
+   "otimista": 0.03
   },
   "margem_principal_cafe": "receita = volume x preco_venda; margem = receita - compra - logística - financiamento - crédito - ops",
   "financiamento_stock_terceiros": {
@@ -334,7 +427,11 @@
    },
    "taxa_verificacao_por_utilizacao_pct": 0.0075,
    "rotacoes_por_ano": 2,
-   "taxa_monitorizacao_anual_pct": 0.005
+   "taxa_monitorizacao_anual_pct": 0.005,
+   "custo_verificacao_eur_kg_verificado": 0.018,
+   "valor_colateral_eur_kg": 3.5,
+   "ltv": 0.625,
+   "nota_custos": "kg verificados/ano = carteira_media / (valor_colateral x ltv) x rotacoes; custo = collateral manager 1.200 EUR + análises 600 EUR por lote de 100 t; alternativa: contratar que o banco ou o mutuário pague diretamente o collateral manager e o laboratório"
   },
   "dados_e_indice_eur": {
    "pessimista": [
@@ -365,35 +462,38 @@
   ]
  },
  "financiamento": {
-  "veiculo": "Sprout Capital, SA (SPV PT) - obrigações a investidores qualificados ou ticket >= 100k EUR; sem retalho",
+  "veiculo": "Sprout Capital, SA (SPV PT) - obrigações a investidores qualificados ou com ticket >= 100k EUR (estes últimos são retalho para efeitos PRIIPs; KID a avaliar no parecer); sem retalho abaixo de 100k EUR; 1.ª série recomendada só a clientes profissionais",
   "pct_capital_giro_azeite_financiado_por_notes": {
    "pessimista": [
-    0.5,
+    0.0,
     0.85,
     0.85,
     0.85,
     0.85
    ],
    "base": [
-    0.6,
+    0.0,
     0.9,
     0.9,
     0.9,
     0.9
    ],
    "otimista": [
-    0.6,
+    0.0,
     0.9,
     0.9,
     0.9,
     0.9
    ]
   },
-  "nota_piloto": "na série piloto as notes cobrem 80% (subordinado 20%); 2027 = 60% em média porque a 1.ª emissão só ocorre em abr. 2027",
+  "saldo_obrigacoes": "= pct x capital de giro / utilizacao_media_capital (capital levantado; o excedente fica em caixa na série); o cupão incide só sobre as obrigações",
+  "nota_2027": "2027 = 0%: a SPV só pode emitir obrigações 12 meses após o registo definitivo (CSC art. 348.º/2 [L]); sem garantia bancária, a 1.ª série sai em 2027-11 a 2028-01 e o stock do piloto (fev.-jul. 2027) e do 4.º trim. de 2027 é financiado por capital próprio (incl. capital social da SPV) ou linha bancária",
   "capital_subordinado_patrocinador_pct": {
-   "piloto": 0.2,
+   "primeira_serie": 0.333,
    "regime": 0.1
   },
+  "capital_social_spv_eur": 50000,
+  "capital_social_spv_realizacao": "integral antes da 1.ª emissão (a confirmar no parecer; mínimo legal: 30% na constituição, CSC art. 277.º/2 [L]); modelado como realizado em 2026 e como piso do capital de giro financiado por capital próprio",
   "cupao_anual": {
    "pessimista": [
     0.09,
@@ -464,14 +564,22 @@
    ]
   },
   "concentracao_max_comprador_recebiveis": 0.2,
-  "piloto": {
+  "primeira_serie": {
    "serie_max_eur": 150000,
-   "notes_senior_eur": 120000,
-   "subordinado_patrocinador_eur": 30000,
-   "n_investidores": "3 a 6",
-   "ticket_min_qualificado_eur": 25000,
-   "ticket_min_nao_qualificado_eur": 100000,
-   "data_emissao_alvo": "2027-04"
+   "notes_senior_eur": 100000,
+   "subordinado_patrocinador_eur": 50000,
+   "subordinado_forma": "capital social da Sprout Capital, SA (mínimo legal 50.000 EUR, CSC art. 276.º/5 [L])",
+   "n_investidores": "2 a 4",
+   "publico_recomendado": "só clientes profissionais: per se (MiFID II Anexo II, I) ou já classificados como profissionais por banco/empresa de investimento, com declaração escrita (Reg. 2017/1129 art. 2.º al. e))",
+   "ticket_min_profissional_eur": 25000,
+   "ticket_min_nao_profissional_eur": 100000,
+   "data_emissao_alvo": "2027-12 (janela 2027-11 a 2028-01: 12 meses após o registo definitivo da SPV, que tem de ocorrer até 2026-12)",
+   "condicoes_previas": "parecer favorável às perguntas 2 (CSC art. 348.º e RGICSF art. 9.º) e 10 (PRIIPs) do 01-desenho-do-modelo.md sec. 3.5; gate de 2027-08-31 cumprido",
+   "alternativa_garantia_bancaria": {
+    "data_emissao": "2027-04",
+    "custo": "comissão de garantia bancária NV; ordem de grandeza 1-2%/ano do montante garantido [E, NV]",
+    "estado": "não modelada"
+   }
   },
   "retorno_investidor": {
    "bruto_anual": "= cupao_anual",
@@ -484,27 +592,35 @@
    "por_serie_eur": 5000,
    "series_por_ano": {
     "pessimista": [
-     1,
+     0,
      1,
      2,
      2,
      2
     ],
     "base": [
-     1,
+     0,
      2,
      3,
      4,
      5
     ],
     "otimista": [
-     1,
+     0,
      3,
      4,
      5,
      6
     ]
-   }
+   },
+   "funcoes_independentes_eur": [
+    15000,
+    30000,
+    30000,
+    30000,
+    30000
+   ],
+   "nota_funcoes_independentes": "administrador independente da SPV (desde a constituição), membro independente do Comité de Risco e representante comum dos obrigacionistas (desde a 1.ª emissão) [E, NV]; não incluídos nos 25k/ano"
   }
  },
  "custos": {
@@ -523,7 +639,7 @@
     "kyb_empresa_mes_eur": 0.8,
     "usar": "só se o modelo passar a agente com fundos de terceiros"
    },
-   "nota": "no modelo principal os custos de pagamento/KYC/faturação por kg já estão em commodities.azeite.custos_fisicos_e_custodia.pagamentos_kyc_faturacao_eur_kg; os valores abaixo servem para validar"
+   "nota": "no modelo principal só as comissões bancárias por operação entram no custo por kg (commodities.azeite.canais.*.pagamentos_bancarios_eur_kg); KYC e faturação estão no fixo de tecnologia; os valores abaixo servem para validar"
   },
   "kyc": {
    "identidade_eur_por_verificacao": 2.0,
@@ -555,7 +671,9 @@
      8000,
      10000
     ]
-   }
+   },
+   "base_volume_seguro": "vendas de azeite (todos os canais)",
+   "incluido_no_opex_desde": 2028
   },
   "hedge": {
    "azeite": {
@@ -575,14 +693,18 @@
   "pessoal": {
    "tsu_entidade_empregadora": 0.2375,
    "outros_encargos_pct": 0.02,
+   "subsidio_refeicao_eur_fte_ano": 2000,
+   "nota_subsidio_refeicao": "fora da base da TSU até aos limites legais [L]; ~6-10 EUR/dia útil (valores de 2026 NV); atualizado com os salários",
    "atualizacao_salarial_anual": 0.03,
    "fator_salarial_fundadores_2027": {
     "funcoes": [
      "ceo_comercial",
      "cto"
     ],
-    "fator": 0.6,
-    "nota": "fundadores a 60% até ao gate; 100% a partir de 2028"
+    "fator_ate_gate": 0.6,
+    "meses_ate_gate": 8,
+    "fator_efetivo_2027": 0.7333,
+    "nota": "fundadores a 60% até ao gate (31-08-2027) e a 100% a partir de 01-09-2027: fator efetivo 2027 = 8/12 x 0,6 + 4/12 x 1"
    },
    "nota_salarios": "salário bruto anual (14 meses incluídos)",
    "funcoes": {
@@ -784,16 +906,18 @@
        1,
        2,
        3,
-       3
+       5
       ],
       "otimista": [
        1,
        2,
        3,
-       4,
-       5
+       5,
+       8
       ]
-     }
+     },
+     "contas_por_gestor": 400,
+     "nota": "~400 contas HoReCa ativas por gestor com encomenda self-service e SDD recorrente [I, NV]; num modelo assistido (250-300 contas [I, NV]) o base precisaria de 7-8 FTE em 2031"
     },
     "controller_financeiro": {
      "salario_bruto_anual": 45000,
@@ -1115,6 +1239,10 @@
    "aipd_rgpd": 5000,
    "integracoes_ledger_contratado": 15000,
    "contingencia": 10000
+  },
+  "capital_pre_arranque_2026_eur": {
+   "capital_social_spv": 50000,
+   "nota": "não é custo: capital realizado na Sprout Capital, SA; financia o stock do piloto em 2027"
   }
  },
  "capex": {
@@ -1173,7 +1301,7 @@
   }
  },
  "capital_de_giro": {
-  "azeite": "dias_stock, dias_recebimento por canal (commodities.azeite.canais); dias_pagamento_produtor = 30",
+  "azeite": "stock médio x (granel + embalamento) + recebíveis x preço - fornecedores x (granel + embalamento) a 30 dias; dias por canal em commodities.azeite.canais (HoReCa por ano)",
   "cafe": {
    "dias_stock": 45,
    "dias_recebimento": 30,
@@ -1184,14 +1312,15 @@
    "stock": 0
   },
   "caixa_minima_operacional_eur": 150000,
-  "reserva_primeira_perda_restrita": "5% do saldo de notes (caixa restrita na SPV)",
+  "reserva_primeira_perda_restrita": "5% do saldo de obrigações (caixa restrita na SPV); se a margem dos lotes não chegar, o patrocinador completa com capital próprio (pressuposto do modelo)",
   "iva": {
    "azeite": 0.06,
    "agua": 0.13,
    "cafe": 0.23,
    "comissoes_servicos": 0.23,
    "periodicidade": "trimestral se volume de negócios < 650k EUR, mensal acima [L]"
-  }
+  },
+  "capital_proprio_minimo_no_capital_de_giro_eur": 50000
  },
  "impostos": {
   "irc_taxa_geral": {
@@ -1245,12 +1374,15 @@
    "gourmet_retalho_independente": 8,
    "distribuidores_exportadores_com_offtake": 3
   },
-  "investidores_qualificados": "3 a 6",
+  "investidores_qualificados": "0 no piloto (sem obrigações antes de 12 meses de registo da SPV); 1.ª série de 2 a 4 profissionais após o gate",
   "volume": {
-   "azeite_t": 40,
-   "agua_paletes": 120
+   "azeite_t": 20,
+   "azeite_horeca_gourmet_t": 4,
+   "azeite_distribuidores_offtake_t": 16,
+   "lotes": 1,
+   "agua_paletes": 60
   },
-  "gmv_alvo_eur": 240000,
+  "gmv_alvo_eur": "preenchido por calculo_referencia.py",
   "metas": {
    "fill_rate_min": 0.95,
    "variacao_base_compra_vs_indice_max_eur_kg": 0.15,
@@ -1258,7 +1390,8 @@
     0.08,
     0.12
    ],
-   "margem_contribuicao_azeite_min": 0.08,
+   "margem_contribuicao_horeca_gourmet_min_eur_kg": "preenchido por calculo_referencia.py",
+   "margem_contribuicao_distribuidores_min_eur_kg": 0.0,
    "pagamento_produtor_max_dias": 30,
    "pagamento_cupao_atraso_max_dias": 0,
    "match_automatico_min": 0.95,
@@ -1271,11 +1404,17 @@
    "incumprimento_max_pct_gmv": 0.005,
    "lotes_desclassificados_a_entrega": 0,
    "concentracao_lagar_ancora_max": 0.5,
-   "compradores_recorrentes_min": 0.6
-  }
+   "compradores_horeca_recorrentes_min_3_encomendas": 0.6,
+   "gmv_gate_min_eur": 90000,
+   "offtake_cobertura_min_lote": 0.8
+  },
+  "ticket_medio_horeca_eur": [
+   150,
+   300
+  ]
  },
  "stress_tests": {
-  "descricao": "parâmetros para o modelo financeiro; resultados de referência em 01-desenho-do-modelo.md sec. 4",
+  "descricao": "parâmetros para o modelo financeiro; aplicação à 1.ª série (book de 150k EUR; almofada 33% = capital social da SPV) em 01-desenho-do-modelo.md sec. 4.4",
   "S1_choque_preco": {
    "queda_indice": -0.3,
    "pct_compradores_back_to_back_que_renegociam": 0.2

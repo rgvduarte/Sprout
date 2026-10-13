@@ -1,4 +1,5 @@
-import { motion, useTransform, type MotionValue } from 'motion/react';
+import { useEffect } from 'react';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
 import { Chapter, EASE_OUT, JourneyTrack, LotGauge } from '../../components/game';
 import { RiskNote, TextLink } from '../../components/ui';
 import { fundedFraction } from '../../data';
@@ -72,7 +73,7 @@ function Tanks({ units, progress, lotKg }: { units: TelemetryUnit[]; progress: M
   const width = TANK.x0 * 2 + units.length * TANK.w + (units.length - 1) * TANK.gap;
   const lotUnits = ['D1', 'D2'];
   const bracketTo = TANK.x0 + 2 * TANK.w + TANK.gap;
-  const height = TANK.top + TANK.h + 36;
+  const height = TANK.top + TANK.h + 44;
   return (
     <figure className="mt-4 min-w-0">
       <svg viewBox={`0 0 ${width} ${height}`} className="block h-auto w-full max-w-[460px]" role="img" aria-label={`Depósitos do ${LAGAR.nome}: ${units.map((u) => `${u.label} com ${kg(u.level)} de ${kg(u.capacity)}`).join('; ')}. O lote ${FOCUS_LOT_ID} ocupa os depósitos 1 e 2.`}>
@@ -100,26 +101,24 @@ function Tanks({ units, progress, lotKg }: { units: TelemetryUnit[]; progress: M
 
 function Tank({ unit, x, progress, inLot }: { unit: TelemetryUnit; x: number; progress: MotionValue<number>; inLot: boolean }) {
   const fraction = unit.capacity ? Math.min(1, unit.level / unit.capacity) : 0;
+  const reduce = useReducedMotion();
+  // nível da telemetria (anima quando chega uma leitura) × progresso do scroll
+  const level = useMotionValue(fraction);
+  useEffect(() => {
+    if (reduce) {
+      level.set(fraction);
+      return;
+    }
+    const c = animate(level, fraction, { duration: 0.8, ease: EASE_OUT });
+    return () => c.stop();
+  }, [fraction, level, reduce]);
+  const fill = useTransform([progress, level], ([p, l]: number[]) => p * l);
   const { w, h, top } = TANK;
   const line = 'color-mix(in oklab, var(--fg) 55%, var(--surface))';
   return (
     <g>
       <rect x={x} y={top} width={w} height={h} rx={6} fill="color-mix(in oklab, var(--fg) 5%, var(--surface))" stroke={inLot ? 'var(--world-ink)' : line} strokeWidth={inLot ? 1.75 : 1.25} />
-      <motion.g style={{ scaleY: progress, transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
-        <motion.rect
-          x={x + 3}
-          y={top + 3}
-          width={w - 6}
-          height={h - 6}
-          rx={4}
-          fill="var(--world)"
-          opacity={0.9}
-          initial={false}
-          animate={{ scaleY: fraction }}
-          transition={{ duration: 0.8, ease: EASE_OUT }}
-          style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}
-        />
-      </motion.g>
+      <motion.rect x={x + 3} y={top + 3} width={w - 6} height={h - 6} rx={4} fill="var(--world)" opacity={0.9} style={{ scaleY: fill, transformBox: 'fill-box', transformOrigin: '50% 100%' }} />
       {/* graduações a cada 25 % */}
       {[0.25, 0.5, 0.75].map((t) => (
         <line key={t} x1={x + 4} x2={x + 12} y1={top + h * (1 - t)} y2={top + h * (1 - t)} stroke={line} strokeWidth="1.25" />
@@ -136,17 +135,15 @@ function LiveLine() {
   const nowValue = useNow(15_000);
   const latest = events.find((e) => e.producerId === FOCUS_PRODUCER_ID && (e.kind === 'telemetria' || e.kind === 'rececao'));
   if (!latest) return null;
+  const status = feed.paused ? (feed.pauseReason === 'reduced-motion' ? 'Diário em pausa (movimento reduzido)' : 'Diário em pausa') : 'Ao vivo';
   return (
-    <p className="mt-5 flex min-w-0 max-w-[460px] items-start gap-2.5 text-sm" aria-live="polite">
-      <span aria-hidden className={cn('mt-[0.4em] size-2 shrink-0 rounded-full', feed.paused ? 'bg-border' : 'bg-ok')} />
-      <span className="min-w-0">
-        <span className="font-medium text-fg">{latest.title}</span>
-        <span className="text-muted">
-          {' '}
-          · {relative(latest.at, nowValue)} · {feed.paused ? (feed.pauseReason === 'reduced-motion' ? 'diário em pausa (movimento reduzido)' : 'diário em pausa') : 'ao vivo'}
-        </span>
-      </span>
-    </p>
+    <div className="mt-5 min-w-0 max-w-[460px] border-t border-border pt-3 text-sm" aria-live="polite">
+      <p className="flex items-center gap-2 text-[13px] text-muted">
+        <span aria-hidden className={cn('size-2 shrink-0 rounded-full', feed.paused ? 'bg-border' : 'bg-ok')} />
+        {status} · {relative(latest.at, nowValue)}
+      </p>
+      <p className="mt-1 font-medium text-fg">{latest.title}</p>
+    </div>
   );
 }
 
@@ -161,17 +158,25 @@ function FundingFacts() {
     <div className="min-w-0 pb-1">
       <p className="font-display text-[2rem] font-bold leading-none text-fg">{pct(fundedFraction(lot))}</p>
       <p className="mt-1 text-sm text-muted">financiado pelos co-financiadores</p>
-      <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
-        <dt className="text-muted">Montante financiado</dt>
-        <dd className="font-mono text-fg tnum">
-          {eur(f.raised)} de {eur(f.goal)}
-        </dd>
-        <dt className="text-muted">Co-financiadores</dt>
-        <dd className="font-mono text-fg tnum">{num(f.coFinancers)}</dd>
-        <dt className="text-muted">Bilhete mínimo</dt>
-        <dd className="text-fg">
-          <span className="font-mono tnum">{eur(f.minTicket)}</span> <span className="text-muted">= {ticket.primary}, {ticket.secondary}</span>
-        </dd>
+      <dl className="mt-4 flex flex-col gap-2.5 text-sm">
+        <div>
+          <dt className="text-muted">Montante financiado</dt>
+          <dd className="font-medium text-fg tnum">
+            {eur(f.raised)} de {eur(f.goal)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted">Co-financiadores · bilhete mínimo</dt>
+          <dd className="font-medium text-fg tnum">
+            {num(f.coFinancers)} · {eur(f.minTicket)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-muted">{eur(f.minTicket)} financiam</dt>
+          <dd className="font-medium text-fg tnum">
+            {ticket.primary}, {ticket.secondary}
+          </dd>
+        </div>
       </dl>
       <RiskNote compact className="mt-4" />
       <TextLink to={`/lote/${lot.id}`} className="mt-2 inline-flex min-h-11 items-center">

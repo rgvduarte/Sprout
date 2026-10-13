@@ -4,6 +4,7 @@ import { DemoBadge } from '../../app/AppShell';
 import { useData } from '../../state';
 import { useMediaQuery } from '../../lib/useMediaQuery';
 import { cn } from '../../lib/cn';
+import { tidyText } from '../../lib/format';
 import { LABEL_BASE_Y, LABEL_COLUMNS, LS_H, OliveLandscape } from './OliveLandscape';
 import { FOCUS_PRODUCER_ID } from './model';
 import { Frame } from './parts';
@@ -17,7 +18,11 @@ const LABELS = [
   { title: 'Compra direta ao lagar', detail: '80–90 % da margem do embalador passa a financiar o ciclo.' },
   { title: 'IBC de 1 000 kg, selados', detail: 'Cada lote tem número, análise e uma janela de 18 meses.' },
   { title: 'Comprador B2B', detail: 'Paga 10–15 % abaixo da referência de mercado.' },
-];
+].map((l) => ({ title: tidyText(l.title), detail: tidyText(l.detail) }));
+
+const SUBHEAD = tidyText(
+  'A Sprout compra azeite e água diretamente a lagares e nascentes, retém 80–90 % da margem que hoje fica no embalador e vende a distribuição, HoReCa e retalho 10–15 % abaixo do mercado. Investidores qualificados financiam lotes concretos, em janelas de 18 meses, e seguem cada quilo do depósito à liquidação.',
+);
 
 const ILLUSTRATION = 'Ilustração: olival em filas num monte, o lagar com quatro depósitos de inox, IBC de 1 000 kg numa palete e um camião a sair para o comprador.';
 
@@ -28,14 +33,13 @@ export function Hook() {
 
   return (
     <section id="colheita" data-chapter="A colheita" aria-labelledby="apr-titulo" className="relative isolate overflow-hidden" style={wide ? { minHeight: 'max(640px, calc(100dvh - 101px))' } : undefined}>
-      <Frame className={cn('relative z-10', wide ? 'pb-[calc(13.5vw+1.5rem)] pt-[clamp(3rem,9vh,6rem)]' : 'pb-10 pt-10 sm:pt-14')}>
+      <Frame className={cn('relative z-10', wide ? 'pb-[calc(12vw+0.5rem)] pt-[clamp(2.5rem,6.5vh,4.5rem)]' : 'pb-10 pt-10 sm:pt-14')}>
         <div className={wide ? 'max-w-[min(38rem,52vw)]' : 'max-w-[42rem]'}>
           <h1 id="apr-titulo" className="text-[clamp(2.5rem,1.35rem+3.9vw,4.75rem)] leading-[1.02] tracking-[-0.03em]">
             Uma parte da colheita, não um ecrã de cotações.
           </h1>
           <p className="mt-6 text-[1.125rem] leading-relaxed text-[color-mix(in_oklab,var(--fg)_86%,var(--bg))] sm:text-[1.1875rem]">
-            A Sprout compra azeite e água diretamente a lagares e nascentes, retém 80–90 % da margem que hoje fica no embalador e vende a distribuição, HoReCa e retalho 10–15 % abaixo do mercado.
-            Investidores qualificados financiam lotes concretos, em janelas de 18 meses, e seguem cada quilo do depósito à liquidação.
+            {SUBHEAD}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <ButtonLink to="/onboarding" variant="primary" size="lg" iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>

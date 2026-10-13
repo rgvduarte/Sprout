@@ -9,7 +9,7 @@ import { cn } from '../../lib/cn';
 import { date as fmtDate, eur, num, pct } from '../../lib/format';
 import { analysisReport, contractSummary, downloadText, fileDate } from './docs';
 import { ExitTerms } from './ExitTerms';
-import { physicalShare, plannedSettlement, playbookFor, positionState, windowOf } from './positions';
+import { decimalsOf, physicalShare, plannedSettlement, playbookFor, positionState, windowOf } from './positions';
 
 /* =====================================================================
    Gaveta da posição: rastreabilidade, análises, documentos, prazos e saída
@@ -52,7 +52,7 @@ function AnalysisBlock({ a }: { a: QualityAnalysis }) {
               <tr key={x.id} className="border-b border-border last:border-b-0">
                 <td className="px-1 py-2 text-fg">{x.label}</td>
                 <td className="px-1 py-2 text-right font-mono text-fg tnum">
-                  {num(x.value, x.value % 1 ? (Math.abs(x.value) < 1 ? 2 : 1) : 0)}
+                  {num(x.value, decimalsOf(x.value, x.limit))}
                   {x.unit ? <span className="text-muted"> {x.unit}</span> : null}
                 </td>
                 <td className={cn('px-1 py-2 text-right font-mono tnum', x.pass ? 'text-muted' : 'text-crit-ink')}>
@@ -70,7 +70,7 @@ function AnalysisBlock({ a }: { a: QualityAnalysis }) {
         </p>
       )}
       {a.note && <p className="mt-1 text-sm text-fg">{a.note}</p>}
-      <p className="mt-2 text-xs text-muted">Referência legal: {a.reference}</p>
+      <p className="mt-2 text-sm text-muted">Referência legal: {a.reference}</p>
     </section>
   );
 }

@@ -257,7 +257,7 @@ function MissionRow({ quest: q, game }: { quest: Quest; game: GameView }) {
       {!p.done && (
         <Link
           to={q.href}
-          className="col-start-2 mt-2 inline-flex min-h-11 items-center gap-1 justify-self-start text-sm font-medium text-accent hover:underline sm:col-start-3 sm:row-start-1 sm:mt-0 sm:justify-self-end sm:px-1"
+          className="col-start-2 mt-2 inline-flex min-h-11 items-center gap-1 justify-self-start text-sm font-medium text-accent hover:underline sm:col-start-3 sm:row-start-1 sm:mt-0 sm:self-start sm:justify-self-end sm:px-1"
           aria-label={`${actionLabel(q)}: ${q.title}`}
         >
           {actionLabel(q)}

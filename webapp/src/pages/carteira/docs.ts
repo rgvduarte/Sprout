@@ -3,7 +3,7 @@ import type { Investor, Lot, QualityAnalysis } from '../../data';
 import type { PositionView } from '../../state';
 import { TODAY_DATE, toDate } from '../../lib/clock';
 import { date as fmtDate, eur, lisbonParts, MONTHS_LONG, num, pct } from '../../lib/format';
-import { physicalShare, plannedSettlement, playbookFor, windowOf } from './positions';
+import { decimalsOf, physicalShare, plannedSettlement, playbookFor, windowOf } from './positions';
 
 /* =====================================================================
    Documentos da carteira gerados no browser a partir dos dados de
@@ -171,7 +171,7 @@ export function analysisReport(lot: Lot, a: QualityAnalysis): string {
     `Resultado: ${plain(a.category)}`,
     RULE,
     `${pad('Parâmetro', 32)}${padL('Valor', 12)}  Limite`,
-    ...a.params.map((x) => `${pad(plain(x.label), 32)}${padL(`${num(x.value, x.value % 1 ? (x.value < 1 ? 2 : 1) : 0)}${x.unit ? ` ${x.unit}` : ''}`, 12)}  ${plain(x.limitLabel)}${x.pass ? '' : '  (fora do limite)'}`),
+    ...a.params.map((x) => `${pad(plain(x.label), 32)}${padL(plain(`${num(x.value, decimalsOf(x.value, x.limit))}${x.unit ? ` ${x.unit}` : ''}`), 12)}  ${plain(x.limitLabel)}${x.pass ? '' : '  (fora do limite)'}`),
     ...(a.panel ? [RULE, `Painel de prova: frutado ${num(a.panel.medianaFrutado, 1)} · defeito ${num(a.panel.medianaDefeito, 1)} · ${a.panel.atributos.join(', ')}`] : []),
     ...(a.note ? [RULE, plain(a.note)] : []),
   ];

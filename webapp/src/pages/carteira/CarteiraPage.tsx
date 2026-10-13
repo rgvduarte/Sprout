@@ -38,7 +38,8 @@ export default function CarteiraPage() {
 
   // TESTE-TEMPORARIO-INICIO
   useEffect(() => {
-    if (!import.meta.env.DEV || !window.location.hash.includes('teste-compromisso')) return;
+    if (!import.meta.env.DEV || !window.location.hash.includes('teste-compromisso') || (window as unknown as { __tc?: boolean }).__tc) return;
+    (window as unknown as { __tc?: boolean }).__tc = true;
     const l = data.getLot('AZ-2026-021');
     if (!l) return;
     l.riskFactors.forEach((r) => game.markRiskRead(l.id, r.id));

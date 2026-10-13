@@ -1,9 +1,9 @@
 import { useId, type ReactNode } from 'react';
 import { motion, useTransform, type MotionValue } from 'motion/react';
 import { Chapter, HarvestBand } from '../../components/game';
-import { getLot, REFUNDING_PLAYBOOKS } from '../../data';
+import { getLot } from '../../data';
 import { addMonths } from '../../lib/clock';
-import { date, kg, lisbonParts, monthYear, pct } from '../../lib/format';
+import { date, kg, lisbonParts, monthYear, pct, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
 import { CYCLE, FOCUS_LOT_ID } from './model';
 import { ChapterHead, Frame, useStep } from './parts';
@@ -27,7 +27,6 @@ const PHASE_TONE = [34, 54, 76, 100];
 
 const extended = getLot('AZ-2025-017');
 const lossCase = getLot('AZ-2025-009');
-const playbook = REFUNDING_PLAYBOOKS.find((p) => p.id === focus.refundingPlaybookId);
 
 /* posição de uma data na faixa de meses da HarvestBand (mesmo cálculo do componente) */
 const FIRST = lisbonParts(`${CYCLE.start.slice(0, 7)}-01`);
@@ -61,10 +60,10 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
       <div data-world="azeite" className="min-w-0">
         <ChapterHead
           title="O ciclo de 18 meses"
-          lead="Do fecho do financiamento à liquidação prevista, desenhado sobre a campanha agrícola. Se o mês 18 chega com o preço em baixo ou stock por vender, o contrato prevê dois caminhos, e nenhum deles garante o capital."
+          lead="Do fecho do financiamento à liquidação prevista, sobre a campanha agrícola. No mês 18 há três caminhos previstos em contrato."
         />
 
-        <p className="mt-8 font-mono text-sm text-fg tnum" aria-hidden={rich ? true : undefined}>
+        <p className="mt-6 font-mono text-sm text-fg tnum" aria-hidden={rich ? true : undefined}>
           {rich ? (
             <>
               Mês {month} de {CYCLE.months} · {monthYear(addMonths(CYCLE.start, month))}
@@ -94,9 +93,9 @@ function CycleScene({ progress, rich }: { progress: MotionValue<number>; rich: b
             );
           })}
         </div>
-        <HarvestBand world="azeite" start={CYCLE.start} months={CYCLE.months} extensionMonths={CYCLE.extensionMonths} progress={rich ? cursor : undefined} className="mt-2" />
+        <HarvestBand world="azeite" start={CYCLE.start} months={CYCLE.months} extensionMonths={CYCLE.extensionMonths} progress={rich ? cursor : undefined} className="mt-6" />
 
-        <div className="mt-8 grid min-w-0 gap-y-8 md:grid-cols-[minmax(0,var(--fork))_minmax(0,1fr)]" style={{ ['--fork' as string]: `${FORK_X * 100}%` }}>
+        <div className="mt-7 grid min-w-0 gap-y-8 md:grid-cols-[minmax(0,var(--fork))_minmax(0,1fr)]" style={{ ['--fork' as string]: `${FORK_X * 100}%` }}>
           <ol className="grid min-w-0 gap-x-5 gap-y-5 sm:grid-cols-2 md:pr-6 xl:grid-cols-4" aria-label="Fases da janela">
             {PHASES.map((p, i) => (
               <li key={p.n} className="min-w-0">
@@ -131,13 +130,13 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
     {
       title: 'Liquidação prevista',
       when: date(CYCLE.end),
-      body: 'O lote está vendido e cobrado dentro da janela.',
+      body: 'Lote vendido e cobrado dentro da janela.',
       swatch: <span aria-hidden className="inline-block h-2.5 w-4 rounded-[2px] bg-world-ink" />,
     },
     {
       title: 'Extensão condicionada',
       when: `até ${date(CYCLE.extendedEnd)}`,
-      body: `Uma vez, até ${CYCLE.extensionMonths} meses, se no mês 18 a referência estiver 15 % ou mais abaixo da entrada ou mais de 30 % do stock estiver por vender.${extended?.settlement.extendedTo ? ` Hoje: ${extended.id}, estendido até ${date(extended.settlement.extendedTo)}.` : ''}`,
+      body: `Uma vez, até ${CYCLE.extensionMonths} meses: referência 15 % abaixo da entrada ou mais de 30 % do stock por vender.${extended?.settlement.extendedTo ? ` Em curso: ${extended.id}, até ${date(extended.settlement.extendedTo)}.` : ''}`,
       swatch: (
         <svg aria-hidden className="h-2.5 w-4 shrink-0 overflow-hidden rounded-[2px] border border-world-ink">
           <defs>
@@ -152,7 +151,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
     {
       title: 'Refunding',
       when: 'playbook do lote',
-      body: `${playbook ? `Gatilho: ${playbook.trigger.charAt(0).toLowerCase()}${playbook.trigger.slice(1)} ` : ''}Cobertura seguinte, revisão da reserva e, se preciso, uma nova ronda que refinancia a armazenagem. Custa ${pct(CYCLE.refundingCostPct, 1)} do lote e pode não recuperar a perda.`,
+      body: tidyText(`Se a referência ficar 15 % ou mais abaixo da entrada durante 10 dias úteis: cobertura seguinte e, se preciso, nova ronda que refinancia a armazenagem. Custa ${pct(CYCLE.refundingCostPct, 1)} do lote e pode não recuperar a perda.`),
       swatch: <span aria-hidden className="inline-block h-2.5 w-4 rounded-[2px] border border-world-ink" />,
     },
   ];
@@ -160,7 +159,7 @@ function Fork({ progress, drawn }: { progress: MotionValue<number>; drawn: boole
     <div className="relative min-w-0 pl-5">
       <span className="sr-only">No mês 18, três caminhos:</span>
       <motion.span aria-hidden className="absolute bottom-3 left-0 top-0 w-0.5 origin-top bg-world-ink" style={{ scaleY: drawn ? 1 : stem }} />
-      <ul className="flex flex-col gap-5">
+      <ul className="flex flex-col gap-4">
         {items.map((it, i) => (
           <ForkItem key={it.title} index={i} progress={progress} drawn={drawn} {...it} />
         ))}

@@ -89,7 +89,7 @@ const STEPS: { text: ReactNode }[] = [
 ];
 
 function Fig({ children }: { children: ReactNode }) {
-  return <span className="whitespace-nowrap font-mono text-[0.94em] text-fg tnum">{children}</span>;
+  return <span className="whitespace-nowrap font-medium text-fg tnum">{children}</span>;
 }
 
 function ValueChainScene({ progress, rich }: { progress: MotionValue<number>; rich: boolean }) {

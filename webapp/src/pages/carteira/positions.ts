@@ -172,3 +172,8 @@ export function byNextDate(a: PositionView, b: PositionView): number {
   const db = nextMilestone(b.lot)?.planned ?? plannedSettlement(b.lot) ?? '9999';
   return da.localeCompare(db);
 }
+
+/** Casas decimais com que um valor foi registado (para não arredondar boletins). */
+export function decimalsOf(...values: number[]): number {
+  return Math.min(3, Math.max(0, ...values.map((v) => (String(v).split('.')[1] ?? '').length)));
+}

@@ -96,22 +96,24 @@ export function GameSection() {
             <div className="min-w-0 border-t border-border p-5 sm:p-6 lg:border-l lg:border-t-0">
               <h3 className="text-[1.1875rem]">Selos e níveis</h3>
               <div className="mt-3 flex items-center gap-4">
-                <OriginSeal seal={EXAMPLE_SEAL} producer={sealProducer.producer} region={sealProducer.region} state="earned" size={104} />
+                <OriginSeal seal={EXAMPLE_SEAL} producer={sealProducer.producer} region={sealProducer.region} state="earned" size={104} className="shrink-0" />
                 <p className="min-w-0 text-sm leading-relaxed text-muted">
                   Um selo de lacre por produtor e campanha. Este, do {sealProducer.producer.nome}, ganha-se com um compromisso no lote ou com {EXAMPLE_SEAL.questIds.length} missões de diligência.
                 </p>
               </div>
-              <p className="mt-2 text-sm text-muted">
-                No teu caderno: <span className="font-mono text-fg tnum">{earnedCount}</span> de <span className="font-mono tnum">{seals.length}</span> selos ·{' '}
+              <p className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-muted">
+                <span>
+                  No teu caderno: <span className="font-medium text-fg tnum">{earnedCount}</span> de <span className="tnum">{seals.length}</span> selos.
+                </span>
                 <Link to="/caderno" className="inline-flex min-h-11 items-center font-medium text-accent underline underline-offset-[0.2em]">
-                  abrir o caderno
+                  Abrir o caderno
                 </Link>
               </p>
               <ol className="mt-3 flex flex-col border-t border-border" aria-label="Níveis de conhecimento">
                 {LEVELS.map((l) => {
                   const current = game.level.id === l.id;
                   return (
-                    <li key={l.id} className={cn('flex items-start gap-3 border-b border-border py-2.5', current && 'bg-accent-soft -mx-2 px-2')}>
+                    <li key={l.id} className={cn('flex items-start gap-3 border-b border-border px-2 py-2.5', current && 'bg-accent-soft')} aria-current={current ? 'step' : undefined}>
                       <LevelGlyph level={l.id} className={cn('mt-0.5', current ? 'text-accent' : 'text-muted')} />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">

@@ -117,8 +117,8 @@ function LearnPhase({ cards, onDone }: { cards: SensoryAttribute[]; onDone: () =
   const defects = OLIVE_ATTRIBUTES.filter((a) => a.tipo === 'defeito');
 
   return (
-    <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-      <div className="min-w-0">
+    <div className="grid min-w-0 gap-x-6 gap-y-5 [grid-template-areas:'card'_'chips'_'actions'] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:[grid-template-areas:'card_chips'_'actions_chips']">
+      <div className="min-w-0 [grid-area:card]">
         <p className="text-sm text-muted">
           Descrição <span className="font-mono tnum text-fg">{idx + 1}</span> de <span className="font-mono tnum">{cards.length}</span> · à primeira: <span className="font-mono tnum text-fg">{firstTry}</span>
         </p>
@@ -155,20 +155,20 @@ function LearnPhase({ cards, onDone }: { cards: SensoryAttribute[]; onDone: () =
             ) : wrong.length > 0 ? (
               <p className="mt-4 text-sm text-crit-ink">Não é {OLIVE_ATTRIBUTES.find((a) => a.id === wrong[wrong.length - 1])?.nome.toLowerCase()}. Volta a ler e escolhe outro.</p>
             ) : (
-              <p className="mt-4 text-sm text-muted">Escolhe o atributo à direita, ou arrasta-o para este cartão.</p>
+              <p className="mt-4 text-sm text-muted">Escolhe o termo certo entre os atributos e os defeitos. Com rato, também o podes arrastar para aqui.</p>
             )}
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Button onClick={next} disabled={!solved} iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
-            {last ? 'Passar às amostras' : 'Descrição seguinte'}
-          </Button>
-          <Button variant="ghost" onClick={onDone}>
-            Já os conheço: ir às amostras
-          </Button>
-        </div>
       </div>
-      <div className="min-w-0">
+      <div className="flex min-w-0 flex-wrap items-start gap-3 [grid-area:actions]">
+        <Button onClick={next} disabled={!solved} iconRight={<ArrowRight aria-hidden className="size-4" strokeWidth={1.75} />}>
+          {last ? 'Passar às amostras' : 'Descrição seguinte'}
+        </Button>
+        <Button variant="ghost" onClick={onDone}>
+          Já os conheço: ir às amostras
+        </Button>
+      </div>
+      <div className="min-w-0 [grid-area:chips]">
         {[
           { title: 'Atributos positivos', list: positives },
           { title: 'Defeitos', list: defects },
