@@ -78,12 +78,18 @@ let key = '';
 const listeners = new Set<() => void>();
 let wired = false;
 
+/** O CSS de produção vem minificado (#ffffff → #fff): devolve sempre #rrggbb para cálculos de contraste. */
+function normalizeHex(value: string): string {
+  const m = /^#([0-9a-f])([0-9a-f])([0-9a-f])([0-9a-f])?$/i.exec(value);
+  return m ? `#${m[1]}${m[1]}${m[2]}${m[2]}${m[3]}${m[3]}${m[4] ? m[4] + m[4] : ''}`.toLowerCase() : value;
+}
+
 function read(): Tokens {
   if (typeof window === 'undefined') return FALLBACK;
   const cs = getComputedStyle(document.documentElement);
   const out = { ...FALLBACK };
   for (const [k, v] of Object.entries(MAP)) {
-    const value = cs.getPropertyValue(v).trim();
+    const value = normalizeHex(cs.getPropertyValue(v).trim());
     if (value) (out as Record<string, unknown>)[k] = value;
   }
   out.fontSans = cs.getPropertyValue('--font-sans').trim() || FALLBACK.fontSans;

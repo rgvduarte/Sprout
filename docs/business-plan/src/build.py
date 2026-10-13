@@ -184,55 +184,48 @@ def _():
             'Tanque selado\n+ collateral manager', 'Armazém 3PL\ncom custódia', 'Comprador B2B\nHoReCa, distrib.']
     cw = (W - left) / len(cols)
     cx = [left + cw * (i + 0.5) for i in range(len(cols))]
-    rows = [('Mercadoria', 66, 132, '#8C8A16', 'g'), ('Dinheiro', 132, 266, '#3F5A1E', 'm'), ('Título e\ngarantias', 266, 386, '#1A1E16', 't')]
-    H = 392
+    rows = [('Mercadoria', 46, 112, '#8C8A16', 'g'), ('Dinheiro', 112, 234, '#3F5A1E', 'm'), ('Título e\ngarantias', 234, 342, '#1A1E16', 't')]
+    H = 346
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="Fluxos de mercadoria, dinheiro e título entre investidores, SPV, OpCo, lagar, tanque, 3PL e comprador" style="width:100%;height:auto">']
     o.append(_arrow_defs({'ag': '#8C8A16', 'am': '#3F5A1E', 'at': '#1A1E16'}))
-    # cabeçalhos de coluna e guias
     for i, c in enumerate(cols):
         l1, l2 = c.split('\n')
-        o.append(_txt(cx[i], 20, l1, 9.6, weight=600))
-        o.append(_txt(cx[i], 32, l2, 8.2, fill='#5B6352'))
-        o.append(f'<line x1="{cx[i]:.1f}" x2="{cx[i]:.1f}" y1="44" y2="{H - 6}" stroke="#E6E9DD" stroke-width="1"/>')
-    o.append(f'<line x1="0" x2="{W}" y1="50" y2="50" stroke="#1A1E16" stroke-width="0.9"/>')
+        o.append(_txt(cx[i], 14, l1, 9.6, weight=600))
+        o.append(_txt(cx[i], 26, l2, 8.2, fill='#5B6352'))
+        o.append(f'<line x1="{cx[i]:.1f}" x2="{cx[i]:.1f}" y1="38" y2="{H - 4}" stroke="#E6E9DD" stroke-width="1"/>')
+    o.append(f'<line x1="0" x2="{W}" y1="{rows[0][1]}" y2="{rows[0][1]}" stroke="#1A1E16" stroke-width="0.9"/>')
     for name, y0, y1, col, key in rows:
         o.append(f'<line x1="0" x2="{W}" y1="{y1}" y2="{y1}" stroke="#D7DBCC" stroke-width="0.8"/>')
         for j, ln in enumerate(name.split('\n')):
-            o.append(_txt(0, y0 + 20 + j * 12, ln, 9.8, anchor='start', weight=650, fill=col if key != 't' else '#1A1E16'))
+            o.append(_txt(0, y0 + 18 + j * 12, ln, 9.8, anchor='start', weight=650, fill=col if key != 't' else '#1A1E16'))
 
-    def arr(a, b, y, label, key, col, lab_at=0.5, dash=False):
+    def arr(a, b, y, label, key, col, lab_at=0.5):
         x1, x2 = cx[a], cx[b]
         d = 1 if x2 > x1 else -1
         xs, xe = x1 + 5 * d, x2 - 5 * d
-        da = ' stroke-dasharray="4 3"' if dash else ''
         o.append(f'<circle cx="{x1:.1f}" cy="{y}" r="3" fill="{col}"/>')
-        o.append(f'<line x1="{xs:.1f}" x2="{xe:.1f}" y1="{y}" y2="{y}" stroke="{col}" stroke-width="1.6"{da} marker-end="url(#a{key})"/>')
-        lx = x1 + (x2 - x1) * lab_at
-        o.append(_txt(lx, y - 5, label, 8.6, halo=True))
-    # mercadoria
-    arr(3, 4, 84, 'granel AOVE', 'g', '#8C8A16')
-    arr(4, 5, 84, 'tranches embaladas', 'g', '#8C8A16')
-    arr(5, 6, 84, 'entregas HoReCa', 'g', '#8C8A16')
-    arr(4, 6, 116, 'paletes de 5 L com offtake (distribuidores)', 'g', '#8C8A16')
-    # dinheiro
-    arr(0, 1, 154, 'subscrição (SCT)', 'm', '#3F5A1E')
-    arr(1, 3, 154, 'preço do lote ≤ 30 dias (SCT Inst)', 'm', '#3F5A1E')
-    arr(1, 0, 180, 'cupão + cash sweep', 'm', '#3F5A1E')
-    arr(1, 2, 180, 'margem do lote', 'm', '#3F5A1E')
-    arr(6, 1, 210, 'cobrança SDD B2B ≤ 35–45 dias → conta de cobranças da série', 'm', '#3F5A1E')
-    # reserva de primeira perda (nó sob a SPV)
+        o.append(f'<line x1="{xs:.1f}" x2="{xe:.1f}" y1="{y}" y2="{y}" stroke="{col}" stroke-width="1.6" marker-end="url(#a{key})"/>')
+        o.append(_txt(x1 + (x2 - x1) * lab_at, y - 5, label, 8.6, halo=True))
+    arr(3, 4, 68, 'granel AOVE', 'g', '#8C8A16')
+    arr(4, 5, 68, 'tranches embaladas', 'g', '#8C8A16')
+    arr(5, 6, 68, 'entregas HoReCa', 'g', '#8C8A16')
+    arr(4, 6, 96, 'paletes de 5 L com offtake (distribuidores)', 'g', '#8C8A16')
+    arr(0, 1, 132, 'subscrição (SCT)', 'm', '#3F5A1E')
+    arr(1, 3, 132, 'preço do lote ≤ 30 dias (SCT Inst)', 'm', '#3F5A1E')
+    arr(1, 0, 156, 'cupão + cash sweep', 'm', '#3F5A1E')
+    arr(1, 2, 156, 'margem do lote', 'm', '#3F5A1E')
+    arr(6, 1, 182, 'cobrança SDD B2B ≤ 35–45 dias → conta de cobranças da série', 'm', '#3F5A1E')
     rx = cx[1]
-    o.append(f'<line x1="{rx:.1f}" x2="{rx:.1f}" y1="215" y2="232" stroke="#3F5A1E" stroke-width="1.6" marker-end="url(#am)"/>')
-    o.append(f'<rect x="{rx - 52:.1f}" y="235" width="104" height="24" rx="3" fill="#F4F5EF" stroke="#AEB49F" stroke-width="0.8"/>')
-    o.append(_txt(rx, 245, 'reserva de 1.ª perda', 8.6, weight=600))
-    o.append(_txt(rx, 255.5, '30 % da margem, até 5 %', 8, fill='#5B6352'))
-    # título e garantias
-    arr(3, 1, 290, 'propriedade do lote individualizado', 't', '#1A1E16')
-    arr(1, 0, 290, 'garantias (repr. comum)', 't', '#1A1E16')
-    arr(1, 2, 316, 'transfere na venda', 't', '#1A1E16')
-    arr(2, 6, 316, 'venda com reserva de propriedade até pagamento', 't', '#1A1E16', lab_at=0.55)
-    arr(2, 1, 342, 'cessão de recebíveis', 't', '#1A1E16')
-    arr(1, 4, 370, 'depósito tripartido: guarda por conta da SPV; liberta só com ordem escrita', 't', '#1A1E16', lab_at=0.5)
+    o.append(f'<line x1="{rx:.1f}" x2="{rx:.1f}" y1="186" y2="199" stroke="#3F5A1E" stroke-width="1.6" marker-end="url(#am)"/>')
+    o.append(f'<rect x="{rx - 52:.1f}" y="202" width="104" height="24" rx="3" fill="#F4F5EF" stroke="#AEB49F" stroke-width="0.8"/>')
+    o.append(_txt(rx, 212, 'reserva de 1.ª perda', 8.6, weight=600))
+    o.append(_txt(rx, 222.5, '30 % da margem, até 5 %', 8, fill='#5B6352'))
+    arr(3, 1, 254, 'propriedade do lote individualizado', 't', '#1A1E16')
+    arr(1, 0, 254, 'garantias (repr. comum)', 't', '#1A1E16')
+    arr(1, 2, 278, 'transfere na venda', 't', '#1A1E16')
+    arr(2, 6, 278, 'venda com reserva de propriedade até pagamento', 't', '#1A1E16', lab_at=0.55)
+    arr(2, 1, 302, 'cessão de recebíveis', 't', '#1A1E16')
+    arr(1, 4, 328, 'depósito tripartido: guarda por conta da SPV; liberta só com ordem escrita', 't', '#1A1E16')
     o.append('</svg>')
     return ''.join(o)
 

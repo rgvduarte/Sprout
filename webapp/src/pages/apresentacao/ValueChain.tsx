@@ -184,7 +184,7 @@ function ChainFigure({ progress }: { progress: MotionValue<number> }) {
           <DataTable columns={TABLE_COLUMNS} rows={TABLE_ROWS} getRowId={(r) => r.id} caption="Um quilo de azeite virgem extra a granel, hoje e com a Sprout (€/kg, ilustrativo)" framed={false} />
         </div>
       )}
-      <p className="mt-4 text-sm text-muted">
+      <p className="mt-4 max-w-[62ch] text-sm text-muted">
         O preço de {kgEur(C.producerToday)} que o lagar recebe hoje é uma hipótese de trabalho. Referência de {kgEur(C.ref)} e desconto de {Math.round(C.discountPct * 100)} % do lote {FOCUS_LOT_ID}: índice ilustrativo, dados fictícios. Margem líquida do embalador e custo de embalamento: {OLIVE_CHAIN_FACTS.sourceShort}.
       </p>
     </figure>
