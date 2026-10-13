@@ -90,6 +90,8 @@ export interface Note {
   title: string;
   detail?: string;
   live?: boolean;
+  /** nota tirada de um marco da jornada do lote */
+  milestone?: boolean;
 }
 
 export function notesFor(c: CampaignDef, lots: Lot[], events: CampaignEvent[], f: Follow): Note[] {
@@ -118,7 +120,7 @@ export function notesFor(c: CampaignDef, lots: Lot[], events: CampaignEvent[], f
       if (!m.done || !m.date) continue;
       const near = (lotEvents.get(lot.id) ?? []).some((e) => Math.abs(toDate(e.at).getTime() - toDate(m.date!).getTime()) < 1.5 * 86_400_000);
       if (near) continue;
-      out.push({ id: `m-${lot.id}-${m.stage}`, at: m.date, world: lot.world, lotId: lot.id, title: `${lot.id} · ${stageLabel(lot.world, m.stage)}`, detail: m.note });
+      out.push({ id: `m-${lot.id}-${m.stage}`, at: m.date, world: lot.world, lotId: lot.id, title: `Etapa da jornada: ${stageLabel(lot.world, m.stage).toLowerCase()}`, detail: m.note, milestone: true });
     }
   }
   return out.sort((a, b) => toDate(b.at).getTime() - toDate(a.at).getTime());
