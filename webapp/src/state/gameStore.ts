@@ -314,6 +314,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
 /* ------------------------------------------------------------ vistas derivadas */
 
+/** Referência da transferência SEPA de um compromisso (igual na Jornada do lote e na Carteira). */
+export function transferReference(p: Pick<Position, 'id' | 'lotId'>): string {
+  const seq = p.id.match(/-s(\d+)-/)?.[1] ?? p.id.match(/(\d+)$/)?.[1] ?? '1';
+  return `SPR-${p.lotId.replace(/-/g, '')}-${seq.padStart(3, '0')}`;
+}
+
 /** Lote com o efeito dos compromissos da sessão. */
 export function mergeLot(lot: Lot, deltas: GameState['lotDeltas']): Lot {
   const d = deltas[lot.id];

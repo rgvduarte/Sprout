@@ -10,16 +10,16 @@ import {
   SEALS,
   CAMPAIGN_EVENTS,
 } from '../data';
-import type { CampaignEvent, EarnedSeal, Investor, KnowledgeLevel, Lot, OriginSealDef, Position, Producer, Region, RegionState, WorldId } from '../data/types';
+import type { CampaignEvent, CancelledCommitment, EarnedSeal, Investor, KnowledgeLevel, LearningGoalState, Lot, OriginSealDef, Position, Producer, Region, RegionState, RewardRequest, WorldId } from '../data/types';
 import type { TelemetryState } from '../lib/useLiveFeed';
 import { FeedContext, GameContext, RoleContext, ThemeContext, type CommitFailure, type GameActions } from './AppProvider';
 import { allPositions, knowledgePoints, mergeLot, regionStates } from './gameStore';
 
-export { AppProvider, ROLES, ROLE_LABEL, THEMES, THEME_LABEL, applyTheme } from './AppProvider';
+export { AppProvider, ROLES, ROLE_LABEL, THEMES, THEME_LABEL, applyTheme, REFLECTION_DAYS, reflectionEndOf } from './AppProvider';
 export type { Role, ThemePref, CommitResult, CommitFailure, GameActions } from './AppProvider';
-export type { ProfileId, ProfileState, GameState } from './gameStore';
+export type { ProfileId, ProfileState, GameState, KycDecisionKind } from './gameStore';
 export { useToast } from './toast';
-export { knowledgePoints, mergeLot } from './gameStore';
+export { knowledgePoints, mergeLot, transferReference } from './gameStore';
 
 function need<T>(v: T | null, name: string): T {
   if (!v) throw new Error(`${name} fora do AppProvider`);
@@ -52,6 +52,18 @@ export interface GameView extends GameActions {
   hasReadAnalysis: (lotId: string) => boolean;
   simRuns: import('../data/types').SimRunResult[];
   onboarding: import('../data/types').OnboardingState;
+  /** mundos já visitados pelo perfil ativo */
+  worldsVisited: WorldId[];
+  /** regiões abertas no mapa */
+  regionsVisited: string[];
+  /** pedidos de recompensas em espécie, mais recente primeiro */
+  rewardRequests: RewardRequest[];
+  /** pedido de amostra deste lote, se existir (uma por lote, qualquer montante) */
+  sampleRequest: (lotId: string) => RewardRequest | undefined;
+  /** objetivo de aprendizagem partilhado entre registo, Início e Academia */
+  learningGoal?: LearningGoalState;
+  /** compromissos cancelados no período de reflexão */
+  cancelled: CancelledCommitment[];
   /** pode comprometer capital (onboarding aprovado) */
   canCommit: boolean;
   /** motivo genérico de bloqueio, independente do lote */
@@ -86,6 +98,12 @@ export function useGame(): GameView {
       hasReadAnalysis: (lotId) => profile.analysesRead.includes(lotId),
       simRuns: profile.simRuns,
       onboarding: profile.onboarding,
+      worldsVisited: profile.worldsVisited,
+      regionsVisited: profile.regionsVisited,
+      rewardRequests: profile.rewardRequests,
+      sampleRequest: (lotId) => profile.rewardRequests.find((r) => r.rewardId === 'amostra' && r.lotId === lotId),
+      learningGoal: profile.learningGoal,
+      cancelled: profile.cancelled,
       canCommit: commitBlock === null,
       commitBlock,
       commitBlockMessage:
