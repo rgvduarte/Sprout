@@ -29,7 +29,7 @@ jobs:
         continue-on-error: true
         working-directory: webapp
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm ci || npm install
           npx vite build --base ./ --outDir ../_site --emptyOutDir
 
       - name: Página provisória (se a webapp ainda não compila)
