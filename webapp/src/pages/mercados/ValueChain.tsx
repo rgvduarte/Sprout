@@ -215,7 +215,13 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
             return (
               <span
                 key={i}
-                className={cn('absolute top-0 whitespace-nowrap motion-safe:transition-opacity motion-safe:duration-300', show ? 'opacity-100' : 'opacity-0', i === 0 ? 'translate-x-0' : i === arr.length - 1 ? '-translate-x-full' : '-translate-x-1/2')}
+                className={cn(
+                  'absolute top-0 whitespace-nowrap motion-safe:transition-opacity motion-safe:duration-300',
+                  show ? 'opacity-100' : 'opacity-0',
+                  i === 0 ? 'translate-x-0' : i === arr.length - 1 ? '-translate-x-full' : '-translate-x-1/2',
+                  // no telemóvel os limites intermédios colidem; os valores de cada parte estão na lista por baixo
+                  i !== 0 && i !== arr.length - 1 && 'max-sm:hidden',
+                )}
                 style={{ left: `${x}%` }}
               >
                 {fmt(v)}
