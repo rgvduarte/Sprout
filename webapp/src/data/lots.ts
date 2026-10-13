@@ -575,7 +575,7 @@ export const LOTS: Lot[] = tidyDeep([
     milestones: milestones(
       'azeite',
       { colhido: '2026-10-05', analisado: '2026-10-09' },
-      { 'em-deposito': '2026-10-27', 'em-venda': '2027-02-01', expedido: '2027-09-30', liquidado: '2028-04-30' },
+      { 'em-deposito': '2026-10-30', 'em-venda': '2027-02-01', expedido: '2027-09-30', liquidado: '2028-04-30' },
       {
         colhido: 'Primeiras moendas da campanha; 24 000 kg separados nos depósitos 1 e 2.',
         analisado: 'Acidez 0,21 %, painel sem defeitos, frutado verde 5,4.',

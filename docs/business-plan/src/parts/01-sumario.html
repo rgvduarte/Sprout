@@ -37,16 +37,21 @@
   </div>
 
   <h2>Os números que decidem</h2>
-  <div class="fig-side">
-    <div>
-      {{tbl_resumo_cenarios}}
-      <p class="tblnote">Capital próprio = pré-arranque, capital da SPV, caixa mínima e perdas acumuladas até 2031; em todos os cenários ainda está a subir em 2031. Recomendado com todas as alavancas no topo do que a investigação suporta: EBITDA de 2031 de −47 k€ e capital de 3,08 M€, ainda sem break-even <span class="ref">Modelo · sensibilidade</span>.</p>
-    </div>
+  {{tbl_resumo_cenarios}}
+  <p class="tblnote">Nenhum cenário chega ao break-even até 2031. Capital próprio necessário = pré-arranque, capital social da SPV, caixa mínima e o vale do cash flow acumulado; em todos os cenários ainda está a subir em 2031. O recomendado com todas as alavancas no topo do que a investigação suporta fica com EBITDA de 2031 de −47 k€ e capital de 3,08 M€, ainda sem break-even <span class="ref">Modelo · sensibilidade</span>.</p>
+
+  <div class="fig-row">
     <figure>
-      <p class="fig-title">EBITDA por cenário, 2027–2031</p>
-      <p class="fig-sub">k€; nenhuma linha cruza o zero dentro do horizonte</p>
-      <div class="legend"><span class="key"><span class="ln" style="--sw: var(--accent)"></span>Recomendado</span><span class="key"><span class="ln" style="--sw: var(--neutral-1)"></span>Base</span><span class="key"><span class="ln" style="--sw: var(--neutral-2)"></span>Pessimista e otimista</span></div>
+      <p class="fig-title">EBITDA por cenário</p>
+      <p class="fig-sub">k€, 2027–2031: nenhuma linha cruza o zero</p>
+      <div class="legend"><span class="key"><span class="ln" style="--sw: var(--accent)"></span>Recomendado</span><span class="key"><span class="ln" style="--sw: var(--neutral-1)"></span>Base</span><span class="key"><span class="ln" style="--sw: var(--neutral-2)"></span>Pessimista, otimista</span></div>
       {{fig_ebitda_cenarios}}
+    </figure>
+    <figure>
+      <p class="fig-title">Capital próprio levantado, acumulado</p>
+      <p class="fig-sub">k€, 2027–2031: a curva ainda sobe em 2031 em todos os cenários</p>
+      <div class="legend"><span class="key"><span class="ln" style="--sw: var(--accent)"></span>Recomendado</span><span class="key"><span class="ln" style="--sw: var(--neutral-1)"></span>Base</span><span class="key"><span class="ln" style="--sw: var(--neutral-2)"></span>Pessimista, otimista</span></div>
+      {{fig_capital_cenarios}}
     </figure>
   </div>
 

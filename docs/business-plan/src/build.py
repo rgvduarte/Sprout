@@ -93,13 +93,12 @@ def _():
     ]
     out = ['<table class="compact t-scen"><thead><tr><th>Cenário</th><th class="num">GMV 2031<span class="sub">M€</span></th>'
            '<th class="num">Margem de contrib. 2031<span class="sub">k€</span></th><th class="num">EBITDA 2027<span class="sub">k€</span></th>'
-           '<th class="num">EBITDA 2031<span class="sub">k€</span></th><th class="num">Capital próprio<span class="sub">M€, até 2031</span></th><th>Break-even</th></tr></thead><tbody>']
+           '<th class="num">EBITDA 2031<span class="sub">k€</span></th><th class="num">Capital próprio necessário<span class="sub">M€, até 2031</span></th></tr></thead><tbody>']
     for name, s, sub in rows:
         cls = ' class="em"' if name == 'Recomendado' else ''
         out.append(f'<tr{cls}><td>{name}<span class="sub">{sub}</span></td><td class="num">{M(s["gmv_total"][4])}</td>'
                    f'<td class="num">{k(s["margem_contribuicao"]["total"][4])}</td><td class="num">{k(s["ebitda"][0])}</td>'
-                   f'<td class="num">{k(s["ebitda"][4])}</td><td class="num">{M(s["necessidade_capital_proprio"])}</td>'
-                   f'<td>não até 2031</td></tr>')
+                   f'<td class="num">{k(s["ebitda"][4])}</td><td class="num">{M(s["necessidade_capital_proprio"])}</td></tr>')
     out.append('</tbody></table>')
     return ''.join(out)
 

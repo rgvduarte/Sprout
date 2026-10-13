@@ -44,7 +44,7 @@
   ol.toc .toc-p { font-family: var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; font-size: 8.6pt; }
   .howto { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10mm; row-gap: 4mm; font-size: 8pt; line-height: 1.4; }
   .howto h3 { margin: 0 0 1mm; font-size: 9pt; }
-  .howto dl.defs { row-gap: 1mm; }
+  .howto dl.defs { row-gap: 1mm; grid-template-columns: 15mm 1fr; }
   .howto dl.defs dt { font-family: var(--f-mono); font-weight: 500; font-size: 7.6pt; }
 
   /* ---------- capítulos ---------- */
@@ -71,6 +71,7 @@
   /* ---------- tabelas ---------- */
   table { font-size: 7.9pt; }
   td.num { font-size: 7.5pt; }
+  th.num { font-family: var(--f-body); font-size: 7.2pt; }
   th .sub { font-weight: 400; color: var(--muted); }
   tr.sub-total td { font-weight: 600; }
   tr.total td { border-top: 0.9pt solid var(--ink); }
@@ -184,7 +185,7 @@
       <dl class="defs">
         <dt>00 §1.4</dt><dd>Base factual consolidada, secção 1.4 (docs/research/00-base-factual.md). É a única base numérica autorizada.</dd>
         <dt>01 §2.2</dt><dd>Desenho do modelo de negócio recomendado (01-desenho-do-modelo.md).</dd>
-        <dt>10 · 20 · 30 · 40 · 50</dt><dd>Relatórios de mercado, regulação, pagamentos e infraestrutura, risco e coberturas, concorrência.</dd>
+        <dt>10–50</dt><dd>Relatórios de mercado, regulação, pagamentos e infraestrutura, risco e coberturas, concorrência.</dd>
         <dt>Modelo</dt><dd>Sprout-Modelo-Financeiro.xlsx, lido de modelo/resultados.json depois de recalculado. Todas as tabelas e gráficos financeiros deste documento são gerados a partir desse ficheiro.</dd>
       </dl>
     </div>
