@@ -48,27 +48,53 @@ function hexPoints(cx: number, cy: number, r: number) {
 
 export function TileMap({ map, states, world, selectedId, onSelect, labels = true, className, title }: TileMapProps) {
   const reduce = useReducedMotion();
-  const R = map === 'pt' ? 30 : 25;
+  const R = map === 'pt' ? 28 : 22;
   const W = Math.sqrt(3) * R;
   const VS = R * 1.5;
-  const pad = 6;
   const tint = world ?? (map === 'cafe' ? 'cafe' : 'azeite');
+  const CHAR = 6.9; // largura média de um carácter a 13 px
 
-  const geo: Geo[] = useMemo(() => {
-    return getRegionsByMap(map).map((region) => {
-      const tiles = region.tiles.map((t) => ({ cx: pad + W / 2 + t.col * W + (t.row % 2 === 1 ? W / 2 : 0), cy: pad + R + t.row * VS }));
+  const layout = useMemo(() => {
+    const regions = getRegionsByMap(map);
+    // rótulos do mar (oeste) à esquerda, os restantes à direita
+    const westOf = (r: Region) => map === 'pt' && r.tiles.every((t) => t.col === 0);
+    const leftW = map === 'pt' && labels ? Math.max(...regions.filter(westOf).map((r) => r.nome.length)) * CHAR + 22 : 6;
+    const geo: Geo[] = regions.map((region) => {
+      const tiles = region.tiles.map((t) => ({ cx: leftW + W / 2 + t.col * W + (t.row % 2 === 1 ? W / 2 : 0), cy: 6 + R + t.row * VS }));
       const cx = tiles.reduce((s, t) => s + t.cx, 0) / tiles.length;
       const cy = tiles.reduce((s, t) => s + t.cy, 0) / tiles.length;
       return { region, tiles, cx, cy, active: !world || region.worlds.includes(world) };
     });
-  }, [map, W, R, VS, world]);
+    const mapRight = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cx))) + W / 2;
+    const mapLeft = leftW;
+    const mapBottom = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cy))) + R;
 
-  const maxX = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cx))) + W / 2 + pad;
-  const maxY = Math.max(...geo.flatMap((g) => g.tiles.map((t) => t.cy))) + R + pad;
-  const labelX = maxX + 14;
-  const width = map === 'pt' && labels ? labelX + 150 : maxX;
-  const height = map === 'cafe' && labels ? maxY + 34 : maxY;
+    type Lab = { id: string; side: 'left' | 'right'; ax: number; ay: number; y: number; text: string };
+    const labs: Lab[] = [];
+    if (map === 'pt' && labels) {
+      for (const side of ['left', 'right'] as const) {
+        const group = geo
+          .filter((g) => (side === 'left') === westOf(g.region))
+          .map((g) => {
+            const edge = side === 'left' ? g.tiles.reduce((a, b) => (b.cx < a.cx ? b : a)) : g.tiles.reduce((a, b) => (b.cx > a.cx ? b : a));
+            return { id: g.region.id, side, ax: edge.cx + (side === 'left' ? -W / 2 + 3 : W / 2 - 3), ay: edge.cy, y: edge.cy, text: g.region.nome };
+          })
+          .sort((a, b) => a.ay - b.ay);
+        let prev = -Infinity;
+        for (const l of group) {
+          l.y = Math.max(l.ay, prev + 19);
+          prev = l.y;
+          labs.push(l);
+        }
+      }
+    }
+    const rightW = map === 'pt' && labels ? Math.max(...labs.filter((l) => l.side === 'right').map((l) => l.text.length)) * CHAR + 24 : 6;
+    const width = Math.ceil(mapRight + rightW);
+    const height = Math.ceil(Math.max(mapBottom + 6, ...labs.map((l) => l.y + 10)) + (map === 'cafe' && labels ? 28 : 0));
+    return { geo, labs, mapLeft, mapRight, mapBottom, width, height };
+  }, [map, W, R, VS, world, labels]);
 
+  const { geo, labs, mapLeft, mapRight, mapBottom, width, height } = layout;
   const focusables = geo.filter((g) => g.active);
   const [focusId, setFocusId] = useState<string | undefined>(selectedId ?? focusables[0]?.region.id);
   const refs = useRef<Record<string, SVGGElement | null>>({});
@@ -109,13 +135,25 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
   const countries = map === 'cafe' ? Array.from(new Set(geo.map((g) => g.region.country!))) : [];
 
   return (
-    <div className={cn('min-w-0 max-w-full overflow-x-auto', className)} data-world={tint}>
-      <svg role="group" aria-label={title ?? (map === 'pt' ? 'Mapa das regiões de origem em Portugal' : 'Mapa das origens de café')} viewBox={`0 0 ${width} ${height}`} width={width} height={height} className="block max-w-none">
+    <div className={cn('min-w-0', className)} data-world={tint}>
+      <svg
+        role="group"
+        aria-label={title ?? (map === 'pt' ? 'Mapa das regiões de origem em Portugal' : 'Mapa das origens de café')}
+        viewBox={`0 0 ${width} ${height}`}
+        className="block h-auto w-full"
+        style={{ maxWidth: width }}
+      >
         <defs>
-          <pattern id={`contour-${map}`} width="8" height="8" patternUnits="userSpaceOnUse">
-            <circle cx="4" cy="4" r="1" fill="var(--world-ink)" opacity="0.55" />
+          <pattern id={`contour-${map}`} width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1" fill="var(--world-ink)" opacity="0.55" />
           </pattern>
         </defs>
+        {/* fios dos rótulos (por baixo dos mosaicos) */}
+        {labs.map((l) => {
+          const edgeX = l.side === 'left' ? mapLeft - 4 : mapRight + 4;
+          const textX = l.side === 'left' ? mapLeft - 12 : mapRight + 12;
+          return <polyline key={`w-${l.id}`} points={`${l.ax},${l.ay} ${edgeX},${l.ay} ${textX - (l.side === 'left' ? -2 : 2)},${l.y}`} fill="none" stroke="var(--border)" strokeWidth="1" />;
+        })}
         {geo.map((g) => {
           const state = states[g.region.id] ?? 'unexplored';
           const selected = g.region.id === selectedId;
@@ -129,7 +167,8 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
               : state === 'learned'
                 ? 'color-mix(in oklab, var(--world) 22%, var(--surface))'
                 : 'var(--surface)';
-          const stroke = !g.active ? 'color-mix(in oklab, var(--fg) 10%, var(--surface))' : state === 'unexplored' ? 'var(--border)' : 'var(--world-ink)';
+          const stroke = !g.active ? 'color-mix(in oklab, var(--fg) 12%, var(--surface))' : state === 'unexplored' ? 'color-mix(in oklab, var(--fg) 26%, var(--surface))' : 'var(--world-ink)';
+          const dotTile = g.tiles.reduce((a, b) => (Math.hypot(b.cx - g.cx, b.cy - g.cy) < Math.hypot(a.cx - g.cx, a.cy - g.cy) ? b : a));
           return (
             <g
               key={g.region.id}
@@ -144,20 +183,26 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
               onFocus={() => setFocusId(g.region.id)}
               onKeyDown={g.active ? (e) => onKey(e, g) : undefined}
               onClick={g.active ? () => onSelect?.(g.region.id) : undefined}
-              className={cn('outline-none', g.active && onSelect && 'cursor-pointer', g.active && '[&:hover_polygon.tile]:brightness-[0.97]')}
+              className={cn('group/tile outline-none', g.active && onSelect && 'cursor-pointer')}
             >
               <title>{name}</title>
               {g.tiles.map((t, i) => (
                 <g key={i}>
-                  <polygon className="tile" points={hexPoints(t.cx, t.cy, R - 1.5)} fill={fill} stroke={stroke} strokeWidth={1.25} style={{ transition: reduce ? undefined : 'fill 450ms cubic-bezier(0.16,1,0.3,1), stroke 450ms' }} />
-                  {g.active && state === 'learned' && <polygon points={hexPoints(t.cx, t.cy, R * 0.62)} fill={`url(#contour-${map})`} stroke="var(--world-ink)" strokeOpacity="0.5" strokeWidth="1" />}
-                  {g.active && state === 'participated' && <polygon points={hexPoints(t.cx, t.cy, R * 0.62)} fill="none" stroke="color-mix(in oklab, var(--world) 45%, var(--surface))" strokeWidth="1.25" />}
+                  <polygon
+                    points={hexPoints(t.cx, t.cy, R - 1.5)}
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth={1.25}
+                    className={g.active && onSelect ? 'group-hover/tile:[stroke-width:2.25]' : undefined}
+                    style={{ transition: reduce ? undefined : 'fill 450ms cubic-bezier(0.16,1,0.3,1), stroke 450ms' }}
+                  />
+                  {g.active && state === 'learned' && <polygon points={hexPoints(t.cx, t.cy, R * 0.6)} fill={`url(#contour-${map})`} stroke="var(--world-ink)" strokeOpacity="0.45" strokeWidth="1" />}
+                  {g.active && state === 'participated' && <polygon points={hexPoints(t.cx, t.cy, R * 0.6)} fill="none" stroke="color-mix(in oklab, var(--world) 40%, var(--surface))" strokeWidth="1.25" />}
                 </g>
               ))}
               {g.active && producers.length > 0 && (
-                <circle cx={g.cx} cy={g.cy} r={4} fill={state === 'participated' ? 'var(--surface)' : 'var(--world-ink)'} stroke={state === 'participated' ? 'var(--world-ink)' : 'none'} strokeWidth="1.5" />
+                <circle cx={dotTile.cx} cy={dotTile.cy} r={4} fill={state === 'participated' ? 'var(--surface)' : 'var(--world-ink)'} stroke={state === 'participated' ? 'var(--world-ink)' : 'none'} strokeWidth="1.5" />
               )}
-              {/* seleção e foco */}
               {(selected || focused) &&
                 g.tiles.map((t, i) => (
                   <motion.polygon
@@ -166,33 +211,42 @@ export function TileMap({ map, states, world, selectedId, onSelect, labels = tru
                     fill="none"
                     stroke={selected ? 'var(--fg)' : 'var(--accent)'}
                     strokeWidth={selected ? 2.5 : 2}
-                    strokeDasharray={focused && !selected ? '4 3' : undefined}
                     initial={reduce ? false : { opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
-                    className={focused && !selected ? 'hidden [g:focus-visible_&]:inline' : undefined}
+                    className={!selected ? 'hidden group-focus-visible/tile:inline' : undefined}
                   />
                 ))}
-              {/* rótulo PT à direita com fio */}
-              {labels && map === 'pt' && (
-                <>
-                  <line x1={Math.max(...g.tiles.map((t) => t.cx)) + W / 2 - 2} x2={labelX - 4} y1={g.cy} y2={g.cy} stroke="var(--border)" strokeWidth="1" />
-                  <text x={labelX} y={g.cy + 4.5} fontSize="13" fontFamily="var(--font-sans)" fill={g.active ? 'var(--fg)' : 'var(--muted)'} fontWeight={selected ? 600 : 400}>
-                    {g.region.nome}
-                  </text>
-                </>
-              )}
             </g>
+          );
+        })}
+        {labs.map((l) => {
+          const g = geo.find((x) => x.region.id === l.id)!;
+          const selected = l.id === selectedId;
+          return (
+            <text
+              key={`t-${l.id}`}
+              x={l.side === 'left' ? mapLeft - 12 : mapRight + 12}
+              y={l.y + 4.5}
+              textAnchor={l.side === 'left' ? 'end' : 'start'}
+              fontSize="13"
+              fontFamily="var(--font-sans)"
+              fill={g.active ? 'var(--fg)' : 'var(--muted)'}
+              fontWeight={selected ? 650 : 400}
+              aria-hidden
+            >
+              {l.text}
+            </text>
           );
         })}
         {labels &&
           map === 'cafe' &&
           countries.map((country) => {
             const members = geo.filter((g) => g.region.country === country);
-            const cx = members.reduce((s, g) => s + g.cx, 0) / members.length;
-            const bottom = Math.max(...members.flatMap((g) => g.tiles.map((t) => t.cy))) + R + 18;
+            const xs = members.flatMap((g) => g.tiles.map((t) => t.cx));
+            const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
             return (
-              <text key={country} x={cx} y={bottom} textAnchor="middle" fontSize="13" fontFamily="var(--font-sans)" fontWeight={600} fill="var(--fg)">
+              <text key={country} x={cx} y={mapBottom + 22} textAnchor="middle" fontSize="13" fontFamily="var(--font-sans)" fontWeight={600} fill="var(--fg)" aria-hidden>
                 {country}
               </text>
             );
