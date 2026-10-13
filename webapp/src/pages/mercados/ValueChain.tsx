@@ -35,6 +35,8 @@ function inkOn(fillHex: string, light: string, dark: string): string {
   return contrast(L, luminance(light)) >= contrast(L, luminance(dark)) ? light : dark;
 }
 
+const SHORT: Record<ChainSegment['id'], string> = { produtor: 'Produtor', premio: 'Prémio', custos: 'Custos', spread: 'Spread do lote', desconto: 'Desconto ao comprador' };
+
 const MIDDLE_SPROUT: Record<WorldId, string> = {
   azeite: 'Sprout · lote em IBC',
   agua: 'Sprout · lote em paletes',
@@ -85,7 +87,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
 
   return (
     <div data-world={world} className="min-w-0">
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-x-4">
         <div className="min-w-0 flex-1">
           <h3 id={`${uid}-t`} className="text-[1.1875rem] leading-tight">
             A cadeia neste mercado
@@ -110,10 +112,10 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
       </div>
 
       {/* percurso: quem está entre o produtor e o comprador */}
-      <ol className="mt-5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1.2fr)_auto_minmax(0,1fr)] items-center gap-x-2 text-sm" aria-label="Percurso da mercadoria">
+      <ol className="mt-5 grid grid-cols-1 justify-items-stretch gap-y-1 text-sm sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.2fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-x-2" aria-label="Percurso da mercadoria">
         <li className="min-w-0 rounded-sm border border-border bg-surface px-2.5 py-2 text-center font-medium leading-snug text-fg">{model.nodes[0]}</li>
-        <li aria-hidden className="text-muted">
-          <ArrowRight className="size-4" strokeWidth={1.75} />
+        <li aria-hidden className="justify-self-center text-muted">
+          <ArrowRight className="size-4 max-sm:rotate-90" strokeWidth={1.75} />
         </li>
         <li className={cn('relative min-w-0 rounded-sm border px-2.5 py-2 text-center font-medium leading-snug transition-colors duration-300', sprout ? 'border-world-line bg-world-soft text-world-ink' : 'border-dashed border-border bg-surface text-fg')}>
           <span className={cn('block transition-opacity duration-200', sprout ? 'opacity-0' : 'opacity-100')} aria-hidden={sprout}>
@@ -123,8 +125,8 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
             {MIDDLE_SPROUT[world]}
           </span>
         </li>
-        <li aria-hidden className="text-muted">
-          <ArrowRight className="size-4" strokeWidth={1.75} />
+        <li aria-hidden className="justify-self-center text-muted">
+          <ArrowRight className="size-4 max-sm:rotate-90" strokeWidth={1.75} />
         </li>
         <li className="min-w-0 rounded-sm border border-border bg-surface px-2.5 py-2 text-center font-medium leading-snug text-fg">{model.nodes[2]}</li>
       </ol>
@@ -189,7 +191,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
                   )}
                   aria-hidden
                 >
-                  <span className={cn('truncate', isDiscount && 'rounded-xs bg-surface px-1 text-fg')}>{s.label}</span>
+                  <span className={cn('truncate', isDiscount && 'rounded-xs bg-surface px-1 text-fg')}>{SHORT[s.id]}</span>
                 </span>
               </div>
             );
@@ -235,7 +237,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
             <div className="min-w-0">
               <dt className="text-sm text-muted">{s.label}</dt>
               <dd className="font-mono text-[0.9375rem] text-fg tnum">
-                {unitPrice(world, s.value)} <span className="text-muted">· {pct(s.value / pool, 0)} da margem</span>
+                {unitPrice(world, s.value)} <span className="whitespace-nowrap font-sans text-sm text-muted">· {pct(s.value / pool, 0)} da margem</span>
               </dd>
               <dd className="text-sm text-muted">{s.description}</dd>
             </div>

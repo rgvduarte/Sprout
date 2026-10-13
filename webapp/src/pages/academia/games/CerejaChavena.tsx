@@ -217,7 +217,11 @@ function StepItem({ step, index, total, locked, onMove }: { step: CoffeeStep; in
 /* ------------------------------------------------------------ ronda 2 */
 
 function ProcessRound({ seed, onDone }: { seed: number; onDone: (score: number) => void }) {
-  const effects = useMemo(() => shuffle(COFFEE_EFFECTS, createRng(`cafe-proc-${seed}`)), [seed]);
+  const effects = useMemo(() => {
+    const s = shuffle(COFFEE_EFFECTS, createRng(`cafe-proc-${seed}`));
+    // a ordem dos cartões nunca coincide com a dos botões (lavado, natural, honey)
+    return s.every((e, i) => e.process === COFFEE_PROCESSES[i].id) ? [s[1], s[2], s[0]] : s;
+  }, [seed]);
   const [picks, setPicks] = useState<Record<string, CoffeeProcess['id']>>({});
   const [checked, setChecked] = useState(false);
   const all = effects.every((e) => picks[e.id]);
@@ -382,9 +386,9 @@ function ScaRound({ onDone }: { onDone: (score: number) => void }) {
               <tr className="border-b border-border text-left text-muted">
                 <th scope="col" className="py-1.5 pr-2 font-medium">Especialidade?</th>
                 <th scope="col" className="py-1.5 pr-2 font-medium">Amostra</th>
-                <th scope="col" className="py-1.5 pr-2 text-right font-medium">Humid.</th>
-                <th scope="col" className="py-1.5 pr-2 text-right font-medium">Cat. 1</th>
-                <th scope="col" className="py-1.5 pr-2 text-right font-medium">Cat. 2</th>
+                <th scope="col" className="whitespace-nowrap py-1.5 pr-2 text-right font-medium">Humid.</th>
+                <th scope="col" className="whitespace-nowrap py-1.5 pr-2 text-right font-medium">Cat. 1</th>
+                <th scope="col" className="whitespace-nowrap py-1.5 pr-2 text-right font-medium">Cat. 2</th>
                 <th scope="col" className="py-1.5 text-right font-medium">SCA</th>
               </tr>
             </thead>
@@ -441,7 +445,7 @@ function GradeRow({ c, marked, checked, onToggle }: { c: CoffeeSample; marked: b
           {c.origem} · {c.processo === 'honey' ? 'honey' : c.processo}
         </span>
       </td>
-      <td className="py-1.5 pr-2 text-right font-mono text-fg tnum">{num(c.humidade, 1)} %</td>
+      <td className="whitespace-nowrap py-1.5 pr-2 text-right font-mono text-fg tnum">{num(c.humidade, 1)}&nbsp;%</td>
       <td className={cn('py-1.5 pr-2 text-right font-mono tnum', checked && c.defeitosCat1 > 0 ? 'font-semibold text-crit-ink' : 'text-fg')}>{c.defeitosCat1}</td>
       <td className={cn('py-1.5 pr-2 text-right font-mono tnum', checked && c.defeitosCompletosCat2 > 5 ? 'font-semibold text-crit-ink' : 'text-fg')}>{c.defeitosCompletosCat2}</td>
       <td className={cn('py-1.5 text-right font-mono tnum', checked && c.pontuacao < 80 ? 'font-semibold text-crit-ink' : 'text-fg')}>

@@ -156,14 +156,20 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
 
   if (layout === 'split') {
     return (
-      <Card as="article" padding="none" data-world={world} className={cn('grid overflow-hidden md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]', className)} aria-label={w.nome}>
-        <div className="flex flex-col justify-between border-b border-world-line bg-world-soft pt-3 md:border-b-0 md:border-r">{art}</div>
-        <div className="min-w-0 p-5 sm:p-6">
-          <WorldHeading world={world} onMap={onMap} />
-          <p className="mt-3 text-[0.9375rem] text-muted">{w.tagline}</p>
-          <MiniReferenceChart world={world} lot={chainLot} className="mt-5" />
-          <div className="mt-5 flex flex-col gap-5">
-            <Margin world={world} sentence={sentence} />
+      <Card as="article" padding="none" data-world={world} className={cn('overflow-hidden', className)} aria-label={w.nome}>
+        <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <div className="flex flex-col justify-center border-b border-world-line bg-world-soft pt-3 md:border-b-0 md:border-r">{art}</div>
+          <div className="min-w-0 p-5 sm:p-6">
+            <WorldHeading world={world} onMap={onMap} />
+            <p className="mt-3 text-[0.9375rem] text-muted">{w.tagline}</p>
+            <div className="mt-5">
+              <Margin world={world} sentence={sentence} />
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-border p-5 sm:p-6">
+          <div className="grid min-w-0 gap-x-8 gap-y-6 md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">
+            <MiniReferenceChart world={world} lot={chainLot} />
             <OpenMissions world={world} open={open} upcoming={upcoming} />
           </div>
           <SeasonTrack world={world} className="mt-6" />
@@ -173,19 +179,21 @@ function WorldPanel({ world, layout, onMap, fillOnMount, className }: { world: W
   }
 
   return (
-    <Card as="article" padding="none" data-world={world} className={cn('grid overflow-hidden lg:grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,4fr)]', className)} aria-label={w.nome}>
-      <div className="flex flex-col justify-end border-b border-world-line bg-world-soft pt-3 lg:border-b-0 lg:border-r">{art}</div>
+    <Card as="article" padding="none" data-world={world} className={cn('grid overflow-hidden lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]', className)} aria-label={w.nome}>
+      <div className="flex flex-col justify-center border-b border-world-line bg-world-soft pt-3 lg:border-b-0 lg:border-r">{art}</div>
       <div className="min-w-0 p-5 sm:p-6">
         <WorldHeading world={world} onMap={onMap} />
-        <p className="mt-3 text-[0.9375rem] text-muted">{w.tagline}</p>
-        <div className="mt-5 flex flex-col gap-5">
-          <Margin world={world} sentence={sentence} />
-          <OpenMissions world={world} open={open} upcoming={upcoming} />
+        <p className="measure mt-3 text-[0.9375rem] text-muted">{w.tagline}</p>
+        <div className="mt-6 grid min-w-0 gap-x-8 gap-y-6 md:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-5">
+            <Margin world={world} sentence={sentence} />
+            <OpenMissions world={world} open={open} upcoming={upcoming} />
+          </div>
+          <div className="min-w-0">
+            <MiniReferenceChart world={world} lot={chainLot} />
+            <SeasonTrack world={world} className="mt-6" />
+          </div>
         </div>
-      </div>
-      <div className="min-w-0 border-t border-border p-5 sm:p-6 lg:border-l lg:border-t-0">
-        <MiniReferenceChart world={world} lot={chainLot} />
-        <SeasonTrack world={world} className="mt-6" />
       </div>
     </Card>
   );

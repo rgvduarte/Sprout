@@ -306,7 +306,7 @@ function OlivalScene({ variant = 'hero', levels, fillOnMount = false, className,
     { cx: 32.2, cy: 13.8 },
     { cx: 35.4, cy: 13.8 },
   ];
-  const vb = variant === 'band' ? '40 70 640 236' : '0 6 720 330';
+  const vb = variant === 'band' ? '70 36 580 284' : '106 18 512 310';
   return (
     <svg viewBox={vb} role="img" aria-label={label} className={cn('block h-auto w-full', className)} preserveAspectRatio="xMidYMid meet">
       <Contours P={P} cx={8} cy={5} radii={[11, 14.5, 18.5, 23, 28]} seed={1.3} />
@@ -355,7 +355,7 @@ function NascenteScene({ variant = 'hero', levels, fillOnMount = false, classNam
   const level = levels[0] ?? 0;
   const lv = useLevel(level, fillOnMount);
   const ordered = slots.map((s, i) => ({ s, i })).sort((a, b) => a.s[0] + a.s[1] - (b.s[0] + b.s[1]));
-  const vb = variant === 'band' ? '128 40 372 280' : '112 6 404 318';
+  const vb = variant === 'band' ? '122 34 392 298' : '112 22 404 312';
   return (
     <svg viewBox={vb} role="img" aria-label={label} className={cn('block h-auto w-full', className)} preserveAspectRatio="xMidYMid meet">
       <Contours P={P} cx={5} cy={4} radii={[8.5, 12, 16]} seed={0.4} />
@@ -462,7 +462,7 @@ function PlantacaoScene({ variant = 'hero', levels, className, label }: ScenePro
     [33, 16.1, 0.92],
     [34.6, 16.1, 0.92],
   ];
-  const vb = variant === 'band' ? '30 40 640 250' : '0 0 720 320';
+  const vb = variant === 'band' ? '96 22 512 306' : '96 20 512 310';
   return (
     <svg viewBox={vb} role="img" aria-label={label} className={cn('block h-auto w-full', className)} preserveAspectRatio="xMidYMid meet">
       <Contours P={P} cx={12} cy={8} radii={[17, 21, 25.5]} seed={2.7} />

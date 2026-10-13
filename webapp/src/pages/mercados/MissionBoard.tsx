@@ -65,7 +65,9 @@ function MissionRow({ lot }: { lot: Lot }) {
   const read = game.riskRead(lot.id).length;
   const factors = lot.riskFactors.length;
   const min = physicalForAmount(lot, lot.funding.minTicket);
+  // sem data fixada (em preparação, Fase 2): estimativa a partir da abertura, em mês e ano
   const end = lot.settlement.plannedEnd ?? addMonths(lot.funding.opensPlanned ?? lot.funding.opensAt, lot.settlement.windowMonths);
+  const endExact = Boolean(lot.settlement.plannedEnd);
   const physicalUnit = world === 'agua' ? 'paletes' : world === 'cafe' ? 'sacas' : 'kg';
   const gaugeLabel = preparing ? `Stock do ${lot.id} a encher` : preview ? `${lot.id}, pré-visualização da Fase 2` : `Financiamento do ${lot.id}`;
   const gaugeText = preparing ? `${num(lot.stock)} de ${num(lot.quantity)} ${physicalUnit}` : `${Math.round(funded * 100)} %`;
@@ -117,7 +119,7 @@ function MissionRow({ lot }: { lot: Lot }) {
         <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 lg:grid-cols-4">
           <Term label="Desconto ao comprador" value={pct(lot.economics.discountPct, 0)} hint={`vende a ${unitPrice(world, lot.economics.buyerPrice)}`} />
           <Term label="Ticket mínimo" value={eur(lot.funding.minTicket)} hint={`≈ ${min.primary}`} />
-          <Term label="Janela" value={`${lot.settlement.windowMonths} meses`} hint={`liquidação prevista ${preview ? 'em' : 'a'} ${preview ? monthYear(end) : fmtDate(end)}`} />
+          <Term label="Janela" value={`${lot.settlement.windowMonths} meses`} hint={endExact ? `liquidação prevista a ${fmtDate(end)}` : `liquidação prevista por volta de ${monthYear(end)}`} />
           <Term label="Extensão" value={`até ${lot.extension.maxMonths} meses`} hint="condicionada, uma só vez" />
         </dl>
         <p className="measure mt-3 text-sm text-muted">

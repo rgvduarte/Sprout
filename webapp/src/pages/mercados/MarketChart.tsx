@@ -63,14 +63,14 @@ export function MiniReferenceChart({ world, lot, className }: { world: WorldId; 
   return (
     <ChartFrame
       className={className}
-      title="Referência, últimos 60 dias"
-      description={`€/${unit} · índice ilustrativo, dados fictícios`}
+      title="Referência, 60 dias"
+      description={`€/${unit} · índice ilustrativo`}
       legend={legend}
       height={176}
       table={{ caption: `${series.label}, últimos 60 dias`, rows: data, getRowId: (r) => r.t, columns: priceColumns(world) }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 18, right: 14, bottom: 0, left: 0 }}>
+        <ComposedChart data={data} margin={{ top: 18, right: 26, bottom: 0, left: 0 }}>
           <CartesianGrid stroke={tokens.chartGrid} vertical={false} />
           <XAxis dataKey="t" ticks={xTicks} tickFormatter={tickDay} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={{ stroke: tokens.chartGrid }} tickLine={false} />
           <YAxis domain={domain} ticks={ticks} width={unit === 'L' ? 44 : 38} tickFormatter={(v: number) => priceNumber(world, v)} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={false} tickLine={false} />
@@ -123,7 +123,7 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
   const bandName = isPreview ? 'Preço indicativo dos lotes da Fase 2' : 'Preço ao comprador nos lotes abertos';
 
   const legend: LegendItem[] = [{ label: 'Referência de mercado', color, kind: 'line' }];
-  if (low !== undefined) legend.push(isBand ? { label: `${bandName} (${priceNumber(world, low)}–${priceNumber(world, high!)})`, color: `color-mix(in oklab, ${color} 30%, ${tokens.surface})`, kind: 'rect' } : { label: `${bandName} (${priceNumber(world, low)})`, color: color, kind: 'line', dashed: true });
+  if (low !== undefined) legend.push(isBand ? { label: `${bandName} (${priceNumber(world, low)}–${priceNumber(world, high!)})`, color: `color-mix(in oklab, ${color} 55%, ${tokens.surface})`, kind: 'rect' } : { label: `${bandName} (${priceNumber(world, low)})`, color: color, kind: 'line', dashed: true });
   if (compare) legend.push({ label: `${compare.id} · venda a ${priceNumber(world, compare.economics.buyerPrice)}`, color: tokens.fg, kind: 'line', dashed: true });
 
   const pick = (lot: Lot) => {
@@ -135,8 +135,8 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
   return (
     <div className="min-w-0">
       <ChartFrame
-        title={series.label}
-        description={`€/${unit} · ${range === '24m' ? 'mensal, nov. 2024 a out. 2026' : 'diário, 15/08 a 13/10/2026'} · ${range === '24m' ? '24 meses' : '60 dias'}: ${pct(change, 1, { sign: true })}`}
+        title="Referência de mercado"
+        description={`${series.label} · €/${unit} · ${range === '24m' ? 'mensal, nov. 2024 a out. 2026' : 'diário, 15/08 a 13/10/2026'}`}
         legend={legend}
         height={wide ? 272 : 236}
         actions={
@@ -155,12 +155,12 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
         footnote={`${series.note} ${low !== undefined ? `A ${isBand ? 'faixa' : 'linha tracejada'} marca ${isPreview ? 'o preço indicativo' : 'o preço de venda ao comprador'} ${isBand ? 'dos lotes' : 'do lote'} de hoje: o espaço até à linha da referência é o desconto.` : ''}`}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 20, right: wide ? 18 : 10, bottom: 0, left: 0 }}>
+          <ComposedChart data={data} margin={{ top: 20, right: 28, bottom: 0, left: 0 }}>
             <CartesianGrid stroke={tokens.chartGrid} vertical={false} />
             <XAxis dataKey="t" ticks={xTicks} tickFormatter={range === '24m' ? tickMonth : tickDay} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={{ stroke: tokens.chartGrid }} tickLine={false} />
             <YAxis domain={domain} ticks={ticks} width={unit === 'L' ? 46 : 40} tickFormatter={(v: number) => priceNumber(world, v)} tick={{ fill: tokens.chartAxis, fontSize: AXIS_FONT }} axisLine={false} tickLine={false} />
             <RTooltip cursor={{ stroke: tokens.chartAxis, strokeWidth: 1 }} content={<ChartTooltipContent valueFormatter={(v) => unitPrice(world, v)} labelFormatter={(l) => longLabel(String(l))} />} />
-            {isBand && <ReferenceArea y1={low} y2={high} fill={color} fillOpacity={0.22} stroke="none" ifOverflow="extendDomain" />}
+            {isBand && <ReferenceArea y1={low} y2={high} fill={color} fillOpacity={0.5} stroke={color} strokeOpacity={0.9} strokeWidth={1} ifOverflow="extendDomain" />}
             {!isBand && low !== undefined && <ReferenceLine y={low} stroke={color} strokeWidth={1.5} strokeDasharray="4 3" />}
             {compare && (
               <ReferenceLine
@@ -176,6 +176,20 @@ export function ReferenceChart({ world, lots, onCompare }: ReferenceChartProps) 
           </ComposedChart>
         </ResponsiveContainer>
       </ChartFrame>
+
+      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-border pt-4 sm:grid-cols-4">
+        {[
+          { label: 'Hoje', value: unitPrice(world, today) },
+          { label: 'Há 12 meses', value: unitPrice(world, series.monthly[series.monthly.length - 13].value) },
+          { label: 'Mínimo em 24 meses', value: unitPrice(world, Math.min(...series.monthly.map((m) => m.value))) },
+          { label: range === '24m' ? 'Variação, 24 meses' : 'Variação, 60 dias', value: pct(change, 1, { sign: true }) },
+        ].map((it) => (
+          <div key={it.label} className="min-w-0">
+            <dt className="text-sm text-muted">{it.label}</dt>
+            <dd className="mt-0.5 font-mono text-[0.9375rem] text-fg tnum">{it.value}</dd>
+          </div>
+        ))}
+      </dl>
 
       {lots.length > 0 && (
         <div className="mt-4 border-t border-border pt-4">

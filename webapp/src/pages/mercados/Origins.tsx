@@ -117,7 +117,7 @@ export function OriginsAtlas({ world, onWorldChange }: { world: WorldId; onWorld
         options={WORLD_ORDER.map((id) => ({ value: id, label: getWorld(id).commodity }))}
       />
 
-      <div className={cn('mt-4', world === 'cafe' ? 'max-w-[440px]' : 'mx-auto max-w-[420px]')}>
+      <div className={cn('mt-4 [&_svg]:mx-auto', world === 'cafe' ? 'max-w-[440px]' : 'mx-auto max-w-[400px]')}>
         <TileMap map={w.map} world={world} states={regionStates} selectedId={regionOk?.id} onSelect={select} labels={wide} title={`Mapa das origens: ${w.nome}`} />
       </div>
       <TileMapLegend world={world} className="mt-3" />
@@ -319,7 +319,7 @@ export function OriginsExplorer({ world, regionId, onSelect }: { world: WorldId;
   return (
     <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <div className="min-w-0">
-        <div className={cn(world === 'cafe' ? 'max-w-[460px]' : 'mx-auto max-w-[440px] lg:mx-0')}>
+        <div className={cn('[&_svg]:mx-auto lg:[&_svg]:mx-0', world === 'cafe' ? 'max-w-[460px]' : 'mx-auto max-w-[440px] lg:mx-0')}>
           <TileMap map={w.map} world={world} states={regionStates} selectedId={region.id} onSelect={onSelect} labels={wide} title={`Regiões de ${w.nome}`} />
         </div>
         <TileMapLegend world={world} className="mt-3" />

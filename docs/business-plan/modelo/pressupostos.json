@@ -307,7 +307,36 @@
     "dias_pagamento_produtor": 30,
     "nota": "custódia (collateral manager) e pagamentos bancários por kg estão por canal em commodities.azeite.canais; KYC e faturação certificada ficam só no custo fixo de tecnologia (sem dupla contagem)"
    },
-   "check_margem_contribuicao_base_eur_kg": "preenchido por calculo_referencia.py"
+   "check_margem_contribuicao_base_eur_kg": {
+    "piloto_2027": {
+     "horeca_gourmet": {
+      "preco_eur_kg": 5.085,
+      "custo_direto_eur_kg": 4.744,
+      "margem_eur_kg": 0.341,
+      "margem_pct": 0.067
+     },
+     "distribuidores_export": {
+      "preco_eur_kg": 4.35,
+      "custo_direto_eur_kg": 4.254,
+      "margem_eur_kg": 0.096,
+      "margem_pct": 0.0222
+     }
+    },
+    "regime": {
+     "horeca_gourmet": {
+      "preco_eur_kg": 5.085,
+      "custo_direto_eur_kg": 4.738,
+      "margem_eur_kg": 0.347,
+      "margem_pct": 0.0683
+     },
+     "distribuidores_export": {
+      "preco_eur_kg": 4.35,
+      "custo_direto_eur_kg": 4.286,
+      "margem_eur_kg": 0.064,
+      "margem_pct": 0.0148
+     }
+    }
+   }
   },
   "agua": {
    "unidade": "palete",
@@ -1449,50 +1478,71 @@
   }
  },
  "resultados_referencia": {
-  "nota": "Resultados de referência calculados com estes pressupostos (modelo simplificado usado em 01-desenho-do-modelo.md sec. 7). O modelo financeiro deve reproduzi-los com tolerância de +-5%; diferenças maiores indicam erro de implementação ou de pressuposto.",
+  "nota": "Gerado por calculo_referencia.py a partir deste ficheiro (2026-10-13). O modelo financeiro deve reproduzi-los com tolerância de +-5%; diferenças maiores indicam erro de implementação ou de pressuposto. Margem de contribuição inclui o cupão das obrigações; exclui o custo nocional do capital próprio.",
   "unidade": "EUR",
   "pessimista": {
    "gmv_total": [
-    329922,
-    739522,
-    1548980,
-    2349872,
-    3142200
+    188160,
+    643860,
+    1372160,
+    2101120,
+    2823480
    ],
    "margem_contribuicao_total": [
-    12774,
-    28288,
-    59061,
-    97776,
-    136906
+    -3800,
+    -29751,
+    -53806,
+    -65151,
+    -79080
+   ],
+   "margem_contribuicao_azeite_horeca_gourmet": [
+    224,
+    -4367,
+    -10095,
+    -5082,
+    -684
+   ],
+   "margem_contribuicao_azeite_distribuidores": [
+    -4186,
+    -25384,
+    -48996,
+    -72412,
+    -97796
    ],
    "margem_contribuicao_azeite_pct_gmv_azeite": [
-    0.0397,
-    0.0383,
-    0.038,
-    0.0365,
-    0.036
+    -0.023,
+    -0.0462,
+    -0.0457,
+    -0.0399,
+    -0.0381
+   ],
+   "margem_contribuicao_agua_cafe_terceiros_dados": [
+    162,
+    0,
+    5286,
+    12343,
+    19400
    ],
    "custos_pessoal": [
-    365932,
-    441672,
-    454922,
-    499487,
-    514471
+    400886,
+    456092,
+    469774,
+    515878,
+    531354
    ],
    "opex_nao_salarial": [
-    294400,
-    219567,
-    238190,
-    263425,
-    280496
+    304400,
+    252142,
+    273365,
+    301202,
+    320848
    ],
    "ebitda": [
-    -647559,
-    -632951,
-    -634051,
-    -665136,
-    -658061
+    -709086,
+    -737985,
+    -796945,
+    -882230,
+    -931281
    ],
    "capex": [
     92000,
@@ -1502,18 +1552,25 @@
     21000
    ],
    "capital_giro_liquido": [
-    80927,
-    199855,
-    404513,
-    604647,
-    800256
+    37392,
+    137716,
+    299485,
+    377971,
+    467711
    ],
    "obrigacoes_em_circulacao_fim_ano": [
-    40463,
-    169877,
-    343836,
-    513950,
-    680218
+    0,
+    167226,
+    363661,
+    458965,
+    567935
+   ],
+   "reserva_primeira_perda": [
+    0,
+    8361,
+    18183,
+    22948,
+    28397
    ],
    "fte": [
     7.0,
@@ -1522,174 +1579,251 @@
     7.5,
     7.5
    ],
-   "cash_flow_acionista_acumulado": [
-    -780022,
-    -1425982,
-    -2120429,
-    -2846091,
-    -3562807
+   "cash_flow_acionista": [
+    -801086,
+    -761346,
+    -827767,
+    -915691,
+    -971191
    ],
-   "necessidade_capital_proprio": 3808000
+   "cash_flow_acionista_acumulado": [
+    -801086,
+    -1562432,
+    -2390199,
+    -3305890,
+    -4277081
+   ],
+   "necessidade_capital_proprio_minima": 4572000
   },
   "base": {
    "gmv_total": [
-    681600,
-    2205000,
-    4819250,
-    8160625,
-    12293000
+    307380,
+    1929195,
+    4300755,
+    7352745,
+    11142350
    ],
    "margem_contribuicao_total": [
-    69208,
-    231343,
-    522194,
-    908119,
-    1372500
+    8548,
+    29287,
+    119438,
+    236999,
+    380661
+   ],
+   "margem_contribuicao_azeite_horeca_gourmet": [
+    2728,
+    5610,
+    46169,
+    96209,
+    147737
+   ],
+   "margem_contribuicao_azeite_distribuidores": [
+    5011,
+    18665,
+    46052,
+    79305,
+    119997
    ],
    "margem_contribuicao_azeite_pct_gmv_azeite": [
-    0.108,
-    0.1061,
-    0.1084,
-    0.1085,
-    0.1064
+    0.029,
+    0.0137,
+    0.0243,
+    0.027,
+    0.0271
+   ],
+   "margem_contribuicao_agua_cafe_terceiros_dados": [
+    810,
+    5011,
+    27217,
+    61485,
+    112928
    ],
    "custos_pessoal": [
-    365932,
-    491538,
-    644361,
-    825150,
-    906517
+    400886,
+    508018,
+    667701,
+    855746,
+    1042442
    ],
    "opex_nao_salarial": [
-    309100,
-    285614,
-    376465,
-    419394,
-    488710
+    319100,
+    322683,
+    421646,
+    475409,
+    558195
    ],
    "ebitda": [
-    -605825,
-    -545809,
-    -498633,
-    -336425,
-    -22727
+    -711437,
+    -801413,
+    -969910,
+    -1094156,
+    -1219976
    ],
    "capex": [
     92000,
     44000,
     48000,
     38000,
-    34000
+    38000
    ],
    "capital_giro_liquido": [
-    130701,
-    429861,
-    929234,
-    1572714,
-    2363296
+    45499,
+    276088,
+    500492,
+    866765,
+    1323908
    ],
    "obrigacoes_em_circulacao_fim_ano": [
-    78420,
-    386875,
-    836310,
-    1415442,
-    2126967
+    0,
+    310599,
+    563054,
+    975110,
+    1489396
+   ],
+   "reserva_primeira_perda": [
+    0,
+    15530,
+    28153,
+    48756,
+    74470
    ],
    "fte": [
     7.0,
-    8,
-    11,
-    14,
-    15
+    8.0,
+    11.0,
+    14.0,
+    17.0
+   ],
+   "cash_flow_acionista": [
+    -803437,
+    -860943,
+    -1030582,
+    -1189386,
+    -1329405
    ],
    "cash_flow_acionista_acumulado": [
-    -750105,
-    -1349964,
-    -1969005,
-    -2436735,
-    -2608096
+    -803437,
+    -1664381,
+    -2694963,
+    -3884349,
+    -5213754
    ],
-   "necessidade_capital_proprio": 2853000
+   "necessidade_capital_proprio_minima": 5509000
   },
   "otimista": {
    "gmv_total": [
-    1149300,
-    3821250,
-    7646550,
-    12889400,
-    19211150
+    417600,
+    3353800,
+    6832000,
+    11648000,
+    17469500
    ],
    "margem_contribuicao_total": [
-    174731,
-    595920,
-    1228671,
-    2094292,
-    3116176
+    29376,
+    225647,
+    530196,
+    957601,
+    1458149
+   ],
+   "margem_contribuicao_azeite_horeca_gourmet": [
+    7097,
+    41677,
+    153014,
+    311225,
+    466838
+   ],
+   "margem_contribuicao_azeite_distribuidores": [
+    20820,
+    162859,
+    316457,
+    520948,
+    781422
    ],
    "margem_contribuicao_azeite_pct_gmv_azeite": [
-    0.1598,
-    0.1613,
-    0.1626,
-    0.1618,
-    0.1593
+    0.0757,
+    0.0686,
+    0.0778,
+    0.081,
+    0.081
+   ],
+   "margem_contribuicao_agua_cafe_terceiros_dados": [
+    1458,
+    21110,
+    60725,
+    125428,
+    209889
    ],
    "custos_pessoal": [
-    365932,
-    674812,
-    914513,
-    1136384,
-    1416035
+    400886,
+    699532,
+    948462,
+    1229685,
+    1625550
    ],
    "opex_nao_salarial": [
-    324850,
-    367726,
-    431717,
-    531364,
-    647145
+    334850,
+    409649,
+    485855,
+    602440,
+    738759
    ],
    "ebitda": [
-    -516052,
-    -446619,
-    -117559,
-    426544,
-    1052997
+    -706360,
+    -883535,
+    -904120,
+    -874525,
+    -906160
    ],
    "capex": [
     92000,
     73000,
     66000,
-    56000,
-    58000
+    58000,
+    62000
    ],
    "capital_giro_liquido": [
-    181826,
-    600716,
-    1193288,
-    2004003,
-    2970925
+    52092,
+    346248,
+    653170,
+    1130465,
+    1704826
    ],
    "obrigacoes_em_circulacao_fim_ano": [
-    109096,
-    540645,
-    1073959,
-    1803602,
-    2673832
+    0,
+    366615,
+    691592,
+    1196963,
+    1805110
+   ],
+   "reserva_primeira_perda": [
+    0,
+    18331,
+    34580,
+    59848,
+    90255
    ],
    "fte": [
     7.0,
-    12,
-    16,
-    20,
-    25
+    12.0,
+    16.0,
+    21.0,
+    28.0
+   ],
+   "cash_flow_acionista": [
+    -800452,
+    -972773,
+    -1001686,
+    -1005523,
+    -1056003
    ],
    "cash_flow_acionista_acumulado": [
-    -680782,
-    -1214774,
-    -1484256,
-    -1254822,
-    -464304
+    -800452,
+    -1773226,
+    -2774912,
+    -3780434,
+    -4836438
    ],
-   "necessidade_capital_proprio": 1729000
+   "necessidade_capital_proprio_minima": 5131000
   },
   "rondas_recomendadas_base": [
    {

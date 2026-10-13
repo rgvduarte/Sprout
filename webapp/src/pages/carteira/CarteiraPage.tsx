@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, Download } from 'lucide-react';
 import { getProducer } from '../../data';
 import { LotGauge } from '../../components/game';
@@ -36,17 +36,6 @@ export default function CarteiraPage() {
   const { toast } = useToast();
   const [openId, setOpenId] = useState<string | null>(null);
 
-  // TESTE-TEMPORARIO-INICIO
-  useEffect(() => {
-    if (!import.meta.env.DEV || !window.location.hash.includes('teste-compromisso') || (window as unknown as { __tc?: boolean }).__tc) return;
-    (window as unknown as { __tc?: boolean }).__tc = true;
-    const l = data.getLot('AZ-2026-021');
-    if (!l) return;
-    l.riskFactors.forEach((r) => game.markRiskRead(l.id, r.id));
-    window.setTimeout(() => game.commitToLot('AZ-2026-021', 5000), 80);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  // TESTE-TEMPORARIO-FIM
   const approved = game.onboarding.status === 'aprovado';
   if (!approved) return <CarteiraLocked status={game.onboarding.status} visitor={isVisitor} />;
 

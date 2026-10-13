@@ -56,7 +56,7 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
         </header>
 
         <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2">
-          <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-6 xl:grid-cols-4">
             <div className="min-w-0">
               <dt className="text-sm text-muted">Montante financiado</dt>
               <dd className="mt-0.5 font-mono text-fg tnum">{eur(p.amount)}</dd>

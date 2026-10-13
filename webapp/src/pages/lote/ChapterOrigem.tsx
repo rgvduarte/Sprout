@@ -153,11 +153,11 @@ function DiligenceList({ items }: { items: DiligenceItem[] }) {
   );
 }
 
-function SpecRow({ label, value, detail }: { label: string; value: string; detail?: string }) {
+function SpecRow({ label, value, detail, mono = true }: { label: string; value: string; detail?: string; mono?: boolean }) {
   return (
     <div className="min-w-0 border-t border-world-line py-3">
       <dt className="text-sm text-muted">{label}</dt>
-      <dd className="mt-0.5 font-mono text-[1.0625rem] text-fg tnum">{value}</dd>
+      <dd className={cn('mt-0.5 text-[1.0625rem] text-fg', mono && 'font-mono tnum')}>{value}</dd>
       {detail && <dd className="mt-0.5 text-sm text-muted">{detail}</dd>}
     </div>
   );
@@ -176,8 +176,9 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
   return (
     <section id="origem" data-chapter="Origem" aria-labelledby="origem-titulo" className="relative scroll-mt-6 overflow-hidden border-b border-world-line" style={{ background: 'color-mix(in oklab, var(--world) 8%, var(--bg))' }}>
       <Wrap className="grid gap-x-10 gap-y-7 pb-10 pt-7 lg:grid-cols-12 lg:pt-10">
+        <div className="contents lg:col-span-7 lg:flex lg:flex-col lg:gap-7">
         {/* título */}
-        <div className="order-1 min-w-0 lg:col-span-7 lg:row-start-1">
+        <div className="order-1 min-w-0 lg:order-none">
           <h1 id="origem-titulo" tabIndex={-1} className="text-[clamp(2.125rem,3.7vw,3.375rem)] leading-[1.02] outline-none" style={{ letterSpacing: '-0.025em' }}>
             {lot.title}
           </h1>
@@ -206,35 +207,18 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
           </p>
         </div>
 
-        {/* medidor da missão sobre a paisagem */}
-        <div className="order-2 min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
-          <Terrain world={lot.world} seed={lot.id} tanks={data.telemetry[lot.producerId]} label={`${ctx.copy.terrainLabel}: ${ctx.producer.nome}, ${ctx.region.nome}`} />
-          <div className="relative -mt-14 flex items-end justify-between gap-4 sm:-mt-24">
-            <MissionCaption />
-            <LotGauge
-              kind={lot.world}
-              value={fundedFraction(lot)}
-              size="lg"
-              animateOnMount
-              label={`Financiamento do lote ${lot.id}`}
-              valueText={`${pct(fundedFraction(lot), 1)} financiado`}
-              className="w-[148px] shrink-0 sm:w-[200px] xl:w-[240px] [&_svg]:h-auto [&_svg]:w-full"
-            />
-          </div>
-        </div>
-
         {/* ficha */}
-        <dl className="order-4 grid min-w-0 gap-x-8 sm:grid-cols-2 lg:order-none lg:col-span-7 lg:row-start-2">
+        <dl className="order-4 grid min-w-0 gap-x-8 sm:grid-cols-2 lg:order-none">
           <SpecRow label="Quantidade" value={lotQuantityLabel(lot)} detail={lotPhysicalDetail(lot)} />
           <SpecRow label="Preço de venda ao comprador B2B" value={price(e.buyerPrice, unit, d)} detail={`${pct(e.discountPct, 0)} abaixo da referência de ${price(e.refPrice, unit, d)}`} />
           <SpecRow label="Custo do lote financiado" value={price(e.fundingPrice, unit, d)} detail={`Aquisição ${num(e.acquisitionPrice, d)} + custos ${num(e.costsPerUnit, d)} (análises, armazenagem, seguro, logística, cobertura)`} />
           <SpecRow label="Janela de liquidação" value={`${win.months} meses`} detail={`Liquidação prevista até ${fmtDate(win.end)} · extensão condicionada até ${lot.extension.maxMonths} meses`} />
           <SpecRow label="Bilhete por co-financiador" value={`${eur(lot.funding.minTicket)} a ${eur(lot.funding.maxTicket)}`} detail="Sem mercado secundário no piloto" />
-          <SpecRow label="Armazenagem" value={lot.storage.container} detail={lot.storage.local} />
+          <SpecRow label="Armazenagem" value={lot.storage.container} detail={lot.storage.local} mono={false} />
         </dl>
 
         {/* ação */}
-        <div className="order-3 min-w-0 lg:order-none lg:col-span-7 lg:row-start-3">
+        <div className="order-3 min-w-0 lg:order-none">
           <div className="flex flex-wrap gap-2">
             {lot.status === 'aberto' && !isVisitor && (
               <Button variant="primary" size="lg" iconRight={<ArrowDown aria-hidden className="size-4" strokeWidth={1.75} />} onClick={() => goTo('compromisso')}>
@@ -268,8 +252,28 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
           <RiskNote compact className="mt-4" />
         </div>
 
-        <div className="order-5 min-w-0 lg:col-span-5 lg:col-start-8 lg:row-start-3">
+        </div>
+        <div className="contents lg:col-span-5 lg:flex lg:flex-col lg:gap-8">
+        {/* medidor da missão sobre a paisagem */}
+        <div className="order-2 min-w-0 lg:order-none">
+          <Terrain world={lot.world} seed={lot.id} tanks={data.telemetry[lot.producerId]} label={`${ctx.copy.terrainLabel}: ${ctx.producer.nome}, ${ctx.region.nome}`} />
+          <div className="relative -mt-14 flex items-end justify-between gap-4 sm:-mt-24">
+            <MissionCaption />
+            <LotGauge
+              kind={lot.world}
+              value={fundedFraction(lot)}
+              size="lg"
+              animateOnMount
+              label={`Financiamento do lote ${lot.id}`}
+              valueText={`${pct(fundedFraction(lot), 1)} financiado`}
+              className="w-[148px] shrink-0 sm:w-[200px] xl:w-[240px] [&_svg]:h-auto [&_svg]:w-full"
+            />
+          </div>
+        </div>
+
+        <div className="order-5 min-w-0 lg:order-none">
           <DiligenceList items={diligence} />
+        </div>
         </div>
       </Wrap>
 

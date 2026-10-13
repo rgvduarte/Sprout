@@ -109,10 +109,16 @@ function World({ world }: { world: WorldId }) {
                 )}
               </div>
             </div>
-            <figure className="min-w-0 px-3 pb-4 lg:px-4 lg:py-6">
-              <WorldScene world={world} variant="hero" levels={scene.levels} label={scene.label} />
-              <figcaption className="mt-1 px-2 text-sm text-world-ink">{scene.caption}</figcaption>
-            </figure>
+            <div className="min-w-0 px-3 pb-5 lg:px-5 lg:py-6">
+              <figure className="m-0">
+                <WorldScene world={world} variant="hero" levels={scene.levels} label={scene.label} />
+                <figcaption className="mt-1 px-2 text-sm text-world-ink">{scene.caption}</figcaption>
+              </figure>
+              <div className="mx-2 mt-4 border-t border-world-line pt-3">
+                <p className="text-sm font-medium text-fg">Diário {w.nome.startsWith('O ') ? 'do' : 'da'} {w.nome.replace(/^(O|A) /, '')}</p>
+                <CampaignFeed events={worldEvents} live={world === 'cafe' ? undefined : { paused: feed.paused, reason: feed.pauseReason }} limit={3} compact />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -127,18 +133,12 @@ function World({ world }: { world: WorldId }) {
           }
           className="mt-12"
         >
-          <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
-            <Card>
-              <MissionList lots={missions} emptyText="Sem missões abertas neste mundo. A próxima abre com a campanha." />
-              <div className="mt-5 border-t border-border pt-4">
-                <RiskNote />
-              </div>
-            </Card>
-            <Card>
-              <CardHeader title={`Diário ${w.nome.startsWith('O ') ? 'do' : 'da'} ${w.nome.replace(/^(O|A) /, '')}`} description="O que acontece nos produtores deste mundo." />
-              <CampaignFeed events={worldEvents} live={world === 'cafe' ? undefined : { paused: feed.paused, reason: feed.pauseReason }} limit={6} compact />
-            </Card>
-          </div>
+          <Card>
+            <MissionList lots={missions} emptyText="Sem missões abertas neste mundo. A próxima abre com a campanha." />
+            <div className="mt-5 border-t border-border pt-4">
+              <RiskNote />
+            </div>
+          </Card>
           {running.length > 0 && (
             <Card className="mt-6">
               <CardHeader title="Em curso e liquidados" description="O medidor mostra o stock que ainda está em armazenagem. Os resultados liquidados são os efetivos, incluindo perdas." />
@@ -154,7 +154,7 @@ function World({ world }: { world: WorldId }) {
 
         {/* ------------------------------------------------ preço e cadeia */}
         <Section id="mercado" title="Preço e margem" description="A referência de mercado conta o risco de preço; a cadeia mostra de onde vem o desconto ao comprador.">
-          <div className="grid min-w-0 gap-6 xl:grid-cols-2">
+          <div className="grid min-w-0 items-start gap-6 xl:grid-cols-2">
             <Card>
               <ReferenceChart
                 world={world}

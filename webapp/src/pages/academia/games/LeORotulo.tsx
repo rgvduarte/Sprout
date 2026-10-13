@@ -170,7 +170,7 @@ function WaterLabelCard({ w, highlight }: { w: WaterLabel; highlight: Set<WaterF
     ['Magnésio (Mg²⁺)', w.magnesio],
     ['Sílica (SiO₂)', w.silica],
   ];
-  const fmt = (v: number) => num(v, v < 10 && v % 1 !== 0 ? (v < 1 ? 2 : 1) : v % 1 !== 0 ? 1 : 0);
+  const fmt = (v: number) => new Intl.NumberFormat('pt-PT', { maximumFractionDigits: v < 1 ? 2 : 1, useGrouping: true }).format(v).replace(/\s/g, '\u00a0');
   const row = ([label, v, field]: [string, number, WaterField?]) => (
     <div key={label} className={cn('flex items-baseline justify-between gap-3 px-2 py-1 transition-colors duration-300', field && highlight.has(field) && 'rounded-xs bg-world-soft font-semibold')}>
       <dt className="min-w-0 truncate text-fg">{label}</dt>
@@ -184,7 +184,7 @@ function WaterLabelCard({ w, highlight }: { w: WaterLabel; highlight: Set<WaterF
     </div>
   );
   return (
-    <article aria-label={`Rótulo de ${w.marca}`} className="min-w-0 rounded-md border border-world-line bg-surface">
+    <article aria-label={`Rótulo de ${w.marca}`} className="min-w-0 self-start rounded-md border border-world-line bg-surface lg:sticky lg:top-20">
       <header className="flex items-start gap-3 border-b border-world-line px-4 py-3.5">
         <BottleMark className="h-14 w-8 shrink-0" />
         <div className="min-w-0">

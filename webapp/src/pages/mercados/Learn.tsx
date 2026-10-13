@@ -64,7 +64,7 @@ export function LearnWorld({ world }: { world: WorldId }) {
   const mgPoints = best !== undefined ? Math.round((Math.min(best, mg.maxScore) / mg.maxScore) * mg.maxPoints) : 0;
 
   return (
-    <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+    <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
       <Card>
         <CardHeader title={`O vocabulário d${world === 'azeite' ? 'o' : 'a'} ${w.nome.replace(/^(O|A) /, '')}`} description="As palavras que aparecem nas análises, nos diários e nos contratos." />
         <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">

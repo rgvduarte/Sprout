@@ -41,7 +41,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
     {
       key: 'nome',
       header: 'Gestor',
-      minWidth: 200,
+      minWidth: 250,
       render: (e) => (
         <span className="flex flex-col">
           <span className="font-medium text-fg">
@@ -69,7 +69,8 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
   ];
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+    <div className="flex flex-col gap-6">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
       <div className="min-w-0">
         <p className="measure text-[0.9375rem] text-fg">
           Uma liga da coorte do piloto para a campanha 2026/27. É opcional, usa pseudónimos e só conta campanhas com dinheiro fictício. Ordena pela <strong className="font-semibold">pontuação de gestão</strong>, não pelo resultado: ganha quem gere o risco, não quem arrisca mais.
@@ -97,18 +98,7 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
           </p>
         )}
 
-        <div className="mt-5">
-          <DataTable
-            columns={columns}
-            rows={ranked}
-            getRowId={(e) => e.id}
-            caption={`Liga de campanha 2026/27: ${ranked.length} gestores, ordenados pela pontuação de gestão (dinheiro fictício)`}
-            rowClassName={(e) => (e.you ? 'bg-accent-soft' : undefined)}
-            maxHeight={560}
-          />
-        </div>
       </div>
-
       <aside className="min-w-0 rounded-md border border-border bg-surface p-4 sm:p-5" aria-labelledby="formula-title">
         <h3 id="formula-title" className="text-[1.0625rem]">
           Como se calcula a pontuação
@@ -132,6 +122,17 @@ export function LeaguePanel({ optIn, pseudonym, runs, onOptIn, onNextPseudonym }
           A liga existe só no simulador. Com dinheiro real não há rankings, comparações nem pontos: a carteira mostra os teus lotes e mais nada.
         </p>
       </aside>
+      </div>
+        <div className="min-w-0">
+          <DataTable
+            columns={columns}
+            rows={ranked}
+            getRowId={(e) => e.id}
+            caption={`Liga de campanha 2026/27: ${ranked.length} gestores, ordenados pela pontuação de gestão (dinheiro fictício)`}
+            rowClassName={(e) => (e.you ? 'bg-accent-soft' : undefined)}
+            maxHeight={620}
+          />
+        </div>
     </div>
   );
 }
