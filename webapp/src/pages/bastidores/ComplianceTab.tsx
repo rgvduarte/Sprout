@@ -11,6 +11,7 @@ import { cn } from '../../lib/cn';
 import { date as fmtDate, dateTime, eur, num, plural } from '../../lib/format';
 import { BLOCKED_TRIGGERS, DISCLAIMERS, FRAMEWORKS, MATERIALS, MONEY_SCREENS, POINT_SOURCES, SIM_LABEL_OK, type Material } from './content';
 import { KYC_SLA_DAYS, OPEN_KYC } from './metrics';
+import { HeaderRow } from './parts';
 import { actions, lastDecision, useBastidores, type KycAction } from './store';
 import { kycStatusAfter, SESSION_CASE_ID, useKycCases } from './useCases';
 
@@ -396,7 +397,7 @@ export default function ComplianceTab() {
       </section>
 
       <Card>
-        <CardHeader
+        <HeaderRow
           title="Classificação do produto: pré-check com o advogado"
           description="Seis perguntas que decidem se o piloto pode avançar como está. Nenhuma tem parecer ainda."
           actions={
@@ -436,7 +437,7 @@ export default function ComplianceTab() {
       </Card>
 
       <Card>
-        <CardHeader
+        <HeaderRow
           title="Controlo da gamificação"
           description="Prova de que as mecânicas permitidas estão em uso e as proibidas não existem onde há dinheiro real."
           actions={

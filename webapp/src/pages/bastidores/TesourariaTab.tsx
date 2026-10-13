@@ -8,7 +8,7 @@ import { GameContext } from '../../state/AppProvider';
 import { TODAY_DATE } from '../../lib/clock';
 import { date as fmtDate, dateTime, eur, lisbonParts, num, plural, time } from '../../lib/format';
 import { recon } from './metrics';
-import { ReconStrip, Row, signedEur, type StripDay } from './parts';
+import { HeaderRow, ReconStrip, Row, signedEur, type StripDay } from './parts';
 import { actions, APPROVERS, useBastidores, type Approver } from './store';
 import {
   approvalsNeeded,
@@ -86,7 +86,7 @@ function ReconCard() {
 
   return (
     <Card>
-      <CardHeader
+      <HeaderRow
         title="Reconciliação diária"
         description={`Saldo da conta de clientes no ${PSP_NAME} contra o razão interno, todos os dias até às 20:00.`}
         actions={
