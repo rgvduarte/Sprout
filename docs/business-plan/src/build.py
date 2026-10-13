@@ -726,86 +726,93 @@ def _box(x, y, w, h, lines, fill='#FFFFFF', stroke='#AEB49F', sw=0.8, dash=False
 
 @gen('svg_arvore')
 def _():
-    W, H = 680, 300
+    W, H = 680, 292
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="Árvore de decisão: qualificação jurídica do produto e estrutura permitida" style="width:100%;height:auto">',
          _arrow_defs({'ak': '#5B6352'})]
+    QX, QW = 0, 166          # coluna das perguntas
+    OX, OW = 258, 206        # coluna dos resultados
+    RX, RW = 482, 198        # verificações transversais
+    INK2 = '#5B6352'
 
-    def link(x1, y1, x2, y2, lab=None, lx=None, ly=None):
-        mx = x1 + 14
-        o.append(f'<path d="M{x1},{y1} H{mx} V{y2} H{x2 - 2}" fill="none" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)"/>')
-        if lab:
-            o.append(_txt(lx if lx else mx + 4, ly if ly else y2 - 4, lab, 8.2, anchor='start', fill='#5B6352', halo=True))
-    # perguntas
-    o.append(_box(0, 18, 168, 46, ['P1. O pagador compra', 'mercadoria para usar ou revender,', 'com entrega física?'], fill='#F4F5EF', size=9))
-    o.append(_box(228, 18, 210, 40, ['A. Marketplace B2B puro (comércio)', 'sem licença financeira; UTP 30/60 dias'], fill='#E1E8CF', stroke='#3F5A1E'))
-    link(168, 34, 228, 38, 'sim', 186, 33)
-    o.append(_box(0, 96, 168, 46, ['P2. Retorno prometido e capital', 'reembolsável (incl. «refunding»)?'], fill='#F4F5EF', size=9))
-    o.append(f'<path d="M60,64 V96" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)" fill="none"/>')
-    o.append(_txt(64, 84, 'não: quer retorno', 8.2, anchor='start', fill='#5B6352'))
-    o.append(_box(228, 92, 210, 40, ['G. Proibido', 'fora de obrigações/ECSP/FIA: RGICSF art. 200.º'], fill='#FFFFFF', stroke='#B42318', sw=1))
-    link(168, 112, 228, 112, 'sim, sem veículo', 172, 107)
-    o.append(_box(0, 178, 168, 40, ['P3. Via obrigações (dívida):', 'quem subscreve?'], fill='#F4F5EF', size=9))
-    o.append(f'<path d="M60,142 V178" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)" fill="none"/>')
-    o.append(_txt(64, 162, 'via obrigações da SA', 8.2, anchor='start', fill='#5B6352'))
-    o.append(_box(228, 160, 210, 40, ['C. SPV PT, obrigações: fase 1', 'profissionais; ≥ 100 000 € só com parecer (KID)'], fill='#E1E8CF', stroke='#3F5A1E', sw=1.2))
-    link(168, 196, 228, 180, 'profissionais', 172, 176)
-    o.append(_box(228, 208, 210, 34, ['D. Promotor em ECSP de terceiros', 'retalho, ≤ 5 M€/12 meses: fase 2+'], fill='#FFFFFF'))
-    link(168, 200, 228, 225, 'retalho ≤ 5 M€', 172, 222)
-    o.append(_box(228, 250, 210, 34, ['Oferta pública + intermediário', 'prospeto > 12 M€; KID: não na fase 1'], fill='#FFFFFF'))
-    link(168, 206, 228, 267, 'retalho > 5 M€', 172, 262)
+    def hline(x1, y, x2, lab):
+        o.append(f'<path d="M{x1},{y} H{x2 - 2}" fill="none" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
+        o.append(_txt(x1 + 8, y - 4, lab, 8.2, anchor='start', fill=INK2))
+
+    def vline(x, y1, y2, lab):
+        o.append(f'<path d="M{x},{y1} V{y2 - 2}" fill="none" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
+        o.append(_txt(x + 5, (y1 + y2) / 2 + 3, lab, 8.2, anchor='start', fill=INK2))
+
+    # P1 -> A
+    o.append(_box(QX, 6, QW, 46, ['P1. O pagador compra', 'mercadoria para usar ou revender,', 'com entrega física?'], fill='#F4F5EF', size=9))
+    o.append(_box(OX, 9, OW, 40, ['A. Marketplace B2B puro (comércio)', 'sem licença financeira; UTP 30/60 dias'], fill='#E1E8CF', stroke='#3F5A1E'))
+    hline(QW, 29, OX, 'sim')
+    vline(60, 52, 84, 'não: quer retorno')
+    # P2 -> G
+    o.append(_box(QX, 84, QW, 46, ['P2. Retorno prometido e capital', 'reembolsável (incl. «refunding»)?'], fill='#F4F5EF', size=9))
+    o.append(_box(OX, 87, OW, 40, ['G. Proibido', 'fora de obrigações/ECSP/FIA: RGICSF art. 200.º'], fill='#FFFFFF', stroke='#B42318', sw=1))
+    hline(QW, 107, OX, 'sim, sem veículo')
+    vline(60, 130, 162, 'sim, via obrigações da SA')
+    # P3 -> C, D, E (barramento vertical)
+    o.append(_box(QX, 162, QW, 46, ['P3. Via obrigações (dívida):', 'quem subscreve?'], fill='#F4F5EF', size=9))
+    ys = [(166, 'profissionais'), (218, 'retalho ≤ 5 M€'), (264, 'retalho > 5 M€')]
+    bx = QW + 12
+    o.append(f'<path d="M{QW},185 H{bx}" fill="none" stroke="{INK2}" stroke-width="1"/>')
+    o.append(f'<path d="M{bx},{ys[0][0]} V{ys[-1][0]}" fill="none" stroke="{INK2}" stroke-width="1"/>')
+    for y, lab in ys:
+        hline(bx, y, OX, lab)
+    o.append(_box(OX, 146, OW, 40, ['C. SPV PT, obrigações: fase 1', 'profissionais; ≥ 100 000 € só com parecer (KID)'], fill='#E1E8CF', stroke='#3F5A1E', sw=1.2))
+    o.append(_box(OX, 201, OW, 34, ['D. Promotor em ECSP de terceiros', 'retalho, ≤ 5 M€/12 meses: fase 2+'], fill='#FFFFFF'))
+    o.append(_box(OX, 247, OW, 34, ['Oferta pública + intermediário', 'prospeto > 12 M€; KID: não na fase 1'], fill='#FFFFFF'))
     # verificações transversais
-    o.append(_box(478, 18, 202, 52, ['P4. Retorno de um conjunto de lotes', 'gerido com política discricionária?', '→ FIA + gestor (E): não'], fill='#FFFFFF', size=9))
-    o.append(_box(478, 82, 202, 52, ['P5. O investidor só recebe a', 'diferença de preço em dinheiro?', '→ derivado MiFID C(5): fora'], fill='#FFFFFF', size=9))
-    o.append(_box(478, 146, 202, 52, ['P6. Lotes em token ou veículo', 'fora da UE?', '→ MiCA/MiFID na mesma: não'], fill='#FFFFFF', size=9))
-    o.append(_box(478, 210, 202, 74, ['Testes que a estrutura C tem de', 'passar no parecer: cupão fixo (não', 'derivado); finalidade comercial (não FIA);', 'CSC 348.º/2 (exceção do RGICSF 9.º)'], fill='#F4F5EF', size=9))
+    o.append(_box(RX, 6, RW, 50, ['P4. Retorno de um conjunto de lotes', 'gerido com política discricionária?', '→ FIA + gestor (E): não'], fill='#FFFFFF', size=9))
+    o.append(_box(RX, 66, RW, 50, ['P5. O investidor só recebe a', 'diferença de preço em dinheiro?', '→ derivado MiFID C(5): fora'], fill='#FFFFFF', size=9))
+    o.append(_box(RX, 126, RW, 50, ['P6. Lotes em token ou veículo', 'fora da UE?', '→ MiCA/MiFID na mesma: não'], fill='#FFFFFF', size=9))
+    o.append(_box(RX, 186, RW, 95, ['Testes que a estrutura C', 'tem de passar no parecer:', 'cupão fixo (não derivado);', 'finalidade comercial (não FIA);', 'CSC 348.º/2 (exceção do', 'RGICSF art. 9.º)'], fill='#F4F5EF', size=9))
     o.append('</svg>')
     return ''.join(o)
 
 
 @gen('svg_arquitetura')
 def _():
-    W, H = 680, 332
+    W, H = 680, 290
     o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="Arquitetura de referência do piloto: canais, serviços núcleo com o ledger ao centro, e integrações externas; backoffice atual em quarentena" style="width:100%;height:auto">',
          _arrow_defs({'ak': '#5B6352'})]
+    INK2 = '#5B6352'
     # camada canais
-    o.append(_txt(0, 12, 'Canais', 9.6, anchor='start', weight=650))
     chans = [['WebApp do investidor', 'jogo, carteira, ritual'], ['Portal do comprador', 'catálogo, encomendas'], ['Portal do produtor', 'stock, lotes, análises'], ['Bastidores', 'ops, tesouraria, compliance']]
     cw = (W - 3 * 10) / 4
     for i, c in enumerate(chans):
-        o.append(_box(i * (cw + 10), 18, cw, 34, c))
+        o.append(_box(i * (cw + 10), 0, cw, 32, c))
+        x = i * (cw + 10) + cw / 2
+        o.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="32" y2="44" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
     # núcleo
-    o.append(f'<rect x="0" y="70" width="{W}" height="152" rx="4" fill="#F4F5EF" stroke="#D7DBCC" stroke-width="0.8"/>')
-    o.append(_txt(8, 84, 'Serviços núcleo (região UE; SSO + MFA; RBAC com separação ops / tesouraria / compliance)', 9.2, anchor='start', weight=650))
-    core = [['Identidade e RBAC'], ['Contrapartes, KYC/KYB', 'orquestração e casos'], ['Catálogo e lotes', 'em € e kg'], ['Encomendas e contratos', 'força maior, offtake'],
-            ['Telemetria', 'MQTT/HTTP → séries'], ['Documentos e assinatura', 'CMD/CC, QES']]
+    o.append(f'<rect x="0" y="46" width="{W}" height="136" rx="4" fill="#F4F5EF" stroke="#D7DBCC" stroke-width="0.8"/>')
+    o.append(_txt(8, 59, 'Serviços núcleo (região UE)', 9.2, anchor='start', weight=650))
+    core = [['Identidade', 'SSO, MFA, RBAC'], ['Contrapartes e KYC', 'orquestração e casos'], ['Catálogo e lotes', 'em € e kg'], ['Encomendas', 'contratos, offtake'],
+            ['Telemetria', 'MQTT/HTTP → séries'], ['Documentos', 'assinatura CMD/CC, QES']]
     bw = (W - 16 - 5 * 8) / 6
     for i, c in enumerate(core):
-        o.append(_box(8 + i * (bw + 8), 92, bw, 36, c, size=8.8))
-    # ledger destacado
-    o.append(_box(8, 140, 250, 34, ['Ledger de dupla entrada (€ + kg)', 'imutável; conta-espelho por banco, lote e série'], fill='#E1E8CF', stroke='#3F5A1E', sw=1.3))
-    o.append(_box(270, 140, 190, 34, ['Reconciliação D+1', 'camt.053 → matching → breaks'], fill='#FFFFFF'))
-    o.append(_box(472, 140, 200, 34, ['Risco', 'preço vs contrato, gatilhos, PnL do lote'], fill='#FFFFFF'))
-    o.append(f'<line x1="258" x2="268" y1="157" y2="157" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)"/>')
-    o.append(f'<line x1="460" x2="470" y1="157" y2="157" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)"/>')
-    o.append(_box(8, 184, W - 16, 28, ['Audit log append-only, encadeado por hash → armazenamento WORM; quatro olhos em IBAN, pagamentos > 25 k€ e libertação de lotes'], fill='#FFFFFF', size=8.8))
-    for i in range(4):
-        x = i * (cw + 10) + cw / 2
-        o.append(f'<line x1="{x:.1f}" x2="{x:.1f}" y1="52" y2="70" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)"/>')
+        o.append(_box(8 + i * (bw + 8), 65, bw, 32, c, size=8.8))
+    o.append(_box(8, 105, 250, 32, ['Ledger de dupla entrada (€ + kg)', 'imutável; conta-espelho por banco, lote e série'], fill='#E1E8CF', stroke='#3F5A1E', sw=1.3))
+    o.append(_box(270, 105, 190, 32, ['Reconciliação D+1', 'camt.053 → matching → breaks'], fill='#FFFFFF'))
+    o.append(_box(472, 105, 200, 32, ['Risco', 'preço vs contrato, gatilhos, PnL do lote'], fill='#FFFFFF'))
+    o.append(f'<line x1="258" x2="268" y1="121" y2="121" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
+    o.append(f'<line x1="460" x2="470" y1="121" y2="121" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
+    o.append(_box(8, 145, W - 16, 28, ['Audit log append-only, encadeado por hash → armazenamento WORM; quatro olhos em IBAN, pagamentos > 25 k€ e libertação de lotes'], fill='#FFFFFF', size=8.8))
     # externos
-    o.append(_txt(0, 240, 'Integrações externas', 9.6, anchor='start', weight=650))
     ext = [['Bancos PT', 'OpCo + SPV (1 conta/série)', 'SCT Inst, VoP, SDD B2B'], ['KYC/KYB + screening', 'Sumsub ou Veriff', '+ ComplyAdvantage'],
            ['Faturação certificada AT', 'API; ATCUD, QR', 'selo qualificado 2027'], ['ERP do lagar + sensores', 'CSV → API →', 'radar a cada 15 min'], ['PSP marketplace', 'só fase 2, se houver', 'fundos de terceiros']]
     ew = (W - 4 * 8) / 5
-    labs = ['camt.053 / pain.001 / pain.008', 'decisões e evidência', 'rascunho → fatura', 'eventos de stock', 'webhooks']
+    labs = ['camt.053, pain.001/008', 'decisões e evidência', 'rascunho → fatura', 'eventos de stock', 'webhooks']
     for i, e in enumerate(ext):
         x = i * (ew + 8)
-        o.append(_box(x, 248, ew, 44, e, size=8.8, dash=(i == 4)))
+        o.append(_box(x, 210, ew, 44, e, size=8.8, dash=(i == 4)))
         cxm = x + ew / 2
-        o.append(f'<line x1="{cxm:.1f}" x2="{cxm:.1f}" y1="246" y2="214" stroke="#5B6352" stroke-width="1" marker-end="url(#ak)"/>')
-        o.append(_txt(cxm + 3, 230, labs[i], 7.8, anchor='start', fill='#5B6352', halo=True))
+        o.append(f'<line x1="{cxm:.1f}" x2="{cxm:.1f}" y1="208" y2="184" stroke="{INK2}" stroke-width="1" marker-end="url(#ak)"/>')
+        o.append(_txt(cxm + 4, 199, labs[i], 7.8, anchor='start', fill=INK2))
     # quarentena
-    o.append(_box(0, 302, 300, 28, ['Backoffice atual («reverse engineered»): quarentena, sem ligação', 'até à auditoria; sem dinheiro real nem dados de investidores'], fill='#FFFFFF', stroke='#B42318', dash=True, size=8.6, anchor='start'))
-    o.append(_txt(312, 320, '× nenhuma integração com o ledger, pagamentos ou KYC antes do gate de auditoria', 8.4, anchor='start', fill='#B42318', weight=600))
+    o.append(_box(0, 262, 300, 28, ['Backoffice atual («reverse engineered»): quarentena, sem ligação', 'até à auditoria; sem dinheiro real nem dados de investidores'], fill='#FFFFFF', stroke='#B42318', dash=True, size=8.6, anchor='start'))
+    o.append(_txt(312, 280, '× nenhuma integração com o ledger, pagamentos ou KYC antes do gate de auditoria', 8.4, anchor='start', fill='#B42318', weight=600))
     o.append('</svg>')
     return ''.join(o)
 
