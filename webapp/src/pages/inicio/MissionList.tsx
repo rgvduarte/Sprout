@@ -15,17 +15,17 @@ function MissionItem({ mission }: { mission: Mission }) {
   const complete = mission.done >= mission.total;
   return (
     <li className="min-w-0 py-4 first:pt-0 last:pb-0" data-world={mission.world}>
-      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+      <div className="flex min-w-0 items-baseline justify-between gap-3">
+        <h3 className="min-w-0 text-[1.0625rem] leading-snug">{mission.title}</h3>
+        <span className="shrink-0 font-mono text-sm text-fg tnum">{mission.valueText}</span>
+      </div>
+      <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         <Badge tone={mission.kind === 'campanha' ? 'azeite' : mission.kind === 'acesso' ? 'info' : 'accent'} icon={mission.live ? <Radio aria-hidden className="size-3.5" strokeWidth={1.75} /> : undefined}>
           {MISSION_KIND_LABEL[mission.kind]}
         </Badge>
         {mission.world && <CommodityGlyph world={mission.world} className="size-4 text-world-ink" />}
+        {mission.context && <span className="min-w-0 text-sm text-muted">{mission.context}</span>}
       </div>
-      <div className="mt-2 flex min-w-0 items-baseline justify-between gap-3">
-        <h3 className="min-w-0 text-[1.0625rem] leading-snug">{mission.title}</h3>
-        <span className="shrink-0 font-mono text-sm text-fg tnum">{mission.valueText}</span>
-      </div>
-      {mission.context && <p className="mt-0.5 text-sm text-muted">{mission.context}</p>}
       <Meter className="mt-3" value={mission.total ? mission.done / mission.total : 0} label={`Progresso: ${mission.title}`} valueLabel={mission.valueText} showLabel={false} tone={complete ? 'ok' : 'accent'} size="sm" />
       <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
         {mission.steps.map((s) => (

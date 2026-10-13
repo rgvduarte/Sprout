@@ -31,14 +31,14 @@ function OpenLotCard({ lot }: { lot: Lot }) {
   const settle = lot.milestones.find((m) => m.stage === 'liquidado')?.planned ?? lot.settlement.plannedEnd;
   return (
     <article className="flex min-w-0 flex-col rounded-md border border-border bg-surface p-4 sm:p-5" data-world={lot.world} aria-labelledby={`nm-${lot.id}`}>
-      <div className="flex flex-wrap items-center gap-2">
+      <h3 id={`nm-${lot.id}`} className="text-[1.125rem] leading-snug">
+        {MISSION_VERB[lot.world]}
+      </h3>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <CommodityChip world={lot.world} label="world" />
         <span className="font-mono text-sm text-muted tnum">{lot.id}</span>
       </div>
-      <h3 id={`nm-${lot.id}`} className="mt-3 text-[1.125rem] leading-snug">
-        {MISSION_VERB[lot.world]}
-      </h3>
-      <p className="mt-0.5 text-sm text-muted">
+      <p className="mt-2 text-sm text-muted">
         {lot.title} · {producer?.nome}, {region?.nome}
       </p>
       <div className="mt-4 flex min-w-0 items-end gap-4">

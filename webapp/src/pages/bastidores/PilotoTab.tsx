@@ -44,8 +44,8 @@ interface KpiRowProps {
 
 function KpiRow({ label, note, value, sub, tone, toneLabel, history }: KpiRowProps) {
   return (
-    <li className="grid items-start gap-x-8 gap-y-3 border-t border-border py-4 first:border-t-0 first:pt-1 md:grid-cols-[minmax(0,1fr)_11.5rem] xl:grid-cols-[minmax(0,1fr)_11.5rem_220px]">
-      <div className="min-w-0">
+    <li className="grid grid-cols-[minmax(0,1fr)_minmax(0,12.5rem)] items-start gap-x-6 gap-y-3 border-t border-border py-4 first:border-t-0 first:pt-1 xl:grid-cols-[minmax(0,1fr)_11.5rem_13.75rem] xl:gap-x-8">
+      <div className="col-span-2 min-w-0 xl:col-span-1">
         <h3 className="text-[1rem] leading-snug">{label}</h3>
         <p className="measure mt-1 text-sm text-muted">{note}</p>
       </div>
@@ -54,7 +54,7 @@ function KpiRow({ label, note, value, sub, tone, toneLabel, history }: KpiRowPro
         {sub && <p className="mt-0.5 text-sm text-muted">{sub}</p>}
         <StatusPill className="mt-2" tone={tone} label={toneLabel ?? TONE_LABEL[tone]} />
       </div>
-      <div className="min-w-0 md:col-span-2 xl:col-span-1">{history}</div>
+      <div className="min-w-0">{history}</div>
     </li>
   );
 }
@@ -99,12 +99,12 @@ export default function PilotoTab() {
       key: 'lote',
       header: 'Lote',
       sortValue: (l) => l.id,
-      minWidth: 230,
+      minWidth: 250,
       render: (l) => {
         const open = l.status === 'aberto';
         const v = open ? fundedFraction(l) : l.quantity ? l.stock / l.quantity : 0;
         return (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 whitespace-nowrap">
             <LotGauge kind={l.world} value={v} size="xs" label={open ? `Financiamento do ${l.id}` : `Stock por vender do ${l.id}`} />
             <div className="min-w-0">
               <Link to={`/lote/${l.id}`} className="font-mono text-[0.9375rem] font-medium text-accent underline decoration-[color-mix(in_oklab,var(--accent)_40%,transparent)] underline-offset-[0.2em] hover:decoration-accent tnum">
@@ -117,12 +117,13 @@ export default function PilotoTab() {
       },
     },
     { key: 'estado', header: 'Estado', sortValue: (l) => l.status, render: (l) => <StatusPill status={l.status} /> },
-    { key: 'etapa', header: 'Etapa', sortValue: (l) => l.stage, render: (l) => stageLabel(l.world, l.stage) },
+    { key: 'etapa', header: 'Etapa', className: 'whitespace-nowrap', sortValue: (l) => l.stage, render: (l) => stageLabel(l.world, l.stage) },
     {
       key: 'financiado',
       header: 'Financiado',
       align: 'right',
       mono: true,
+      className: 'whitespace-nowrap',
       sortValue: (l) => l.funding.raised,
       render: (l) => (
         <div>
@@ -136,6 +137,7 @@ export default function PilotoTab() {
       header: 'Stock por vender',
       align: 'right',
       mono: true,
+      className: 'whitespace-nowrap',
       sortValue: (l) => (l.quantity ? l.stock / l.quantity : 0),
       render: (l) => {
         const s = physicalStock(l);
@@ -152,6 +154,7 @@ export default function PilotoTab() {
       header: 'Fim da janela',
       align: 'right',
       mono: true,
+      className: 'whitespace-nowrap',
       sortValue: (l) => windowOf(l).ext ?? windowOf(l).end,
       render: (l) => {
         const w = windowOf(l);
@@ -272,7 +275,7 @@ export default function PilotoTab() {
         <DataTable columns={columns} rows={cyc} getRowId={(l) => l.id} caption="Lotes em ciclo no piloto" initialSort={{ key: 'janela', dir: 'asc' }} />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <Card>
           <CardHeader title="Diário operacional" description="Eventos dos produtores do piloto, mais recentes primeiro." />
           <CampaignFeed events={pilotEvents} live={{ paused: feed.paused, reason: feed.pauseReason }} limit={8} />

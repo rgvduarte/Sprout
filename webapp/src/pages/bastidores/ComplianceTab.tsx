@@ -407,7 +407,7 @@ export default function ComplianceTab() {
         />
         <ul className="divide-y divide-border">
           {FRAMEWORKS.map((f) => (
-            <li key={f.id} className="grid gap-x-6 gap-y-2 py-4 first:pt-0 last:pb-0 lg:grid-cols-[13rem_minmax(0,1fr)_12rem]">
+            <li key={f.id} className="grid gap-x-6 gap-y-2 py-4 first:pt-0 last:pb-0 lg:grid-cols-[12rem_minmax(0,1fr)_15rem]">
               <div>
                 <p className="font-semibold text-fg">{f.name}</p>
                 <p className="text-sm text-muted">{f.ref}</p>

@@ -26,7 +26,7 @@ function ActionChips({ r }: { r: LotRisk }) {
       {r.triggerFired && <Badge tone="warn">Gatilho dispara</Badge>}
       {r.extension && <Badge tone="warn">Extensão</Badge>}
       {r.refunding && <Badge tone="crit">Refunding</Badge>}
-      {!r.triggerFired && !r.extension && !r.refunding && <span className="text-sm text-muted">{r.lot.status === 'em-extensao' ? 'Em extensão' : 'Sem ação'}</span>}
+      {!r.triggerFired && !r.extension && !r.refunding && r.lot.status === 'em-extensao' && <Badge tone="neutral">Já em extensão</Badge>}
     </div>
   );
 }
@@ -58,15 +58,15 @@ export default function RiscoTab() {
       key: 'lote',
       header: 'Lote',
       sortValue: (r) => r.lot.id,
-      minWidth: 170,
+      minWidth: 150,
       render: (r) => (
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 whitespace-nowrap">
           <LotGauge kind={r.lot.world} value={r.Q ? r.S / r.Q : 0} size="xs" label={`Stock por vender do ${r.lot.id}`} />
-          <div className="min-w-0">
+          <div>
             <Link to={`/lote/${r.lot.id}#cobertura`} className="font-mono font-medium text-accent underline decoration-[color-mix(in_oklab,var(--accent)_40%,transparent)] underline-offset-[0.2em] hover:decoration-accent tnum">
               {r.lot.id}
             </Link>
-            <p className="text-xs text-muted">{qty(r.lot.world, r.S)} por vender</p>
+            <p className="font-mono text-xs text-muted tnum">{qty(r.lot.world, r.S)}</p>
           </div>
         </div>
       ),
@@ -75,9 +75,8 @@ export default function RiscoTab() {
       key: 'cobertura',
       header: 'Cobertura',
       sortValue: (r) => r.h,
-      minWidth: 150,
       render: (r) => (
-        <div>
+        <div className="whitespace-nowrap">
           <div className="font-mono tnum">
             {r.h !== r.h0 ? (
               <>
@@ -87,16 +86,17 @@ export default function RiscoTab() {
               pct(r.h, 0)
             )}
           </div>
-          <div className="text-xs text-muted">{r.lot.hedge.instrument === 'nenhuma' ? 'Sem cobertura de preço' : r.trigger?.def.status === 'executado' ? 'Venda a prazo, gatilho executado' : r.lot.hedge.label}</div>
+          <div className="font-mono text-xs text-muted tnum">{r.lot.hedge.instrument === 'nenhuma' ? 'sem cobertura de preço' : `${qty(r.lot.world, Math.round(r.exposure))} expostos`}</div>
         </div>
       ),
     },
-    { key: 'contrato', header: 'Contrato', align: 'right', mono: true, sortValue: (r) => r.lot.economics.buyerPrice, render: (r) => unitPrice(r.lot.world, r.lot.economics.buyerPrice) },
+    { key: 'contrato', header: 'Contrato', align: 'right', mono: true, className: 'whitespace-nowrap', sortValue: (r) => r.lot.economics.buyerPrice, render: (r) => unitPrice(r.lot.world, r.lot.economics.buyerPrice) },
     {
       key: 'referencia',
       header: 'Referência',
       align: 'right',
       mono: true,
+      className: 'whitespace-nowrap',
       sortValue: (r) => r.refChange,
       render: (r) => (
         <div>
@@ -105,31 +105,33 @@ export default function RiscoTab() {
         </div>
       ),
     },
-    { key: 'base', header: 'Base', align: 'right', mono: true, sortValue: (r) => r.basis, render: (r) => signedPct(r.basis) },
-    { key: 'exposto', header: 'Sem cobertura', align: 'right', mono: true, sortValue: (r) => r.exposure, render: (r) => qty(r.lot.world, Math.round(r.exposure)) },
+    { key: 'base', header: 'Base', align: 'right', mono: true, className: 'whitespace-nowrap', sortValue: (r) => r.basis, render: (r) => signedPct(r.basis) },
     {
       key: 'mtm',
       header: 'MTM do stock',
       align: 'right',
       mono: true,
+      className: 'whitespace-nowrap',
       sortValue: (r) => r.unrealized,
-      render: (r) => <span className={r.unrealized < 0 ? 'text-crit-ink' : undefined}>{signedEur(r.unrealized)}</span>,
+      render: (r) => <span className={r.unrealized < -0.5 ? 'text-crit-ink' : undefined}>{signedEur(r.unrealized)}</span>,
     },
     {
       key: 'resultado',
       header: 'Resultado previsto',
       sortValue: (r) => r.result,
-      minWidth: 200,
+      minWidth: 190,
       render: (r) => (
-        <div>
+        <div className="whitespace-nowrap">
           <ResultBar value={r.result} label={`Resultado previsto do ${r.lot.id}: ${signedPct(r.result)}`} />
           <div className="mt-0.5 text-xs text-muted">
-            na oferta: {pct(r.lot.economics.expectedRange[0], 1)} a {pct(r.lot.economics.expectedRange[1], 1)}
+            oferta {pct(r.lot.economics.expectedRange[0], 1)} a {pct(r.lot.economics.expectedRange[1], 1)}
+          </div>
+          <div className="mt-1">
+            <ActionChips r={r} />
           </div>
         </div>
       ),
     },
-    { key: 'acao', header: 'Neste cenário', minWidth: 150, render: (r) => <ActionChips r={r} /> },
   ];
 
   /* gatilhos */
@@ -239,7 +241,7 @@ export default function RiscoTab() {
             Marcação a mercado por lote
           </h2>
           <p className="measure mt-1 text-muted">
-            Preço contratado com o comprador contra a referência, base, volume sem cobertura e PnL do lote. O resultado previsto é o dos co-financiadores, em % do montante financiado, comparado com o intervalo anunciado na oferta.
+            Preço contratado com o comprador contra a referência, base, cobertura e PnL do lote. O resultado previsto é o dos co-financiadores, em % do montante financiado, ao lado do intervalo anunciado na oferta e da ação que o cenário pede.
           </p>
         </div>
         <DataTable columns={columns} rows={rows} getRowId={(r) => r.lot.id} caption={`Marcação a mercado por lote, cenário ${res.scenario.label}`} rowClassName={(r) => (affected.has(r.lot.id) ? 'bg-[color-mix(in_oklab,var(--warn)_6%,var(--surface))]' : undefined)} />

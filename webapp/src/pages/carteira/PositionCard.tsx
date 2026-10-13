@@ -41,15 +41,15 @@ export function PositionCard({ p, onOpen }: { p: PositionView; onOpen: (p: Posit
         </figure>
 
         <header className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
+          <h3 id={`pos-${p.id}`} className="text-[1.1875rem] leading-snug">
+            {p.producer.nome} · {lot.title}
+          </h3>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <CommodityChip world={lot.world} label="commodity" />
             <span className="font-mono text-sm text-fg tnum">{lot.id}</span>
             <StatusPill label={st.label} tone={st.tone} />
           </div>
-          <h3 id={`pos-${p.id}`} className="mt-2 text-[1.1875rem] leading-snug">
-            {p.producer.nome} · {lot.title}
-          </h3>
-          <p className="mt-0.5 text-sm text-muted">
+          <p className="mt-2 text-sm text-muted">
             Campanha {lot.campanha} · {lot.storage.local}
           </p>
           {st.detail && <p className="mt-1 text-sm text-fg">{st.detail}</p>}

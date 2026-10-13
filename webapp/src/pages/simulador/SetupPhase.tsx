@@ -285,17 +285,20 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
       aria-labelledby={titleId}
       className={cn('transition-colors duration-200', selected ? 'border-[color-mix(in_oklab,var(--world)_55%,var(--border))] bg-world-soft' : '')}
     >
-      <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-4 gap-y-3 sm:grid-cols-[112px_minmax(0,1fr)] sm:gap-x-5">
-        <div className="flex flex-col items-center pt-1">
-          <LotGauge kind={lot.world} value={alloc.amount / SIM_RULES.maxPerLot} size="md" showScale={false} className="w-[72px] sm:w-[112px]" label={`${shortName(lot.id)}: parte do teto por lote`} valueText={`${fe(alloc.amount)} de ${fe(SIM_RULES.maxPerLot)}`} />
+      <div className="grid gap-x-5 sm:grid-cols-[112px_minmax(0,1fr)]">
+        <div className="hidden flex-col items-center pt-1 sm:flex">
+          <LotGauge kind={lot.world} value={alloc.amount / SIM_RULES.maxPerLot} size="md" showScale={false} className="w-[112px]" label={`${shortName(lot.id)}: parte do teto por lote`} valueText={`${fe(alloc.amount)} de ${fe(SIM_RULES.maxPerLot)}`} />
         </div>
         <div className="min-w-0">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
+          <div className="grid grid-cols-[52px_minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="sm:hidden">
+              <LotGauge kind={lot.world} value={alloc.amount / SIM_RULES.maxPerLot} size="sm" showScale={false} className="w-[52px]" label={`${shortName(lot.id)}: parte do teto por lote`} valueText={`${fe(alloc.amount)} de ${fe(SIM_RULES.maxPerLot)}`} />
+            </div>
             <div className="min-w-0">
               <h4 id={titleId} className="text-[1.0625rem] leading-snug">
                 {lot.nome}
               </h4>
-              <p className="text-sm text-muted">{lot.origem} · vendas previstas de {monthLabel(lot.salesWindow[0])} a {monthLabel(lot.salesWindow[1])}</p>
+              <p className="text-sm text-muted">{lot.origem}</p>
             </div>
             <Button
               variant={selected ? 'ghost' : 'secondary'}
@@ -316,6 +319,9 @@ function DeckCard({ lot, alloc, canAdd, addReason, onAmount, onHedge }: { lot: S
             <Fact label="Margem base, 18 meses" value={pct(lot.expectedMargin, 1)} />
             <Fact label="Oscilação mensal" value={`± ${pct(lot.monthlyVolatility, 1)}`} />
           </dl>
+          <p className="mt-2 text-sm text-muted">
+            Vendas previstas de {monthLabel(lot.salesWindow[0])} a {monthLabel(lot.salesWindow[1])} (meses {lot.salesWindow[0]} a {lot.salesWindow[1]}).
+          </p>
 
           <div className="mt-4">
             <div className="flex flex-wrap items-baseline justify-between gap-x-3">

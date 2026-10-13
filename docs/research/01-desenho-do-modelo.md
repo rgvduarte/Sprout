@@ -123,90 +123,101 @@ No piloto (fev.–jul. 2027) o calendário é o mesmo, mas sem série: o lote é
 
 ## 2. Aritmética com números reais
 
-### 2.1 Pressupostos do lote-tipo (base, fev. 2027)
+### 2.1 Pressupostos do lote-tipo (base; regime = 2029, piloto = 2027)
 
 | Parâmetro | Valor | Origem |
 |---|---|---|
-| Preço do granel ao lagar | 3,60 €/kg = índice 3,50 + prémio 0,10 | SIMA PT 3,40–3,80 e 3,50 (sem. 39/2026); Poolred 3,34 [F] — `00-base-factual.md` §1.2 |
+| Preço do granel ao lagar | 3,60 €/kg = índice 3,50 + prémio 0,10 | Índice definido (média SIMA + Poolred) a out. 2026 = 3,42–3,47 €/kg: SIMA PT 3,40–3,80 (início out. 2026) e Poolred 3,34 [F]; os 3,50 da sem. 39/2026 são cotação Oleista. O modelo usa 3,50, arredondado para cima (conservador) — `00-base-factual.md` §1.2 |
 | Embalamento no lagar | 0,55 €/kg | Observatorio 0,47–0,51 €/kg [F] + mix com vidro [E] |
-| Logística até HoReCa | 0,30 €/kg | 0,15–0,30 €/kg [E] |
-| Armazenagem / seguro / análises | 4 €/t/mês; 0,2%/ano; 2 × €300 por lote | [E] `40-risco-coberturas.md` §5.2 |
+| Logística até HoReCa | 0,28 €/kg (2029); 0,30 (2027) | 0,15–0,30 €/kg [E] |
+| Armazém logístico (3PL) e *picking* | 0,06 €/kg | [E, NV] encomendas de 20–50 kg a ~€2–4 cada |
+| Armazenagem / seguro / análises | 4 €/t/mês e 0,2%/ano sobre o **stock médio** (45 dias em regime; 180 dias com < 300 clientes); 2 × €300 por lote | [E] `40-risco-coberturas.md` §5.2 |
 | Perdas / desclassificação esperada | 0,5% uma vez; 3% por trimestre × 0,30 €/kg | [E] idem |
-| Custódia (*collateral manager*) | €1.200 por lote | [E] €300–1.500 por inspeção |
-| Pagamentos, KYC, faturação | 0,02 €/kg | [E] rails SEPA bancários |
+| Custódia (*collateral manager*) | €2.000 por lote: entrada + ~3 libertações de tranche para o 3PL + fecho | [E, NV] €300–500 por visita |
+| Pagamentos bancários | 0,01 €/kg | [E] comissões SEPA por operação; KYC e faturação estão no custo fixo de tecnologia |
 | Provisão de crédito | 0,6% das vendas | [E] com SDD B2B |
-| Financiamento | cupão 8%/ano; ciclo líquido 95 dias (90 stock + 35 recebimento − 30 pagamento); utilização 80% | [E] |
-| **Preço de referência do comprador** | **6,00 €/kg s/ IVA** (≈ 5,50 €/L) | **[E] NV**: retalho PT 6,67 €/kg com granel a 4,43 (abr. 2026) ajustado à descida do granel; porta do lagar 6,08 €/L (mar. 2026) [F] |
+| Financiamento | Regime: cupão 7,5%/ano (2029); 90% do capital em obrigações; utilização 80%; ciclo líquido 50 dias (45 stock médio + 35 recebimento − 30 pagamento). **Piloto: sem obrigações** (capital próprio) | [E]; CSC art. 348.º/2 [L] |
+| **Preço de referência do comprador** | **5,65 €/kg s/ IVA** (≈ 5,18 €/L; ≈ 5,49 €/L c/ IVA) | **[E] NV**: equivalente de retalho *standard* a out. 2026. Retalho PT 6,67 €/kg com granel a 4,43 (abr. 2026) [F] ajustado ao granel de 3,50–3,60: rácio 0,664 ⇒ 5,27–5,42; diferencial constante de 2,24 €/kg ⇒ 5,74–5,84; base = ponto médio de 5,3–6,0. **6,00 €/kg só no otimista**, com cotações documentadas de origem identificada |
 | Desconto | 10% | Documento-fonte (limite inferior) |
 
 ### 2.2 Lote de 20 t de AOVE (HoReCa/gourmet)
 
-| Linha | € (20 t) | €/kg |
-|---|---|---|
-| Valor à referência (6,00 €/kg) | 120.000 | 6,000 |
-| Desconto ao comprador (10%) | −12.000 | −0,600 |
-| **Receita Sprout** | **108.000** | **5,400** |
-| Compra do granel ao lagar | 72.000 | 3,600 |
-| Embalamento | 11.000 | 0,550 |
-| Logística | 6.000 | 0,300 |
-| Armazenagem (3 meses) | 240 | 0,012 |
-| Seguro do stock | 36 | 0,002 |
-| Análises (entrada + intermédia) | 600 | 0,030 |
-| Perdas físicas | 360 | 0,018 |
-| Desclassificação esperada | 180 | 0,009 |
-| Custódia e inspeção | 1.200 | 0,060 |
-| Pagamentos, KYC, faturação | 400 | 0,020 |
-| Provisão de crédito | 648 | 0,032 |
-| Cupão do investidor (capital parado incluído) | 2.160 | 0,108 |
-| Custo de cobertura explícito | 0 | 0 |
-| **Total de custos diretos** | **94.824** | **4,741** |
-| **Margem de contribuição do Sprout** | **13.176** | **0,659 (12,2%)** |
-| Retida na reserva de primeira perda (30% da margem, teto 5% do saldo) | 3.735 | 0,187 |
-| Margem livre para a OpCo após reserva | 9.441 | 0,472 |
+| Linha | Regime 2029: € (20 t) | €/kg | Piloto 2027: €/kg |
+|---|---|---|---|
+| Valor à referência (5,65 €/kg) | 113.000 | 5,650 | 5,650 |
+| Desconto ao comprador (10%) | −11.300 | −0,565 | −0,565 |
+| **Receita Sprout** | **101.700** | **5,085** | **5,085** |
+| Compra do granel ao lagar | 72.000 | 3,600 | 3,600 |
+| Embalamento | 11.000 | 0,550 | 0,550 |
+| Logística | 5.600 | 0,280 | 0,300 |
+| Armazém logístico (3PL) e *picking* | 1.200 | 0,060 | 0,060 |
+| Armazenagem (stock médio 45 dias; piloto 180) | 120 | 0,006 | 0,024 |
+| Seguro do stock | 18 | 0,001 | 0,004 |
+| Análises (entrada + intermédia) | 600 | 0,030 | 0,030 |
+| Perdas físicas | 360 | 0,018 | 0,018 |
+| Desclassificação esperada | 90 | 0,005 | 0,018 |
+| Custódia e libertações por tranche | 2.000 | 0,100 | 0,100 |
+| Pagamentos bancários | 200 | 0,010 | 0,010 |
+| Provisão de crédito | 610 | 0,031 | 0,031 |
+| Cupão das obrigações (90% do capital; 50 dias) | 959 | 0,048 | 0 (sem obrigações) |
+| Custo de cobertura explícito | 0 | 0 | 0 |
+| **Total de custos diretos** | **94.757** | **4,738** | **4,744** |
+| **Margem de contribuição do Sprout** | **6.943** | **0,347 (6,8%)** | **0,341 (6,7%)** |
+| Retida na reserva de primeira perda (30% da margem; teto 5% do saldo = €4.669) | 2.083 | 0,104 | — |
+| Margem livre para a OpCo após reserva | 4.860 | 0,243 | — |
+| *Memo:* custo nocional do capital próprio a 8% (fora do EBITDA) | — | 0,005 (10% do capital) | 0,168 (100% do capital) |
 
-**Do lado do investidor (regime, 90% de *notes*):** €74.700 de obrigações financiam o lote; o cupão do ciclo (95 dias) é de €1.555; o retorno é **8,0%/ano bruto**, ou ~5,8% líquido para um particular residente (retenção de 28% [L]). O investidor não ganha nem perde com o preço do azeite enquanto a almofada (subordinado + reserva) absorver as perdas.
+**Do lado do investidor (regime 2029, base):** o lote imobiliza €83.000 (granel + embalamento) durante ~50 dias. Com 90% do capital em obrigações e utilização média de 80%, a série tem **€93.375 de obrigações** afetas ao lote (o excedente fica em caixa na série); o cupão do ciclo é **€959** (7,5%/ano bruto; ~5,4% líquido para um particular residente, retenção de 28% [L]). Os outros 10% (€8.300) são capital subordinado do patrocinador, cujo custo é nocional. O investidor não ganha nem perde com o preço do azeite enquanto a almofada (subordinado + reserva) absorver as perdas.
+
+**No piloto (fev.–jul. 2027) não há obrigações:** a SPV só pode emitir 12 meses depois do registo definitivo (CSC art. 348.º/2 [L]). O stock é capital próprio, e o seu custo nocional (0,17 €/kg a 8% durante 185 dias) corta a margem económica da parte HoReCa para metade (~0,17 €/kg).
 
 ### 2.3 Repartição do bolo de intermediação
 
-Π = 120.000 − 72.000 − 11.000 − 6.000 = **€31.000 (1,55 €/kg)**.
+Π = 113.000 − 72.000 − 11.000 − 5.600 = **€24.400 (1,22 €/kg)**.
 
-| Destino | € | % de Π |
-|---|---|---|
-| Comprador (desconto) | 12.000 | 38,7% |
-| Sprout (margem de contribuição) | 13.176 | 42,5% |
-| Investidores (cupão) | 2.160 | 7,0% |
-| **Redistribuído (a métrica "80–90%")** | **27.336** | **88,2%** |
-| Atrito: custódia, análises, armazenagem, perdas, crédito, pagamentos | 3.664 | 11,8% |
+| Destino | € | €/kg | % de Π |
+|---|---|---|---|
+| Comprador (desconto) | 11.300 | 0,565 | 46,3% |
+| Investidores (cupão: custo de financiar stock, que os incumbentes também suportam dentro de Π) | 959 | 0,048 | 3,9% |
+| Custos diretos: 3PL, custódia, análises, armazenagem, perdas, crédito, pagamentos | 5.198 | 0,260 | 21,3% |
+| Sprout (margem de contribuição) | 6.943 | 0,347 | 28,5% |
+| **Total** | **24.400** | **1,220** | **100%** |
+
+**Leitura.** No lote-tipo HoReCa, o bolo de intermediação (1,22 €/kg) reparte-se em 46% desconto ao comprador, 4% custo de capital, 21% custos diretos e 28% margem de contribuição do Sprout. À escala do plano (2031, base), essa margem, somada à dos distribuidores, que fica perto de zero, não paga a estrutura: **EBITDA de −€1,22M**. A antiga "taxa de redistribuição de 88%" não distinguia lotes viáveis de inviáveis (com referência 5,40 e 15% de desconto, o lote perde €2.898 e a "redistribuição" ainda dá 74%) e contava o cupão como redistribuição. Não a usar.
 
 ### 2.4 A leitura literal falha
 
-Margem líquida do embalador × 20 t = €3.800 (0,19 €/kg) a €10.000 (0,50 €/kg) [F]. Capturar 80–90% dá **€3.040–9.000**. Só o desconto de 10% custa **€12.000** (15%: €18.000). **Com a definição literal, o desconto custa 1,3 a 5,9 vezes o que se captura.** O deck não pode usar "80–90% da margem do embalador" sem esta correção: seria uma afirmação enganosa perante investidores (MiFID art. 24.º(3) [L]).
+Margem líquida do embalador × 20 t = €3.800 (0,19 €/kg) a €10.000 (0,50 €/kg) [F]. Capturar 80–90% dá **€3.040–9.000**. Só o desconto de 10% sobre 5,65 €/kg custa **€11.300** (15%: €16.950). **Com a definição literal, o desconto custa 1,3 a 5,6 vezes o que se captura.** O deck não pode usar "80–90% da margem do embalador" sem esta correção: seria uma afirmação enganosa perante investidores (Reg. 2017/1129, art. 22.º; CVM, art. 7.º; responsabilidade civil e penal do emitente [L]). A MiFID art. 24.º(3) aplica-se ao intermediário, se houver um.
 
-### 2.5 Sensibilidade (mesmo lote de 20 t)
+### 2.5 Sensibilidade (lote de 20 t, regime 2029)
 
-| Referência do comprador | Desconto | Receita | Margem Sprout | % | €/kg | Redistribuído | Sprout / Π |
+| Referência do comprador | Desconto | Receita | Margem Sprout | % | €/kg | Π (€/kg) | Sprout / Π |
 |---|---|---|---|---|---|---|---|
-| Origem identificada, 6,00 €/kg | 10% | 108.000 | **13.176** | **12,2%** | 0,66 | 88% | 43% |
-| Origem identificada, 6,00 €/kg | 15% | 102.000 | 7.212 | 7,1% | 0,36 | 88% | 23% |
-| AOVE *standard*, 5,40 €/kg (granel 3,50, sem prémio) | 10% | 97.200 | 4.504 | 4,6% | 0,23 | 83% | 21% |
-| AOVE *standard*, 5,40 €/kg | 15% | 91.800 | **−864** | −0,9% | −0,04 | 83% | −4% |
-| Marca branca ES 1 L, 4,57 €/kg | 10% | 82.260 | **−10.346** | −12,6% | −0,52 | — | — |
-| Retalho PT médio abr. 2026, 6,67 €/kg | 10% | 120.060 | 25.164 | 21,0% | 1,26 | 92% | 57% |
-| Retalho PT médio abr. 2026, 6,67 €/kg | 15% | 113.390 | 18.534 | 16,3% | 0,93 | 92% | 42% |
+| Origem identificada, 6,00 €/kg (só otimista) | 10% | 108.000 | 13.205 | 12,2% | 0,66 | 1,57 | 42% |
+| Origem identificada, 6,00 €/kg | 15% | 102.000 | 7.241 | 7,1% | 0,36 | 1,57 | 23% |
+| **Base, 5,65 €/kg** | **10%** | **101.700** | **6.943** | **6,8%** | **0,35** | **1,22** | **28%** |
+| Base, 5,65 €/kg | 15% | 96.050 | 1.327 | 1,4% | 0,07 | 1,22 | 5% |
+| AOVE *standard*, 5,40 €/kg (rácio 0,664) | 10% | 97.200 | 2.470 | 2,5% | 0,12 | 0,97 | 13% |
+| AOVE *standard*, 5,40 €/kg | 15% | 91.800 | **−2.898** | −3,2% | −0,14 | 0,97 | −15% |
+| Marca branca ES 1 L, 4,57 €/kg | 10% | 82.260 | **−12.381** | −15,1% | −0,62 | 0,14 | — |
+| Retalho PT médio abr. 2026, 6,67 €/kg | 10% | 120.060 | 25.193 | 21,0% | 1,26 | 2,24 | 56% |
+| Retalho PT médio abr. 2026, 6,67 €/kg | 15% | 113.390 | 18.563 | 16,4% | 0,93 | 2,24 | 41% |
 
 **Desconto máximo compatível com cada margem-alvo:**
 
-| Margem-alvo do Sprout | Referência 6,00 (origem) | Referência 5,40 (*standard*) |
-|---|---|---|
-| 0% (*break-even* do lote) | 21,0% | 14,2% |
-| 5% | 16,9% | 9,7% |
-| 10% (necessária para cobrir estrutura à escala do plano) | **12,2%** | **4,6%** |
+| Margem-alvo do Sprout | Referência 6,00 (origem, otimista) | **Referência 5,65 (base)** | Referência 5,40 (*standard*) |
+|---|---|---|---|
+| 0% (*break-even* do lote) | 21,1% | 16,2% | 12,3% |
+| 5% | 16,9% | 11,7% | 7,7% |
+| 10% | 12,2% | **6,8%** | 2,5% |
 
-A última linha da referência 6,67 €/kg (retalho de abril) **não é uma referência HoReCa**: o granel caiu ~20% desde então e a HoReCa compra abaixo do retalho. Não a usar no deck [I].
+As linhas da referência 6,67 €/kg (retalho de abril) **não são referência HoReCa**: o granel caiu ~21% desde então (4,43 → 3,50) e a HoReCa compra abaixo do retalho. Não as usar no deck [I].
+
+**Distribuidores/exportadores (regime 2029):** preço de venda 4,35 €/kg (preço de saída do embalador, sem desconto), custos diretos 4,286 €/kg, margem **0,064 €/kg (1,5%)**. O canal só não perde dinheiro com referência ≥ **4,29 €/kg**; cada 0,10 €/kg vale ~€178k de EBITDA em 2031 (base, 1.790 t). O granel em IBC fica fora do modelo de principal: negoceia-se ao índice (3,34–3,50 €/kg) + corretagem < 1%, sem custo de embalamento; vendê-lo a 4,35 seria cobrar 24–30% acima do índice.
 
 ### 2.6 E se o lote ficar 18 meses?
 
-Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%** [E]. Contra uma margem de 12%, a perda potencial é de **45–65% do lote**. Com azeite não há futuros para cobrir isto. **Detenção longa não é financiável sem passar o risco de preço para o investidor**, e isso transforma o produto em derivado ou FIA (`20-regulatorio.md` §2).
+Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%** [E]. Contra uma margem de ~7%, a perda potencial é de **50–70% do lote**. Com azeite não há futuros para cobrir isto. **Detenção longa não é financiável sem passar o risco de preço para o investidor**, e isso transforma o produto em derivado ou FIA (`20-regulatorio.md` §2).
 
 ### 2.7 Lote de água (20 paletes = 15.000 L = 10.000 garrafas de 1,5 L)
 
@@ -219,31 +230,34 @@ Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%
 | Operação, pagamentos | 150 | 150 | — |
 | Financiamento (stock + depósitos, 30 dias) | 38 | 38 | — |
 | Provisão de crédito | 32 | 31 | — |
-| **Margem / comissão Sprout** | **630 (11,7%; 0,042 €/L)** | **332 (6,5%)** | **216 (4% do GMV)** |
+| **Margem / comissão Sprout** | **630 (11,7%; 0,042 €/L)** | **332 (6,5%)** | **108 (2% do GMV; banda 0,5–3% [E])** |
 | Depósito SDR a adiantar e reconciliar | 1.000 (19% da receita) | 1.000 | 0 |
 | Margem de embalador capturável | **0** (embalamento na origem obrigatório [F]) | 0 | 0 |
 
-**Leitura:** a percentagem parece aceitável como principal, mas o valor absoluto é irrelevante (€630 por 20 paletes; seriam precisas ~9.300 paletes/ano para pagar 1,5 FTE), assume que um engarrafador vende a um comprador pequeno ao preço médio do mercado (improvável) e obriga a gerir depósitos SDR. **Não há margem de embalador a capturar e não há nada para financiar** (€3.600 de stock durante 30 dias). A água fica como **agente com faturação direta**, sem investidores, e com critério de saída no gate.
+**Leitura:** a percentagem parece aceitável como principal, mas o valor absoluto é irrelevante (como principal, €630 por 20 paletes, ou €31,5 por palete: 1,5 FTE, €72–85k com encargos, exigem ~2.300–2.700 paletes/ano; como agente a 2%, €5,4 por palete: ~13.300–15.700 paletes/ano, 7 a 9 vezes as 1.800 previstas para 2031), assume que um engarrafador vende a um comprador pequeno ao preço médio do mercado (improvável) e obriga a gerir depósitos SDR. **Não há margem de embalador a capturar e não há nada para financiar** (€3.600 de stock durante 30 dias). A água fica como **agente com faturação direta**, sem investidores, e com critério de saída no gate.
 
 ### 2.8 Veredicto: o que cabe e o que tem de ceder
 
-**Cabem em simultâneo** "80–90%", "10% de desconto", "8% ao investidor" e uma margem de plataforma de ~12% **apenas** quando se verificam as cinco condições:
+**Cabem em simultâneo** "10% de desconto", "7,5–8% ao investidor" e uma margem HoReCa de **~7% (0,35 €/kg)** quando se verificam as cinco condições:
 1. azeite de **origem identificada** (lagar, lote, ficha analítica; DOP/monovarietal quando houver);
-2. vendido a compradores que hoje pagam **≥ 6,00 €/kg s/ IVA** pelo equivalente (referência documentada);
+2. vendido a compradores que hoje pagam **≥ 5,65 €/kg s/ IVA** pelo equivalente (referência documentada);
 3. desconto de **10%**, não 15%;
-4. lote rodado em **≤ 3–4 meses**, ≥ 85% vendido *back-to-back*;
+4. **≥ 300 clientes HoReCa ativos** (stock médio ≤ 45 dias) e ≥ 85% do lote vendido *back-to-back*; abaixo disso, com obrigações, a margem HoReCa cai para ~0,15 €/kg;
 5. produtor pago a preço de índice + prémio pequeno, e não acima do mercado.
+
+**Uma margem de ~12% só existe com referência ≥ 6,00 €/kg documentada** (cenário otimista). Aos distribuidores, o Sprout vende ao preço de saída do embalador, com margem de ~1–2%: o canal serve para dar volume aos lotes (diluir custódia e análises) e historial para o financiamento de terceiros, não para ganhar dinheiro. **Mesmo com as cinco condições, a margem por kg não paga a estrutura do plano** (secção 7.4).
 
 **Tem de ceder:**
 
 | O quê | Como fica |
 |---|---|
-| "80–90% da margem do embalador" | "80–90% do bolo de intermediação redistribuído; o Sprout retém ~40%" |
-| "10–15% de desconto" | "Até 10% sobre uma referência documentada em €/kg; 5% a compradores profissionais; nunca contra marca branca" |
+| "80–90% da margem do embalador" | "No lote-tipo HoReCa, o bolo de intermediação (1,22 €/kg) reparte-se em 46% desconto, 4% cupão, 21% custos diretos e 28% margem do Sprout. A tese mede-se por margem em €/kg por canal e por EBITDA" |
+| "10–15% de desconto" | "Até 10% sobre uma referência documentada em €/kg (HoReCa/*gourmet*); 0% a distribuidores e exportadores (preço de saída do embalador); nunca contra marca branca" |
 | "Liquidação a 18 meses" | "Vencimento esperado a 12 meses, legal a 18, com uma extensão condicionada" |
 | "Refunding" | Reserva de primeira perda + extensão + *cash sweep* + refinanciamento voluntário |
-| Água como "captura de margem" | Água como serviço de agente (4%), sem tese de margem |
+| Água como "captura de margem" | Água como serviço de agente (~2%), sem tese de margem |
 | AOVE *standard* para HoReCa | Fora: é o produto-chamariz do cash & carry |
+| Granel em IBC "com margem" | Fora do modelo de principal: é corretagem ao índice |
 
 ---
 
@@ -255,7 +269,7 @@ Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%
 |---|---|---|---|---|---|---|---|---|
 | **A.** Marketplace agente com PSP *marketplace* | Do PSP | Empresas | — | €5–20k + PSP (Lemonway €5.490 + €840/mês) | 1–3 meses | Baixo | Baixo (comissão < 1–3%) | Só na água, e **sem PSP** (faturação direta) |
 | **B.** OpCo principal (compra e revende) | Nenhuma | Empresas | Balanço | Baixo | 1–3 meses | Baixo | **Alto** | **Sim — azeite** |
-| **C.** SPV PT (SA) emite obrigações a qualificados / ≥ €100k | Nenhuma em colocação direta pelo emitente | Qualificados; ≥ €100k por investidor | Isenções do art. 1.º(4) | €15–40k + ~€25k/ano | 2–3 meses | Médio (parecer sobre FIA e RGICSF) | **Alto** | **Sim — a partir de abr. 2027** |
+| **C.** SPV PT (SA) emite obrigações a qualificados / ≥ €100k | Nenhuma em colocação direta pelo emitente | Profissionais; ≥ €100k por investidor (retalho para os PRIIPs) | Isenções do art. 1.º(4); CSC art. 348.º/2 | €15–40k + capital social €50k + ~€25k/ano + funções independentes ~€30k/ano | Constituição 1–2 meses; **1.ª emissão ≥ 12 meses após o registo definitivo**, salvo garantia bancária | Médio (parecer sobre FIA, RGICSF/CSC e PRIIPs) | **Alto** | **Sim — 1.ª série nov. 2027–jan. 2028** (ou abr. 2027 com garantia de instituição de crédito, custo NV a orçamentar) |
 | **D.** Promotor em plataforma ECSP de terceiros | Do parceiro (CMVM) | Incl. não sofisticados | **€5M/12 meses** | Comissões NV + €10–20k | 3–6 meses | Médio | Médio (capital de retalho custa 10–13%/ano) | Fase 2+, só recebíveis ou lotes diferenciados |
 | **E.** FIA + AIFM | AIFM | Profissionais | Limiares AIFMD | €100–250k + €80–200k/ano | 3–9 meses | Baixo, mas pesado | Médio | Não (só acima de €10–20M) |
 | **F.** Licenças próprias (IP/IME/ECSP) | Sprout | Conforme licença | — | €150–500k + equipa | 9–18 meses | Baixo, mas lento | Baixo | Não |
@@ -268,29 +282,29 @@ Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%
 | Entidade | Forma | Papel | Notas |
 |---|---|---|---|
 | **Sprout Marketplace** (OpCo) | Lda ou SA (SA se houver rondas de capital) | Principal no azeite; agente na água; *servicer* da SPV; emite faturas por software certificado AT | Contas bancárias: operação + reserva de IVA |
-| **Sprout Capital, SA** (SPV) | SA, detida pela OpCo, com 1 administrador independente | Compra e detém os lotes individualizados; emite obrigações por série; recebe as cobranças (recebíveis cedidos) | Uma conta bancária por série; representante comum dos obrigacionistas (CSC art. 357.º ss. [L]); cláusulas de *limited recourse* e *non-petition*; ROC |
+| **Sprout Capital, SA** (SPV) | SA, detida pela OpCo, **constituída e registada até nov. 2026**, com capital social de **€50.000** (mínimo legal, CSC art. 276.º/5 [L]; ≥ 30% realizado na constituição, art. 277.º/2 [L]; integralmente realizado antes da 1.ª emissão, a confirmar no parecer) e 1 administrador independente | Compra e detém os lotes individualizados; emite obrigações por série; recebe as cobranças (recebíveis cedidos) | Uma conta bancária por série; representante comum dos obrigacionistas (CSC art. 357.º ss. [L]); cláusulas de *limited recourse* e *non-petition*; ROC. O capital social é o subordinado da 1.ª série |
 | *Collateral manager* | Contrato com inspetora independente | Detém por conta da SPV; certifica existências; inspeção na entrada e libertação | Nunca o lagar âncora sozinho |
 
-**Porque não FIA [I, a confirmar no parecer]:** a SPV tem finalidade comercial (compra e vende mercadoria a clientes reais com risco comercial), paga **cupão fixo** e não um retorno agregado indexado ao desempenho dos lotes, e não tem política de investimento discricionária. **Porque não captação ilícita de fundos reembolsáveis:** emite obrigações nos termos do CSC (exceção do RGICSF art. 9.º [L]). **Porque não derivado:** o investidor não recebe diferenças de preço do azeite; recebe juro.
+**Porque não FIA [I, a confirmar no parecer]:** a SPV tem finalidade comercial (compra e vende mercadoria a clientes reais com risco comercial), paga **cupão fixo** e não um retorno agregado indexado ao desempenho dos lotes, e não tem política de investimento discricionária. **Porque não captação ilícita de fundos reembolsáveis:** emite obrigações nos termos e limites do CSC (exceção do RGICSF art. 9.º [L]). Esses limites incluem o art. 348.º/2 do CSC [L]: só emitem obrigações sociedades com contrato definitivamente registado há mais de um ano, salvo (a) fusão ou cisão com sociedade registada há mais de um ano, (b) maioria do capital detida pelo Estado ou (c) obrigações garantidas por instituição de crédito ou pelo Estado. Uma emissão da SPV antes de 12 meses de registo, sem garantia bancária, sai da exceção e cai no risco do art. 200.º. Por isso a pergunta 2 do parecer é **condição prévia (go/no-go) da 1.ª emissão** (redação em vigor a reconfirmar no DRE). **Porque não derivado:** o investidor não recebe diferenças de preço do azeite; recebe juro.
 
 **Atenção ao Regulamento de Titularização (UE) 2017/2402** [L]: subordinar o patrocinador sobre uma carteira que inclui recebíveis pode configurar *tranching*. O parecer tem de o afastar (por exemplo, estruturando o subordinado como capital ou suprimentos da OpCo e não como *tranche*).
 
-### 3.3 Públicos permitidos no piloto
+### 3.3 Públicos permitidos no piloto e na 1.ª série
 
 | Público | Permitido? | Condição |
 |---|---|---|
 | Compradores | Sim | Só empresas e ENI com NIF e atividade; KYB; SDD B2B |
 | Produtores | Sim | Lagares licenciados; engarrafadores com captação reconhecida; KYB; IBAN validado por VoP |
-| Investidores profissionais *per se* (MiFID II, Anexo II, I) | Sim | Documentar a categoria |
-| Profissionais a pedido | Sim | Pedido escrito + **2 de 3** critérios (carteira > €500k; 10 transações/trimestre; ≥ 1 ano no setor financeiro), com evidência guardada |
-| Qualquer investidor com subscrição ≥ €100.000 | Sim | Art. 1.º(4)(d) Reg. Prospetos; KYC e origem de fundos |
+| Investidores profissionais *per se* (MiFID II, Anexo II, I) | Sim (1.ª série, após o gate) | Documentar a categoria |
+| Profissionais a pedido | Só se já classificados | Só se o investidor já estiver classificado como cliente profissional por um banco ou empresa de investimento. Guardar a declaração escrita dessa entidade (Reg. 2017/1129, art. 2.º, al. e) [L]). O Sprout não aplica o teste do Anexo II por si: a SPV e a OpCo não são intermediários financeiros e não podem fazer o *opt-up*. Na falta dessa classificação, só com subscrição ≥ €100.000 (art. 1.º(4)(d)) |
+| Qualquer investidor com subscrição ≥ €100.000 | Sim, mas é **investidor de retalho** (PRIIPs/MiFID) | Art. 1.º(4)(d) Reg. Prospetos dispensa o prospeto, não o KID: exige KID se as obrigações forem PRIIP (provável com *limited recourse* aos lotes; Reg. 1286/2014, arts. 4.º(1) e 4.º(6) [L]); KYC e origem de fundos. **Na 1.ª série, não aceitar** sem parecer que afaste o KID |
 | "HNWI" sem estes critérios | **Não** | "Rico" não é "qualificado" |
-| **Retalho / "jogadores"** | **Não** | Ver abaixo |
+| **Retalho abaixo de €100k / "jogadores"** | **Não** | Ver abaixo |
 | Investidores fora de PT | Não no piloto | *Reverse solicitation* não serve; exige análise local |
 | Residentes ou fundos de países da lista UE de alto risco | Não | Lista atualizada a 29-01-2026 [F] |
 
 **Porque os "jogadores" ficam fora — sete razões:**
-1. **Reserva bancária:** "entregue €X; devolvemos €X + 10–15%; se correr mal fazemos *refunding*" é captação de fundos reembolsáveis; fora das obrigações, é crime (RGICSF art. 200.º) [F/L].
+1. **Reserva bancária:** qualquer promessa de retorno fixo a retalho com "*refunding*" (por exemplo, "entregue €X; devolvemos €X + y%; se correr mal fazemos *refunding*") é captação de fundos reembolsáveis; fora das obrigações emitidas nos termos e limites do CSC, é crime (RGICSF art. 200.º) [F/L]. Os 10–15% do documento-fonte são desconto ao cliente, não retorno ao investidor: não os misturar.
 2. **Precedentes:** Afinsa/Fórum Filatélico (ativo tangível + recompra prometida; penas até 12 anos), Asset Land e Capital Alternatives (lotes individuais e colheitas = OIC), Cimovelpark (alerta CMVM) [F].
 3. **Retalho exige** plataforma ECSP (teto €5M/ano, teste, simulação de perdas, 4 dias de reflexão, KIIS), intermediário autorizado ou prospeto, e KID PRIIPs [F].
 4. **Gamificação** é alvo declarado da ESMA (DP ESMA35-43-3682) e da IOSCO; a diretriz aprovada no documento-fonte já a proíbe [F].
@@ -302,7 +316,7 @@ Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%
 
 ### 3.4 Jurisdição
 
-- **Fase 1: Portugal** para OpCo e SPV. Rails bancários UE sem risco de repatriação; custo de €15–40k e 1–2 meses [E].
+- **Fase 1: Portugal** para OpCo e SPV. Rails bancários UE sem risco de repatriação; custo de €15–40k e 1–2 meses para constituir [E]; a 1.ª emissão só 12 meses após o registo definitivo (CSC art. 348.º/2 [L]).
 - **Escala (> €5–10M de obrigações e investidores internacionais):** veículo de titularização luxemburguês por compartimentos; sem autorização CSSF enquanto não houver emissões contínuas ao público [F].
 - **Rejeitar** estruturas fora da UE e *tokens*: BVI na lista UE de alto risco desde 29-01-2026; MiCA/MiFID aplicam-se onde está o investidor; banca UE com diligência reforçada [F].
 
@@ -310,14 +324,15 @@ Carry a 18 meses ≈ **19,8%** do valor; VaR 95% de preço a 18 meses **37–57%
 
 O parecer tem de ser **escrito, assinado por advogado independente** (não por um sócio do projeto) e sobre o *term sheet* final:
 1. A SPV é FIA à luz das orientações ESMA/2013/611?
-2. A emissão cabe na exceção do RGICSF art. 9.º (obrigações nos termos do CSC)? Que limites do CSC se aplicam a uma SA recém-constituída?
-3. Isenção de prospeto aplicável (art. 1.º(4)(a) e (d)) e se a CMVM exige documento informativo abaixo de €12M.
+2. **(Condição go/no-go da 1.ª emissão.)** A emissão cabe na exceção do RGICSF art. 9.º (obrigações "nos termos e limites do CSC")? Confirmar a redação em vigor do CSC art. 348.º/2 (1 ano de registo definitivo; exceções: fusão/cisão, maioria pública, garantia de instituição de crédito ou do Estado), se o capital tem de estar integralmente realizado antes de deliberar a emissão, e o custo de uma garantia bancária para emitir antes de nov. 2027.
+3. Isenção de prospeto aplicável (art. 1.º(4)(a) e (d)); como documentar a classificação de profissionais a pedido feita por bancos ou empresas de investimento (art. 2.º, al. e)); se a CMVM exige documento informativo abaixo de €12M; regras de publicidade da oferta isenta (Reg. 2017/1129, art. 22.º; CVM, art. 7.º).
 4. Quem pode comercializar as obrigações: só a administração da SPV? A OpCo pode apresentar o produto sem licença MiFID?
 5. Venda SPV→OpCo vs. comissão (Código Comercial art. 266.º [L]): efeitos em IVA, faturação e insolvência.
-6. Transmissão de propriedade e penhor de coisa genérica depositada no lagar; armazéns gerais e *warrant*; contrato de depósito tripartido.
+6. Transmissão de propriedade e penhor de coisa genérica depositada no lagar e no 3PL; armazéns gerais e *warrant*; contrato de depósito tripartido; garantia sobre a conta da reserva: penhor de direitos de crédito (CC arts. 679.º ss.) ou penhor financeiro (DL 105/2004 só se o beneficiário ou o agente de garantias for instituição de crédito ou outra entidade do art. 2.º).
 7. Regulamento de Titularização: o subordinado do patrocinador cria *tranching*?
 8. Financiar stock de terceiros (fase 2): reserva de concessão de crédito; estrutura com banco mutuante.
 9. Retenção na fonte sobre juros e regime fiscal da SPV.
+10. **As obrigações da Sprout Capital são PRIIP** (montante reembolsável exposto ao desempenho de lotes que o investidor não adquire diretamente; Reg. 1286/2014, art. 4.º(1))? Se sim: KID e responsabilidade do produtor para os subscritores não profissionais (via ≥ €100k e via < 150 pessoas). Até haver resposta, a 1.ª série vai só a profissionais.
 
 ### 3.6 PSP/IME e bancos (lista curta)
 
@@ -354,8 +369,8 @@ O parecer tem de ser **escrito, assinado por advogado independente** (não por u
 
 ### 4.2 Almofada de primeira perda
 
-- **Capital subordinado dos fundadores:** **20%** da série piloto (€30k de €150k); **10%** em regime.
-- **Reserva de primeira perda:** 30% da margem de contribuição de cada lote, até **5%** do saldo vivo das obrigações; conta segregada com penhor financeiro a favor do representante comum; não distribuível enquanto houver obrigações vivas.
+- **Capital subordinado dos fundadores:** **33%** da 1.ª série (o capital social da SPV, €50k, sobre uma série de €150k); **10%** em regime.
+- **Reserva de primeira perda:** 30% da margem de contribuição de cada lote, até **5%** do saldo vivo das obrigações; conta segregada empenhada a favor dos obrigacionistas (penhor de direitos de crédito sobre o depósito, CC arts. 679.º e ss. [L], notificado ao banco depositário); não distribuível enquanto houver obrigações vivas. Só será "penhor financeiro" (DL 105/2004) se o beneficiário ou o agente de garantias for uma instituição de crédito ou outra entidade do art. 2.º [L]: entre a SPV e obrigacionistas não financeiros não há penhor financeiro (pergunta 6 do parecer). Com as margens corrigidas, os 30% da margem podem não chegar ao teto; o modelo assume que o patrocinador completa a reserva com capital próprio.
 - **Cascata de perdas:** margem do lote → reserva → subordinado → extensão com *cash sweep* → obrigacionistas sénior.
 
 ### 4.3 Extensão e refinanciamento (o "refunding" redefinido)
@@ -370,22 +385,22 @@ O parecer tem de ser **escrito, assinado por advogado independente** (não por u
 
 ### 4.4 Stress tests
 
-**Série piloto** (*book* de €150k ao custo ≈ 36 t; 85% vendido *back-to-back*; recebíveis €60k):
+**1.ª série** (nov. 2027–jan. 2028; *book* de €150k ao custo ≈ 36 t; 85% vendido *back-to-back*; recebíveis €60k):
 
-| Cenário | Perda | Almofada 15% (€22,5k) | **Almofada 20% (€30k)** |
+| Cenário | Perda | Almofada 15% (€22,5k) | **Almofada 33% (€50k, capital social da SPV)** |
 |---|---|---|---|
 | S1 — índice −30% (15% em aberto; 20% dos compradores renegoceiam) | €14,4k | Absorvida | Absorvida |
-| S2 — quebra de colheita (+60%) | Neutro: os lotes do piloto são stock já em tanque; o aberto ganha ~€13,5k | Sem perda | Sem perda |
+| S2 — quebra de colheita (+60%) | Neutro: os lotes da série são stock já em tanque; o aberto ganha ~€13,5k | Sem perda | Sem perda |
 | S2b — venda a prazo sem físico, preço +60% | **€90k (60% do *book*)** | Destrói a série | Destrói a série → **proibido** |
 | S3 — 10% dos recebíveis em incumprimento, 50% de recuperação | €3,0k | Absorvida | Absorvida |
 | S4 — 25% do stock desclassificado a 0,45 €/kg | €4,1k | Absorvida | Absorvida |
-| **S5 — S1 + S3 + S4 + atraso de 3 meses nas vendas (carry €5,4k)** | **€26,9k** | **Perda sénior €4,4k (3,4%)** | **Sénior intacto; sobram €3,1k** |
+| **S5 — S1 + S3 + S4 + atraso de 3 meses nas vendas (carry €5,4k)** | **€26,9k** | **Perda sénior €4,4k (3,4%)** | **Sénior intacto; sobram €23,1k** |
 
-Daí os 20% de subordinado no piloto, enquanto a reserva está vazia.
+Daí o capital social da SPV (€50k, que é também o mínimo legal) como subordinado da 1.ª série, enquanto a reserva está vazia. O piloto (fev.–jul. 2027) não tem investidores: as perdas do lote de 20 t ficam inteiramente no capital próprio.
 
 **Book de regime** (€500k, 147 t, almofada 15%; `40-risco-coberturas.md` §5.4): S1 com a política −€60k (absorvido); S5 −€100k, excede a almofada em ~€25k (5,6% do sénior) → ativa extensão com *cash sweep*.
 
-**Detenção de 18 meses:** perda potencial de 45–65% do lote (secção 2.6). Não há almofada que a absorva.
+**Detenção de 18 meses:** perda potencial de 50–70% do lote (secção 2.6). Não há almofada que a absorva.
 
 ### 4.5 Gatilhos (da política de cobertura)
 
@@ -402,6 +417,7 @@ Daí os 20% de subordinado no piloto, enquanto a reserva está vazia.
 
 - **Responsável de Risco e Tesouraria nomeado antes da 1.ª emissão** (o documento-fonte tem "owner a designar"). Perfil: *trade finance* ou tesouraria de *trading*. Sem esta pessoa, não há emissão.
 - **Comité de Risco** mensal com um **membro independente com veto** em matérias da SPV.
+- **Custo das funções independentes** (administrador independente da SPV desde a constituição; membro independente do Comité e representante comum desde a 1.ª emissão): ~€15k em 2027 e ~€30k/ano a partir de 2028 [E, NV], somados aos €25k/ano de manutenção da SPV.
 - **Quatro olhos** em: alteração de IBAN de produtor; pagamentos acima de €25k; libertação de lote financiado; contratos de venda a prazo; alteração de regras de reconciliação.
 - **Partes relacionadas:** nenhuma pessoa com interesse no Lagar do Val aprova preço, qualidade ou libertação de lotes do Lagar do Val (ver alerta 7).
 

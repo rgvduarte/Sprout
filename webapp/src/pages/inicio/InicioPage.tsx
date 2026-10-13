@@ -35,8 +35,8 @@ export default function InicioPage() {
   const hasLots = active.length > 0;
 
   const missions = useMemo(
-    () => buildMissions({ game, lots: data.lots, positions: data.positions, liveEvents: feed.events, isVisitor, worldsVisited }),
-    [game, data.lots, data.positions, feed.events, isVisitor, worldsVisited],
+    () => buildMissions({ game, lots: data.lots, positions: data.positions, liveEvents: feed.events, isVisitor, worldsVisited, feedPaused: feed.pauseReason }),
+    [game, data.lots, data.positions, feed.events, isVisitor, worldsVisited, feed.pauseReason],
   );
   const goal = missions.find((m) => m.kind === 'aprendizagem');
   const listMissions = missions.filter((m) => m.kind !== 'aprendizagem');
@@ -167,11 +167,10 @@ export default function InicioPage() {
 
       <Section id="novas" title="Novas missões" description="Lotes abertos a financiamento. Abre a jornada, lê a análise e os riscos antes de qualquer decisão.">
         <NovasMissoes lots={data.lots} />
-        {!approved && (
-          <p className="mt-4 text-sm text-muted">
-            O piloto está fechado a investidores qualificados. Podes explorar todas as jornadas; comprometer capital pede registo e verificação.
-          </p>
-        )}
+        <div className="mt-5 flex flex-col gap-2">
+          <RiskNote compact />
+          {!approved && <p className="text-sm text-muted">O piloto está fechado a investidores qualificados. Podes explorar todas as jornadas; comprometer capital pede registo e verificação.</p>}
+        </div>
       </Section>
 
       <div className="mt-10 grid min-w-0 gap-x-6 gap-y-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">

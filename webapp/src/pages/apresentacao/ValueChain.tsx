@@ -253,7 +253,9 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
         <RowLabel title="Hoje" sub={`comprador paga ${num(C.ref, 2)} €`} />
         <Track tip={tip?.row === 'a' ? tip.seg : null} total={C.ref}>
           {ROW_TODAY.map((s, i) => (
-            <motion.div key={s.id} className={cn('absolute inset-y-0 outline-offset-2', i > 0 && 'border-l-2 border-surface', i === ROW_TODAY.length - 1 && 'rounded-r-[4px]')} style={{ left: pct(s.from, C.ref), width: pct(value(s), C.ref), background: SEG[s.id].color, opacity: s.id === 'producer' ? dimProducer : 1 }} {...bind('a', s)} />
+            <motion.div key={s.id} className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', i === ROW_TODAY.length - 1 && 'rounded-r-[4px]')} style={{ left: pct(s.from, C.ref), width: pct(value(s), C.ref), background: SEG[s.id].color, opacity: s.id === 'producer' ? dimProducer : 1 }} {...bind('a', s)}>
+              {i > 0 && <Gap />}
+            </motion.div>
           ))}
           <motion.span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px] rounded-[6px] border-2 border-fg" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)`, opacity: hl }} />
         </Track>
@@ -339,11 +341,12 @@ function SproutSegment({ seg, index, build, bind }: { seg: Seg; index: number; b
   const on = useTransform(build, [start, start + 0.4], [0, 1]);
   const last = seg.id === 'discount';
   return (
-    <div className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', index > 0 && 'border-l-2 border-surface', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.ref), width: pct(value(seg), C.ref) }} {...bind}>
+    <div className={cn('absolute inset-y-0 overflow-hidden outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.ref), width: pct(value(seg), C.ref) }} {...bind}>
       <div className="absolute inset-0" style={{ background: 'var(--vc-producer)' }} />
       <motion.div className="absolute inset-0" style={{ opacity: seg.id === 'producer' ? 1 : on }}>
         {last ? <Hatch /> : <div className="h-full w-full" style={{ background: SEG[seg.id].color }} />}
       </motion.div>
+      {index > 0 && <Gap />}
     </div>
   );
 }
@@ -354,11 +357,17 @@ function ZoomSegment({ seg, index, split, bind }: { seg: Seg; index: number; spl
   const last = seg.id === 'discount';
   return (
     <div className={cn('absolute inset-y-0 outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.packager), width: pct(value(seg), C.packager) }} {...bind}>
-      <motion.div className={cn('absolute inset-0 overflow-hidden', index > 0 && 'border-l-2 border-surface', last && 'rounded-r-[4px]')} style={{ opacity: on }}>
+      <motion.div className={cn('absolute inset-0 overflow-hidden', last && 'rounded-r-[4px]')} style={{ opacity: on }}>
         {last ? <Hatch /> : <div className="h-full w-full" style={{ background: SEG[seg.id].color }} />}
+        {index > 0 && <Gap />}
       </motion.div>
     </div>
   );
+}
+
+/** Espaço de 2 px na cor da superfície entre segmentos contíguos (dataviz). */
+function Gap() {
+  return <span aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-surface" />;
 }
 
 /** Chave da ampliação: valor e nome de cada parte, pela ordem da barra. */

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { KnowledgeLevelBadge } from '../../components/game';
+import { LevelProgress } from '../../components/game';
 import { Meter } from '../../components/ui';
 import { TOTAL_KNOWLEDGE_POINTS } from '../../data';
 import { useGame } from '../../state';
@@ -14,7 +14,7 @@ import { Terraces } from './Terraces';
 export function LevelPanel() {
   const game = useGame();
   const reduce = useReducedMotion();
-  const { points, level, nextLevel, levelProgress, pointsToNext } = game;
+  const { points, level, nextLevel, levelProgress } = game;
   const sources = pointsBreakdown(game);
 
   // último ganho de pontos nesta visita (para o mostrar ao lado da barra)
@@ -34,12 +34,7 @@ export function LevelPanel() {
         <h2 id="nivel-title" className="sr-only">
           O teu nível de conhecimento
         </h2>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <KnowledgeLevelBadge level={level} />
-          <p className="text-sm text-muted">
-            <span className="font-mono text-base text-fg tnum">{num(points)}</span> de <span className="font-mono tnum">{num(TOTAL_KNOWLEDGE_POINTS)}</span> pontos de conhecimento
-          </p>
-        </div>
+        <LevelProgress points={points} compact />
 
         {nextLevel ? (
           <div className="mt-5">
@@ -70,14 +65,14 @@ export function LevelPanel() {
             </div>
             <Meter value={levelProgress} label={`Pontos até ${nextLevel.nome}`} showLabel={false} />
             <p className="mt-3 text-[0.9375rem] text-fg">
-              Faltam <span className="font-mono tnum">{num(pointsToNext)}</span> pontos para <strong className="font-semibold">{nextLevel.nome}</strong>: {LEVEL_PERKS[nextLevel.id].short}.
+              Em <strong className="font-semibold">{nextLevel.nome}</strong> desbloqueias {LEVEL_PERKS[nextLevel.id].short}.
             </p>
           </div>
         ) : (
           <p className="mt-5 text-[0.9375rem] text-fg">Chegaste ao último nível. {LEVEL_PERKS[level.id].short.replace(/^./, (c) => c.toUpperCase())} já estão disponíveis.</p>
         )}
 
-        <dl className="mt-6 divide-y divide-border border-y border-border">
+        <dl className="mt-6 divide-y divide-border border-y border-border" aria-label={`De onde vêm os ${num(points)} pontos, de ${num(TOTAL_KNOWLEDGE_POINTS)} possíveis`}>
           {sources.map((s) => (
             <div key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 py-2">
               <dt className="min-w-0 text-sm">
@@ -88,6 +83,12 @@ export function LevelPanel() {
               </dd>
             </div>
           ))}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 py-2">
+            <dt className="text-sm font-medium text-fg">Total</dt>
+            <dd className="font-mono text-sm font-medium text-fg tnum">
+              {num(points)} <span className="font-normal text-muted">/ {num(TOTAL_KNOWLEDGE_POINTS)}</span>
+            </dd>
+          </div>
         </dl>
         <p className="mt-3 text-sm text-muted">Os pontos vêm só de aprender e verificar. Não dependem do montante investido, não se trocam e não dão melhores condições em nenhum lote.</p>
       </div>

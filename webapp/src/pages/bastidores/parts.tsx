@@ -32,9 +32,9 @@ export interface KpiHistoryProps {
   className?: string;
 }
 
-const W = 220;
-const H = 74;
-const PLOT = { x0: 6, x1: 214, y0: 10, y1: 52 };
+const W = 200;
+const H = 72;
+const PLOT = { x0: 4, x1: 196, y0: 10, y1: 50 };
 
 function colPath(x: number, y: number, w: number, h: number, r = 3) {
   if (h <= 0.5) return '';
@@ -418,6 +418,7 @@ export function PriceRuler({ min, max, unit, today, stressed, marks, stressLabel
         ))}
       </div>
       <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
+        <li>Limiares em {unit}:</li>
         {sorted.map((m) => (
           <li key={m.value} className="inline-flex items-center gap-2">
             <span aria-hidden className="inline-block h-3 w-0.5 bg-warn" />

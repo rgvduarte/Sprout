@@ -289,10 +289,10 @@ export default function TesourariaTab() {
       align: 'right',
       render: (p) => {
         const s = payoutStatus(p, st);
-        return s.id === 'aprovado' ? (
-          <span className="text-sm text-muted">Aprovado</span>
-        ) : (
-          <Button size="sm" variant="secondary" disabled={!p.ready} title={p.ready ? undefined : p.notReadyReason} onClick={() => setApproving(p)}>
+        if (s.id === 'aprovado') return <span className="text-sm text-muted">Aprovado</span>;
+        if (!p.ready) return <span className="text-sm text-muted">Sem ação até ao fecho</span>;
+        return (
+          <Button size="sm" variant="secondary" onClick={() => setApproving(p)}>
             {s.id === 'falta-segunda' ? 'Segunda aprovação' : 'Aprovar'}
           </Button>
         );
@@ -401,7 +401,7 @@ export default function TesourariaTab() {
         <CardHeader title="Políticas de tesouraria" description="Regras do piloto e a evidência de que estão a ser cumpridas." />
         <ul className="divide-y divide-border">
           {policies.map((p) => (
-            <li key={p.title} className="grid gap-x-6 gap-y-1 py-3 first:pt-0 last:pb-0 md:grid-cols-[16rem_minmax(0,1fr)_auto] md:items-baseline">
+            <li key={p.title} className="grid gap-x-6 gap-y-1 py-3 first:pt-0 last:pb-0 md:grid-cols-[18rem_minmax(0,1fr)_auto] md:items-baseline">
               <p className="font-medium text-fg">{p.title}</p>
               <p className="text-sm text-muted">{p.evidence}</p>
               <StatusPill tone="ok" label="Em vigor" />
@@ -433,7 +433,7 @@ export default function TesourariaTab() {
             />
           </div>
         </div>
-        <DataTable columns={txCols} rows={txs} getRowId={(t) => t.id} caption="Movimentos na conta de clientes" maxHeight={420} />
+        <DataTable columns={txCols} rows={txs} getRowId={(t) => t.id} caption="Movimentos na conta de clientes" />
         <p className="mt-2 text-sm text-muted">
           Último extrato fechado: {dateTime(lastClose.closedAt)}. Os recebimentos pendentes dos compradores pagam a liquidação dos lotes expedidos.
         </p>

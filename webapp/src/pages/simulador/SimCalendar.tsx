@@ -243,7 +243,16 @@ export function SeasonStrip({ month, extended, className }: { month: number; ext
       </div>
       <div className="mt-1 flex justify-between font-mono text-[11px] leading-4 text-muted" aria-hidden>
         <span>{monthLabel(1)}</span>
-        <span className="max-sm:hidden">colheita: banda mais escura</span>
+        <span className="flex items-center gap-3 max-sm:hidden">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2 w-3 rounded-[1px]" style={{ background: 'color-mix(in oklab, var(--world) 30%, var(--surface))' }} />
+            colheita do azeite
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2 w-3 rounded-[1px] bg-accent" />
+            meses jogados
+          </span>
+        </span>
         <span>
           {monthLabel(WINDOW)} · mês 18{extended ? ` → ${monthLabel(MAX_MONTH)}` : ''}
         </span>

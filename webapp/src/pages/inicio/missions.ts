@@ -103,12 +103,14 @@ export interface MissionInput {
   isVisitor: boolean;
   /** mundos já visitados pelo perfil ativo */
   worldsVisited: WorldId[];
+  /** motivo de pausa da telemetria, se estiver parada */
+  feedPaused?: 'reduced-motion' | 'hidden' | 'disabled' | null;
 }
 
 /** Leituras de telemetria precisas para a missão de campanha. */
 export const CAMPAIGN_READINGS = 3;
 
-export function buildMissions({ game, lots, positions, liveEvents, isVisitor, worldsVisited }: MissionInput): Mission[] {
+export function buildMissions({ game, lots, positions, liveEvents, isVisitor, worldsVisited, feedPaused }: MissionInput): Mission[] {
   const out: Mission[] = [];
 
   /* primeiros passos (visitante e investidores por aprovar) */
@@ -152,7 +154,10 @@ export function buildMissions({ game, lots, positions, liveEvents, isVisitor, wo
       id: 'campanha-extracao',
       kind: 'campanha',
       title: 'Acompanha a primeira extração da campanha',
-      context: 'Leituras dos depósitos dos lagares, no Diário de campanha',
+      context:
+        feedPaused === 'reduced-motion'
+          ? 'Telemetria em pausa com movimento reduzido: a missão avança quando as leituras voltarem.'
+          : 'Leituras dos depósitos dos lagares, no Diário de campanha',
       world: 'azeite',
       live: true,
       steps: [{ id: 'leituras', label: `${CAMPAIGN_READINGS} leituras de telemetria em direto`, done: readings >= CAMPAIGN_READINGS, count: [readings, CAMPAIGN_READINGS], href: '/#diario' }],

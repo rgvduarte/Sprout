@@ -172,6 +172,8 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
   const d = priceDecimals(lot);
   const colhido = lot.milestones.find((m) => m.stage === 'colhido');
   const mine = positions.reduce((s, p) => s + p.amount, 0);
+  // o IBC tem o interior opaco e pode pousar sobre a paisagem; paletes e sacas ficam ao lado
+  const overlap = lot.world === 'azeite';
 
   return (
     <section id="origem" data-chapter="Origem" aria-labelledby="origem-titulo" className="relative scroll-mt-6 overflow-hidden border-b border-world-line" style={{ background: 'color-mix(in oklab, var(--world) 8%, var(--bg))' }}>
@@ -257,8 +259,8 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
         {/* medidor da missão sobre a paisagem */}
         <div className="order-3 min-w-0 lg:order-none">
           <Terrain world={lot.world} seed={lot.id} tanks={data.telemetry[lot.producerId]} crop label={`${ctx.copy.terrainLabel}: ${ctx.producer.nome}, ${ctx.region.nome}`} />
-          <div className="relative">
-            <div className="pr-[156px] pt-3 sm:pr-[216px] xl:pr-[256px]">
+          <div className={cn('relative', !overlap && 'flex items-end justify-between gap-4')}>
+            <div className={cn('min-w-0 pt-3', overlap && 'pr-[156px] sm:pr-[216px] xl:pr-[256px]')}>
               <MissionCaption />
             </div>
             <LotGauge
@@ -268,7 +270,7 @@ export function ChapterOrigem({ diligence }: { diligence: DiligenceItem[] }) {
               animateOnMount
               label={`Financiamento do lote ${lot.id}`}
               valueText={`${pct(fundedFraction(lot), 1)} financiado`}
-              className="absolute bottom-0 right-0 w-[148px] sm:w-[200px] xl:w-[240px] [&_svg]:h-auto [&_svg]:w-full"
+              className={cn(overlap ? 'absolute bottom-0 right-0 w-[148px] sm:w-[200px] xl:w-[240px]' : 'w-[132px] shrink-0 sm:w-[180px] xl:w-[200px]', '[&_svg]:h-auto [&_svg]:w-full')}
             />
           </div>
         </div>

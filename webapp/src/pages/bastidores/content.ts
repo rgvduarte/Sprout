@@ -36,7 +36,7 @@ export const ENGINE_TRIGGERS: EngineTrigger[] = tidyDeep([
     label: 'Análise lida',
     source: 'Lote: boletim de análises aberto até ao fim',
     criteria: ['analysis-read'],
-    example: 'Boletim OA-… do AZ-2026-021 lido',
+    example: 'Boletim de análises do AZ-2026-021 lido até ao fim',
   },
   {
     id: 'risco-lido',
