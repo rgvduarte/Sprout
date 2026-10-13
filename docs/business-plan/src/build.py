@@ -397,7 +397,7 @@ def _():
         ('FTE 2027 → 2031', '7 → 17', '5,5 → 12', '01 §6.2'),
         ('Pré-seed; caixa mínima', '1,1 M€; 150 k€', 'igual', '01 §5.5, §7.3'),
     ]
-    out = ['<table class="compact t-press"><thead><tr><th>Pressuposto</th><th>Base (fonte corrigida)</th><th>Recomendado</th><th>Origem</th></tr></thead><tbody>']
+    out = ['<table class="compact tight t-press"><thead><tr><th>Pressuposto</th><th>Base (fonte corrigida)</th><th>Recomendado</th><th>Origem</th></tr></thead><tbody>']
     for a, b_, c, d in rows:
         out.append(f'<tr><td>{a}</td><td>{b_}</td><td>{c}</td><td class="ref-cell">{d}</td></tr>')
     out.append('</tbody></table>')
@@ -411,7 +411,7 @@ def _fixos(s):
 @gen('tbl_pl')
 def _():
     L = RC['linhas']
-    out = ['<table class="compact t-fin">', years_head('Recomendado, k€'), '<tbody>']
+    out = ['<table class="compact tight t-fin">', years_head('Recomendado, k€'), '<tbody>']
     out.append(num_row('GMV', RC['gmv_total'], lbl_cls='b'))
     out.append(num_row('Receita', L['dr_rec']))
     out.append(num_row('Custo das mercadorias vendidas', L['dr_cmv']))
@@ -437,7 +437,7 @@ def _():
 @gen('tbl_pl_base')
 def _():
     L = B['linhas']
-    out = ['<table class="compact t-fin">', years_head('Base, k€'), '<tbody>']
+    out = ['<table class="compact tight t-fin">', years_head('Base, k€'), '<tbody>']
     out.append(num_row('GMV', B['gmv_total'], lbl_cls='b'))
     out.append(num_row('Margem de contribuição', L['dr_mc'], cls='sub-total'))
     out.append(num_row('Pessoal + opex não salarial', [a + b_ for a, b_ in zip(L['dr_pess'], L['dr_opex'])]))
@@ -451,7 +451,7 @@ def _():
 
 @gen('tbl_cf')
 def _():
-    out = ['<table class="compact t-fin">', years_head('k€'), '<tbody>']
+    out = ['<table class="compact tight t-fin">', years_head('k€'), '<tbody>']
     for name, s in (('Recomendado', RC), ('Base', B)):
         out.append(f'<tr class="grp"><td colspan="6">{name}</td></tr>')
         out.append(num_row('Capital de giro (stock + recebíveis − fornecedores)', s['capital_giro']))
@@ -531,18 +531,20 @@ def _():
 def _():
     m = RC['margem_contribuicao']
     seg = [
-        ('Distribuidores e exportação', m['azeite_distribuidores_exportacao'][4], 'neutral.1'),
-        ('HoReCa/gourmet', m['azeite_horeca_gourmet'][4], 'neutral.2'),
-        ('Granel certificado', m['azeite_granel_certificado'][4], 'neutral.1'),
-        ('Verificação p/ terceiros', m['verificacao_terceiros_liquida'][4], 'accent'),
-        ('Dados', m['dados'][4], 'accentSoft'),
-        ('Café', m['cafe_verde'][4], 'neutral.2'),
-        ('Água', m['agua'][4], 'neutral.3'),
+        ('Azeite: distribuidores e exportação', m['azeite_distribuidores_exportacao'][4], 'neutral.1'),
+        ('Azeite: HoReCa/gourmet', m['azeite_horeca_gourmet'][4], 'neutral.1'),
+        ('Azeite: granel certificado', m['azeite_granel_certificado'][4], 'neutral.1'),
+        ('Verificação para terceiros', m['verificacao_terceiros_liquida'][4], 'accent'),
+        ('Dados', m['dados'][4], 'accent'),
+        ('Café verde', m['cafe_verde'][4], 'neutral.1'),
+        ('Água (agente)', m['agua'][4], 'neutral.1'),
     ]
-    return chart('stackedBar', {
-        'ariaLabel': 'Composição da margem de contribuição de 2031 no cenário recomendado, em milhares de euros',
-        'thickness': 26, 'rowGap': 44, 'labelWidth': 0, 'format': {'dec': 0},
-        'rows': [{'label': '', 'segments': [{'label': a, 'value': round(v / 1000, 1), 'valueLabel': k(v), 'color': c} for a, v, c in seg]}],
+    seg.sort(key=lambda t: -t[1])
+    return chart('barChart', {
+        'ariaLabel': 'Margem de contribuição de 2031 no cenário recomendado, por canal, em milhares de euros',
+        'thickness': 10, 'rowGap': 7, 'labelWidth': 150,
+        'x': {'min': 0, 'max': 300, 'ticks': [0, 100, 200, 300], 'format': {'dec': 0}},
+        'data': [{'label': a, 'value': round(v / 1000), 'valueLabel': k(v), 'color': c} for a, v, c in seg],
     })
 
 
@@ -574,11 +576,8 @@ def _():
         ('GMV 2031, M€', lambda s: M(s['gmv_total'][4])),
         ('Margem do azeite 2031, €/kg', lambda s: nf(s['margem_contribuicao']['azeite_eur_kg'][4], 3)),
         ('Margem de contribuição 2031, k€', lambda s: k(s['margem_contribuicao']['total'][4])),
-        ('Pessoal + opex 2031, k€', lambda s: k(_fixos(s)[4])),
         ('FTE 2031', lambda s: nf(s['fte'][4], 1 if s['fte'][4] % 1 else 0)),
-        ('EBITDA 2027, k€', lambda s: k(s['ebitda'][0])),
         ('EBITDA 2031, k€', lambda s: k(s['ebitda'][4])),
-        ('Resultado líquido 2031, k€', lambda s: k(s['resultado_liquido'][4])),
         ('Cash flow acumulado 2027–2031, k€', lambda s: k(s['cash_flow_acumulado'][4])),
         ('Obrigações em circulação 2031, k€', lambda s: k(s['capital_financiado']['obrigacoes_em_circulacao'][4])),
         ('Investidores estimados 2031', lambda s: nf(s['capital_financiado']['investidores_estimados'][4], 0)),
@@ -587,21 +586,21 @@ def _():
         ('Gasto até ao gate de 31-08-2027, k€', lambda s: k(s['gasto_ate_gate_2027_08'])),
         ('Primeiro ano de EBITDA positivo', lambda s: 'não até 2031'),
     ]
-    out = ['<table class="compact t-scen4"><thead><tr><th></th>' + ''.join(f'<th class="num{" em" if n == "Recomendado" else ""}">{n}</th>' for n, _ in sc) + '</tr></thead><tbody>']
+    out = ['<table class="compact tight t-scen4"><thead><tr><th></th>' + ''.join(f'<th class="num{" em" if n == "Recomendado" else ""}">{n}</th>' for n, _ in sc) + '</tr></thead><tbody>']
     for lab, f in rows:
         out.append(f'<tr><td>{lab}</td>' + ''.join(f'<td class="num{" em" if n == "Recomendado" else ""}">{f(s)}</td>' for n, s in sc) + '</tr>')
     out.append('</tbody></table>')
     return ''.join(out)
 
 
-SENS_CASES = [('desconto_10', 'Caso central'), ('desconto_12_5', 'Desconto HoReCa de 12,5 %'), ('desconto_15', 'Desconto HoReCa de 15 %'),
+SENS_CASES = [('desconto_10', 'Caso central (desconto HoReCa de 10 %)'), ('desconto_12_5', 'Desconto HoReCa de 12,5 %'), ('desconto_15', 'Desconto HoReCa de 15 %'),
               ('volume_menos_30', 'Volumes −30 %'), ('volume_mais_30', 'Volumes +30 %'), ('preco_aove_menos_30', 'Preço do AOVE −30 % (repasse proporcional)'),
               ('topo_dos_intervalos', 'Topo dos intervalos')]
 
 
 @gen('tbl_sens')
 def _():
-    out = ['<table class="compact t-sens"><thead><tr><th>Sensibilidade</th><th class="num">Base<span class="sub">EBITDA 2031, k€</span></th><th class="num">Base<span class="sub">capital, M€</span></th>'
+    out = ['<table class="compact tight t-sens"><thead><tr><th>Sensibilidade</th><th class="num">Base<span class="sub">EBITDA 2031, k€</span></th><th class="num">Base<span class="sub">capital, M€</span></th>'
            '<th class="num">Recomendado<span class="sub">EBITDA 2031, k€</span></th><th class="num">Recomendado<span class="sub">capital, M€</span></th><th class="num">Recomendado<span class="sub">margem HoReCa 2029, €/kg</span></th></tr></thead><tbody>']
     for key, lab in SENS_CASES:
         b, r = SE['base'][key], SE['recomendado'][key]
@@ -626,7 +625,7 @@ def _():
                      'color': 'accent' if v > c0 else 'neutral.1'})
     return chart('barChart', {
         'ariaLabel': f'Sensibilidade do EBITDA de 2031 do cenário recomendado, a partir de {c0} mil euros',
-        'thickness': 11, 'rowGap': 8, 'labelWidth': 245,
+        'thickness': 11, 'rowGap': 8, 'labelWidth': 300,
         'x': {'min': -1050, 'max': 50, 'ticks': [-1000, -750, -500, -250, 0], 'format': {'dec': 0}},
         'data': data,
     })

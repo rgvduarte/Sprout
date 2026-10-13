@@ -206,23 +206,64 @@ export function ApprovedView({ c, profileId, onRestart }: { c: CaseView; profile
     { id: 'revisao', state: 'upcoming', date: monthYear(review), title: 'Revisão periódica do KYC', body: `A cada ${c.risco === 'baixo' ? '24' : '12'} meses para clientes de risco ${c.risco}. Pedimos só o que tiver mudado.` },
   ];
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-      <div className="flex min-w-0 flex-col gap-6">
-        <Card padding="lg">
-          <CardHeader title={c.nome} description={`Aprovado a ${fmtDate(decided)} · processo ${caseLabel(c.id)}`} actions={<StatusPill tone="ok" label="Conta ativa" />} />
-          <KeyValue
-            columns={2}
-            items={[
-              { label: 'Tipo', value: c.tipo === 'pessoa-coletiva' ? 'Pessoa coletiva' : 'Pessoa singular' },
-              { label: 'Classificação', value: CLASSE_LABEL[c.classe], hint: c.rota },
-              { label: 'Residência fiscal', value: c.pais },
-              { label: 'Risco do cliente', value: c.risco === 'baixo' ? 'Baixo' : 'Elevado (diligência reforçada)' },
-            ]}
-          />
-          <h3 className="mt-8 text-[1.0625rem]">Estado do processo</h3>
-          <Timeline items={items} className="mt-4" />
-        </Card>
+    <div className="flex flex-col gap-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+        <div className="flex min-w-0 flex-col gap-6">
+          <Card padding="lg">
+            <CardHeader title={c.nome} description={`Aprovado a ${fmtDate(decided)} · processo ${caseLabel(c.id)}`} actions={<StatusPill tone="ok" label="Conta ativa" />} />
+            <KeyValue
+              columns={2}
+              items={[
+                { label: 'Tipo', value: c.tipo === 'pessoa-coletiva' ? 'Pessoa coletiva' : 'Pessoa singular' },
+                { label: 'Classificação', value: CLASSE_LABEL[c.classe], hint: c.rota },
+                { label: 'Residência fiscal', value: c.pais },
+                { label: 'Risco do cliente', value: c.risco === 'baixo' ? 'Baixo' : 'Elevado (diligência reforçada)' },
+              ]}
+            />
+            <h3 className="mt-8 text-[1.0625rem]">Estado do processo</h3>
+            <Timeline items={items} className="mt-4" />
+          </Card>
+        </div>
 
+        <aside className="flex min-w-0 flex-col gap-6" aria-label="Aprendizagem e percurso">
+          <LearningGoalPanel profileId={profileId} />
+          <Card>
+            <h2 className="text-[1.0625rem]">{role === 'visitante' ? 'Demonstração' : 'Ver o percurso de registo'}</h2>
+            {role === 'visitante' ? (
+              <>
+                <p className="mt-1 text-sm text-muted">A conta deste registo de exemplo está ativa nesta sessão. Cada compromisso continua a exigir a leitura dos fatores de risco do lote.</p>
+                <div className="mt-4 flex flex-col items-start gap-2">
+                  <ButtonLink to="/mercados" variant="secondary">
+                    Explorar os mercados
+                  </ButtonLink>
+                  {onRestart && (
+                    <Button variant="ghost" size="sm" onClick={onRestart}>
+                      Recomeçar o registo de exemplo
+                    </Button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-1 text-sm text-muted">Como Visitante vês os seis passos do registo preenchidos com um exemplo fictício, incluindo o bloqueio de quem não é investidor qualificado.</p>
+                <div className="mt-4 flex flex-col items-start gap-2">
+                  <Button variant="secondary" onClick={() => setRole('visitante')}>
+                    Ver como Visitante
+                  </Button>
+                  {isTeam && (
+                    <ButtonLink to="/bastidores" variant="ghost" size="sm">
+                      Processos KYC em Bastidores
+                    </ButtonLink>
+                  )}
+                </div>
+              </>
+            )}
+          </Card>
+        </aside>
+      </div>
+
+      {/* os documentos ficam por baixo da primeira linha, para as duas colunas abrirem equilibradas */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card padding="lg">
           <CardHeader title="Documentos em ficheiro" description="O que a equipa de compliance verificou. Atualiza o que mudar; o resto fica para a revisão periódica." />
           <ul className="divide-y divide-border">
@@ -244,42 +285,6 @@ export function ApprovedView({ c, profileId, onRestart }: { c: CaseView; profile
           </ul>
         </Card>
       </div>
-
-      <aside className="flex min-w-0 flex-col gap-6" aria-label="Aprendizagem e percurso">
-        <LearningGoalPanel profileId={profileId} />
-        <Card>
-          <h2 className="text-[1.0625rem]">{role === 'visitante' ? 'Demonstração' : 'Ver o percurso de registo'}</h2>
-          {role === 'visitante' ? (
-            <>
-              <p className="mt-1 text-sm text-muted">A conta deste registo de exemplo está ativa nesta sessão. Cada compromisso continua a exigir a leitura dos fatores de risco do lote.</p>
-              <div className="mt-4 flex flex-col items-start gap-2">
-                <ButtonLink to="/mercados" variant="secondary">
-                  Explorar os mercados
-                </ButtonLink>
-                {onRestart && (
-                  <Button variant="ghost" size="sm" onClick={onRestart}>
-                    Recomeçar o registo de exemplo
-                  </Button>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-1 text-sm text-muted">Como Visitante vês os seis passos do registo preenchidos com um exemplo fictício, incluindo o bloqueio de quem não é investidor qualificado.</p>
-              <div className="mt-4 flex flex-col items-start gap-2">
-                <Button variant="secondary" onClick={() => setRole('visitante')}>
-                  Ver como Visitante
-                </Button>
-                {isTeam && (
-                  <ButtonLink to="/bastidores" variant="ghost" size="sm">
-                    Processos KYC em Bastidores
-                  </ButtonLink>
-                )}
-              </div>
-            </>
-          )}
-        </Card>
-      </aside>
     </div>
   );
 }

@@ -4,19 +4,17 @@
   <header class="ch-head">
     <span class="ch-num">13</span>
     <h1>Plano financeiro</h1>
-    <p class="standfirst">Projeções de um modelo, não previsões. O modelo diz duas coisas sem ambiguidade: o negócio descrito no documento-fonte não chega ao break-even até 2031 em nenhum cenário; e o desenho recomendado reduz o prejuízo e a necessidade de capital, mas também não chega ao break-even dentro do horizonte, nem com todas as alavancas no topo do que a investigação suporta.</p>
+    <p class="standfirst">Projeções de um modelo, não previsões. Nenhum cenário chega ao break-even até 2031: nem o negócio do documento-fonte, nem o desenho recomendado, que reduz o prejuízo e o capital necessário, nem este com todas as alavancas no topo do que a investigação suporta.</p>
   </header>
 
   <h2><span class="sn">13.1</span>O modelo e os pressupostos</h2>
   <div class="cols">
-    <p>Sprout-Modelo-Financeiro.xlsx tem só fórmulas vivas (26 475, 0 erros depois de recalculado), um seletor de cenário e uma folha-motor que calcula os quatro cenários e 14 casos de sensibilidade lado a lado. Reproduz o cálculo de referência dos três cenários da fonte com desvio máximo de 0,009 % e o lote-tipo de 01 §2.2 ao euro (0,347 €/kg; 6 943 €; cupão de 959 €). Os preços das mercadorias ficam constantes ao nível de out. 2026: o modelo compra back-to-back e é neutro ao nível de preço; os choques tratam-se em 13.6 e no cap. 8.</p>
-    <p>O EBITDA inclui o cupão das obrigações (custo de financiar stock, lote a lote). Em 2027 não há obrigações: a SPV só emite 12 meses depois do registo. A necessidade de capital próprio soma o pré-arranque, o capital da SPV, a caixa mínima de 150 k€ e o vale do cash flow acumulado para o acionista; como esse vale ainda não chegou em 2031, os valores são mínimos, não picos.</p>
+    <p>Sprout-Modelo-Financeiro.xlsx tem só fórmulas vivas (26 475, 0 erros), um seletor de cenário e uma folha-motor com os quatro cenários e 14 sensibilidades lado a lado. Reproduz o cálculo de referência da fonte com desvio máximo de 0,009 % e o lote-tipo de 01 §2.2 ao euro. Os preços das mercadorias ficam constantes ao nível de out. 2026: o modelo compra back-to-back; os choques estão em 13.6 e no cap. 8.</p>
+    <p>O EBITDA inclui o cupão das obrigações (o custo de financiar stock). Em 2027 não há obrigações: a SPV só emite 12 meses depois do registo. A necessidade de capital próprio soma o pré-arranque, o capital da SPV, a caixa mínima de 150 k€ e o vale do cash flow acumulado; como o vale ainda não chegou em 2031, os valores são mínimos, não picos.</p>
   </div>
   {{tbl_pressupostos}}
 
   <h2><span class="sn">13.2</span>Conta de resultados</h2>
-  {{tbl_pl}}
-  {{tbl_pl_base}}
   <div class="fig-row">
     <figure>
       <p class="fig-title">Recomendado: a margem ainda não paga a estrutura</p>
@@ -27,11 +25,14 @@
     </figure>
     <figure>
       <p class="fig-title">De onde vem a margem de 2031 no recomendado</p>
-      <p class="fig-sub">698 k€ de margem de contribuição, por canal</p>
+      <p class="fig-sub">698 k€ de margem de contribuição, k€; a verde, serviços</p>
       {{fig_mc_mix}}
-      <figcaption>Os canais de trading fazem 81 %; verificação para terceiros e dados, 19 %. A verificação só deixa margem porque o banco ou o mutuário pagam a custódia e o laboratório (no base, 100 k€ de receita dão 18 k€ líquidos). <span class="ref">Modelo</span></figcaption>
+      <figcaption>Trading (azeite, café, água) faz 81 %; verificação e dados, 19 %. A verificação só deixa margem porque o banco ou o mutuário pagam custódia e laboratório (no base, 100 k€ de receita dão 18 k€). <span class="ref">Modelo</span></figcaption>
     </figure>
   </div>
+
+  {{tbl_pl}}
+  {{tbl_pl_base}}
 
   <h2><span class="sn">13.3</span>Cash flow, financiamento e aplicação de fundos</h2>
   {{tbl_cf}}
@@ -54,14 +55,12 @@
   <p class="tblnote">O pessimista é o mundo em que o Sprout vende azeite <i>standard</i>: os distribuidores ficam abaixo do custo a 4,20 €/kg e a margem de contribuição é negativa; a decisão aí é parar no gate, depois de ~0,73 M€. O otimista não chega ao break-even porque a referência mais alta e o cupão mais baixo são comidos por uma estrutura de 28 pessoas.</p>
 
   <h2><span class="sn">13.6</span>Sensibilidade</h2>
-  <div class="fig-side">
-    <figure>
-      <p class="fig-title">EBITDA de 2031 no recomendado, por sensibilidade</p>
-      <p class="fig-sub">k€; cada barra parte do caso central (−530 k€)</p>
-      {{fig_tornado}}
-    </figure>
-    {{tbl_sens}}
-  </div>
+  <figure>
+    <p class="fig-title">EBITDA de 2031 no recomendado, por sensibilidade</p>
+    <p class="fig-sub">k€; cada barra parte do caso central (−530 k€); a verde, as que melhoram</p>
+    {{fig_tornado}}
+  </figure>
+  {{tbl_sens}}
   <div class="cols small">
     <p>O preço do AOVE −30 %, repassado proporcionalmente às referências de venda com embalamento, logística e custos fixos inalterados, é o choque que mais pesa: −987 k€ no recomendado, −1 814 k€ no base, onde a margem HoReCa passa a −0,10 €/kg. O desconto de 15 % custa −61 k€ ao recomendado e −115 k€ ao base em 2031. Volumes ±30 % movem pouco o recomendado (−682 a −378 k€), porque a margem por kg é baixa.</p>
     <p>«Topo dos intervalos» junta prémio de origem de 0,20 €/kg pago por distribuidores e exportadores, a carteira de verificação do otimista (10 M€ em 2031) e volumes +30 %: EBITDA de 2031 de −47 k€ e necessidade de capital de 3,08 M€. É o melhor caso que a investigação suporta, e ainda não fecha dentro do horizonte. Inconsistências registadas no modelo: o lote de água do 01 tem 38 € de financiamento e o modelo dá 30 €; os gestores de conta do base em 2030 ficam em 433 contas cada, dentro do «~400» <span class="ref">pressupostos.json</span>.</p>
