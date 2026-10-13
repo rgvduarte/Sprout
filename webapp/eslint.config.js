@@ -18,6 +18,7 @@ export default tseslint.config(
   {
     files: ['scripts/**/*.mjs', '*.config.{js,ts}'],
     extends: [js.configs.recommended],
-    languageOptions: { ecmaVersion: 2023, globals: globals.node },
+    // os scripts de captura avaliam funções no browser (page.evaluate)
+    languageOptions: { ecmaVersion: 2023, globals: { ...globals.node, ...globals.browser } },
   },
 );
