@@ -1,0 +1,99 @@
+import { useCallback, useSyncExternalStore } from 'react';
+import type { ProfileId } from '../../state';
+import type { Allocation, Decisions } from './engine';
+
+/* =====================================================================
+   Estado da sessão do simulador (em memória, por perfil). Sobrevive à
+   navegação entre ecrãs; volta ao início ao recarregar, como o resto do
+   progresso de jogo da demonstração.
+   ===================================================================== */
+
+export type Phase = 'setup' | 'play' | 'debrief';
+
+export interface SimSession {
+  phase: Phase;
+  /** rascunho da distribuição (todos os lotes do baralho; 0 = fora) */
+  draft: Allocation[];
+  draftSeed: number;
+  /** corrida em jogo ou em balanço */
+  seed: number;
+  allocations: Allocation[];
+  decisions: Decisions;
+  /** último mês revelado */
+  month: number;
+  /** id da corrida já guardada no histórico (balanço lido) */
+  recordedRunId?: string;
+  /** a rever um balanço antigo (não grava) */
+  reviewing?: boolean;
+  /** Liga de campanha: adesão e pseudónimo */
+  leagueOptIn: boolean;
+  pseudonymIndex: number;
+  /** corridas seguidas desde a última pausa (para o aviso de pausa) */
+  streak: number;
+  /** o aviso de pausa foi visto nesta série */
+  pauseAcknowledgedAt: number;
+}
+
+/** Semente da primeira campanha: um choque de preço no azeite em abril, uma extensão e um lote de água calmo. */
+export const DEFAULT_SEED = 1012;
+
+export const DEFAULT_DRAFT: Allocation[] = [
+  { simLotId: 'sim-az-a', amount: 17500, hedged: true },
+  { simLotId: 'sim-az-b', amount: 12500, hedged: false },
+  { simLotId: 'sim-ag-a', amount: 15000, hedged: false },
+  { simLotId: 'sim-ag-b', amount: 0, hedged: false },
+  { simLotId: 'sim-cf-a', amount: 0, hedged: false },
+];
+
+function initial(profile: ProfileId): SimSession {
+  return {
+    phase: 'setup',
+    draft: DEFAULT_DRAFT.map((a) => ({ ...a })),
+    draftSeed: DEFAULT_SEED,
+    seed: DEFAULT_SEED,
+    allocations: [],
+    decisions: {},
+    month: 0,
+    leagueOptIn: false,
+    pseudonymIndex: profile === 'demo' ? 0 : 3,
+    streak: 0,
+    pauseAcknowledgedAt: 0,
+  };
+}
+
+const sessions: Record<ProfileId, SimSession> = { demo: initial('demo'), visitante: initial('visitante') };
+const listeners = new Set<() => void>();
+
+function subscribe(fn: () => void) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export function useSimSession(profile: ProfileId): [SimSession, (patch: Partial<SimSession> | ((s: SimSession) => Partial<SimSession>)) => void] {
+  const state = useSyncExternalStore(
+    subscribe,
+    () => sessions[profile],
+    () => sessions[profile],
+  );
+  const update = useCallback(
+    (patch: Partial<SimSession> | ((s: SimSession) => Partial<SimSession>)) => {
+      const cur = sessions[profile];
+      const p = typeof patch === 'function' ? patch(cur) : patch;
+      sessions[profile] = { ...cur, ...p };
+      listeners.forEach((l) => l());
+    },
+    [profile],
+  );
+  return [state, update];
+}
+
+/** Próxima semente a partir da atual (determinística, 4 dígitos). */
+export function nextSeed(seed: number): number {
+  let x = (seed * 2654435761) >>> 0;
+  x ^= x >>> 13;
+  x = Math.imul(x, 1274126177) >>> 0;
+  return 1000 + (x % 9000);
+}
+
+/** Pseudónimos da liga (vocabulário do campo, nunca nomes de pessoas). */
+export const PSEUDONYMS = ['Mó de Granito', 'Ramo Verde', 'Decantação', 'Prensa Fria', 'Folha de Oliveira', 'Rega Gota a Gota', 'Cinta de Palete', 'Juta Nova'];

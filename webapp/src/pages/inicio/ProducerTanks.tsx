@@ -35,7 +35,7 @@ function Tank({ unit, delay }: { unit: TelemetryUnit; delay: number }) {
       role="img"
       aria-label={`${unit.label}: ${num(unit.level)} de ${num(unit.capacity)} kg${full ? ', cheio' : ''}`}
       viewBox="0 0 26 60"
-      className="block h-[60px] w-[26px] shrink-0 overflow-visible"
+      className="block h-[52px] w-[21px] shrink-0 overflow-visible sm:h-[58px] sm:w-[24px]"
     >
       <title>{`${unit.label} · ${num(unit.level)} / ${num(unit.capacity)} kg`}</title>
       <defs>
@@ -91,44 +91,43 @@ function ProducerBlock({ producer, units, index }: { producer: Producer; units: 
   const unitWord = isOlive ? 'kg' : 'paletes';
   const region = getRegion(producer.regionId);
   return (
-    <li className="min-w-0 py-3 first:pt-0 last:pb-0 sm:py-0" data-world={producer.world}>
+    <li className="min-w-0" data-world={producer.world}>
       <p className="truncate text-sm font-medium leading-tight text-fg">{producer.nome}</p>
       <p className="truncate text-xs leading-5 text-muted">
         {producer.localidade} · {region?.nome}
       </p>
-      <div className="mt-2 flex items-end gap-3">
+      <div className="mt-2 flex h-[60px] items-end">
         {isOlive ? (
-          <div className="flex items-end gap-1.5" aria-label={`${units.length} depósitos`} role="group">
+          <div className="flex items-end gap-1" aria-label={`${units.length} depósitos`} role="group">
             {units.map((u, i) => (
               <Tank key={u.id} unit={u} delay={Math.min(0.35, 0.03 * (index * 4 + i))} />
             ))}
           </div>
         ) : (
-          <LotGauge kind="pallet" size="sm" value={capacity ? total / capacity : 0} label={`Armazém de ${producer.nome}`} valueText={`${num(total)} de ${num(capacity)} paletes`} animateOnMount={!reduce} />
+          <LotGauge kind="pallet" size="sm" value={capacity ? total / capacity : 0} label={`Armazém de ${producer.nome}`} valueText={`${num(total)} de ${num(capacity)} paletes`} animateOnMount={!reduce} className="w-[56px]" />
         )}
-        <div className="min-w-0 pb-0.5">
-          <p className="font-mono text-sm leading-tight text-fg tnum">
-            {num(total)} {unitWord}
-          </p>
-          <p className="text-xs leading-5 text-muted">{isOlive ? `em ${units.length} depósitos` : `de ${num(capacity)} no armazém`}</p>
-          <p className="h-5 text-xs leading-5" aria-hidden>
-            <AnimatePresence>
-              {delta && (
-                <motion.span
-                  key={delta.key}
-                  className="inline-block font-mono tnum text-world-ink"
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                  transition={{ duration: 0.3, ease: EASE_OUT }}
-                >
-                  +{num(delta.value)} {unitWord}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </p>
-        </div>
       </div>
+      <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-sm leading-snug">
+        <span className="font-mono text-fg tnum">
+          {num(total)}{'\u00a0'}{unitWord}
+        </span>
+        <span className="text-xs text-muted">{isOlive ? `${units.length} depósitos` : `de ${num(capacity)}`}</span>
+        <AnimatePresence>
+          {delta && (
+            <motion.span
+              key={delta.key}
+              aria-hidden
+              className="font-mono text-xs text-world-ink tnum"
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
+            >
+              +{num(delta.value)}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </p>
     </li>
   );
 }
@@ -157,7 +156,7 @@ export function ProducerTanks({ className }: { className?: string }) {
         <TextLink to="/mercados/azeite">{olive.length} lagares</TextLink>{' '}
         do piloto. Cada leitura entra no Diário de campanha.
       </p>
-      <ul className="grid min-w-0 grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:gap-x-6 sm:gap-y-5 sm:divide-y-0">
+      <ul className="grid min-w-0 grid-cols-2 gap-x-4 gap-y-5 sm:gap-x-6">
         {olive.map((p, i) => (
           <ProducerBlock key={p.id} producer={p} units={telemetry[p.id] ?? p.telemetry.units} index={i} />
         ))}
