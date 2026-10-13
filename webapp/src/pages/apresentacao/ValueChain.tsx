@@ -4,13 +4,16 @@ import { Chapter } from '../../components/game';
 import { DataTable, SegmentedControl, type Column } from '../../components/ui';
 import { eur, num, tidyText } from '../../lib/format';
 import { cn } from '../../lib/cn';
+import { FOUNDERS_THESIS, OLIVE_CHAIN_FACTS } from '../../data';
 import { CHAIN, FOCUS_LOT_ID } from './model';
 import { ChapterHead, Frame, useStep, useRange } from './parts';
 
 /* =====================================================================
-   2 · A cadeia hoje. O momento focal da página: a margem do embalador
-   destaca-se e divide-se, com o scroll, em prémio ao produtor, custos do
-   ciclo, spread que financia o ciclo e desconto ao comprador.
+   2 · A cadeia hoje. O momento focal da página: o diferencial granel →
+   comprador (embalamento, logística e margens de intermediação; a margem
+   líquida do embalador é só uma parte) destaca-se e divide-se, com o
+   scroll, em prémio ao produtor, custos do ciclo, spread que financia o
+   ciclo e desconto ao comprador.
    Gráfico em HTML (texto nítido a qualquer largura), com legenda, dica por
    segmento (rato e teclado) e vista de tabela.
    ===================================================================== */
@@ -22,7 +25,7 @@ const kgEur = (v: number) => `${num(v, 2)} €/kg`;
 
 const SEG: Record<SegId, { name: string; color: string; who: string }> = {
   producer: { name: 'Preço ao produtor', color: 'var(--vc-producer)', who: 'O lagar recebe-o pelo azeite a granel.' },
-  packager: { name: 'Margem do embalador', color: 'var(--vc-packager)', who: 'Fica no intermediário que compra ao lagar e vende ao comprador.' },
+  packager: { name: 'Diferencial granel → comprador', color: 'var(--vc-packager)', who: 'Embalamento, logística e margens de intermediação entre o lagar e o comprador profissional. A margem líquida do embalador é só uma parte.' },
   premium: { name: 'Prémio ao produtor', color: 'var(--vc-premium)', who: `O lagar recebe ${kgEur(C.producerSprout)} em vez de ${kgEur(C.producerToday)}.` },
   cost: { name: 'Custos do ciclo', color: 'var(--vc-cost)', who: 'Análises, armazenagem, seguro, logística e cobertura de preço.' },
   spread: { name: 'Spread que financia o ciclo', color: 'var(--vc-spread)', who: `${Math.round(C.shares.investors * 100)} % co-financiadores · ${Math.round(C.shares.reserve * 100)} % reserva de primeira perda · ${Math.round(C.shares.ops * 100)} % operação.` },
@@ -68,21 +71,21 @@ const STEPS: { text: ReactNode }[] = [
   {
     text: (
       <>
-        Hoje o lagar recebe <Fig>{kgEur(C.producerToday)}</Fig> e o comprador paga a referência de mercado, <Fig>{kgEur(C.ref)}</Fig>. A diferença, <Fig>{kgEur(C.packager)}</Fig>, é a margem do embalador.
+        Hoje o lagar recebe <Fig>{kgEur(C.producerToday)}</Fig> e o comprador profissional paga a referência, <Fig>{kgEur(C.ref)}</Fig>. A diferença, <Fig>{kgEur(C.differential)}</Fig>, paga embalamento, logística e as margens dos intermediários. A margem líquida do embalador é só <Fig>{num(C.packagerMargin[0], 2)}–{num(C.packagerMargin[1], 2)} €/kg</Fig> dela.
       </>
     ),
   },
   {
     text: (
       <>
-        A Sprout faz o trabalho do embalador por <Fig>{kgEur(C.costs)}</Fig>: análises, armazenagem, seguro, logística e cobertura de preço.
+        A Sprout vende o azeite a granel, em IBC selados, sem o embalar: análises, armazenagem, seguro, logística e cobertura de preço custam <Fig>{kgEur(C.costs)}</Fig>.
       </>
     ),
   },
   {
     text: (
       <>
-        Os outros <Fig>{kgEur(C.redistributed)}</Fig>, {Math.round(C.capturedShare * 100)} % da margem do embalador, dividem-se: <Fig>{num(C.discount, 2)} €</Fig> ficam no comprador, <Fig>{num(C.premium, 2)} €</Fig> vão para o lagar e <Fig>{num(C.spread, 2)} €</Fig> são o spread que financia o ciclo.
+        Os outros <Fig>{kgEur(C.redistributed)}</Fig> do diferencial dividem-se: <Fig>{num(C.discount, 2)} €</Fig> ficam no comprador, <Fig>{num(C.premium, 2)} €</Fig> vão para o lagar e <Fig>{num(C.spread, 2)} €</Fig> são o spread que financia o ciclo.
       </>
     ),
   },
@@ -98,8 +101,8 @@ function ValueChainScene({ progress, rich }: { progress: MotionValue<number>; ri
     <Frame>
       <div className="grid min-w-0 items-center gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="min-w-0">
-          <ChapterHead title="A cadeia hoje" lead="Entre o lagar e quem compra azeite a granel está um embalador. Em cada quilo vendido a 4,48 €, fica com 1,28 €." />
-          <ol className="mt-8 flex flex-col gap-4" aria-label="Como se divide a margem">
+          <ChapterHead title="A cadeia hoje" lead={`Entre o lagar e o comprador profissional há embalamento, transporte e intermediários. Em cada quilo que o comprador paga a ${kgEur(C.ref)}, o lagar recebe ${kgEur(C.producerToday)}.`} />
+          <ol className="mt-8 flex flex-col gap-4" aria-label="Como se divide o diferencial">
             {STEPS.map((s, i) => {
               const active = rich && i === step;
               return (
@@ -113,6 +116,9 @@ function ValueChainScene({ progress, rich }: { progress: MotionValue<number>; ri
           <p className="mt-6 text-sm leading-relaxed text-muted">
             No lote {FOCUS_LOT_ID} inteiro, {num(C.lotKg)} kg: {eur(C.discount * C.lotKg)} ficam nos compradores, mais {eur(C.premium * C.lotKg)} vão para o lagar e {eur(C.spread * C.lotKg)} de spread financiam o ciclo. O spread é uma previsão: se a referência cair, encolhe ou desaparece, e o capital pode ter perda.
           </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            A tese original dos fundadores fala em captar {Math.round(FOUNDERS_THESIS.packagerMarginCaptured[0] * 100)}–{Math.round(FOUNDERS_THESIS.packagerMarginCaptured[1] * 100)} % da margem do embalador. Ainda está por validar: a margem líquida do embalador verificada ({num(C.packagerMargin[0], 2)}–{num(C.packagerMargin[1], 2)} €/kg) não paga sozinha um desconto de {Math.round(FOUNDERS_THESIS.buyerDiscount[0] * 100)}–{Math.round(FOUNDERS_THESIS.buyerDiscount[1] * 100)} %. O que este gráfico mostra depende de compradores que aceitem azeite a granel, em IBC; o piloto mede-o com cotações reais.
+          </p>
         </div>
         <ChainFigure progress={progress} />
       </div>
@@ -125,14 +131,15 @@ function ValueChainScene({ progress, rich }: { progress: MotionValue<number>; ri
 interface TableRow {
   id: string;
   label: string;
-  today?: number;
+  today?: number | string;
   sprout?: number;
   note: string;
 }
 
 const TABLE_ROWS: TableRow[] = [
   { id: 'producer', label: 'Preço ao produtor', today: C.producerToday, sprout: C.producerSprout, note: `Com a Sprout inclui o prémio de ${kgEur(C.premium)}.` },
-  { id: 'packager', label: 'Margem do embalador', today: C.packager, note: 'Deixa de existir na compra direta.' },
+  { id: 'packager', label: 'Diferencial granel → comprador', today: C.differential, note: 'Embalamento, logística e margens de intermediação. Com a Sprout abre-se nas quatro linhas abaixo.' },
+  { id: 'packager-margin', label: 'dos quais: margem líquida do embalador', today: `${num(C.packagerMargin[0], 2)}–${num(C.packagerMargin[1], 2)}`, note: `Valor verificado: ${OLIVE_CHAIN_FACTS.sourceShort}. O embalamento custa ${num(C.packing[0], 2)}–${num(C.packing[1], 2)} €/kg.` },
   { id: 'cost', label: 'Custos do ciclo', sprout: C.costs, note: SEG.cost.who },
   { id: 'spread', label: 'Spread que financia o ciclo', sprout: C.spread, note: SEG.spread.who },
   { id: 'discount', label: 'Desconto ao comprador', sprout: C.discount, note: `${Math.round(C.discountPct * 100)} % abaixo da referência.` },
@@ -141,7 +148,7 @@ const TABLE_ROWS: TableRow[] = [
 
 const TABLE_COLUMNS: Column<TableRow>[] = [
   { key: 'label', header: 'Componente', render: (r) => r.label, minWidth: 180 },
-  { key: 'today', header: 'Hoje (€/kg)', render: (r) => (r.today === undefined ? '—' : num(r.today, 2)), align: 'right', mono: true },
+  { key: 'today', header: 'Hoje (€/kg)', render: (r) => (r.today === undefined ? '—' : typeof r.today === 'string' ? r.today : num(r.today, 2)), align: 'right', mono: true },
   { key: 'sprout', header: 'Com a Sprout (€/kg)', render: (r) => (r.sprout === undefined ? '—' : num(r.sprout, 2)), align: 'right', mono: true },
   { key: 'note', header: 'Para quem', render: (r) => r.note, minWidth: 260 },
 ];
@@ -177,7 +184,9 @@ function ChainFigure({ progress }: { progress: MotionValue<number> }) {
           <DataTable columns={TABLE_COLUMNS} rows={TABLE_ROWS} getRowId={(r) => r.id} caption="Um quilo de azeite virgem extra a granel, hoje e com a Sprout (€/kg, ilustrativo)" framed={false} />
         </div>
       )}
-      <p className="mt-4 text-sm text-muted">O preço de {kgEur(C.producerToday)} que o embalador paga hoje ao lagar é uma hipótese de trabalho. Referência de {kgEur(C.ref)} e desconto de {Math.round(C.discountPct * 100)} % do lote {FOCUS_LOT_ID}. Índice ilustrativo, dados fictícios.</p>
+      <p className="mt-4 text-sm text-muted">
+        O preço de {kgEur(C.producerToday)} que o lagar recebe hoje é uma hipótese de trabalho. Referência de {kgEur(C.ref)} e desconto de {Math.round(C.discountPct * 100)} % do lote {FOCUS_LOT_ID}: índice ilustrativo, dados fictícios. Margem líquida do embalador e custo de embalamento: {OLIVE_CHAIN_FACTS.sourceShort}.
+      </p>
     </figure>
   );
 }
@@ -203,6 +212,12 @@ function Legend() {
           {SEG[id].name}
         </li>
       ))}
+      <li className="inline-flex items-center gap-2">
+        <span aria-hidden className="inline-flex h-3 w-4 items-center rounded-[2px] p-[2px]" style={{ background: SEG.packager.color }}>
+          <span className="block h-full w-full rounded-[1px] border border-dashed border-[var(--surface)]" />
+        </span>
+        dentro: margem líquida do embalador, {num(C.packagerMargin[0], 2)}–{num(C.packagerMargin[1], 2)} €/kg
+      </li>
     </ul>
   );
 }
@@ -279,10 +294,10 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
 
         <RowLabel title="Ampliação" sub={`${num(C.producerToday, 2)}–${num(C.ref, 2)} €/kg`} />
         <div className="min-w-0">
-          <Track tip={tip?.row === 'z' ? tip.seg : null} total={C.packager}>
+          <Track tip={tip?.row === 'z' ? tip.seg : null} total={C.differential}>
             <div className="absolute inset-0 rounded-r-[4px]" style={{ background: SEG.packager.color }} />
             <motion.span aria-hidden className="pointer-events-none absolute inset-0 flex items-center px-3 text-[13px] font-medium text-surface" style={{ opacity: oneBlockLabel }}>
-              <span className="truncate">Margem do embalador · {kgEur(C.packager)}</span>
+              <span className="truncate">Diferencial granel → comprador · {kgEur(C.differential)}</span>
             </motion.span>
             {ZOOM.map((s, i) => (
               <ZoomSegment key={s.id} seg={s} index={i} split={split} bind={bind('z', s)} />
@@ -295,7 +310,7 @@ function ChainChart({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
-/** Linha "Hoje": o preço ao produtor esbate-se e a margem do embalador ganha um contorno. */
+/** Linha "Hoje": o preço ao produtor esbate-se e o diferencial ganha um contorno; dentro dele, a margem líquida do embalador verificada. */
 function TodaySegments({ progress, bind }: { progress: MotionValue<number>; bind: (row: 'a', seg: Seg) => Record<string, unknown> }) {
   const dimProducer = useRange(progress, [0.04, 0.22], [1, 0.5]);
   const ring = useRange(progress, [0.04, 0.22], [0, 1]);
@@ -312,7 +327,25 @@ function TodaySegments({ progress, bind }: { progress: MotionValue<number>; bind
       <span aria-hidden className="pointer-events-none absolute -inset-y-[5px] right-[-5px]" style={{ left: `calc(${pct(C.producerToday, C.ref)} - 3px)` }}>
         <motion.span className="absolute inset-0 rounded-[6px] border-2 border-fg" style={{ opacity: ring }} />
       </span>
+      <PackagerMarginMark />
     </>
+  );
+}
+
+/** Sub-bloco dentro do diferencial: a margem líquida do embalador verificada (mínimo a cheio, intervalo a tracejado). */
+function PackagerMarginMark() {
+  const start = C.producerToday + (C.packing[0] + C.packing[1]) / 2;
+  const [lo, hi] = C.packagerMargin;
+  return (
+    <span
+      role="img"
+      aria-label={`Dentro do diferencial: margem líquida do embalador, ${num(lo, 2)} a ${num(hi, 2)} €/kg (valor verificado), depois de ${num(C.packing[0], 2)}–${num(C.packing[1], 2)} €/kg de embalamento.`}
+      className="pointer-events-none absolute inset-y-[4px]"
+      style={{ left: pct(start, C.ref), width: pct(hi, C.ref) }}
+    >
+      <span className="absolute inset-y-0 left-0 rounded-[2px] border-2 border-[var(--surface)]" style={{ width: `${(lo / hi) * 100}%` }} />
+      <span className="absolute inset-y-0 right-0 rounded-[2px] border-2 border-dashed border-[var(--surface)]" style={{ left: `calc(${(lo / hi) * 100}% - 2px)` }} />
+    </span>
   );
 }
 
@@ -370,7 +403,7 @@ function ZoomSegment({ seg, index, split, bind }: { seg: Seg; index: number; spl
   const on = useRange(split, [start, start + 0.46], [0, 1]);
   const last = seg.id === 'discount';
   return (
-    <div className={cn('absolute inset-y-0 outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.packager), width: pct(value(seg), C.packager) }} {...bind}>
+    <div className={cn('absolute inset-y-0 outline-offset-2', last && 'rounded-r-[4px]')} style={{ left: pct(seg.from, C.differential), width: pct(value(seg), C.differential) }} {...bind}>
       <motion.div className={cn('absolute inset-0 overflow-hidden', last && 'rounded-r-[4px]')} style={{ opacity: on }}>
         {last ? <Hatch /> : <div className="h-full w-full" style={{ background: SEG[seg.id].color }} />}
         {index > 0 && <Gap />}
@@ -387,7 +420,7 @@ function Gap() {
 /** Chave da ampliação: valor e nome de cada parte, pela ordem da barra. */
 function ZoomLabels({ split }: { split: MotionValue<number> }) {
   return (
-    <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4" aria-label="Partes da margem do embalador">
+    <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4" aria-label="Partes do diferencial granel → comprador">
       {ZOOM.map((s, i) => (
         <ZoomKey key={s.id} seg={s} index={i} split={split} />
       ))}

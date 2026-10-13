@@ -1,6 +1,6 @@
-import { getMiniGame, getProducer, getRegion, getWorld, isInvestable } from '../../data';
+import { getMiniGame, getProducer, getRegion, getWorld, isInvestable, OLIVE_CHAIN_FACTS, PRODUCER_PRICE_TODAY } from '../../data';
 import type { Lot, MiniGameId, Tone, WorldId } from '../../data/types';
-import { price } from '../../lib/format';
+import { num, price } from '../../lib/format';
 
 /* =====================================================================
    Modelo local dos Mercados: cadeia de valor ilustrativa, rótulos de
@@ -85,9 +85,9 @@ export interface ChainModel {
   /** quem vende ao comprador na cadeia habitual */
   middleman: string;
   nodes: [producer: string, middleman: string, buyer: string];
-  /** preço habitual pago ao produtor (ilustrativo), na unidade de preço do mundo */
+  /** preço habitual pago ao produtor (hipótese de trabalho partilhada: PRODUCER_PRICE_TODAY) */
   traditionalProducer: number;
-  /** porque é que a parte capturada difere da tese de 80–90 % */
+  /** o que o diferencial paga neste mercado e o que a Sprout muda */
   note: string;
 }
 
@@ -96,21 +96,21 @@ export const CHAIN: Record<WorldId, ChainModel> = {
     lotId: 'AZ-2026-021',
     middleman: 'embalador',
     nodes: ['Lagar', 'Embalador', 'Distribuição, HoReCa, retalho'],
-    traditionalProducer: 3.08,
-    note: 'O lagar vende a granel a um embalador, que embala e revende à distribuição. A Sprout compra o lote em IBC e vende-o diretamente.',
+    traditionalProducer: PRODUCER_PRICE_TODAY.azeite,
+    note: `O lagar vende a granel a um embalador, que embala e revende à distribuição. O diferencial paga o embalamento (${OLIVE_CHAIN_FACTS.packingCost.map((v) => num(v, 2)).join('–')} €/kg), a logística e as margens de cada intermediário; a margem líquida do embalador é só ${OLIVE_CHAIN_FACTS.packagerNetMargin.map((v) => num(v, 2)).join('–')} €/kg (${OLIVE_CHAIN_FACTS.sourceShort}). A Sprout compra o lote a granel e vende-o em IBC, sem embalar.`,
   },
   agua: {
     lotId: 'AG-2026-007',
     middleman: 'grossista',
     nodes: ['Nascente', 'Grossista', 'Distribuição, HoReCa'],
-    traditionalProducer: 0.175,
-    note: 'Na água não há embalador: a lei obriga a engarrafar na origem. A margem que muda de mãos é a do grossista, e a logística pesa mais por litro.',
+    traditionalProducer: PRODUCER_PRICE_TODAY.agua,
+    note: 'Na água não há embalador: a lei obriga a engarrafar na origem. O diferencial paga transporte, armazém e a margem do grossista, e a logística pesa mais por litro.',
   },
   cafe: {
     lotId: 'CF-2027-001',
     middleman: 'exportador e importador',
     nodes: ['Fazenda', 'Exportador e importador', 'Torrefação'],
-    traditionalProducer: 5.45,
+    traditionalProducer: PRODUCER_PRICE_TODAY.cafe,
     note: 'No café verde, a margem fica entre o exportador na origem e o importador na Europa. Na Fase 2 a Sprout compra à fazenda e vende à torrefação.',
   },
 };
@@ -132,13 +132,13 @@ export interface ChainNumbers {
   buyer: number;
   acquisition: number;
   traditionalProducer: number;
-  /** margem do intermediário na cadeia habitual (ref − produtor habitual) */
+  /** diferencial produtor → comprador na cadeia habitual (ref − produtor habitual): embalamento, logística e margens */
   pool: number;
   premium: number;
   costs: number;
   spread: number;
   discount: number;
-  /** parte da margem do intermediário que muda de mãos (sem os custos do lote) */
+  /** parte do diferencial que passa para comprador, produtor e lote (sem os custos do lote) */
   captured: number;
   split: { investors: number; reserve: number; sprout: number };
   segments: ChainSegment[];
@@ -182,7 +182,7 @@ export function chainFor(world: WorldId, lot: Lot): ChainNumbers {
   };
 }
 
-/** Uma frase: como se captura a margem neste mercado, com €/kg ilustrativos. */
+/** Uma frase: de onde vem a margem do lote neste mercado, com €/kg ilustrativos. */
 export function marginSentence(world: WorldId, c: ChainNumbers): string {
   const p = (v: number) => unitPrice(world, v);
   if (world === 'azeite')

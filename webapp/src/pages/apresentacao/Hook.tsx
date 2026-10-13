@@ -15,13 +15,13 @@ import { Frame } from './parts';
    ===================================================================== */
 
 const LABELS = [
-  { title: 'Compra direta ao lagar', detail: '80–90 % da margem do embalador passa a financiar o ciclo.' },
+  { title: 'Compra direta ao lagar', detail: 'Azeite a granel, sem embalador pelo meio: o lagar recebe mais cedo.' },
   { title: 'IBC de 1 000 kg, selados', detail: 'Cada lote tem número, análise e uma janela de 18 meses.' },
   { title: 'Comprador B2B', detail: 'Paga 10–15 % abaixo da referência de mercado.' },
 ].map((l) => ({ title: tidyText(l.title), detail: tidyText(l.detail) }));
 
 const SUBHEAD = tidyText(
-  'A Sprout compra azeite e água diretamente a lagares e nascentes, retém 80–90 % da margem que hoje fica no embalador e vende a distribuição, HoReCa e retalho 10–15 % abaixo do mercado. Investidores qualificados financiam lotes concretos, em janelas de 18 meses, e seguem cada quilo do depósito à liquidação.',
+  'A Sprout compra azeite e água diretamente a lagares e nascentes, sem intermediários pelo meio, e vende a distribuição, HoReCa e retalho 10–15 % abaixo da referência de mercado. Investidores qualificados financiam lotes concretos, em janelas de 18 meses, e seguem cada quilo do depósito à liquidação.',
 );
 
 const ILLUSTRATION = 'Ilustração: olival em filas num monte, o lagar com quatro depósitos de inox, IBC de 1 000 kg numa palete e um camião a sair para o comprador.';

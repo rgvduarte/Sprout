@@ -114,7 +114,7 @@ function OpenMissions({ world, open, upcoming }: { world: WorldId; open: Lot[]; 
 function Margin({ world, sentence }: { world: WorldId; sentence: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-sm text-muted">Como se captura a margem</p>
+      <p className="text-sm text-muted">De onde vem a margem do lote</p>
       <p className="mt-0.5 text-[0.9375rem] text-fg">{sentence}</p>
       <TextLink to={{ pathname: `/mercados/${world}`, hash: '#cadeia' }} className="mt-1 inline-block text-sm">
         Ver a cadeia completa

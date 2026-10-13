@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import type { WorldId } from '../../data/types';
+import { CHAIN_DIFFERENTIAL, FOUNDERS_THESIS, OLIVE_CHAIN_FACTS } from '../../data';
 import { RiskNote, SegmentedControl } from '../../components/ui';
 import { cn } from '../../lib/cn';
 import { pct } from '../../lib/format';
@@ -10,9 +11,10 @@ import { priceNumber, unitPrice, type ChainNumbers, type ChainSegment } from './
 
 /* =====================================================================
    "A cadeia neste mercado": o preço que o comprador B2B paga hoje,
-   decomposto. Na cadeia habitual a margem do intermediário é um bloco;
-   com a Sprout abre-se em prémio ao produtor, custos, spread do lote e
-   desconto ao comprador. É o momento focal do ecrã do mundo.
+   decomposto. Na cadeia habitual o diferencial produtor → comprador
+   (embalamento, logística e margens de intermediação) é um bloco; com a
+   Sprout abre-se em prémio ao produtor, custos, spread do lote e desconto
+   ao comprador. É o momento focal do ecrã do mundo.
    ===================================================================== */
 
 type Mode = 'habitual' | 'sprout';
@@ -150,7 +152,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
           <line x1="99.8" y1="0" x2="99.8" y2="28" stroke="var(--border)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
         </svg>
 
-        {/* a margem do intermediário, ampliada */}
+        {/* o diferencial produtor → comprador, ampliado */}
         <div className="relative h-14">
           {zoom.map((s, i) => {
             const left = pos(s.from);
@@ -202,7 +204,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
             className={cn('pointer-events-none absolute inset-0 flex items-center justify-center rounded-xs px-3 text-center text-sm font-medium motion-safe:transition-opacity motion-safe:duration-300', sprout ? 'opacity-0' : 'opacity-100')}
             style={{ color: FILL.custos.ink, background: 'var(--muted)', transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
           >
-            Margem do {model.middleman}: {unitPrice(world, pool)}
+            {CHAIN_DIFFERENTIAL[world].label}: {unitPrice(world, pool)}
           </div>
         </div>
         {/* eixo ampliado: os limites de cada parte, em preço acumulado */}
@@ -237,7 +239,7 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
             <div className="min-w-0">
               <dt className="text-sm text-muted">{s.label}</dt>
               <dd className="font-mono text-[0.9375rem] text-fg tnum">
-                {unitPrice(world, s.value)} <span className="whitespace-nowrap font-sans text-sm text-muted">· {pct(s.value / pool, 0)} da margem</span>
+                {unitPrice(world, s.value)} <span className="whitespace-nowrap font-sans text-sm text-muted">· {pct(s.value / pool, 0)} do diferencial</span>
               </dd>
               <dd className="text-sm text-muted">{s.description}</dd>
             </div>
@@ -247,8 +249,16 @@ export function ValueChain({ world, chain }: { world: WorldId; chain: ChainNumbe
 
       <div className="mt-5 border-t border-border pt-4">
         <p className="measure text-[0.9375rem] text-fg">
-          <strong className="font-semibold">{pct(chain.captured, 0)} da margem do {model.middleman} muda de mãos</strong>: {unitPrice(world, chain.discount)} ficam com o comprador, {unitPrice(world, chain.premium)} com o produtor e {unitPrice(world, chain.spread)} com o lote. Os outros {unitPrice(world, chain.costs)} pagam o trabalho que o {model.middleman} fazia.
+          <strong className="font-semibold">
+            {pct(chain.captured, 0)} do {CHAIN_DIFFERENTIAL[world].label.charAt(0).toLowerCase() + CHAIN_DIFFERENTIAL[world].label.slice(1)} muda de mãos
+          </strong>
+          : {unitPrice(world, chain.discount)} ficam com o comprador, {unitPrice(world, chain.premium)} com o produtor e {unitPrice(world, chain.spread)} com o lote. Os outros {unitPrice(world, chain.costs)} pagam os custos do lote. O diferencial inclui {CHAIN_DIFFERENTIAL[world].contains}; não é a margem de um só intermediário.
         </p>
+        {world === 'azeite' && (
+          <p className="measure mt-2 text-sm text-muted">
+            A tese original dos fundadores fala em captar {pct(FOUNDERS_THESIS.packagerMarginCaptured[0], 0).replace(' %', '')}–{pct(FOUNDERS_THESIS.packagerMarginCaptured[1], 0)} da margem do embalador. Está por validar: a margem líquida do embalador verificada é de {unitPrice(world, OLIVE_CHAIN_FACTS.packagerNetMargin[0])} a {unitPrice(world, OLIVE_CHAIN_FACTS.packagerNetMargin[1])} ({pct(OLIVE_CHAIN_FACTS.packagerNetMarginOfRetail[0], 1)} a {pct(OLIVE_CHAIN_FACTS.packagerNetMarginOfRetail[1], 1)} do preço de venda ao público) e, sozinha, não paga um desconto de {pct(FOUNDERS_THESIS.buyerDiscount[0], 0).replace(' %', '')}–{pct(FOUNDERS_THESIS.buyerDiscount[1], 0)} ao comprador. O piloto mede-o com cotações reais.
+          </p>
+        )}
         <p className="measure mt-2 text-sm text-muted">
           {model.note} O spread do lote divide-se em {pct(lot.economics.investorShare, 0)} para os co-financiadores ({unitPrice(world, chain.split.investors)}), {pct(lot.economics.reserveShare, 0)} para a reserva de primeira perda ({unitPrice(world, chain.split.reserve)}) e {pct(1 - lot.economics.investorShare - lot.economics.reserveShare, 0)} para a Sprout ({unitPrice(world, chain.split.sprout)}).
         </p>
